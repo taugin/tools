@@ -89,6 +89,7 @@ function main() {
 		echo -e "\033[31mPacking : $index\033[0m"
 		if [ ! -f "$SIGNFOLDER/$file" ];then
 			echo "$SIGNFOLDER/$file is not existed"
+			index=$(($index+1))
 			continue
 		fi
 
@@ -101,6 +102,7 @@ function main() {
 		echo "findedFile = $findedFile"
 		if [[ -z "$findedFile" || ! -f "$SRCFOLDER/$findedFile" ]];then
 			echo "Can not find the src file"
+			index=$(($index+1))
 			continue
 		fi
 		srcfile="$SRCFOLDER/$findedFile"
