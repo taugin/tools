@@ -6,14 +6,14 @@ SIGNFOLDER=sign
 DSTFOLDER=dst
 DSTSIGNEDFOLDER=dst_signed
 REPLACE_FILE="CopyrightDeclaration.xml mmiap.xml assets/AndGame.Sdk.Lib_.dat assets/c_data_store.dat assets/Charge.xml assets/ConsumeCodeInfo.xml assets/d_data_store.dat assets/iridver.dat assets/ItemMapper.xml assets/libmegbpp_02.02.01_01.so assets/plugins.xml assets/feeInfo.dat lib/armeabi/libmegjb.so lib/armeabi-v7a/libmegjb.so"
-#echo $REPLACE_FILE
+
 ZIP=$(which zip)
-#echo $ZIP
+
 UNZIP=$(which unzip)
-#echo $UNZIP
+
 JARSIGNER=$(which jarsigner)
 echo "JARSIGNER = $JARSIGNER"
-JDK7ARG="-tsa https://timestamp.geotrust.com/tsa -digestalg SHA1 -sigalg MD5withRSA"
+#JDK7ARG="-tsa https://timestamp.geotrust.com/tsa -digestalg SHA1 -sigalg MD5withRSA"
 
 if [[ -z "$ZIP" || -z "$UNZIP" || -z "$JARSIGNER" ]];then
 	echo "Can not find zip/unzip/jarsigner"
@@ -22,21 +22,26 @@ fi
 SIGNAPKPATH=$(dirname $(which packzip.sh))
 echo "SIGNAPKPATH = $SIGNAPKPATH"
 
-function repack() {
+function showmsg_fun() {
+	echo -e "\033[31m$1\033[0m" $2 $3 $4
+}
+
+function repack_fun() {
+	showmsg_fun "[Packing...]" "$1 -> $2"
 	$UNZIP -q $1 $REPLACE_FILE
 	$ZIP  -q $2 -m $REPLACE_FILE
 	rm -rf $REPLACE_FILE assets lib
 }
 
-function signapk() {
-	echo "$1 -> $2"
+function signapk_fun() {
+	showmsg_fun "[Signing...]" "$1 -> $2\n"
 	# delete META-INF
 	$ZIP -q -d "$1" META-INF/\*
 	#java -jar $SIGNAPKPATH/signapk.jar $SIGNAPKPATH/testkey.x509.pem $SIGNAPKPATH/testkey.pk8 "$1" "$2"
 	$JARSIGNER $JDK7ARG -keystore $SIGNAPKPATH/fishingjoy3.keystore -storepass fj3.ck.2014 -keypass fj3.ck.2014 -signedjar "$2" "$1" fishingjoy3
 }
 
-function repackfromfile() {
+function repackfromfile_fun() {
 	index=1
 	cat test.txt | while read line
 	do
@@ -51,7 +56,7 @@ function repackfromfile() {
 	done
 }
 
-function findFile() {
+function findFile_fun() {
 	for file in $(ls $SRCFOLDER)
 	do
 		#echo $file
@@ -62,11 +67,11 @@ function findFile() {
 		fi
 	done
 }
-function removesignfromfile() {
+function removesignfromfile_fun() {
 	for file in $(ls $SIGNFOLDER)
 	do
 		renamedFile=$(echo $file | sed s/-signed.apk/.apk/g)
-		echo "renamedFile = $renamedFile"
+		#echo "renamedFile = $renamedFile"
 		srcfile=$SIGNFOLDER/$file
 		dstfile=$SIGNFOLDER/$renamedFile
 		if [ "$srcfile" != "$dstfile" ];then
@@ -83,13 +88,12 @@ function main() {
 	fi
 	mkdir -p $DSTFOLDER
 	mkdir -p $DSTSIGNEDFOLDER
-	removesignfromfile
-	echo -e "\033[31mCopy to dst folder ......\033[0m"
+	removesignfromfile_fun
 	for file in $(ls $SIGNFOLDER)
 	do
 		echo -e "\033[31mPacking : $index\033[0m"
 		if [ ! -f "$SIGNFOLDER/$file" ];then
-			echo "$SIGNFOLDER/$file is not existed"
+			showmsg_fun "[Warning...]" "$SIGNFOLDER/$file is not existed\n"
 			index=$(($index+1))
 			continue
 		fi
@@ -99,21 +103,21 @@ function main() {
 		#echo $number
 
 		#Find the matched apk
-		findedFile=$(findFile $number)
-		echo "findedFile = $findedFile"
+		findedFile=$(findFile_fun $number)
+		#echo "findedFile = $findedFile"
 		if [[ -z "$findedFile" || ! -f "$SRCFOLDER/$findedFile" ]];then
-			echo "Can not find the src file"
+			showmsg_fun "[Warning...]" "Can not find the src file\n"
 			index=$(($index+1))
 			continue
 		fi
 		srcfile="$SRCFOLDER/$findedFile"
 		dstfile="$DSTFOLDER/$file"
-		echo "$srcfile -> $dstfile"		
+		showmsg_fun "[Copying...]" "$srcfile -> $dstfile"
 		cp -f $srcfile $dstfile
 
 		# Start repacking
 		repackfile="$SIGNFOLDER/$file"
-		repack $repackfile $dstfile
+		repack_fun $repackfile $dstfile
 		#echo "$file ====> $tmpfile"
 
 		# Find the name without extension name
@@ -121,8 +125,8 @@ function main() {
 		#echo "basename = $basename"
 
 		# Start sign apk
-		signedapk=$DSTSIGNEDFOLDER/$basename-signed.apk
-		signapk $dstfile $signedapk
+		signedapk="$DSTSIGNEDFOLDER/$basename-signed.apk"
+		signapk_fun $dstfile $signedapk
 		index=$(($index+1))
 	done
 }
