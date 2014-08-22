@@ -19,8 +19,8 @@ if [[ -z "$ZIP" || -z "$UNZIP" || -z "$JARSIGNER" ]];then
 	echo "Can not find zip/unzip/jarsigner"
 	exit
 fi
-SIGNAPKPATH=$(dirname $(which packzip.sh))
-echo "SIGNAPKPATH = $SIGNAPKPATH"
+SIGN_TOOL=$(dirname $(which packzip.sh))
+echo "SIGN_TOOL = $SIGN_TOOL"
 
 function showmsg_fun() {
 	echo -e "\033[31m$1\033[0m" $2 $3 $4
@@ -37,8 +37,8 @@ function signapk_fun() {
 	showmsg_fun "[Signing...]" "$1 -> $2\n"
 	# delete META-INF
 	$ZIP -q -d "$1" META-INF/\*
-	#java -jar $SIGNAPKPATH/signapk.jar $SIGNAPKPATH/testkey.x509.pem $SIGNAPKPATH/testkey.pk8 "$1" "$2"
-	$JARSIGNER $JDK7ARG -keystore $SIGNAPKPATH/fishingjoy3.keystore -storepass fj3.ck.2014 -keypass fj3.ck.2014 -signedjar "$2" "$1" fishingjoy3
+	#java -jar $SIGN_TOOL/signapk.jar $SIGN_TOOL/testkey.x509.pem $SIGN_TOOL/testkey.pk8 "$1" "$2"
+	$JARSIGNER $JDK7ARG -keystore $SIGN_TOOL/fishingjoy3.keystore -storepass fj3.ck.2014 -keypass fj3.ck.2014 -signedjar "$2" "$1" fishingjoy3
 }
 
 function repackfromfile_fun() {
