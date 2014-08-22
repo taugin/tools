@@ -13,6 +13,7 @@ UNZIP=$(which unzip)
 #echo $UNZIP
 JARSIGNER=$(which jarsigner)
 echo "JARSIGNER = $JARSIGNER"
+JDK7ARG="-tsa https://timestamp.geotrust.com/tsa -digestalg SHA1 -sigalg MD5withRSA"
 
 if [[ -z "$ZIP" || -z "$UNZIP" || -z "$JARSIGNER" ]];then
 	echo "Can not find zip/unzip/jarsigner"
@@ -32,7 +33,7 @@ function signapk() {
 	# delete META-INF
 	$ZIP -q -d "$1" META-INF/\*
 	#java -jar $SIGNAPKPATH/signapk.jar $SIGNAPKPATH/testkey.x509.pem $SIGNAPKPATH/testkey.pk8 "$1" "$2"
-	$JARSIGNER -keystore $SIGNAPKPATH/fishingjoy3.keystore -storepass fj3.ck.2014 -keypass fj3.ck.2014 -signedjar "$2" "$1" fishingjoy3
+	$JARSIGNER $JDK7ARG -keystore $SIGNAPKPATH/fishingjoy3.keystore -storepass fj3.ck.2014 -keypass fj3.ck.2014 -signedjar "$2" "$1" fishingjoy3
 }
 
 function repackfromfile() {
@@ -89,7 +90,6 @@ function main() {
 		echo -e "\033[31mPacking : $index\033[0m"
 		if [ ! -f "$SIGNFOLDER/$file" ];then
 			echo "$SIGNFOLDER/$file is not existed"
-			index=$(($index+1))
 			continue
 		fi
 
@@ -102,7 +102,6 @@ function main() {
 		echo "findedFile = $findedFile"
 		if [[ -z "$findedFile" || ! -f "$SRCFOLDER/$findedFile" ]];then
 			echo "Can not find the src file"
-			index=$(($index+1))
 			continue
 		fi
 		srcfile="$SRCFOLDER/$findedFile"
