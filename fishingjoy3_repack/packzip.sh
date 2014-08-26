@@ -5,6 +5,9 @@ SRCFOLDER=src
 SIGNFOLDER=sign
 DSTFOLDER=dst
 DSTSIGNEDFOLDER=dst_signed
+TESTSIGN="false"
+SIGNAPKONLY="false"
+SIGNAPK=""
 REPLACE_FILE="CopyrightDeclaration.xml mmiap.xml assets/AndGame.Sdk.Lib_.dat assets/c_data_store.dat assets/Charge.xml assets/ConsumeCodeInfo.xml assets/d_data_store.dat assets/iridver.dat assets/ItemMapper.xml assets/libmegbpp_02.02.01_01.so assets/plugins.xml assets/feeInfo.dat lib/armeabi/libmegjb.so lib/armeabi-v7a/libmegjb.so"
 
 ZIP=$(which zip)
@@ -34,11 +37,21 @@ function repack_fun() {
 }
 
 function signapk_fun() {
-    showmsg_fun "[Signing...]" "$1 -> $2\n"
-    # delete META-INF
-    $ZIP -q -d "$1" META-INF/\*
-    #java -jar $SIGN_TOOL/signapk.jar $SIGN_TOOL/testkey.x509.pem $SIGN_TOOL/testkey.pk8 "$1" "$2"
-    $JARSIGNER $JDK7ARG -keystore $SIGN_TOOL/fishingjoy3.keystore -storepass fj3.ck.2014 -keypass fj3.ck.2014 -signedjar "$2" "$1" fishingjoy3
+    #showmsg_fun "[Logging...]" "TESTSIGN = $TESTSIGN"
+    showmsg_fun "[Signing...]" "$1 -> $2"
+    if [ "$SIGNAPKONLY" == "false" ];then
+        # delete META-INF
+        $ZIP -d "$1" META-INF/\*
+    fi
+
+    if [ "$TESTSIGN" == "true" ];then
+        showmsg_fun "[Logging...]" "Sign the apk using test key"
+        java -jar $SIGN_TOOL/signapk.jar $SIGN_TOOL/testkey.x509.pem $SIGN_TOOL/testkey.pk8 "$1" "$2"
+    else
+        showmsg_fun "[Logging...]" "Sign the apk using fishingjoy3.keystore"
+        $JARSIGNER $JDK7ARG -keystore $SIGN_TOOL/fishingjoy3.keystore -storepass fj3.ck.2014 -keypass fj3.ck.2014 -signedjar "$2" "$1" fishingjoy3
+    fi
+    echo ""
 }
 
 function repackfromfile_fun() {
@@ -83,7 +96,7 @@ function removesignfromfile_fun() {
 
 function onlysign() {
     if [ ! -f "$1" ];then
-        showmsg_fun "[Error...]" "$1 is not a file"
+        showmsg_fun "[Error...]" "$1 is not found"
         exit
     fi
     #renamedFile=$(echo "$1" | sed s/-signed.apk/.apk/g)
@@ -147,11 +160,7 @@ function batchSign() {
 }
 
 function main() {
-    if [ "$#" -eq 0 ];then
-        batchSign;
-        exit;
-    fi
-    TEMP=$(getopt -o o: --long onlysign: -- "$@" 2>/dev/null)
+    TEMP=$(getopt -o o:t --long onlysign:test -- "$@" 2>/dev/null)
 
     [ $? != 0 ] && echo -e "\033[31mERROR: unknown argument! \033[0m\n" && exit 1
 
@@ -163,8 +172,13 @@ function main() {
 
         case "$1" in
             -o|--onlysign)
-                onlysign $2
+                SIGNAPK="$2"
+                SIGNAPKONLY="true"
                 shift 2
+                ;;
+            -t|--test)
+                TESTSIGN="true"
+                shift
                 ;;
             --)
                 shift;
@@ -175,6 +189,12 @@ function main() {
 
         esac
     done
+
+    if [ "$SIGNAPKONLY" == "true" ];then
+        onlysign "$SIGNAPK"
+    else
+        batchSign
+    fi
 
 }
 main $*
