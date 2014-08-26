@@ -184,7 +184,9 @@ function main() {
                 shift;
                 ;;
              *)
-                echo -e "\033[31mERROR: unknown argument! \033[0m\n" && exit 1
+                #echo -e "\033[31mERROR: unknown argument! \033[0m\n" && exit 1
+                #echo "$*"
+                break;
                 ;;
 
         esac
