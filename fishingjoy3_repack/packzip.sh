@@ -8,6 +8,7 @@ DSTSIGNEDFOLDER=dst_signed
 TESTSIGN="false"
 SIGNAPKONLY="false"
 SIGNAPK=""
+VERSION_DATE=$(date +%Y_%m_%d_%H_%M_%S)
 REPLACE_FILE="CopyrightDeclaration.xml mmiap.xml assets/AndGame.Sdk.Lib_.dat assets/c_data_store.dat assets/Charge.xml assets/ConsumeCodeInfo.xml assets/d_data_store.dat assets/iridver.dat assets/ItemMapper.xml assets/libmegbpp_02.02.01_01.so assets/plugins.xml assets/feeInfo.dat lib/armeabi/libmegjb.so lib/armeabi-v7a/libmegjb.so"
 
 ZIP=$(which zip)
@@ -116,7 +117,7 @@ function batchSign() {
     fi
     mkdir -p $DSTFOLDER
     mkdir -p $DSTSIGNEDFOLDER
-    removesignfromfile_fun
+    #removesignfromfile_fun
     for file in $(ls $SIGNFOLDER)
     do
         echo -e "\033[31mPacking : $index\033[0m"
@@ -149,11 +150,11 @@ function batchSign() {
         #echo "$file ====> $tmpfile"
 
         # Find the name without extension name
-        basename=$(echo $file | sed s/.apk//g)
+        basename=$(echo $file | sed 's/-[^-]*$//g')
         #echo "basename = $basename"
 
         # Start sign apk
-        signedapk="$DSTSIGNEDFOLDER/$basename-signed.apk"
+        signedapk="$DSTSIGNEDFOLDER/$basename-$VERSION_DATE.apk"
         signapk_fun $dstfile $signedapk
         index=$(($index+1))
     done
