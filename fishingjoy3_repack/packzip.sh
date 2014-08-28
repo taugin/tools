@@ -23,7 +23,12 @@ if [[ -z "$ZIP" || -z "$UNZIP" || -z "$JARSIGNER" ]];then
     echo "Can not find zip/unzip/jarsigner"
     exit
 fi
-SIGN_TOOL=$(dirname $(which packzip.sh))
+PACKZIP_PATH=$(which packzip.sh)
+if [ -z "$PACKZIP_PATH" ];then
+    SIGN_TOOL=.
+else
+    SIGN_TOOL=$(dirname $PACKZIP_PATH)
+fi
 echo "SIGN_TOOL = $SIGN_TOOL"
 
 function showmsg_fun() {
@@ -161,7 +166,7 @@ function batchSign() {
 }
 
 function main() {
-    TEMP=$(getopt -o o:t --long onlysign:test -- "$@" 2>/dev/null)
+    TEMP=$(getopt -o o:t --long onlysign: -- "$@" 2>/dev/null)
 
     [ $? != 0 ] && echo -e "\033[31mERROR: unknown argument! \033[0m\n" && exit 1
 
@@ -177,7 +182,7 @@ function main() {
                 SIGNAPKONLY="true"
                 shift 2
                 ;;
-            -t|--test)
+            -t)
                 TESTSIGN="true"
                 shift
                 ;;
