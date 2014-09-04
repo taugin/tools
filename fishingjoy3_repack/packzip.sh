@@ -9,7 +9,7 @@ TESTSIGN="false"
 SIGNAPKONLY="false"
 SIGNAPK=""
 VERSION_DATE=$(date +%Y_%m_%d_%H_%M)
-REPLACE_FILE="CopyrightDeclaration.xml mmiap.xml assets/AndGame.Sdk.Lib_.dat assets/c_data_store.dat assets/Charge.xml assets/ConsumeCodeInfo.xml assets/d_data_store.dat assets/iridver.dat assets/ItemMapper.xml assets/libmegbpp_02.02.01_01.so assets/plugins.xml assets/feeInfo.dat lib/armeabi/libmegjb.so lib/armeabi-v7a/libmegjb.so"
+REPLACE_FILE="CopyrightDeclaration.xml mmiap.xml assets/AndGame.Sdk.Lib_.dat assets/c_data_store.dat assets/Charge.xml assets/ConsumeCodeInfo.xml assets/d_data_store.dat assets/iridver.dat assets/ItemMapper.xml assets/libmegbpp*.so assets/plugins.xml assets/feeInfo.dat lib/armeabi/libmegjb.so lib/armeabi-v7a/libmegjb.so"
 
 ZIP=$(which zip)
 
