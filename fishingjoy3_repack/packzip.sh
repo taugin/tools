@@ -23,12 +23,7 @@ if [[ -z "$ZIP" || -z "$UNZIP" || -z "$JARSIGNER" ]];then
     echo "Can not find zip/unzip/jarsigner"
     exit
 fi
-PACKZIP_PATH=$(which packzip.sh)
-if [ -z "$PACKZIP_PATH" ];then
-    SIGN_TOOL=.
-else
-    SIGN_TOOL=$(dirname $PACKZIP_PATH)
-fi
+SIGN_TOOL=$(dirname "$0")
 echo "SIGN_TOOL = $SIGN_TOOL"
 
 function showmsg_fun() {
@@ -38,6 +33,7 @@ function showmsg_fun() {
 function repack_fun() {
     showmsg_fun "[Packing...]" "$1 -> $2"
     $UNZIP -q $1 $REPLACE_FILE
+    $ZIP -d "$2" $REPLACE_FILE
     $ZIP  -q $2 -m $REPLACE_FILE
     rm -rf $REPLACE_FILE assets lib
 }
