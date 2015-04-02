@@ -1,0 +1,155 @@
+#!/bin/bash
+SRCFILE= 
+DSTFILE=
+TESTSIGN="false"
+SIGNAPKONLY="false"
+SIGNAPK=""
+KEYSTOREFILE=""
+KEYSTOREALIAS=""
+KEYSTOREPASS=""
+
+ZIP=$(which zip)
+
+UNZIP=$(which unzip)
+
+JARSIGNER=$(which jarsigner)
+#echo "JARSIGNER = $JARSIGNER"
+#JDK7ARG="-tsa https://timestamp.geotrust.com/tsa -digestalg SHA1 -sigalg MD5withRSA"
+
+
+if [[ -z "$ZIP" || -z "$UNZIP" || -z "$JARSIGNER" ]];then
+    echo "Can not find zip/unzip/jarsigner"
+    exit
+fi
+
+SIGN_TOOL=$(dirname "$0")
+
+function showmsg_fun() {
+    echo -e "\033[31m$1\033[0m" $2 $3 $4
+}
+
+function showmsg_fun() {
+    echo -e "\033[31m$1\033[0m" $2 $3 $4
+}
+
+function repack_fun() {
+    showmsg_fun "[Packing...]" "$1 -> $2"
+    $UNZIP -q $1 $REPLACE_FILE
+    $ZIP -d "$2" $REPLACE_FILE
+    $ZIP  -q $2 -m $REPLACE_FILE
+    rm -rf $REPLACE_FILE assets lib
+}
+
+function readkeystore() {
+	ALLFILE=($(ls *.keystore 2>/dev/null))
+	arraylen=${#ALLFILE[@]};
+	if [ $arraylen -eq 0 ];then
+		showmsg_fun "Does not find keystore file !!!!!"
+		exit;
+	fi
+	selectindex=0;
+	inputvalue="";
+	index=0;
+	if [ $arraylen -gt 1 ];then
+		showmsg_fun "Please select keystore file : "
+		while [ $index -lt $arraylen ];
+		do
+			echo -e "\t[$index] : ${ALLFILE[$index]}"
+			index=$(($index+1))
+		done
+		read -t 5 -p "Input keystore number : " inputvalue
+		if [ -z "$inputvalue" ];then
+			echo
+		fi
+	fi
+
+	if [[ $inputvalue -ge 0 && $inputvalue -lt $arraylen ]];then
+	selectindex=$inputvalue
+	else
+	selectindex=0
+	fi
+
+	KEYSTOREFILE=${ALLFILE[$selectindex]};
+	echo "$KEYSTOREFILE"
+	keystorefile=${KEYSTOREFILE%.keystore}
+	#echo $keystorefile
+	KEYSTOREALIAS=$(echo "$keystorefile" | awk -F '_' '{print $1}')
+	KEYSTOREPASS=$(echo "$keystorefile" | awk -F '_' '{print $3}')
+	#echo "KEYSTOREALIAS : $KEYSTOREALIAS"
+	#echo "KEYSTOREPASS : $KEYSTOREPASS"
+}
+
+function signapk_fun() {
+    #showmsg_fun "[Logging...]" "TESTSIGN = $TESTSIGN"
+    readkeystore
+    showmsg_fun "[Signing...]" "$1 -> $2"
+    if [ "$SIGNAPKONLY" == "false" ];then
+        # delete META-INF
+        $ZIP -d "$1" META-INF/\*
+    fi
+
+    if [ "$TESTSIGN" == "true" ];then
+        showmsg_fun "[Logging...]" "Sign the apk using test key"
+        java -jar $SIGN_TOOL/signapk.jar $SIGN_TOOL/testkey.x509.pem $SIGN_TOOL/testkey.pk8 "$1" "$2"
+    else
+        showmsg_fun "[Logging...]" "Sign the apk using $KEYSTOREFILE, alias : $KEYSTOREALIAS, pass : $KEYSTOREPASS"
+        $JARSIGNER $JDK7ARG -keystore "$PWD/$KEYSTOREFILE" -storepass "$KEYSTOREPASS" -keypass "$KEYSTOREPASS" -signedjar "$2" "$1" "$KEYSTOREALIAS"
+    fi
+    echo ""
+}
+
+function onlysign() {
+    if [ ! -f "$1" ];then
+        showmsg_fun "[Error...]" "$1 is not found"
+        exit
+    fi
+    #renamedFile=$(echo "$1" | sed s/-signed.apk/.apk/g)
+    basename=$(echo "$1" | sed s/.apk//g)
+    #echo "basename = $basename"
+
+    # Start sign apk
+    signedapk="$basename-signed.apk"
+    signapk_fun "$1" $signedapk
+}
+
+function usage() {
+	tmp=$(basename $0)
+	showmsg_fun "[Usage : ] $tmp -t srcapk";
+	showmsg_fun "[Usage : ] $tmp srcapk (put *.keystore in $PWD such as home_pwd_123456.keystore)";
+}
+
+function main() {
+    TEMP=$(getopt -o t -- "$@" 2>/dev/null)
+
+    [ $? != 0 ] && echo -e "\033[31mERROR: unknown argument! \033[0m\n" && exit 1
+
+    eval set "$TEMP"
+	SIGNAPK="$1"
+    while :
+    do
+        [ -z "$1" ] && break;
+
+        case "$1" in
+            -t)
+	            SIGNAPK="$2"
+                TESTSIGN="true"
+                shift
+                ;;
+            --)
+                shift;
+                ;;
+             *)
+                #echo -e "\033[31mERROR: unknown argument! \033[0m\n" && exit 1
+                #echo "$*"
+                break;
+                ;;
+        esac
+    done
+
+    if [ "$SIGNAPK" == "" ] ;then
+    	usage
+    	exit;
+    fi
+    onlysign "$SIGNAPK"
+}
+main $*
