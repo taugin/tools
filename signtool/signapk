@@ -92,7 +92,7 @@ function signapk_fun() {
         showmsg_fun "[Logging...]" "Sign the apk using test key"
         java -jar $SIGN_TOOL/signapk.jar $SIGN_TOOL/testkey.x509.pem $SIGN_TOOL/testkey.pk8 "$1" "$2"
     else
-        showmsg_fun "[Logging...]" "Sign the apk using $KEYSTOREFILE, alias : $KEYSTOREALIAS, pass : $KEYSTOREPASS"
+        showmsg_fun "[Logging...]" "Sign the apk using $KEYSTOREFILE, keyalias : $KEYSTOREALIAS, keypass : $KEYSTOREPASS"
         $JARSIGNER $JDK7ARG -keystore "$PWD/$KEYSTOREFILE" -storepass "$KEYSTOREPASS" -keypass "$KEYSTOREPASS" -signedjar "$2" "$1" "$KEYSTOREALIAS"
     fi
     echo ""
