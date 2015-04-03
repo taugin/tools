@@ -1,34 +1,26 @@
 #!/bin/bash
-SRCFILE= 
-DSTFILE=
-TESTSIGN="false"
-NEEDDELMETAINF="true"
-SIGNAPK=""
-KEYSTOREFILE=""
-KEYSTOREALIAS=""
-KEYSTOREPASS=""
+USE_TESTSIGN_FILE="false"
+CREATE_TMP_APK="false"
+SRC_APK_FILE=""
+KEYSTORE_FILE=""
+KEYSTORE_ALIAS=""
+KEYSTORE_PASS=""
 
 ZIP=$(which zip)
-
 UNZIP=$(which unzip)
-
 KEYTOOL=$(which keytool)
-
 JARSIGNER=$(which jarsigner)
+
 #echo "JARSIGNER = $JARSIGNER"
 #JDK7ARG="-tsa https://timestamp.geotrust.com/tsa -digestalg SHA1 -sigalg MD5withRSA"
 
 
-if [[ -z "$ZIP" || -z "$UNZIP" || -z "$JARSIGNER" ]];then
+if [[ -z "$ZIP" || -z "$UNZIP" || -z "$JARSIGNER" || -z "$KEYTOOL" ]];then
     echo "Can not find zip/unzip/jarsigner"
     exit
 fi
 
-SIGN_TOOL=$(dirname "$0")
-
-function showmsg_fun() {
-    echo -e "\033[31m$1\033[0m" $2 $3 $4
-}
+SIGN_TOOL_DIR=$(dirname "$0")
 
 function showmsg_fun() {
     echo -e "\033[31m$1\033[0m" $2 $3 $4
@@ -46,7 +38,7 @@ function readkeystore() {
 	ALLFILE=($(ls *.keystore 2>/dev/null))
 	arraylen=${#ALLFILE[@]};
 	if [ $arraylen -eq 0 ];then
-		showmsg_fun "Does not find keystore file !!!!!"
+		showmsg_fun "[Error...] Can not find keystore file !!!!!"
 		exit;
 	fi
 	selectindex=0;
@@ -71,44 +63,42 @@ function readkeystore() {
 	selectindex=0
 	fi
 
-	KEYSTOREFILE=${ALLFILE[$selectindex]};
-	#echo "$KEYSTOREFILE"
-	keystorefile=${KEYSTOREFILE%.keystore}
+	KEYSTORE_FILE=${ALLFILE[$selectindex]};
+	#echo "$KEYSTORE_FILE"
+	keystorefile=${KEYSTORE_FILE%.keystore}
 	#echo $keystorefile
-	KEYSTOREALIAS=$(echo "$keystorefile" | awk -F '_' '{print $1}')
-	KEYSTOREPASS=$(echo "$keystorefile" | awk -F '_' '{print $3}')
-	#echo "KEYSTOREALIAS : $KEYSTOREALIAS"
-	#echo "KEYSTOREPASS : $KEYSTOREPASS"
-	if [[ -z "$KEYSTOREALIAS" || -z "$KEYSTOREPASS" ]];then
-		showmsg_fun "[Error...]" "keypass or keyalias is empty !!!!"
+	KEYSTORE_ALIAS=$(echo "$keystorefile" | awk -F '_' '{print $1}')
+	KEYSTORE_PASS=$(echo "$keystorefile" | awk -F '_' '{print $3}')
+	#echo "KEYSTORE_ALIAS : $KEYSTORE_ALIAS"
+	#echo "KEYSTORE_PASS : $KEYSTORE_PASS"
+	if [[ -z "$KEYSTORE_ALIAS" || -z "$KEYSTORE_PASS" ]];then
+		showmsg_fun "[Error...]" "keypass or keyalias is empty, keyalias : $KEYSTORE_ALIAS, keypass : $KEYSTORE_PASS"
 		exit;
 	fi
-	$KEYTOOL -list -keystore "$PWD/$KEYSTOREFILE" -storepass "$KEYSTOREPASS" 2>/dev/null 1>/dev/null
+	$KEYTOOL -list -keystore "$PWD/$KEYSTORE_FILE" -storepass "$KEYSTORE_PASS" 2>/dev/null 1>/dev/null
 	if [ "$?" != "0" ];then
-		showmsg_fun "[Error...] keypass \"$KEYSTOREPASS\" is not correct for $KEYSTOREFILE"
+		showmsg_fun "[Error...] keypass \"$KEYSTORE_PASS\" is not correct for $KEYSTORE_FILE"
 		exit;
 	fi
 }
 
 function signapk_fun() {
-    #showmsg_fun "[Logging...]" "TESTSIGN = $TESTSIGN"
+    #showmsg_fun "[Logging...]" "USE_TESTSIGN_FILE = $USE_TESTSIGN_FILE"
 
-    if [ "$NEEDDELMETAINF" == "true" ];then
-        # delete META-INF
-        showmsg_fun "[Logging...]" "Delete META-INF..."
-        $ZIP -dq "$1" META-INF/\*
-    fi
+    # delete META-INF
+    showmsg_fun "[Logging...]" "Delete META-INF..."
+    $ZIP -dq "$1" META-INF/\* 2>/dev/null 1>/dev/null
     showmsg_fun "[Signing...]" "$1 -> $2"
-    if [ "$TESTSIGN" == "true" ];then
+    if [ "$USE_TESTSIGN_FILE" == "true" ];then
         showmsg_fun "[Logging...]" "Sign the apk using test key"
-        java -jar $SIGN_TOOL/signapk.jar $SIGN_TOOL/testkey.x509.pem $SIGN_TOOL/testkey.pk8 "$1" "$2"
+        java -jar $SIGN_TOOL_DIR/signapk.jar $SIGN_TOOL_DIR/testkey.x509.pem $SIGN_TOOL_DIR/testkey.pk8 "$1" "$2"
     else
-        showmsg_fun "[Logging...]" "Sign the apk using $KEYSTOREFILE, keyalias : $KEYSTOREALIAS, keypass : $KEYSTOREPASS"
-        $JARSIGNER $JDK7ARG -keystore "$PWD/$KEYSTOREFILE" -storepass "$KEYSTOREPASS" -keypass "$KEYSTOREPASS" -signedjar "$2" "$1" "$KEYSTOREALIAS"
+        showmsg_fun "[Logging...]" "Sign the apk using $KEYSTORE_FILE, keyalias : $KEYSTORE_ALIAS, keypass : $KEYSTORE_PASS"
+        $JARSIGNER $JDK7ARG -keystore "$PWD/$KEYSTORE_FILE" -storepass "$KEYSTORE_PASS" -keypass "$KEYSTORE_PASS" -signedjar "$2" "$1" "$KEYSTORE_ALIAS"
     fi
 }
 
-function onlysign() {
+function exec_sign_process() {
     if [ ! -f "$1" ];then
         showmsg_fun "[Error...]" "$1 is not found"
         exit
@@ -121,14 +111,16 @@ function onlysign() {
     signedapk="$basename-signed.apk"
     tmpapk="$basename-tmp.apk";
     srcapk="$1"
-    readkeystore
-    if [ "$NEEDDELMETAINF" == "true" ];then
+    if [ "$USE_TESTSIGN_FILE" == "false" ];then
+        readkeystore
+    fi
+    if [ "$CREATE_TMP_APK" == "true" ];then
         showmsg_fun "[Logging...]" "Create tmp apk..."
     	cp -f "$srcapk" $tmpapk
     	srcapk=$tmpapk
     fi
     signapk_fun "$srcapk" $signedapk
-    if [ "$NEEDDELMETAINF" == "true" ];then
+    if [ "$CREATE_TMP_APK" == "true" ];then
         showmsg_fun "[Logging...]" "Delete tmp apk..."
 	    rm -rf $tmpapk
     fi    
@@ -141,20 +133,20 @@ function usage() {
 }
 
 function main() {
-    TEMP=$(getopt -o t -- "$@" 2>/dev/null)
+    TEMP=$(getopt t -- "$@" 2>/dev/null)
 
     [ $? != 0 ] && echo -e "\033[31mERROR: unknown argument! \033[0m\n" && exit 1
 
     eval set "$TEMP"
-	SIGNAPK="$1"
+	SRC_APK_FILE="$1"
     while :
     do
         [ -z "$1" ] && break;
 
         case "$1" in
             -t)
-	            SIGNAPK="$2"
-                TESTSIGN="true"
+	            SRC_APK_FILE="$2"
+                USE_TESTSIGN_FILE="true"
                 shift
                 ;;
             --)
@@ -168,10 +160,10 @@ function main() {
         esac
     done
 
-    if [ "$SIGNAPK" == "" ] ;then
+    if [ "$SRC_APK_FILE" == "" ] ;then
     	usage
     	exit;
     fi
-    onlysign "$SIGNAPK"
+    exec_sign_process "$SRC_APK_FILE"
 }
 main $*
