@@ -2,7 +2,7 @@
 SRCFILE= 
 DSTFILE=
 TESTSIGN="false"
-SIGNAPKONLY="false"
+NEEDDELMETAINF="true"
 SIGNAPK=""
 KEYSTOREFILE=""
 KEYSTOREALIAS=""
@@ -11,6 +11,8 @@ KEYSTOREPASS=""
 ZIP=$(which zip)
 
 UNZIP=$(which unzip)
+
+KEYTOOL=$(which keytool)
 
 JARSIGNER=$(which jarsigner)
 #echo "JARSIGNER = $JARSIGNER"
@@ -70,24 +72,33 @@ function readkeystore() {
 	fi
 
 	KEYSTOREFILE=${ALLFILE[$selectindex]};
-	echo "$KEYSTOREFILE"
+	#echo "$KEYSTOREFILE"
 	keystorefile=${KEYSTOREFILE%.keystore}
 	#echo $keystorefile
 	KEYSTOREALIAS=$(echo "$keystorefile" | awk -F '_' '{print $1}')
 	KEYSTOREPASS=$(echo "$keystorefile" | awk -F '_' '{print $3}')
 	#echo "KEYSTOREALIAS : $KEYSTOREALIAS"
 	#echo "KEYSTOREPASS : $KEYSTOREPASS"
+	if [[ -z "$KEYSTOREALIAS" || -z "$KEYSTOREPASS" ]];then
+		showmsg_fun "[Error...]" "keypass or keyalias is empty !!!!"
+		exit;
+	fi
+	$KEYTOOL -list -keystore "$PWD/$KEYSTOREFILE" -storepass "$KEYSTOREPASS" 2>/dev/null 1>/dev/null
+	if [ "$?" != "0" ];then
+		showmsg_fun "[Error...] keypass \"$KEYSTOREPASS\" is not correct for $KEYSTOREFILE"
+		exit;
+	fi
 }
 
 function signapk_fun() {
     #showmsg_fun "[Logging...]" "TESTSIGN = $TESTSIGN"
-    readkeystore
-    showmsg_fun "[Signing...]" "$1 -> $2"
-    if [ "$SIGNAPKONLY" == "false" ];then
-        # delete META-INF
-        $ZIP -d "$1" META-INF/\*
-    fi
 
+    if [ "$NEEDDELMETAINF" == "true" ];then
+        # delete META-INF
+        showmsg_fun "[Logging...]" "Delete META-INF..."
+        $ZIP -dq "$1" META-INF/\*
+    fi
+    showmsg_fun "[Signing...]" "$1 -> $2"
     if [ "$TESTSIGN" == "true" ];then
         showmsg_fun "[Logging...]" "Sign the apk using test key"
         java -jar $SIGN_TOOL/signapk.jar $SIGN_TOOL/testkey.x509.pem $SIGN_TOOL/testkey.pk8 "$1" "$2"
@@ -95,7 +106,6 @@ function signapk_fun() {
         showmsg_fun "[Logging...]" "Sign the apk using $KEYSTOREFILE, keyalias : $KEYSTOREALIAS, keypass : $KEYSTOREPASS"
         $JARSIGNER $JDK7ARG -keystore "$PWD/$KEYSTOREFILE" -storepass "$KEYSTOREPASS" -keypass "$KEYSTOREPASS" -signedjar "$2" "$1" "$KEYSTOREALIAS"
     fi
-    echo ""
 }
 
 function onlysign() {
@@ -109,7 +119,19 @@ function onlysign() {
 
     # Start sign apk
     signedapk="$basename-signed.apk"
-    signapk_fun "$1" $signedapk
+    tmpapk="$basename-tmp.apk";
+    srcapk="$1"
+    readkeystore
+    if [ "$NEEDDELMETAINF" == "true" ];then
+        showmsg_fun "[Logging...]" "Create tmp apk..."
+    	cp -f "$srcapk" $tmpapk
+    	srcapk=$tmpapk
+    fi
+    signapk_fun "$srcapk" $signedapk
+    if [ "$NEEDDELMETAINF" == "true" ];then
+        showmsg_fun "[Logging...]" "Delete tmp apk..."
+	    rm -rf $tmpapk
+    fi    
 }
 
 function usage() {
