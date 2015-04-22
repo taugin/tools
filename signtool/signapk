@@ -5,6 +5,7 @@ SRC_APK_FILE=""
 KEYSTORE_FILE=""
 KEYSTORE_ALIAS=""
 KEYSTORE_PASS=""
+KEYALIAS_PASS=""
 
 ZIP=$(which zip)
 UNZIP=$(which unzip)
@@ -69,8 +70,13 @@ function readkeystore() {
 	#echo $keystorefile
 	KEYSTORE_ALIAS=$(echo "$keystorefile" | awk -F '_' '{print $1}')
 	KEYSTORE_PASS=$(echo "$keystorefile" | awk -F '_' '{print $3}')
+	KEYALIAS_PASS=$(echo "$keystorefile" | awk -F '_' '{print $4}')
 	#echo "KEYSTORE_ALIAS : $KEYSTORE_ALIAS"
-	#echo "KEYSTORE_PASS : $KEYSTORE_PASS"
+	#echo "KEYSTORE_PASS  : $KEYSTORE_PASS"
+	#echo "KEYALIAS_PASS  : $KEYALIAS_PASS"
+	if [ -z "$KEYALIAS_PASS" ];then
+		KEYALIAS_PASS=$KEYSTORE_PASS
+	fi
 	if [[ -z "$KEYSTORE_ALIAS" || -z "$KEYSTORE_PASS" ]];then
 		showmsg_fun "[Error...]" "keypass or keyalias is empty, keyalias : $KEYSTORE_ALIAS, keypass : $KEYSTORE_PASS"
 		exit;
@@ -82,19 +88,24 @@ function readkeystore() {
 	fi
 }
 
-function signapk_fun() {
-    #showmsg_fun "[Logging...]" "USE_TESTSIGN_FILE = $USE_TESTSIGN_FILE"
-
+function deletemetainf() {
     # delete META-INF
     showmsg_fun "[Logging...]" "Delete META-INF..."
     $ZIP -dq "$1" META-INF/\* 2>/dev/null 1>/dev/null
-    showmsg_fun "[Signing...]" "$1 -> $2"
+}
+
+function signapk_fun() {
+    #showmsg_fun "[Logging...]" "USE_TESTSIGN_FILE = $USE_TESTSIGN_FILE"
     if [ "$USE_TESTSIGN_FILE" == "true" ];then
         showmsg_fun "[Logging...]" "Sign the apk using test key"
+        deletemetainf "$1"
+        showmsg_fun "[Signing...]" "$1 -> $2"
         java -jar $SIGN_TOOL_DIR/signapk.jar $SIGN_TOOL_DIR/testkey.x509.pem $SIGN_TOOL_DIR/testkey.pk8 "$1" "$2"
     else
-        showmsg_fun "[Logging...]" "Sign the apk using $KEYSTORE_FILE, keyalias : $KEYSTORE_ALIAS, keypass : $KEYSTORE_PASS"
-        $JARSIGNER $JDK7ARG -keystore "$PWD/$KEYSTORE_FILE" -storepass "$KEYSTORE_PASS" -keypass "$KEYSTORE_PASS" -signedjar "$2" "$1" "$KEYSTORE_ALIAS"
+        showmsg_fun "[Logging...]" "Sign the apk using keystore : [$KEYSTORE_FILE], storepass : [$KEYSTORE_PASS] , keyalias : [$KEYSTORE_ALIAS], keypass : [$KEYSTORE_PASS]"
+        deletemetainf "$1"
+        showmsg_fun "[Signing...]" "$1 -> $2"
+        $JARSIGNER $JDK7ARG -keystore "$PWD/$KEYSTORE_FILE" -storepass "$KEYSTORE_PASS" -keypass "$KEYALIAS_PASS" -signedjar "$2" "$1" "$KEYSTORE_ALIAS"
     fi
 }
 
