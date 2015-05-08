@@ -146,7 +146,7 @@ def readkeystore(dir):
 
 testSign = False
 if (len(sys.argv) < 2):
-    log("[Logging...] 缺少参数, %s [-t] <src_apk>" % sys.argv[0], True);
+    log("[Logging...] 缺少参数, %s [-t] <src_apk>" % os.path.basename(sys.argv[0]), True);
     sys.exit()
 opts, args = getopt.getopt(sys.argv[1:], "t")
 for op, value in opts:
