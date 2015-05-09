@@ -6,11 +6,11 @@ import getopt
 import platform
 import subprocess;
 
-seperater = "/"
-winrar = "C:\Program Files (x86)\WinRAR\WINRAR.exe"
-keytool = "keytool"
-jarsigner="jarsigner"
+SEPERATER = "/"
+KEYTOOL = "keytool"
+JARSIGNER="jarsigner"
 JDK7ARG="-tsa https://timestamp.geotrust.com/tsa -digestalg SHA1 -sigalg MD5withRSA"
+USE_TESTSIGN_FILE = False
 
 def log(str, show=False):
     if (show):
@@ -23,40 +23,30 @@ def inputvalue(prompt, max) :
                 return p
     
 def deletemetainf(src_apk):
-    log("[Logging...] %s" % src_apk)
-    log("[Logging...] Delete META-INF...", True)
-    osstr = platform.system().lower()
-    zipdelete = []
-    if (osstr == "windows"):
-        zipdelete = [winrar, "rd", src_apk, "META-INF"]
-    elif (osstr == "linux"):
-        zipdelete = ["zip", "-dq", src_apk, "META-INF"]
-    else:
-        log("[Logging...] 无法在%s操作系统上运行")
-        sys.exit()
-    subprocess.call(zipdelete, stdout=subprocess.PIPE)
+    log("[Logging...] 正在删除 : META-INF...", True)
+    subprocess.call(["aapt", "r", src_apk, "META-INF", "META-INF/MANIFEST.MF", "META-INF/CERT.RSA", "META-INF/CERT.SF"], stdout=subprocess.PIPE)
 
 def sign_apk(src_apk, dst_apk, keystoreinfo):
-    log("[Signing...] %s -> %s" % (os.path.basename(src_apk), os.path.basename(dst_apk)), True)
     deletemetainf(src_apk)
+    log("[Signing...] 执行签名 : %s -> %s" % (os.path.basename(src_apk), os.path.basename(dst_apk)), True)
     if (len(keystoreinfo) <= 0):
-        log ("[Logging...] Sign the apk using test key", True)
+        log ("[Logging...] 签名信息 : [testkey.x509.pem], [testkey.pk8]", True)
         #deletemetainf "$1"
         toodir = os.path.dirname(sys.argv[0])
-        signapk_jar = toodir + seperater + "signapk.jar"
-        x509 = toodir + seperater + "testkey.x509.pem"
-        pk8 = toodir + seperater + "testkey.pk8"
+        signapk_jar = toodir + SEPERATER + "signapk.jar"
+        x509 = toodir + SEPERATER + "testkey.x509.pem"
+        pk8 = toodir + SEPERATER + "testkey.pk8"
         retcode = subprocess.call(["java", "-jar", signapk_jar, x509, pk8, src_apk, dst_apk], stdout=subprocess.PIPE)
         if (retcode == 0):
             log("[Signing...] 签名成功", True)
         else:
             log("[Signing...] 签名失败", True)
     else:
-        log("[Logging...] Sign the apk using keystore : [%s], storepass : [%s] , keyalias : [%s], keypass : [%s]" % (keystoreinfo[0],keystoreinfo[1], keystoreinfo[2], keystoreinfo[3]), True)
+        log("[Logging...] 签名信息 : keystore : [%s], storepass : [%s] , keyalias : [%s], keypass : [%s]" % (keystoreinfo[0],keystoreinfo[1], keystoreinfo[2], keystoreinfo[3]), True)
 
         dir = os.path.dirname(src_apk)
         cmdlist = []
-        cmdlist.append(jarsigner)
+        cmdlist.append(JARSIGNER)
 
         cmdlist.append("-tsa")
         cmdlist.append("https://timestamp.geotrust.com/tsa")
@@ -66,7 +56,7 @@ def sign_apk(src_apk, dst_apk, keystoreinfo):
         cmdlist.append("MD5withRSA")
         
         cmdlist.append("-keystore")
-        cmdlist.append(dir + seperater + keystoreinfo[0])
+        cmdlist.append(dir + SEPERATER + keystoreinfo[0])
         cmdlist.append("-storepass")
         cmdlist.append(keystoreinfo[1])
         cmdlist.append("-keypass")
@@ -82,18 +72,19 @@ def sign_apk(src_apk, dst_apk, keystoreinfo):
             log("[Signing...] 签名失败", True)
             
     log("", True);
-def exec_sign_process(src_apk, testSign):
-    log("exec_sign_process")
+
+def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
+    log("[Logging...] APK 文件 : " + src_apk, True)
     index = src_apk.rfind(".apk")
     if (index == -1):
-        log("[Error...] 无法识别的的apk压缩包", True)
-        sys.exit()
+        log("[Error...] 无法识别的的apk压缩包 : %s" % src_apk, True)
+        return
     log("index : %d " % index)
     log("substring : %s " % src_apk[0:index])
     dst_apk = src_apk[0:index] + "-signed.apk"
     log("dst_apk : %s " % dst_apk)
     keystoreinfo = []
-    if(testSign == False):
+    if(USE_TESTSIGN_FILE == False):
         keystoreinfo = readkeystore(os.path.dirname(src_apk))
     sign_apk(src_apk, dst_apk, keystoreinfo)
 
@@ -107,10 +98,11 @@ def readkeystore(dir):
         if(file.rfind(".keystore") != -1):
             storefiles.append(file)
             storeindex+=1
-            log("             [%d] : %s" %(storeindex, file), True)
         index+=1
     if (storeindex > 1):
-        p = inputvalue("请输入签名文件索引(1-%d) : "%storeindex, storeindex)
+        for keyfile in storefiles:
+            log("             [%d] : %s" %(storeindex, file), True)
+        p = inputvalue("[Logging...] 输入索引 : ", storeindex)
     else:
         p = 0
     if (storeindex <= 0):
@@ -132,7 +124,7 @@ def readkeystore(dir):
         log("[Error...] keystorealias or keystorepass is empty")
         sys.exit()
 
-    retcode = subprocess.call([keytool, "-list", "-keystore", dir + seperater + keystorefile, "-storepass", keystorepass], stdout=subprocess.PIPE)
+    retcode = subprocess.call([KEYTOOL, "-list", "-keystore", dir + SEPERATER + keystorefile, "-storepass", keystorepass], stdout=subprocess.PIPE)
     if (retcode != 0):
         log("[Logging...] 签名文件不正确", True)
         sys.exit()
@@ -144,21 +136,31 @@ def readkeystore(dir):
     return keystoreinfo
 
 
-testSign = False
+osstr = platform.system().lower()
+if (osstr == "windows"):
+    SEPERATER = "\\"
+elif (osstr == "linux"):
+    SEPERATER = "/"
+else:
+    log("[Logging...] 不支持的操作系统类型")
+    sys.exit()
+
 if (len(sys.argv) < 2):
     log("[Logging...] 缺少参数, %s [-t] <src_apk>" % os.path.basename(sys.argv[0]), True);
     sys.exit()
 opts, args = getopt.getopt(sys.argv[1:], "t")
 for op, value in opts:
     if (op == "-t"):
-        testSign = True
+        USE_TESTSIGN_FILE = True
 
 for file in args :
     if (os.path.isdir(file)):
         listfiles = os.listdir(file)
         for apkfile in listfiles :
-            apkpath = file + seperater + apkfile
-            exec_sign_process(apkpath, testSign)
+            apkpath = file + SEPERATER + apkfile
+            if (len(apkpath) >= 4 and apkpath[-4:] == ".apk"):
+                exec_sign_process(apkpath, USE_TESTSIGN_FILE)
     else:
-        exec_sign_process(file, testSign)
+        if (len(file) >= 4 and file[-4:] == ".apk"):
+            exec_sign_process(file, USE_TESTSIGN_FILE)
 
