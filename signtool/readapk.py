@@ -75,18 +75,25 @@ def getpkg(apkFile):
     tmp = tmp.replace("\n", "")
     log(tmp)
 
-def readapkinfo(apkFile):
-    if (CLASSES_MD5 == True):
-        md5_classes(apkFile)
-    if (SIGNINFO_MD5 == True):
-        md5_signfile(apkFile)
-    if (CLASSES_MD5 == False and SIGNINFO_MD5 == False):
-        getpkg(apkFile)
+def readapkinfo(apkFile, function):
+    function(apkFile)
+
+def processapk(args, function):
+    for file in args :
+        if (os.path.isdir(file)):
+            listfiles = os.listdir(file)
+            for apkfile in listfiles :
+                apkpath = file + SEPERATER + apkfile
+                if (len(apkpath) >= 4 and apkpath[-4:] == ".apk"):
+                    readapkinfo(os.path.abspath(apkpath), function)
+        else:
+            if (len(file) >= 4 and file[-4:] == ".apk"):
+                readapkinfo(os.path.abspath(file), function)
 
 if (len(sys.argv) < 2):
     log("[Logging...] 缺少参数")
     log("[Logging...] %s [-c] <src_apk> 输出classes.dex MD5值" % os.path.basename(sys.argv[0]), True);
-    log("[Logging...] %s [-s] <src_apk> 输出APK文件信息 MD5值" % os.path.basename(sys.argv[0]), True);
+    log("[Logging...] %s [-s] <src_apk> 输出APK文件签名 MD5值" % os.path.basename(sys.argv[0]), True);
     log("[Logging...] %s <src_apk> 输出APK文件信息" % os.path.basename(sys.argv[0]), True);
 
 try:
@@ -100,13 +107,12 @@ except getopt.GetoptError as err:
     log(err)
     sys.exit()
 
-for file in args :
-    if (os.path.isdir(file)):
-        listfiles = os.listdir(file)
-        for apkfile in listfiles :
-            apkpath = file + SEPERATER + apkfile
-            if (len(apkpath) >= 4 and apkpath[-4:] == ".apk"):
-                readapkinfo(os.path.abspath(apkpath))
-    else:
-        if (len(file) >= 4 and file[-4:] == ".apk"):
-            readapkinfo(os.path.abspath(file))
+if (CLASSES_MD5 == True):
+    log("显示classes.dex的MD5值 : ")
+    processapk(args, md5_classes)
+if (SIGNINFO_MD5 == True):
+    log("显示APK文件签名的MD5值 : ")
+    processapk(args, md5_signfile)
+if (CLASSES_MD5 == False and SIGNINFO_MD5 == False):
+    log("显示包文件是的包名信息 : ")
+    processapk(args, getpkg)
