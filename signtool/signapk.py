@@ -4,9 +4,10 @@ import os
 import sys
 import getopt
 import platform
+import zipfile
 import subprocess;
 
-SEPERATER = "/"
+SEPERATER = os.path.sep
 KEYTOOL = "keytool"
 JARSIGNER="jarsigner"
 JDK7ARG="-tsa https://timestamp.geotrust.com/tsa -digestalg SHA1 -sigalg MD5withRSA"
@@ -23,8 +24,21 @@ def inputvalue(prompt, max) :
                 return p
     
 def deletemetainf(src_apk):
-    log("[Logging...] 正在删除 : META-INF...", True)
-    subprocess.call(["aapt", "r", src_apk, "META-INF", "META-INF/MANIFEST.MF", "META-INF/CERT.RSA", "META-INF/CERT.SF"], stdout=subprocess.PIPE)
+    signfilelist = []
+    z = zipfile.ZipFile(src_apk, "r")
+    for file in z.namelist():
+        if (file.startswith("META-INF")):
+            signfilelist.append(file)
+    z.close()
+    output = ""
+    for l in signfilelist:
+        output += "["
+        output += l
+        output += "]"
+        output += " "
+    if (output != "") :
+        log("[Logging...] 正在删除 : %s" % output, True)
+        subprocess.call(["aapt", "r", src_apk] + signfilelist)
 
 def sign_apk(src_apk, dst_apk, keystoreinfo):
     deletemetainf(src_apk)
@@ -135,16 +149,6 @@ def readkeystore(dir):
     keystoreinfo.append(keyaliaspass)
     return keystoreinfo
 
-
-osstr = platform.system().lower()
-if (osstr == "windows"):
-    SEPERATER = "\\"
-elif (osstr == "linux"):
-    SEPERATER = "/"
-else:
-    log("[Logging...] 不支持的操作系统类型")
-    sys.exit()
-
 if (len(sys.argv) < 2):
     log("[Logging...] 缺少参数, %s [-t] <src_apk>" % os.path.basename(sys.argv[0]), True);
     sys.exit()
@@ -159,8 +163,8 @@ for file in args :
         for apkfile in listfiles :
             apkpath = file + SEPERATER + apkfile
             if (len(apkpath) >= 4 and apkpath[-4:] == ".apk"):
-                exec_sign_process(apkpath, USE_TESTSIGN_FILE)
+                exec_sign_process(os.path.abspath(apkpath), USE_TESTSIGN_FILE)
     else:
         if (len(file) >= 4 and file[-4:] == ".apk"):
-            exec_sign_process(file, USE_TESTSIGN_FILE)
+            exec_sign_process(os.path.abspath(file), USE_TESTSIGN_FILE)
 
