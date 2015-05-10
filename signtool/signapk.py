@@ -114,8 +114,10 @@ def readkeystore(dir):
             storeindex+=1
         index+=1
     if (storeindex > 1):
+        index = 1
         for keyfile in storefiles:
-            log("             [%d] : %s" %(storeindex, file), True)
+            log("             [%d] : %s" %(index, keyfile), True)
+            index += 1
         p = inputvalue("[Logging...] 输入索引 : ", storeindex)
     else:
         p = 0
