@@ -38,7 +38,7 @@ def printsign_md5(apkFile, signFile):
         tmp = tmp.strip().lower()
         if (tmp.startswith("md5")):
             tmp = tmp[4:]
-            tmp = tmp.replace(":", "")
+            tmp = tmp.replace(":", "").strip()
             log("[SIGNFILE] " + tmp + " : " + apkFile)
 
 def md5_signfile(apkFile):
