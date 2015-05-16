@@ -169,4 +169,4 @@ for file in args :
     else:
         if (len(file) >= 4 and file[-4:] == ".apk"):
             exec_sign_process(os.path.abspath(file), USE_TESTSIGN_FILE)
-
+os.system("pause");

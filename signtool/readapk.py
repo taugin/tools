@@ -73,7 +73,7 @@ def getpkg(apkFile):
     tmp = str(line, "utf-8")
     tmp = tmp.replace("\r", "")
     tmp = tmp.replace("\n", "")
-    log(tmp)
+    log(tmp + " : " + apkFile)
 
 def readapkinfo(apkFile, function):
     function(apkFile)
@@ -91,10 +91,7 @@ def processapk(args, function):
                 readapkinfo(os.path.abspath(file), function)
 
 if (len(sys.argv) < 2):
-    log("[Logging...] 缺少参数")
-    log("[Logging...] %s [-c] <src_apk> 输出classes.dex MD5值" % os.path.basename(sys.argv[0]), True);
-    log("[Logging...] %s [-s] <src_apk> 输出APK文件签名 MD5值" % os.path.basename(sys.argv[0]), True);
-    log("[Logging...] %s <src_apk> 输出APK文件信息" % os.path.basename(sys.argv[0]), True);
+    log("[Logging...] 缺少参数 : %s <src_apk> 输出APK文件信息" % os.path.basename(sys.argv[0]), True);
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], "sc")
@@ -107,12 +104,11 @@ except getopt.GetoptError as err:
     log(err)
     sys.exit()
 
-if (CLASSES_MD5 == True):
-    log("显示classes.dex的MD5值 : ")
-    processapk(args, md5_classes)
-if (SIGNINFO_MD5 == True):
-    log("显示APK文件签名的MD5值 : ")
-    processapk(args, md5_signfile)
-if (CLASSES_MD5 == False and SIGNINFO_MD5 == False):
-    log("显示包文件是的包名信息 : ")
-    processapk(args, getpkg)
+log("显示包文件是的包名信息 : ")
+processapk(args, getpkg)
+
+log("\n显示classes.dex的MD5值 : ")
+processapk(args, md5_classes)
+
+log("\n显示APK文件签名的MD5值 : ")
+processapk(args, md5_signfile)
