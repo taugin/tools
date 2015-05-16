@@ -1,6 +1,7 @@
 ﻿#!/usr/bin/python
 # coding: UTF-8
 import os
+import re
 import sys
 import getopt
 import zipfile
@@ -73,7 +74,15 @@ def getpkg(apkFile):
     tmp = str(line, "utf-8")
     tmp = tmp.replace("\r", "")
     tmp = tmp.replace("\n", "")
-    log(tmp + " : " + apkFile)
+    tmp = tmp.lower()
+    m = re.match(r".*name='(.+)'\s+versioncode='(.+)'\s+versionname='(.+)'", tmp)
+    if m:
+        (packagename, versioncode, versionname) = m.groups()
+    result =  "packagefile : " + apkFile + "\n"
+    result += "packagename : " + packagename + "\n"
+    result += "versioncode : " + versioncode + "\n"
+    result += "versionname : " + versionname
+    log(result)
 
 def readapkinfo(apkFile, function):
     function(apkFile)
@@ -112,3 +121,4 @@ processapk(args, md5_classes)
 
 log("\n显示APK文件签名的MD5值 : ")
 processapk(args, md5_signfile)
+os.system("pause")
