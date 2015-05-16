@@ -121,4 +121,5 @@ processapk(args, md5_classes)
 
 log("\n显示APK文件签名的MD5值 : ")
 processapk(args, md5_signfile)
+log("")
 os.system("pause")

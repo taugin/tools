@@ -52,7 +52,7 @@ def sign_apk(src_apk, dst_apk, keystoreinfo):
         pk8 = toodir + SEPERATER + "testkey.pk8"
         retcode = subprocess.call(["java", "-jar", signapk_jar, x509, pk8, src_apk, dst_apk], stdout=subprocess.PIPE)
         if (retcode == 0):
-            log("[Signing...] 签名成功", True)
+            log("[Signing...] 签名成功 : %s" % dst_apk, True)
         else:
             log("[Signing...] 签名失败", True)
     else:
@@ -81,10 +81,9 @@ def sign_apk(src_apk, dst_apk, keystoreinfo):
         cmdlist.append(keystoreinfo[2])
         retcode = subprocess.call(cmdlist)
         if (retcode == 0):
-            log("[Signing...] 签名成功", True)
+            log("[Signing...] 签名成功 : %s" % dst_apk, True)
         else:
             log("[Signing...] 签名失败", True)
-            
     log("", True);
 
 def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
@@ -169,4 +168,5 @@ for file in args :
     else:
         if (len(file) >= 4 and file[-4:] == ".apk"):
             exec_sign_process(os.path.abspath(file), USE_TESTSIGN_FILE)
+
 os.system("pause");
