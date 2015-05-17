@@ -161,14 +161,15 @@ except getopt.GetoptError as err:
     log(err)
     sys.exit()
 
-if FILE_MD5 == True:
-    processFileMd5(args)
-    sys.exit()
+#求字符串的MD5值
 if STR_MD5 == True:
     string_md5(args)
     sys.exit()
 
 check_arg(args)
+
+if FILE_MD5 == True:
+    processFileMd5(args)
 
 if APK_INFO == True:
     log("显示包文件是的包名信息 : ")
