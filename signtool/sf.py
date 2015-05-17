@@ -10,10 +10,10 @@ import zipfile
 import hashlib
 import subprocess
 
-SEPERATER = os.path.sep
 SIGNINFO_MD5 = False
 FILE_MD5 = False
 STR_MD5 = False
+APK_INFO = False
 KEYTOOL = "keytool"
 
 def log(str, show=True):
@@ -86,6 +86,7 @@ def getpkg(apkFile):
     result += "versioncode : " + versioncode + "\n"
     result += "versionname : " + versionname
     log(result)
+    log("--------------------------------------------")
 
 def readapkinfo(apkFile, function):
     function(apkFile)
@@ -95,7 +96,7 @@ def processapk(args, function):
         if (os.path.isdir(file)):
             listfiles = os.listdir(file)
             for apkfile in listfiles :
-                apkpath = file + SEPERATER + apkfile
+                apkpath = os.path.join(file, apkfile)
                 if (len(apkpath) >= 4 and apkpath[-4:] == ".apk"):
                     readapkinfo(os.path.abspath(apkpath), function)
         else:
@@ -107,7 +108,7 @@ def processFileMd5(args):
         if (os.path.isdir(file)):
             listfiles = os.listdir(file)
             for apkfile in listfiles :
-                apkpath = file + SEPERATER + apkfile
+                apkpath = os.path.join(file, apkfile)
                 if (os.path.isfile(os.path.abspath(apkpath))):
                     file_md5(os.path.abspath(apkpath))
         else:
@@ -148,12 +149,14 @@ if (len(sys.argv) < 2):
     sys.exit()
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "ms")
+    opts, args = getopt.getopt(sys.argv[1:], "pms")
     for op, value in opts:
         if (op == "-m"):
             FILE_MD5 = True
         elif (op == "-s") :
             STR_MD5 = True
+        elif (op == "-p") :
+            APK_INFO = True
 except getopt.GetoptError as err:
     log(err)
     sys.exit()
@@ -167,13 +170,18 @@ if STR_MD5 == True:
 
 check_arg(args)
 
-log("显示包文件是的包名信息 : ")
-processapk(args, getpkg)
+if APK_INFO == True:
+    log("显示包文件是的包名信息 : ")
+    log("--------------------------------------------")
+    processapk(args, getpkg)
 
-log("\n显示classes.dex的MD5值 : ")
-processapk(args, md5_classes)
+    log("显示classes.dex的MD5值 : ")
+    log("--------------------------------------------")
+    processapk(args, md5_classes)
+    log("--------------------------------------------")
 
-log("\n显示APK文件签名的MD5值 : ")
-processapk(args, md5_signfile)
-log("")
+    log("显示APK文件签名的MD5值 : ")
+    log("--------------------------------------------")
+    processapk(args, md5_signfile)
+    log("--------------------------------------------")
 os.system("pause")
