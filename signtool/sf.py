@@ -1,8 +1,10 @@
 ﻿#!/usr/bin/python
 # coding: UTF-8
 import os
+import io
 import re
 import sys
+import hashlib
 import getopt
 import zipfile
 import hashlib
@@ -10,7 +12,8 @@ import subprocess
 
 SEPERATER = os.path.sep
 SIGNINFO_MD5 = False
-CLASSES_MD5 = False
+FILE_MD5 = False
+STR_MD5 = False
 KEYTOOL = "keytool"
 
 def log(str, show=True):
@@ -99,19 +102,70 @@ def processapk(args, function):
             if (len(file) >= 4 and file[-4:] == ".apk"):
                 readapkinfo(os.path.abspath(file), function)
 
+def processFileMd5(args):
+    for file in args :
+        if (os.path.isdir(file)):
+            listfiles = os.listdir(file)
+            for apkfile in listfiles :
+                apkpath = file + SEPERATER + apkfile
+                if (os.path.isfile(os.path.abspath(apkpath))):
+                    file_md5(os.path.abspath(apkpath))
+        else:
+            if (os.path.isfile(os.path.abspath(file))):
+                file_md5(os.path.abspath(file))
+
+def file_md5(strFile):
+    m = hashlib.md5()
+    file = io.FileIO(strFile,'rb')
+    bytes = file.read(1024)
+    while(bytes != b''):
+        m.update(bytes)
+        bytes = file.read(1024)
+    file.close()
+    md5value = m.hexdigest()
+    log("[MD5..] " + md5value + " : " + strFile)
+
+def string_md5(srcStr):
+    if (len(srcStr) > 0):
+        md5=hashlib.md5(srcStr[0].encode('utf-8')).hexdigest()
+        log("[MD5..] " + md5)
+    else:
+        log("[Logging...] 缺少参数")
+
+def check_arg(args):
+    if (len(args) > 0):
+        for arg in args:
+            if (os.path.isfile(arg) == False and os.path.isdir(arg) == False):
+                log("[Logging...] " + os.path.abspath(arg) + " 不是目录或文件")
+                args.remove(arg)
+    log("")
+    if (len(args) <= 0):
+        log("[Logging...] 缺少文件")
+        sys.exit()
+# start ============================================================================================
 if (len(sys.argv) < 2):
     log("[Logging...] 缺少参数 : %s <src_apk> 输出APK文件信息" % os.path.basename(sys.argv[0]), True);
+    sys.exit()
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "sc")
+    opts, args = getopt.getopt(sys.argv[1:], "ms")
     for op, value in opts:
-        if (op == "-c"):
-            CLASSES_MD5 = True
-        elif (op == "-s"):
-            SIGNINFO_MD5 = True
+        if (op == "-m"):
+            FILE_MD5 = True
+        elif (op == "-s") :
+            STR_MD5 = True
 except getopt.GetoptError as err:
     log(err)
     sys.exit()
+
+if FILE_MD5 == True:
+    processFileMd5(args)
+    sys.exit()
+if STR_MD5 == True:
+    string_md5(args)
+    sys.exit()
+
+check_arg(args)
 
 log("显示包文件是的包名信息 : ")
 processapk(args, getpkg)
