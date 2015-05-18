@@ -68,24 +68,20 @@ def getpkg(apkFile):
         log("aapt命令执行失败")
         sys.exit()
 
+    tmppkg = ""
     tmp = ""
     alllines = process.stdout.readlines()
     for line in alllines :
         tmp = str(line, "utf-8")
         if (tmp.startswith("package")):
+            tmppkg = tmp
             break;
-    tmp = str(line, "utf-8")
-    tmp = tmp.replace("\r", "")
-    tmp = tmp.replace("\n", "")
-    tmp = tmp.lower()
-    m = re.match(r".*name='(.+)'\s+versioncode='(.+)'\s+versionname='(.+)'", tmp)
-    if m:
-        (packagename, versioncode, versionname) = m.groups()
-    result =  "packagefile : " + apkFile + "\n"
-    result += "packagename : " + packagename + "\n"
-    result += "versioncode : " + versioncode + "\n"
-    result += "versionname : " + versionname
-    log(result)
+    tmppkg = str(line, "utf-8")
+    tmppkg = tmppkg.replace("\r", "")
+    tmppkg = tmppkg.replace("\n", "")
+    tmppkg = tmppkg.replace("'", "")
+    log("apkfile: " + apkFile)
+    log(tmppkg)
     log("--------------------------------------------")
 
 def readapkinfo(apkFile, function):
