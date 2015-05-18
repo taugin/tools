@@ -6,6 +6,7 @@ import getopt
 import platform
 import zipfile
 import subprocess;
+import msvcrt
 
 SEPERATER = os.path.sep
 KEYTOOL = "keytool"
@@ -169,4 +170,4 @@ for file in args :
         if (len(file) >= 4 and file[-4:] == ".apk"):
             exec_sign_process(os.path.abspath(file), USE_TESTSIGN_FILE)
 
-os.system("pause");
+msvcrt.getch()

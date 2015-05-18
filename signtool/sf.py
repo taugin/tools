@@ -1,4 +1,4 @@
-﻿#!/usr/bin/python
+#!/usr/bin/python
 # coding: UTF-8
 import os
 import io
@@ -9,12 +9,15 @@ import getopt
 import zipfile
 import hashlib
 import subprocess
+import msvcrt
 
 SIGNINFO_MD5 = False
 FILE_MD5 = False
 STR_MD5 = False
 APK_INFO = False
+INSTALL_APK = False
 KEYTOOL = "keytool"
+ADB = "adb"
 
 def log(str, show=True):
     if (show):
@@ -139,13 +142,32 @@ def check_arg(args):
     if (len(args) <= 0):
         log("[Logging...] 缺少文件")
         sys.exit()
+
+def install_apk(args):
+    if (len(args) > 0):
+        cmd = [ADB, "install", "-r", args[0]]
+        log("正在安装 : " + os.path.abspath(args[0]))
+        result = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        execret = result.stdout.readlines();
+        allret = ""
+        success = False
+        for s in execret:
+            s = str(s, "utf-8")
+            s = s.replace("\r", "")
+            s = s.replace("\n", "")
+            allret = allret + s + "\n"
+            if (s.lower() == "success"):
+                success = True
+        log(allret)
+        if (success == False):
+            msvcrt.getch()
 # start ============================================================================================
 if (len(sys.argv) < 2):
     log("[Logging...] 缺少参数 : %s <src_apk> 输出APK文件信息" % os.path.basename(sys.argv[0]), True);
     sys.exit()
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "pms")
+    opts, args = getopt.getopt(sys.argv[1:], "pmsi")
     for op, value in opts:
         if (op == "-m"):
             FILE_MD5 = True
@@ -153,10 +175,15 @@ try:
             STR_MD5 = True
         elif (op == "-p") :
             APK_INFO = True
+        elif (op == "-i") :
+            INSTALL_APK = True
 except getopt.GetoptError as err:
     log(err)
     sys.exit()
-
+#安装apk
+if INSTALL_APK == True:
+    install_apk(args)
+    sys.exit()
 #求字符串的MD5值
 if STR_MD5 == True:
     string_md5(args)
@@ -181,4 +208,4 @@ if APK_INFO == True:
     log("--------------------------------------------")
     processapk(args, md5_signfile)
     log("--------------------------------------------")
-os.system("pause")
+msvcrt.getch()
