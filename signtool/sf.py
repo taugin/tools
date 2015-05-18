@@ -65,11 +65,7 @@ def md5_signfile(apkFile):
 
 def getpkg(apkFile):
     cmdlist = ["aapt", "d", "badging", apkFile]
-    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
-    retcode = process.wait()
-    if (retcode != 0):
-        log("aapt命令执行失败")
-        sys.exit()
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
 
     tmppkg = ""
     tmp = ""
