@@ -159,6 +159,7 @@ def install_apk(args):
                 success = True
         log(allret)
         if (success == False):
+            log("操作完成，按任意键退出", True)
             msvcrt.getch()
 
 def print_xml(args):
@@ -235,4 +236,5 @@ if APK_INFO == True:
     log("--------------------------------------------")
     processapk(args, md5_signfile)
     log("--------------------------------------------")
+log("操作完成，按任意键退出", True)
 msvcrt.getch()

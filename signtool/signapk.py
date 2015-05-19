@@ -85,7 +85,7 @@ def sign_apk(src_apk, dst_apk, keystoreinfo):
             log("[Signing...] 签名成功 : %s" % dst_apk, True)
         else:
             log("[Signing...] 签名失败", True)
-    log("", True);
+    log("---------------------------------------", True);
 
 def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     log("[Logging...] APK 文件 : " + src_apk, True)
@@ -170,4 +170,5 @@ for file in args :
         if (len(file) >= 4 and file[-4:] == ".apk"):
             exec_sign_process(os.path.abspath(file), USE_TESTSIGN_FILE)
 
+log("操作完成，按任意键退出", True)
 msvcrt.getch()
