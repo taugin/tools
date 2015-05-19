@@ -63,8 +63,7 @@ def sign_apk(src_apk, dst_apk, keystoreinfo):
         cmdlist = []
         cmdlist.append(JARSIGNER)
 
-        cmdlist.append("-tsa")
-        cmdlist.append("https://timestamp.geotrust.com/tsa")
+        #cmdlist +=["-tsa", "https://timestamp.geotrust.com/tsa"]
         cmdlist.append("-digestalg")
         cmdlist.append("SHA1")
         cmdlist.append("-sigalg")
@@ -80,7 +79,7 @@ def sign_apk(src_apk, dst_apk, keystoreinfo):
         cmdlist.append(dst_apk)
         cmdlist.append(src_apk)
         cmdlist.append(keystoreinfo[2])
-        retcode = subprocess.call(cmdlist)
+        retcode = subprocess.call(cmdlist, stdout=subprocess.PIPE)
         if (retcode == 0):
             log("[Signing...] 签名成功 : %s" % dst_apk, True)
         else:
