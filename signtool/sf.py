@@ -16,8 +16,10 @@ FILE_MD5 = False
 STR_MD5 = False
 APK_INFO = False
 INSTALL_APK = False
+AXMLPRINTER = False
 KEYTOOL = "keytool"
 ADB = "adb"
+JAVA = "java"
 
 def log(str, show=True):
     if (show):
@@ -54,6 +56,7 @@ def md5_signfile(apkFile):
     for f in z.namelist() :
         if (len(f) >=2 and f[-2:] == "SA"):
             signfile = f
+            break;
     if (signfile != ""):
         tmpfile = os.path.basename(signfile)
         f = open(tmpfile, "wb");
@@ -157,13 +160,35 @@ def install_apk(args):
         log(allret)
         if (success == False):
             msvcrt.getch()
+
+def print_xml(args):
+    manifest = ""
+    jarfile = os.path.join(os.path.dirname(sys.argv[0]), "AXMLPrinter2.jar")
+    if (len(args) > 0):
+        if (len(args[0]) >= 4 and args[0][-4:] == ".apk"):
+            zf = zipfile.ZipFile(os.path.abspath(args[0]), "r")
+            for file in zf.namelist():
+                if (file == "AndroidManifest.xml"):
+                    manifest = file
+                    break;
+            if (manifest != ""):
+                tmpfile = os.path.basename(manifest)
+                f = open(tmpfile, "wb");
+                f.write(zf.read(manifest));
+                f.close()
+                log(jarfile)
+                cmd = [JAVA, "-jar", jarfile, tmpfile]
+                subprocess.call(cmd)
+                os.remove(tmpfile)
+            zf.close()
+
 # start ============================================================================================
 if (len(sys.argv) < 2):
     log("[Logging...] 缺少参数 : %s <src_apk> 输出APK文件信息" % os.path.basename(sys.argv[0]), True);
     sys.exit()
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "pmsi")
+    opts, args = getopt.getopt(sys.argv[1:], "pmsia")
     for op, value in opts:
         if (op == "-m"):
             FILE_MD5 = True
@@ -173,12 +198,18 @@ try:
             APK_INFO = True
         elif (op == "-i") :
             INSTALL_APK = True
+        elif (op == "-a") :
+            AXMLPRINTER = True
 except getopt.GetoptError as err:
     log(err)
     sys.exit()
 #安装apk
 if INSTALL_APK == True:
     install_apk(args)
+    sys.exit()
+#打印Android xml 文件
+if AXMLPRINTER == True:
+    print_xml(args)
     sys.exit()
 #求字符串的MD5值
 if STR_MD5 == True:
