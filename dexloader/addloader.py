@@ -5,10 +5,15 @@ import zipfile
 import xml.etree.ElementTree as ET
 import shutil
 
+MANIFEST_FILE = "AndroidManifest.xml"
 TMP_DECOMPILE_FOLDER = "debuild"
+TMP_DECOMPILE_APKFILE = "debuild.apk"
 APP_ENTRYAPPLICATION = "com.loader.dexloader.WrapperApp"
 APP_APPLICATION_KEY = "APPLICATION_CLASS_NAME"
 DEX_DECRYPTDATA = "encryptdata.dat"
+DEX_DECRYPTDATA_PATH = os.path.join(TMP_DECOMPILE_FOLDER, "assets", DEX_DECRYPTDATA)
+APP_MODIFIED_MANIFEST = os.path.join(TMP_DECOMPILE_FOLDER, MANIFEST_FILE)
+SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "signtool", "signapk.py")
 
 def log(str, show=True):
     if (show):
@@ -31,16 +36,16 @@ def apk_decompile(apkfile):
         f.close()
         sys.exit(0);
 
-def apk_compile(apkloaderfile):
+def apk_compile():
     thisdir = os.path.dirname(sys.argv[0])
     apktoolfile = os.path.join(thisdir, "apktool.jar")
     sys.argv[0] = apktoolfile
-    cmdlist = ["java", "-jar", apktoolfile, "b", TMP_DECOMPILE_FOLDER, apkloaderfile]
+    cmdlist = ["java", "-jar", apktoolfile, "b", TMP_DECOMPILE_FOLDER, TMP_DECOMPILE_APKFILE]
     log("[Logging...] 正在回编译 %s" % apkloaderfile)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
-        log("[Error...] %s 回编译出错，请查看日志文件 : compile_err.txt" % apkloaderfile)
+        log("[Error...] %s 回编译出错，请查看日志文件 : compile_err.txt" % TMP_DECOMPILE_APKFILE)
         f = open("compile_err.txt", "w")
         for line in process.stdout.readlines() :
             tmp = str(line, "utf-8")
@@ -74,13 +79,37 @@ def generate_decryptdata():
     zipf.write("%s/classes.dex" % TMP_DECOMPILE_FOLDER, "classes.dex")
     zipf.close()
 
-def copy_loaderclass():
+def generate_loaderapk(apkloaderfile):
+    log("[Logging...] 正在生成%s" % apkloaderfile)
+    shutil.copyfile(basename, apkloaderfile)
+
+def zip_loaderanddat(apkloaderfile):
     log("[Logging...] 正在拷贝%s" % "classes.dex")
+    subprocess.call(["aapt", "r", apkloaderfile, MANIFEST_FILE])
+    subprocess.call(["aapt", "r", apkloaderfile, "classes.dex"])
     sysdir = os.path.dirname(sys.argv[0])
+    szf = zipfile.ZipFile(TMP_DECOMPILE_APKFILE, "r")
     srcclassdex = os.path.join(sysdir, "classes.dex")
-    dstclassdes = "%s/classes.dex" % TMP_DECOMPILE_FOLDER
-    shutil.copyfile(srcclassdex, dstclassdes)
-    log(srcclassdex)
+    zf = zipfile.ZipFile(apkloaderfile, "a")
+    zf.write(srcclassdex, "classes.dex")
+    zf.write(DEX_DECRYPTDATA_PATH, "assets/%s" % DEX_DECRYPTDATA)
+    manifest = open(MANIFEST_FILE, "wb")
+    manifest.write(szf.read(MANIFEST_FILE))
+    manifest.close()
+    zf.write(MANIFEST_FILE)
+    zf.close()
+    szf.close()
+
+def clear_tmp_folder():
+    log("[Logging...] 清除临时文件")
+    shutil.rmtree(TMP_DECOMPILE_FOLDER)
+    os.remove(TMP_DECOMPILE_APKFILE)
+    os.remove(MANIFEST_FILE)
+
+def signapk_use_testkey(apkloaderfile):
+    log(SIGNAPK_FILE)
+    cmdlist = ["python", SIGNAPK_FILE, "-t", apkloaderfile]
+    subprocess.call(cmdlist)
 
 if (len(sys.argv) < 2):
     log("[Logging...] 缺少参数: %s <*.apk>" % os.path.basename(sys.argv[0]), True);
@@ -102,6 +131,12 @@ modify_xml()
 log("")
 generate_decryptdata()
 log("")
-copy_loaderclass()
+apk_compile()
 log("")
-apk_compile(apkloaderfile)
+generate_loaderapk(apkloaderfile)
+log("")
+zip_loaderanddat(apkloaderfile)
+log("")
+clear_tmp_folder()
+log("")
+signapk_use_testkey(apkloaderfile)
