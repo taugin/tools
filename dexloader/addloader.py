@@ -4,6 +4,7 @@ import subprocess
 import zipfile
 import xml.etree.ElementTree as ET
 import shutil
+import platform
 
 MANIFEST_FILE = "AndroidManifest.xml"
 TMP_DECOMPILE_FOLDER = "debuild"
@@ -14,6 +15,14 @@ DEX_DECRYPTDATA = "encryptdata.dat"
 DEX_DECRYPTDATA_PATH = os.path.join(TMP_DECOMPILE_FOLDER, "assets", DEX_DECRYPTDATA)
 APP_MODIFIED_MANIFEST = os.path.join(TMP_DECOMPILE_FOLDER, MANIFEST_FILE)
 SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "signtool", "signapk.py")
+XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
+
+EXE = ""
+if (platform.system().lower() == "windows"):
+    EXE = ".exe"
+AAPT = "aapt%s" % EXE
+
+AAPT_FILE = os.path.join(os.path.dirname(sys.argv[0]), AAPT)
 
 def log(str, show=True):
     if (show):
@@ -56,13 +65,13 @@ def apk_compile():
 def modify_xml():
     log("[Logging...] 正在编辑AndrodManifest.xml")
     manifest = "%s/AndroidManifest.xml" % TMP_DECOMPILE_FOLDER
-    ET.register_namespace('android', "http://schemas.android.com/apk/res/android")
+    ET.register_namespace('android', XML_NAMESPACE)
     tree = ET.parse(manifest)
     root = tree.getroot()
     pkgname = root.get("package")
     application = root.find("application");
-    appname = application.get("{http://schemas.android.com/apk/res/android}name")
-    application.set("{http://schemas.android.com/apk/res/android}name", APP_ENTRYAPPLICATION)
+    appname = application.get("{%s}name" % XML_NAMESPACE)
+    application.set("{%s}name" % XML_NAMESPACE, APP_ENTRYAPPLICATION)
     if (appname != None):
         fullappname = appname
         if (appname.startswith(".")):
@@ -85,8 +94,9 @@ def generate_loaderapk(apkloaderfile):
 
 def zip_loaderanddat(apkloaderfile):
     log("[Logging...] 正在拷贝%s" % "classes.dex")
-    subprocess.call(["aapt", "r", apkloaderfile, MANIFEST_FILE])
-    subprocess.call(["aapt", "r", apkloaderfile, "classes.dex"])
+    subprocess.call([AAPT_FILE, "rv", apkloaderfile, MANIFEST_FILE])
+    subprocess.call([AAPT_FILE, "rv", apkloaderfile, "classes.dex"])
+    subprocess.call([AAPT_FILE, "rv", apkloaderfile, "assets/%s" % DEX_DECRYPTDATA])
     sysdir = os.path.dirname(sys.argv[0])
     szf = zipfile.ZipFile(TMP_DECOMPILE_APKFILE, "r")
     srcclassdex = os.path.join(sysdir, "classes.dex")
@@ -107,7 +117,6 @@ def clear_tmp_folder():
     os.remove(MANIFEST_FILE)
 
 def signapk_use_testkey(apkloaderfile):
-    log(SIGNAPK_FILE)
     cmdlist = ["python", SIGNAPK_FILE, "-t", apkloaderfile]
     subprocess.call(cmdlist)
 
