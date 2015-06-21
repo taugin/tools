@@ -134,6 +134,10 @@ if (os.path.exists(file) == False):
 basename = os.path.basename(file)
 (name, ext) = os.path.splitext(basename)
 apkloaderfile = name + "-loader.apk"
+
+#更改当前目录为源文件所在目录
+os.chdir(os.path.dirname(os.path.abspath(file)))
+
 apk_decompile(os.path.abspath(file))
 log("")
 modify_xml()
