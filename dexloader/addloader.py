@@ -133,20 +133,20 @@ def process_addloader(file, apkloaderfile):
         and apk_compile() \
         and generate_loaderapk(apkloaderfile) \
         and zip_loaderanddat(apkloaderfile) \
-        and clear_tmp_folder() \
-        and signapk_use_testkey(apkloaderfile)
+        and clear_tmp_folder()
     if (success == False):
         f = open(TRY_CONFIG, "w")
         f.close()
+    signapk_use_testkey(apkloaderfile)
 
 def process_addloader_fromcompile(file, apkloaderfile):
     success = apk_compile() \
         and generate_loaderapk(apkloaderfile) \
         and zip_loaderanddat(apkloaderfile) \
-        and clear_tmp_folder() \
-        and signapk_use_testkey(apkloaderfile)
+        and clear_tmp_folder()
     if (success == True):
         os.remove(TRY_CONFIG)
+    signapk_use_testkey(apkloaderfile)
 
 if (len(sys.argv) < 2):
     log("[Logging...] 缺少参数: %s <*.apk>" % os.path.basename(sys.argv[0]), True);
