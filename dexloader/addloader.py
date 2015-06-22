@@ -69,6 +69,9 @@ def modify_xml():
     pkgname = root.get("package")
     application = root.find("application");
     appname = application.get("{%s}name" % XML_NAMESPACE)
+    if (appname != None and appname == APP_ENTRYAPPLICATION):
+        log("[Logging...] 貌似已经加过密了，查看一下吧")
+        return False
     application.set("{%s}name" % XML_NAMESPACE, APP_ENTRYAPPLICATION)
     log("[Logging...] 应用包名 %s" % pkgname)
     if (appname != None):
@@ -139,26 +142,39 @@ def signapk_use_testkey(apkloaderfile):
         return False
 
 def process_addloader(file, apkloaderfile):
-    success = apk_decompile(os.path.abspath(file))\
-        and modify_xml() \
-        and generate_encryptdata() \
-        and apk_compile() \
-        and generate_loaderapk(apkloaderfile) \
-        and zip_loaderanddat(apkloaderfile) \
-        and clear_tmp_folder()
-    if (success == False):
-        f = open(TRY_CONFIG, "w")
-        f.close()
-    signapk_use_testkey(apkloaderfile)
+    functions = []
+    functions += ["apk_decompile(os.path.abspath(file))"]
+    functions += ["modify_xml()"]
+    functions += ["generate_encryptdata()"]
+    functions += ["apk_compile()"]
+    functions += ["generate_loaderapk(apkloaderfile)"]
+    functions += ["zip_loaderanddat(apkloaderfile)"]
+    functions += ["clear_tmp_folder()"]
+    functions += ["signapk_use_testkey(apkloaderfile)"]
 
-def process_addloader_fromcompile(file, apkloaderfile):
-    success = apk_compile() \
-        and generate_loaderapk(apkloaderfile) \
-        and zip_loaderanddat(apkloaderfile) \
-        and clear_tmp_folder()
-    if (success == True):
+    result = False
+    length = len(functions)
+    func_exec_pos = 0
+    if (os.path.exists(TRY_CONFIG)):
+        f = open(TRY_CONFIG, "r");
+        string = f.read()
+        f.close()
+        saveflag = eval(string)
+        func_exec_pos = saveflag["function_pos"]
+
+    for item in range(0, length):
+        if (item >= func_exec_pos):
+            result = eval(functions[item])
+            if (result == False):
+                savestr = '{"function_pos":%d}' % item
+                fd = open(TRY_CONFIG, "w")
+                fd.write(savestr)
+                fd.close()
+                return;
+    if (os.path.exists(TRY_CONFIG)):
         os.remove(TRY_CONFIG)
-    signapk_use_testkey(apkloaderfile)
+
+
 
 if (len(sys.argv) < 2):
     log("[Logging...] 缺少参数: %s <*.apk>" % os.path.basename(sys.argv[0]), True);
@@ -177,7 +193,4 @@ apkloaderfile = name + "-loader.apk"
 
 #更改当前目录为源文件所在目录
 os.chdir(os.path.dirname(os.path.abspath(file)))
-if (os.path.exists(TRY_CONFIG)):
-    process_addloader_fromcompile(file, apkloaderfile)
-else:
-    process_addloader(file, apkloaderfile)
+process_addloader(file, apkloaderfile)
