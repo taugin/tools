@@ -31,7 +31,6 @@ def log(str, show=True):
         print(str)
 
 def apk_decompile(apkfile):
-    log("")
     thisdir = os.path.dirname(sys.argv[0])
     apktoolfile = os.path.join(thisdir, "apktool.jar")
     sys.argv[0] = apktoolfile
@@ -46,7 +45,6 @@ def apk_decompile(apkfile):
         return True
 
 def apk_compile():
-    log("")
     thisdir = os.path.dirname(sys.argv[0])
     apktoolfile = os.path.join(thisdir, "apktool.jar")
     cmdlist = ["java", "-jar", apktoolfile, "b", TMP_DECOMPILE_FOLDER, TMP_DECOMPILE_APKFILE]
@@ -60,7 +58,6 @@ def apk_compile():
         return True
 
 def modify_xml():
-    log("")
     log("[Logging...] 正在编辑 AndrodManifest.xml")
     manifest = "%s/AndroidManifest.xml" % TMP_DECOMPILE_FOLDER
     ET.register_namespace('android', XML_NAMESPACE)
@@ -72,6 +69,7 @@ def modify_xml():
     if (appname != None and appname == APP_ENTRYAPPLICATION):
         log("[Logging...] 貌似已经加过密了，查看一下吧")
         return False
+    log("[Logging...] 设置入口 Application : %s" % APP_ENTRYAPPLICATION)
     application.set("{%s}name" % XML_NAMESPACE, APP_ENTRYAPPLICATION)
     log("[Logging...] 应用包名 %s" % pkgname)
     if (appname != None):
@@ -85,7 +83,6 @@ def modify_xml():
 
 
 def generate_encryptdata():
-    log("")
     zf = "%s/assets/%s" %(TMP_DECOMPILE_FOLDER, DEX_ENCRYPTDATA)
     log("[Logging...] 正在生成 %s" % zf)
     assetsdir = "%s/assets/" % TMP_DECOMPILE_FOLDER
@@ -97,13 +94,11 @@ def generate_encryptdata():
     return True
 
 def generate_loaderapk(apkloaderfile):
-    log("")
     log("[Logging...] 正在生成 %s" % apkloaderfile)
     shutil.copyfile(basename, apkloaderfile)
     return True
 
 def zip_loaderanddat(apkloaderfile):
-    log("")
     log("[Logging...] 正在拷贝 assets/%s" % DEX_ENCRYPTDATA)
     log("[Logging...] 正在拷贝 %s" % MANIFEST_FILE)
     log("[Logging...] 正在拷贝 %s" % "classes.dex")
@@ -125,7 +120,6 @@ def zip_loaderanddat(apkloaderfile):
     return True
 
 def clear_tmp_folder():
-    log("")
     log("[Logging...] 清除临时文件")
     shutil.rmtree(TMP_DECOMPILE_FOLDER)
     os.remove(TMP_DECOMPILE_APKFILE)
@@ -164,6 +158,7 @@ def process_addloader(file, apkloaderfile):
 
     for item in range(0, length):
         if (item >= func_exec_pos):
+            log("--------------------------------------------")
             result = eval(functions[item])
             if (result == False):
                 savestr = '{"function_pos":%d}' % item
