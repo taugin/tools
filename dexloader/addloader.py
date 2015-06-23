@@ -144,7 +144,8 @@ def process_addloader(file, apkloaderfile):
     functions += ["generate_loaderapk(apkloaderfile)"]
     functions += ["zip_loaderanddat(apkloaderfile)"]
     functions += ["clear_tmp_folder()"]
-    functions += ["signapk_use_testkey(apkloaderfile)"]
+    if (platform.system().lower() == "windows"):
+        functions += ["signapk_use_testkey(apkloaderfile)"]
 
     result = False
     length = len(functions)
