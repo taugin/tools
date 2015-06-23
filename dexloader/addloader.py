@@ -25,7 +25,6 @@ EXE = ""
 if (platform.system().lower() == "windows"):
     EXE = ".exe"
 AAPT = "aapt%s" % EXE
-
 AAPT_FILE = os.path.join(os.path.dirname(sys.argv[0]), AAPT)
 
 def log(str, show=True):
@@ -34,9 +33,8 @@ def log(str, show=True):
 
 def apk_decompile(apkfile):
     thisdir = os.path.dirname(sys.argv[0])
-    apktoolfile = os.path.join(thisdir, "apktool.jar")
-    sys.argv[0] = apktoolfile
-    cmdlist = ["java", "-jar", apktoolfile, "d", "-s", "-f" , apkfile, TMP_DECOMPILE_FOLDER]
+    apktoolfile = os.path.join(thisdir, "apktool_2.0.0.jar")
+    cmdlist = ["java", "-jar", apktoolfile, "d", "-s", "-f" , apkfile, "-o", TMP_DECOMPILE_FOLDER]
     log("[Logging...] 正在反编译 %s" % apkfile)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
@@ -48,8 +46,8 @@ def apk_decompile(apkfile):
 
 def apk_compile():
     thisdir = os.path.dirname(sys.argv[0])
-    apktoolfile = os.path.join(thisdir, "apktool.jar")
-    cmdlist = ["java", "-jar", apktoolfile, "b", TMP_DECOMPILE_FOLDER, TMP_DECOMPILE_APKFILE]
+    apktoolfile = os.path.join(thisdir, "apktool_2.0.0.jar")
+    cmdlist = ["java", "-jar", apktoolfile, "b", TMP_DECOMPILE_FOLDER, "-o", TMP_DECOMPILE_APKFILE]
     log("[Logging...] 正在回编译 %s" % TMP_DECOMPILE_APKFILE)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
