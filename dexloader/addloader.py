@@ -1,4 +1,6 @@
-﻿import sys
+#!/usr/bin/python
+# coding: UTF-8
+import sys
 import os
 import subprocess
 import zipfile
