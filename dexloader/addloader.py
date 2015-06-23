@@ -18,6 +18,7 @@ DEX_DECRYPTDATA_PATH = os.path.join(TMP_DECOMPILE_FOLDER, "assets", DEX_ENCRYPTD
 APP_MODIFIED_MANIFEST = os.path.join(TMP_DECOMPILE_FOLDER, MANIFEST_FILE)
 SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "signtool", "signapk.py")
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
+APKTOOL_JAR = "apktool_2.0.0.jar"
 TRY_CONFIG = "addloader.tryagain"
 
 
@@ -33,26 +34,26 @@ def log(str, show=True):
 
 def apk_decompile(apkfile):
     thisdir = os.path.dirname(sys.argv[0])
-    apktoolfile = os.path.join(thisdir, "apktool_2.0.0.jar")
+    apktoolfile = os.path.join(thisdir, APKTOOL_JAR)
     cmdlist = ["java", "-jar", apktoolfile, "d", "-s", "-f" , apkfile, "-o", TMP_DECOMPILE_FOLDER]
     log("[Logging...] 正在反编译 %s" % apkfile)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
-        log("[Error...] %s 反编译出错 ...")
+        log("[Error...] 反编译出错 ...")
         return False
     else:
         return True
 
 def apk_compile():
     thisdir = os.path.dirname(sys.argv[0])
-    apktoolfile = os.path.join(thisdir, "apktool_2.0.0.jar")
+    apktoolfile = os.path.join(thisdir, APKTOOL_JAR)
     cmdlist = ["java", "-jar", apktoolfile, "b", TMP_DECOMPILE_FOLDER, "-o", TMP_DECOMPILE_APKFILE]
     log("[Logging...] 正在回编译 %s" % TMP_DECOMPILE_APKFILE)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
-        log("[Error...] %s 回编译出错 ...")
+        log("[Error...] 回编译出错 ...")
         return False
     else:
         return True
@@ -155,20 +156,21 @@ def process_addloader(file, apkloaderfile):
         string = f.read()
         f.close()
         saveflag = eval(string)
-        func_exec_pos = saveflag["function_pos"]
+        filename = saveflag["filename"]
+        if (filename != None and filename == os.path.abspath(file)):
+            func_exec_pos = saveflag["function_pos"]
+        os.remove(TRY_CONFIG)
 
     for item in range(0, length):
         if (item >= func_exec_pos):
             log("--------------------------------------------")
             result = eval(functions[item])
             if (result == False):
-                savestr = '{"function_pos":%d}' % item
+                savestr = '{"function_pos":%d,"filename":r"%s"}' % (item, os.path.abspath(file))
                 fd = open(TRY_CONFIG, "w")
                 fd.write(savestr)
                 fd.close()
                 return;
-    if (os.path.exists(TRY_CONFIG)):
-        os.remove(TRY_CONFIG)
 
 
 
