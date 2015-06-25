@@ -113,19 +113,17 @@ def zip_loaderanddat(apkloaderfile):
     zf = zipfile.ZipFile(apkloaderfile, "a")
     zf.write(srcclassdex, "classes.dex")
     zf.write(DEX_DECRYPTDATA_PATH, "assets/%s" % DEX_ENCRYPTDATA, zipfile.ZIP_DEFLATED)
-    manifest = open(MANIFEST_FILE, "wb")
-    manifest.write(szf.read(MANIFEST_FILE))
-    manifest.close()
-    zf.write(MANIFEST_FILE)
+    zf.writestr(MANIFEST_FILE, szf.read(MANIFEST_FILE))
     zf.close()
     szf.close()
     return True
 
 def clear_tmp_folder():
     log("[Logging...] 清除临时文件")
-    shutil.rmtree(TMP_DECOMPILE_FOLDER)
-    os.remove(TMP_DECOMPILE_APKFILE)
-    os.remove(MANIFEST_FILE)
+    if (os.path.exists(TMP_DECOMPILE_FOLDER)):
+        shutil.rmtree(TMP_DECOMPILE_FOLDER)
+    if (os.path.exists(TMP_DECOMPILE_APKFILE)):
+        os.remove(TMP_DECOMPILE_APKFILE)
     return True
 
 def signapk_use_testkey(apkloaderfile):
