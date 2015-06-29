@@ -7,6 +7,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 import shutil
 import platform
+import msvcrt
 
 MANIFEST_FILE = "AndroidManifest.xml"
 TMP_DECOMPILE_FOLDER = "debuild"
@@ -169,6 +170,7 @@ def process_addloader(file, apkloaderfile):
                 fd = open(TRY_CONFIG, "w")
                 fd.write(savestr)
                 fd.close()
+                msvcrt.getch()
                 return;
 
 
