@@ -41,7 +41,8 @@ def check_public(gamefolder, payfolder):
 def check_lib_assets(gamefolder, payfolder):
     exist = False
     logfile = open("dup.txt", "a");
-    list = os.walk(gamefolder + "/lib", True)
+    checkpath = os.path.join(gamefolder, "lib")
+    list = os.walk(checkpath, True)
     for root, dirs, files in list:
         for file in files:
             filedir = os.path.join(root, file)
@@ -50,7 +51,8 @@ def check_lib_assets(gamefolder, payfolder):
                 logfile.write(filedir + "\n")
                 exist = True
 
-    list = os.walk(gamefolder + "/assets", True)
+    checkpath = os.path.join(gamefolder, "assets")
+    list = os.walk(checkpath, True)
     for root, dirs, files in list:
         for file in files:
             filedir = os.path.join(root, file)
