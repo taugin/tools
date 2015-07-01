@@ -26,4 +26,5 @@ def apk_decompile(apkfile, decompiled_folder=None):
         log("[Error...] 反编译出错 ...")
         return False
     else:
+        log("[Logging...] 反编译完成 ...\n")
         return True

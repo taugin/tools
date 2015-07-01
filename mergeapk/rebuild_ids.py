@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 from xml.etree import cElementTree as ET
 from xml.dom import minidom
 
-def log(str, show=True):
+def log(str, show=False):
     if (show):
         print(str)
 
@@ -58,6 +58,13 @@ def process_maxid(maxid, dict, type):
     return hexid
 
 def rebuild_ids(gamefolder, payfolder):
+    if (os.path.exists(gamefolder) == False):
+        log("[Error...] 无法定位文件夹 %s" % gamefolder, True)
+        sys.exit(0)
+    if (os.path.exists(payfolder) == False):
+        log("[Error...] 无法定位文件夹 %s" % payfolder, True)
+        sys.exit(0)
+    log("[Logging...] 正在重建资源ID", True)
     gamepublic = "%s/res/values/public.xml" % gamefolder;
     paypublic = "%s/res/values/public.xml" % payfolder;
     dict = gettypeid(gamepublic)
@@ -92,5 +99,7 @@ def rebuild_ids(gamefolder, payfolder):
         element.attrib["type"] = type
         gameroot.append(element)
     gametree.write(gamepublic)
+    log("[Logging...] 重建资源ID完成\n", True)
 
-rebuild_ids(sys.argv[1], sys.argv[2])
+if __name__ == "__main__":
+    rebuild_ids(sys.argv[1], sys.argv[2])

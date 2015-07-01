@@ -22,4 +22,5 @@ def apk_compile(folder, compileapk):
         log("[Error...] 回编译出错 ...")
         return False
     else:
+        log("[Logging...] 回编译完成 ...\n")
         return True

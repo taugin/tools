@@ -20,27 +20,24 @@ def readislist(publicfile):
 def exist_in(text, list):
     return text in list
 
-def check_public(gamefolder, payfolder):
+def check_public(gamefolder, payfolder, dup_list):
     gamepublic = "%s/res/values/public.xml" % gamefolder;
     paypublic = "%s/res/values/public.xml" % payfolder;
 
     gameidlist = readislist(gamepublic)
     payidlist = readislist(paypublic)
 
-    logfile = open("dup.txt", "w");
     idexist = False
     for text in gameidlist:
         exist = exist_in(text, payidlist)
         if (exist == True):
             idexist = True
-            logfile.write(text + "\n")
+            dup_list.append(text + "\n")
             log("%s exist : %s" % (text, exist_in(text, payidlist)))
-    logfile.close()
     return idexist;
 
-def check_lib_assets(gamefolder, payfolder):
+def check_lib_assets(gamefolder, payfolder, dup_list):
     exist = False
-    logfile = open("dup.txt", "a");
     checkpath = os.path.join(gamefolder, "lib")
     list = os.walk(checkpath, True)
     for root, dirs, files in list:
@@ -48,7 +45,7 @@ def check_lib_assets(gamefolder, payfolder):
             filedir = os.path.join(root, file)
             payfile = filedir.replace(gamefolder, payfolder)
             if (os.path.exists(payfile) == True):
-                logfile.write(filedir + "\n")
+                dup_list.append(filedir + "\n")
                 exist = True
 
     checkpath = os.path.join(gamefolder, "assets")
@@ -57,20 +54,34 @@ def check_lib_assets(gamefolder, payfolder):
         for file in files:
             filedir = os.path.join(root, file)
             payfile = filedir.replace(gamefolder, payfolder)
-            if (os.path.exists(payfile) == True):
-                logfile.write(filedir + "\n")
+            if (os.path.exists(payfile) == True and (file != "ItemMapper.xml" and file != "plugins.xml")):
+                dup_list.append(filedir + "\n")
                 exist = True
-    logfile.close()
     return exist;
 
 def check_dup(gamefolder, payfolder):
-    if (os.path.exists(gamefolder) == False or os.path.exists(payfolder) == False):
-        log("[Error...] 无法定位文件夹 %s or %s" % (gamefolder, payfolder))
+    dup_list = []
+    if (os.path.exists(gamefolder) == False):
+        log("[Error...] 无法定位文件夹 %s" % gamefolder, True)
         sys.exit(0)
+    if (os.path.exists(payfolder) == False):
+        log("[Error...] 无法定位文件夹 %s" % payfolder, True)
+        sys.exit(0)
+    log("[Logging...] 正在检查重复资源", True)
     filedup = False
-    id_dup = check_public(gamefolder, payfolder)
-    filedup = check_lib_assets(gamefolder, payfolder)
+    id_dup = check_public(gamefolder, payfolder, dup_list)
+    filedup = check_lib_assets(gamefolder, payfolder, dup_list)
     all_dup = id_dup or filedup
-    log("Has Dup Files : %s " % all_dup, True)
+    if (all_dup == True):
+        log("[Logging...] 有重复资源 \n", True)
+        f = open("dup.txt", "w")
+        for s in dup_list:
+            f.write(s)
+        f.close()
+    else:
+        if (os.path.exists("dup.txt")):
+            os.remove("dup.txt")
+        log("[Logging...] 无重复资源 \n", True)
 
-check_dup(sys.argv[1], sys.argv[2])
+if __name__ == "__main__":
+    check_dup(sys.argv[1], sys.argv[2])
