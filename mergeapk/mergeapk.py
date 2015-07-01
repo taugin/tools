@@ -84,5 +84,6 @@ for item in range(0, length):
             fd = open(TRY_CONFIG, "w")
             fd.write(savestr)
             fd.close()
+            log("[Logging...] 按任意键退出")
             msvcrt.getch()
             break

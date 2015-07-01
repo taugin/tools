@@ -12,7 +12,6 @@ PLUGIN_FILE = "assets/plugins.xml"
 ITEM_MAPPER = "assets/ItemMapper.xml"
 COCOSPAYAPK = "assets/CocosPaySdk.apk"
 
-APKTOOL_JAR = "apktool_2.0.0.jar"
 EXE = ""
 if (platform.system().lower() == "windows"):
     EXE = ".exe"
@@ -44,9 +43,7 @@ def copy_payapk(mergedapk, payapk):
             mergedzip.writestr(name, payzip.read(name))
     mergedzip.close()
     payzip.close()
-    
-    
-    
+
 def should_copygameapkfile(name):
     if (name.startswith("assets")):
         return False
@@ -92,14 +89,15 @@ def generate_cocospay(mergedapk, payapk):
 def copy_fromapk(mergedapk, gameapk, payapk):
     log("[Logging...] 正在拷贝APK相关文件", True)
     if (os.path.exists(mergedapk) == False):
-        log("[Error...] 无法定位文件夹 %s" % mergedapk, True)
+        log("[Error...] 无法定位文件 %s" % mergedapk, True)
         sys.exit(0)
     if (os.path.exists(gameapk) == False):
-        log("[Error...] 无法定位文件夹 %s" % gameapk, True)
+        log("[Error...] 无法定位文件 %s" % gameapk, True)
         sys.exit(0)
     if (os.path.exists(payapk) == False):
-        log("[Error...] 无法定位文件夹 %s" % payapk, True)
+        log("[Error...] 无法定位文件 %s" % payapk, True)
         sys.exit(0)
+
     subprocess.call([AAPT_FILE, "r", mergedapk, PLUGIN_FILE], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     subprocess.call([AAPT_FILE, "r", mergedapk, ITEM_MAPPER], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     subprocess.call([AAPT_FILE, "r", mergedapk, COCOSPAYAPK], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
