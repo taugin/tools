@@ -16,6 +16,20 @@ def log(str, show=False):
     if (show):
         print(str)
 
+## Get pretty look
+def indent(elem, level=0):
+    i = "\n" + level*"    "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "    "
+        for e in elem:
+            indent(e, level+1)
+        if not e.tail or not e.tail.strip():
+            e.tail = i
+    if level and (not elem.tail or not elem.tail.strip()):
+        elem.tail = i
+    return elem
+
 def merge_xml(gamefolder, payfolder):
     log("[Logging...] 正在合并AndroidManifest.xml文件", True)
     if (os.path.exists(gamefolder) == False):
@@ -39,10 +53,11 @@ def merge_xml(gamefolder, payfolder):
     for item in payroot.getchildren():
         if (item.tag == "uses-permission"):
             gameroot.append(item)
-    
+
     for item in payapplication.getchildren():
         gameapplication.append(item)
 
+    indent(gameroot)
     gametree.write(gamemanifest)
     f = open(gamemanifest, "r")
     strinfo = re.compile(RE_STRING)

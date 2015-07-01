@@ -32,11 +32,19 @@ def getmaxids(dict, key):
     list.sort()
     return list[-1]
 
-def fomatTree(elem):
-     """格式化XML的内容,用于输出，保存XML时并不需要"""
-     root_str = ET.tostring(elem, 'UTF-8')
-     reparse = minidom.parseString(root_str)
-     return reparse.toprettyxml(" ")
+## Get pretty look
+def indent(elem, level=0):
+    i = "\n" + level*"    "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "    "
+        for e in elem:
+            indent(e, level+1)
+        if not e.tail or not e.tail.strip():
+            e.tail = i
+    if level and (not elem.tail or not elem.tail.strip()):
+        elem.tail = i
+    return elem
 
 def process_maxid(maxid, dict, type):
     if (maxid != "0x0"):
@@ -98,6 +106,7 @@ def rebuild_ids(gamefolder, payfolder):
         element.attrib["name"] = name
         element.attrib["type"] = type
         gameroot.append(element)
+    indent(gameroot)
     gametree.write(gamepublic)
     log("[Logging...] 重建资源ID完成\n", True)
     return True
