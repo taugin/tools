@@ -15,7 +15,7 @@ import copy_res
 import merge_xml
 import copy_fromapk
 
-TRY_CONFIG = "addloader.tryagain"
+TRY_CONFIG = "mergeapk.tryagain"
 SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "signtool", "signapk.py")
 
 def log(str, show=True):
@@ -30,15 +30,6 @@ gamefolder = name
 gamemergedapk = name + "-merged.apk"
 (name, ext) = os.path.splitext(payapk)
 payfolder = name
-
-#decompile_apk.apk_decompile(gameapk, gamefolder)
-#decompile_apk.apk_decompile(payapk, payfolder)
-#check_dup.check_dup(gamefolder, payfolder)
-#rebuild_ids.rebuild_ids(gamefolder, payfolder)
-#copy_res.copy_res(gamefolder, payfolder)
-#merge_xml.merge_xml(gamefolder, payfolder)
-#compile_apk.apk_compile(gamefolder, gamemergedapk)
-#copy_fromapk.copy_fromapk(gamemergedapk, gameapk, payapk)
 
 def signapk_use_testkey(apkloaderfile):
     log("")
@@ -84,6 +75,4 @@ for item in range(0, length):
             fd = open(TRY_CONFIG, "w")
             fd.write(savestr)
             fd.close()
-            log("[Logging...] 按任意键退出")
-            msvcrt.getch()
             break
