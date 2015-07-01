@@ -5,6 +5,7 @@ import os
 import sys
 import platform
 import subprocess
+import msvcrt
 
 import decompile_apk
 import compile_apk

@@ -2,13 +2,14 @@
 # coding: UTF-8
 
 import os
+import re
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from xml.etree import cElementTree as ET
 from xml.dom import minidom
 
-
+RE_STRING = "PACKAGE_NAME"
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
 
 def log(str, show=False):
@@ -29,6 +30,7 @@ def merge_xml(gamefolder, payfolder):
     gametree = ET.parse(gamemanifest)
     gameroot = gametree.getroot()
     gameapplication = gameroot.find("application")
+    pkgname = gameroot.get("package")
 
     paytree = ET.parse(paymanifest)
     payroot = paytree.getroot()
@@ -42,6 +44,13 @@ def merge_xml(gamefolder, payfolder):
         gameapplication.append(item)
 
     gametree.write(gamemanifest)
+    f = open(gamemanifest, "r")
+    strinfo = re.compile(RE_STRING)
+    rc = strinfo.sub(pkgname, f.read())
+    f.close()
+    f = open(gamemanifest, "w")
+    f.write(rc)
+    f.close()
     log("[Logging...] AndroidManifest.xml文件合并完成\n", True)
     return True
 
