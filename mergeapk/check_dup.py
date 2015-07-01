@@ -66,6 +66,7 @@ def check_lib_assets(gamefolder, payfolder):
 def check_dup(gamefolder, payfolder):
     if (os.path.exists(gamefolder) == False or os.path.exists(payfolder) == False):
         log("[Error...] 无法定位文件夹 %s or %s" % (gamefolder, payfolder))
+        sys.exit(0)
     filedup = False
     id_dup = check_public(gamefolder, payfolder)
     filedup = check_lib_assets(gamefolder, payfolder)

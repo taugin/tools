@@ -87,9 +87,9 @@ def rebuild_ids(gamefolder, payfolder):
         maxids[type] = hexid
         #element = ET.XML('<public type="%s" name="%s" id="%s" />' % (type, name, hexid))
         element = ET.Element("public")
-        element.attrib["type"] = type
-        element.attrib["name"] = name
         element.attrib["id"] = hexid
+        element.attrib["name"] = name
+        element.attrib["type"] = type
         gameroot.append(element)
     gametree.write(gamepublic)
 
