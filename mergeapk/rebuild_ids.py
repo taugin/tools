@@ -100,6 +100,7 @@ def rebuild_ids(gamefolder, payfolder):
         gameroot.append(element)
     gametree.write(gamepublic)
     log("[Logging...] 重建资源ID完成\n", True)
+    return True
 
 if __name__ == "__main__":
     rebuild_ids(sys.argv[1], sys.argv[2])

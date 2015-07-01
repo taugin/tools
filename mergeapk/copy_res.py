@@ -39,7 +39,8 @@ def copy_res(gamefolder, payfolder):
                     gamefile = tmp.replace(payfolder, gamefolder)
                     #log("payfile : %s , gamefile : %s " % (payfile, gamefile))
                     shutil.copy2(payfile, gamefile)
-    log("[Logging...] 拷贝资源文件完成\n", True)      
+    log("[Logging...] 拷贝资源文件完成\n", True)
+    return True
 
 if __name__ == "__main__":
     copy_res(sys.argv[1], sys.argv[2])

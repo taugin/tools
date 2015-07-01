@@ -107,8 +107,9 @@ def copy_fromapk(mergedapk, gameapk, payapk):
     copy_gameapk(mergedapk, gameapk)
     copy_payapk(mergedapk, payapk)
     generate_cocospay(mergedapk, payapk)
-    
+
     log("[Logging...] APK相关文件拷贝完成\n", True)
+    return True
 
 if __name__ == "__main__":
     copy_fromapk(sys.argv[1], sys.argv[2], sys.argv[3])

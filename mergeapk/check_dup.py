@@ -78,10 +78,12 @@ def check_dup(gamefolder, payfolder):
         for s in dup_list:
             f.write(s)
         f.close()
+        return False
     else:
         if (os.path.exists("dup.txt")):
             os.remove("dup.txt")
         log("[Logging...] 无重复资源 \n", True)
+        return True
 
 if __name__ == "__main__":
     check_dup(sys.argv[1], sys.argv[2])

@@ -43,6 +43,7 @@ def merge_xml(gamefolder, payfolder):
 
     gametree.write(gamemanifest)
     log("[Logging...] AndroidManifest.xml文件合并完成\n", True)
+    return True
 
 if __name__ == "__main__":
     merge_xml(sys.argv[1], sys.argv[2])
