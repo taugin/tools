@@ -71,20 +71,18 @@ def copy_gameapk(mergedapk, gameapk):
     gamezip.close()
 
 def generate_cocospay(mergedapk, payapk):
-    (name, ext) = os.path.splitext(payapk)
-    newpayapk = name + "-bak.apk"
-    shutil.copy(payapk, newpayapk)
-    payzip = zipfile.ZipFile(newpayapk)
-    for name in payzip.namelist():
-        if (name != "classes.dex"):
-            subprocess.call([AAPT_FILE, "r", newpayapk, name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    payzip = zipfile.ZipFile(payapk, "r")
+    tmpzipfile = "tmp.apk"
+    tmpzip = zipfile.ZipFile(tmpzipfile, "w")
+    tmpzip.writestr("classes.dex", payzip.read("classes.dex"), zipfile.ZIP_DEFLATED)
     payzip.close()
+    tmpzip.close()
     
     mergedzip = zipfile.ZipFile(mergedapk, "a")
-    mergedzip.write(newpayapk, COCOSPAYAPK, zipfile.ZIP_DEFLATED)
+    mergedzip.write(tmpzipfile, COCOSPAYAPK, zipfile.ZIP_DEFLATED)
     mergedzip.close()
-    if (os.path.exists(newpayapk)):
-        os.remove(newpayapk)
+    if (os.path.exists(tmpzipfile)):
+        os.remove(tmpzipfile)
 
 def copy_fromapk(mergedapk, gameapk, payapk):
     log("[Logging...] 正在拷贝APK相关文件", True)
