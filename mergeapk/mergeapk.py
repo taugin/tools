@@ -22,6 +22,10 @@ def log(str, show=True):
     if (show):
         print(str)
 
+
+if (len(sys.argv) < 3):
+    log("[Logging...] 缺少参数: %s apk1 apk2" % os.path.basename(sys.argv[0]), True);
+    sys.exit()
 gameapk = os.path.abspath(sys.argv[1])
 payapk = os.path.abspath(sys.argv[2])
 
