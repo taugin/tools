@@ -10,6 +10,7 @@ from xml.etree import cElementTree as ET
 from xml.dom import minidom
 
 RE_STRING = "PACKAGE_NAME"
+#RE_STRING = "XXX"
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
 
 def log(str, show=False):

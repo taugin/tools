@@ -1,15 +1,59 @@
 #!/usr/bin/python
 # coding: UTF-8
-
+# encoding:utf-8
 import os
 import sys
 import xml.etree.ElementTree as ET
 from xml.etree import cElementTree as ET
 from xml.dom import minidom
+from xml.dom.minidom import Document
+
+XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
+ACTIVITY_ENTRY_NAME = "dest_activity"
 
 def log(str, show=False):
     if (show):
         print(str)
+
+
+def add_gb_classname(root, dict, maxids, gamefolder):
+    gamemanifest = "%s/AndroidManifest.xml" % gamefolder;
+    ET.register_namespace('android', XML_NAMESPACE)
+    gametree = ET.parse(gamemanifest)
+    gameroot = gametree.getroot()
+    activity_entry_value = None
+    for item in gameroot.iter('meta-data'):
+        if (item.get("{%s}name" % XML_NAMESPACE) == ACTIVITY_ENTRY_NAME):
+            activity_entry_value = item.get("{%s}value" % XML_NAMESPACE)
+    if (activity_entry_value == None):
+        return
+
+    maxid = maxids["string"]
+    maxid = process_maxid(maxid, dict, type)
+    intid = int(eval(maxid))
+    intid = intid + 1
+    hexid = hex(intid)
+    maxids[type] = hexid
+    element = ET.Element("public")
+    element.attrib["id"] = hexid
+    element.attrib["name"] = "g_class_name"
+    element.attrib["type"] = "string"
+    root.append(element)
+    
+    gbstringfile = "%s/res/values/gb_strings.xml" % gamefolder
+    doc = Document()  #创建DOM文档对象
+    root = doc.createElement('resources') #创建根元素
+    doc.appendChild(root)
+    gbstring = doc.createElement("string")
+    gbstring.setAttribute("name", "g_class_name")
+    textnode = doc.createTextNode(activity_entry_value)
+    gbstring.appendChild(textnode)
+    root.appendChild(gbstring)
+    f = open(gbstringfile,'w')
+    f.write(doc.toprettyxml(indent = '    '))
+    f.close()
+    
+
 
 def gettypeid(publicfile):
     tree = ET.parse(publicfile)
@@ -106,6 +150,7 @@ def rebuild_ids(gamefolder, payfolder):
         element.attrib["name"] = name
         element.attrib["type"] = type
         gameroot.append(element)
+    add_gb_classname(gameroot, dict, maxids, gamefolder)
     indent(gameroot)
     gametree.write(gamepublic)
     log("[Logging...] 重建资源ID完成\n", True)
