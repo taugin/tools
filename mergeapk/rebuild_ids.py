@@ -16,7 +16,9 @@ def log(str, show=False):
         print(str)
 
 
-def add_gb_classname(root, dict, maxids, gamefolder):
+def add_gb_string(root, dict, maxids, gamefolder):
+    if (check_name_exists(root, "g_class_name", "string") == True):
+        return []
     gamemanifest = "%s/AndroidManifest.xml" % gamefolder;
     ET.register_namespace('android', XML_NAMESPACE)
     gametree = ET.parse(gamemanifest)
@@ -26,7 +28,7 @@ def add_gb_classname(root, dict, maxids, gamefolder):
         if (item.get("{%s}name" % XML_NAMESPACE) == ACTIVITY_ENTRY_NAME):
             activity_entry_value = item.get("{%s}value" % XML_NAMESPACE)
     if (activity_entry_value == None):
-        return
+        return []
 
     maxid = maxids["string"]
     maxid = process_maxid(maxid, dict, type)
@@ -40,20 +42,64 @@ def add_gb_classname(root, dict, maxids, gamefolder):
     element.attrib["type"] = "string"
     root.append(element)
     
-    gbstringfile = "%s/res/values/gb_strings.xml" % gamefolder
+    gbstringfile = "%s/res/values/njck1_strings.xml" % gamefolder
     doc = Document()  #创建DOM文档对象
-    root = doc.createElement('resources') #创建根元素
-    doc.appendChild(root)
     gbstring = doc.createElement("string")
     gbstring.setAttribute("name", "g_class_name")
     textnode = doc.createTextNode(activity_entry_value)
     gbstring.appendChild(textnode)
-    root.appendChild(gbstring)
-    f = open(gbstringfile,'w')
-    f.write(doc.toprettyxml(indent = '    '))
-    f.close()
-    
 
+    return [gbstring]
+
+def check_name_exists(root, name, type):
+    list = root.findall(".//public[@name='%s'][@type='%s']" % (name, type))
+    if (len(list) <= 0):
+        return False
+    return True
+
+def add_company_string(root, dict, maxids, gamefolder):
+    if (check_name_exists(root, "PARTNER_NAME", "string") == True):
+        return []
+    maxid = maxids["string"]
+    maxid = process_maxid(maxid, dict, type)
+    intid = int(eval(maxid))
+    intid = intid + 1
+    hexid = hex(intid)
+    maxids[type] = hexid
+    element = ET.Element("public")
+    element.attrib["id"] = hexid
+    element.attrib["name"] = "PARTNER_NAME"
+    element.attrib["type"] = "string"
+    root.append(element)
+
+    company_name = "上海触控有限公司"
+    doc = Document()  #创建DOM文档对象
+    gbstring = doc.createElement("string")
+    gbstring.setAttribute("name", "PARTNER_NAME")
+    textnode = doc.createTextNode(company_name)
+    gbstring.appendChild(textnode)
+
+    return [gbstring]
+
+def add_extra_string(root, dict, maxids, gamefolder):
+    list = []
+    list += add_gb_string(root, dict, maxids, gamefolder)
+    list += add_company_string(root, dict, maxids, gamefolder)
+
+    if (len(list) <= 0):
+        return
+    gbstringfile = "%s/res/values/njck_extra_strings.xml" % gamefolder
+    doc = Document()  #创建DOM文档对象
+    root = doc.createElement('resources') #创建根元素
+    doc.appendChild(root)
+    for item in list:
+        root.appendChild(item)
+    f = open(gbstringfile,'wb')
+    f.write(doc.toxml(encoding = "utf-8"))
+    f.close()
+    tree = ET.parse(gbstringfile)
+    indent(tree.getroot())
+    tree.write(gbstringfile, encoding="utf-8", xml_declaration=True)
 
 def gettypeid(publicfile):
     tree = ET.parse(publicfile)
@@ -150,9 +196,9 @@ def rebuild_ids(gamefolder, payfolder):
         element.attrib["name"] = name
         element.attrib["type"] = type
         gameroot.append(element)
-    add_gb_classname(gameroot, dict, maxids, gamefolder)
+    add_extra_string(gameroot, dict, maxids, gamefolder)
     indent(gameroot)
-    gametree.write(gamepublic)
+    gametree.write(gamepublic, encoding="utf-8", xml_declaration=True)
     log("[Logging...] 重建资源ID完成\n", True)
     return True
 
