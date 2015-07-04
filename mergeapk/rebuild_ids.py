@@ -165,6 +165,12 @@ def rebuild_ids(gamefolder, payfolder):
     log("[Logging...] 正在重建资源ID", True)
     gamepublic = "%s/res/values/public.xml" % gamefolder;
     paypublic = "%s/res/values/public.xml" % payfolder;
+    if (os.path.exists(gamepublic) == False):
+        log("[Error...] 无法定位文件 %s" % gamepublic, True)
+        sys.exit(0)
+    if (os.path.exists(paypublic) == False):
+        log("[Error...] 无法定位文件 %s" % paypublic, True)
+        sys.exit(0)
     dict = gettypeid(gamepublic)
 
     tree = ET.parse(paypublic)
