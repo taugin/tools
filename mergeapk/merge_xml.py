@@ -59,7 +59,7 @@ def merge_xml(gamefolder, payfolder):
         gameapplication.append(item)
 
     indent(gameroot)
-    gametree.write(gamemanifest)
+    gametree.write(gamemanifest, encoding='utf-8', xml_declaration=True)
     f = open(gamemanifest, "r")
     strinfo = re.compile(RE_STRING)
     rc = strinfo.sub(pkgname, f.read())
