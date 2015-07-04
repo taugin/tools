@@ -5,3 +5,4 @@ mergeapk/__pycache__/copy_res.cpython-33.pyc
 mergeapk/__pycache__/decompile_apk.cpython-33.pyc
 mergeapk/__pycache__/merge_xml.cpython-33.pyc
 mergeapk/__pycache__/rebuild_ids.cpython-33.pyc
+winreg/mytool.reg
