@@ -61,12 +61,21 @@ def should_copygameapkfile(name):
         return False
     return True
 
+def exists_in_gameapk(zip, name):
+    try:
+        zipinfo = zip.getinfo(name)
+        return zipinfo != None
+    except:
+        return False
+
 def copy_gameapk(mergedapk, gameapk):
     mergedzip = zipfile.ZipFile(mergedapk, "a")
     gamezip = zipfile.ZipFile(gameapk, "r")
     for name in gamezip.namelist():
-        if (should_copygameapkfile(name)):
-            mergedzip.writestr(name, gamezip.read(name))
+        shouldcopy = should_copygameapkfile(name)
+        exists_in = exists_in_gameapk(mergedzip, name)
+        if (shouldcopy == True and exists_in == False):
+            mergedzip.writestr(name, gamezip.read(name), zipfile.ZIP_DEFLATED)
     mergedzip.close()
     gamezip.close()
 
