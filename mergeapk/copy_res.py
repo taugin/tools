@@ -34,7 +34,7 @@ def copy_res(gamefolder, payfolder):
                 shutil.copy2(payfile, gamefile)
             else:
                 if (file != "public.xml"):
-                    file = "ck_" + file
+                    file = "njck_" + file
                     tmp = os.path.join(root, file)
                     gamefile = tmp.replace(payfolder, gamefolder)
                     #log("payfile : %s , gamefile : %s " % (payfile, gamefile))
