@@ -19,7 +19,7 @@ def log(str, show=False):
 def add_gb_string(root, dict, maxids, gamefolder):
     if (check_name_exists(root, "g_class_name", "string") == True):
         return []
-    type = "string"
+
     gamemanifest = "%s/AndroidManifest.xml" % gamefolder;
     ET.register_namespace('android', XML_NAMESPACE)
     gametree = ET.parse(gamemanifest)
@@ -31,15 +31,8 @@ def add_gb_string(root, dict, maxids, gamefolder):
     if (activity_entry_value == None):
         return []
 
-    try:
-        maxid = maxids[type]
-    except:
-        maxid = "0x0"
-    maxid = process_maxid(maxid, dict, type)
-    intid = int(eval(maxid))
-    intid = intid + 1
-    hexid = hex(intid)
-    maxids[type] = hexid
+    type = "string"
+    hexid = get_next_id(type, dict, maxids)
     element = ET.Element("public")
     element.attrib["id"] = hexid
     element.attrib["name"] = "g_class_name"
@@ -64,16 +57,9 @@ def check_name_exists(root, name, type):
 def add_company_string(root, dict, maxids, gamefolder):
     if (check_name_exists(root, "PARTNER_NAME", "string") == True):
         return []
+
     type = "string"
-    try:
-        maxid = maxids[type]
-    except:
-        maxid = "0x0"
-    maxid = process_maxid(maxid, dict, type)
-    intid = int(eval(maxid))
-    intid = intid + 1
-    hexid = hex(intid)
-    maxids[type] = hexid
+    hexid = get_next_id(type, dict, maxids)
     element = ET.Element("public")
     element.attrib["id"] = hexid
     element.attrib["name"] = "PARTNER_NAME"
@@ -123,13 +109,6 @@ def gettypeid(publicfile):
             dict[type] = [id]
     return dict;
 
-def getmaxids(dict, key):
-    if (key not in dict):
-        return "0x0"
-    list = dict[key]
-    list.sort()
-    return list[-1]
-
 ## Get pretty look
 def indent(elem, level=0):
     i = "\n" + level*"    "
@@ -161,6 +140,24 @@ def process_maxid(maxid, dict, type):
     hexid = hex(intid) + "0000"
     dict[type] = [hexid]
     log("unfind id : %s" % hexid)
+    return hexid
+
+def getmaxids(dict, key):
+    if (key not in dict):
+        return "0x0"
+    list = dict[key]
+    list.sort()
+    return list[-1]
+
+def get_next_id(type, dict, maxids):
+    if (type not in maxids):
+        maxid = getmaxids(dict, type)
+        maxids[type] = maxid
+    maxid = process_maxid(maxids[type], dict, type)
+    intid = int(eval(maxid))
+    intid = intid + 1
+    hexid = hex(intid)
+    maxids[type] = hexid
     return hexid
 
 def rebuild_ids(gamefolder, payfolder):
@@ -197,16 +194,7 @@ def rebuild_ids(gamefolder, payfolder):
         name = child.attrib["name"]
         id = child.attrib["id"]
 
-        if (type not in maxids):
-            maxid = getmaxids(dict, type)
-            maxids[type] = maxid
-        #log(maxids[type])
-        maxid = process_maxid(maxids[type], dict, type)
-        #log(maxid)
-        intid = int(eval(maxid))
-        intid = intid + 1
-        hexid = hex(intid)
-        maxids[type] = hexid
+        hexid = get_next_id(type, dict, maxids)
         #element = ET.XML('<public type="%s" name="%s" id="%s" />' % (type, name, hexid))
         element = ET.Element("public")
         element.attrib["id"] = hexid
