@@ -19,6 +19,7 @@ def log(str, show=False):
 def add_gb_string(root, dict, maxids, gamefolder):
     if (check_name_exists(root, "g_class_name", "string") == True):
         return []
+    type = "string"
     gamemanifest = "%s/AndroidManifest.xml" % gamefolder;
     ET.register_namespace('android', XML_NAMESPACE)
     gametree = ET.parse(gamemanifest)
@@ -30,7 +31,10 @@ def add_gb_string(root, dict, maxids, gamefolder):
     if (activity_entry_value == None):
         return []
 
-    maxid = maxids["string"]
+    try:
+        maxid = maxids[type]
+    except:
+        maxid = "0x0"
     maxid = process_maxid(maxid, dict, type)
     intid = int(eval(maxid))
     intid = intid + 1
@@ -60,7 +64,11 @@ def check_name_exists(root, name, type):
 def add_company_string(root, dict, maxids, gamefolder):
     if (check_name_exists(root, "PARTNER_NAME", "string") == True):
         return []
-    maxid = maxids["string"]
+    type = "string"
+    try:
+        maxid = maxids[type]
+    except:
+        maxid = "0x0"
     maxid = process_maxid(maxid, dict, type)
     intid = int(eval(maxid))
     intid = intid + 1
@@ -177,6 +185,9 @@ def rebuild_ids(gamefolder, payfolder):
     root = tree.getroot();
     list = []
     maxids = {}
+    for type in dict:
+        maxid = getmaxids(dict, type)
+        maxids[type] = maxid
 
     gametree = ET.parse(gamepublic)
     gameroot = gametree.getroot()
