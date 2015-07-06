@@ -25,11 +25,6 @@ def log(str, show=True):
     if (show):
         print(str)
 
-
-if (len(sys.argv) < 3):
-    log("[Logging...] 缺少参数: %s apk1 apk2" % os.path.basename(sys.argv[0]), True);
-    sys.exit()
-
 try:
     opts, args = getopt.getopt(sys.argv[1:], "c")
     for op, value in opts:
@@ -37,6 +32,10 @@ try:
             ONLY_CHECK_DUP = True
 except getopt.GetoptError as err:
     log(err)
+    sys.exit()
+
+if (len(args) < 2):
+    log("[Logging...] 缺少参数: %s [-c] apk1 apk2" % os.path.basename(sys.argv[0]), True);
     sys.exit()
 
 gameapk = os.path.abspath(args[0])
