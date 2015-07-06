@@ -43,9 +43,9 @@ class ConfigParer:
         return None
 
     def readpkglist(self):
+        list = []
         if (ConfigParer.root != None):
             pkgs = ConfigParer.root.findall("package")
-            list = []
             for pkg in pkgs:
                 list += [pkg.text]
         return list
