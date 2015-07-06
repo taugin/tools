@@ -39,7 +39,9 @@ class ConfigParer:
 
     def readconfig(self, tag):
         if (ConfigParer.root != None):
-            return ConfigParer.root.find(tag).text;
+            element = ConfigParer.root.find(tag)
+            if (element != None):
+                return element.text;
         return None
 
     def readpkglist(self):
