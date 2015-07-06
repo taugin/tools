@@ -9,8 +9,6 @@ import xml.etree.ElementTree as ET
 from xml.etree import cElementTree as ET
 from xml.dom import minidom
 
-import config_parser
-
 RE_STRING = "PACKAGE_NAME"
 #RE_STRING = "XXX"
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
@@ -34,6 +32,9 @@ def indent(elem, level=0):
     return elem
 
 def merge_xml(gamefolder, payfolder):
+    merge_xml_change_pkg(gamefolder, payfolder, None)
+
+def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
     log("[Logging...] 正在合并AndroidManifest.xml文件", True)
     if (os.path.exists(gamefolder) == False):
         log("[Error...] 无法定位文件夹 %s" % gamefolder, True)
@@ -65,7 +66,7 @@ def merge_xml(gamefolder, payfolder):
     f = open(gamemanifest, "r")
     strinfo = re.compile(RE_STRING)
     rc = strinfo.sub(pkgname, f.read())
-    newpkgname = config_parser.getpackage()
+
     if (newpkgname != None and newpkgname != ""):
         log("[Logging...] 使用配置的包名 : [%s]" % newpkgname, True)
         strinfo = re.compile(pkgname)

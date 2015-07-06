@@ -42,6 +42,14 @@ class ConfigParer:
             return ConfigParer.root.find(tag).text;
         return None
 
+    def readpkglist(self):
+        if (ConfigParer.root != None):
+            pkgs = ConfigParer.root.findall("package")
+            list = []
+            for pkg in pkgs:
+                list += [pkg.text]
+        return list
+
 def getpackage():
     config_parser = ConfigParer.getInstance()
     pkgname = config_parser.readconfig("package")
@@ -51,3 +59,7 @@ def getcompany():
     config_parser = ConfigParer.getInstance()
     company = config_parser.readconfig("company")
     return company
+
+def readpkglist():
+    config_parser = ConfigParer.getInstance()
+    return config_parser.readpkglist()
