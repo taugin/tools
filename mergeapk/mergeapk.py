@@ -6,6 +6,7 @@ import sys
 import platform
 import subprocess
 import msvcrt
+import shutil
 
 import decompile_apk
 import compile_apk
@@ -43,6 +44,10 @@ def signapk_use_testkey(apkloaderfile):
         return True
     else:
         return False
+def clean_tmp_folders(gamefolder, payfolder):
+    log("[Logging...] 清除临时文件")
+    shutil.rmtree(payfolder, ignore_errors = True)
+    log("[Logging...] 临时文件清除完成")
 
 functions = []
 functions += ["decompile_apk.apk_decompile(gameapk, gamefolder)"]
@@ -53,6 +58,7 @@ functions += ["copy_res.copy_res(gamefolder, payfolder)"]
 functions += ["merge_xml.merge_xml(gamefolder, payfolder)"]
 functions += ["compile_apk.apk_compile(gamefolder, gamemergedapk)"]
 functions += ["copy_fromapk.copy_fromapk(gamemergedapk, gameapk, payapk)"]
+functions += ["clean_tmp_folders(gamefolder, payfolder)"]
 
 if (platform.system().lower() == "windows"):
     functions += ["signapk_use_testkey(gamemergedapk)"]

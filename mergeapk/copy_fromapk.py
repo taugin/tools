@@ -10,7 +10,9 @@ import subprocess
 
 PLUGIN_FILE = "assets/plugins.xml"
 ITEM_MAPPER = "assets/ItemMapper.xml"
-COCOSPAYAPK = "assets/CocosPaySdk.apk"
+#COCOSPAYAPK = "assets/CocosPaySdk.apk"
+COCOSPAYAPK = "assets/com.cocospay.stub.dat"
+
 
 EXE = ""
 if (platform.system().lower() == "windows"):
