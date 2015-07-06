@@ -8,13 +8,14 @@ from xml.etree import cElementTree as ET
 from xml.dom import minidom
 from xml.dom.minidom import Document
 
+import config_parser
+
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
 ACTIVITY_ENTRY_NAME = "dest_activity"
 
 def log(str, show=False):
     if (show):
         print(str)
-
 
 def add_gb_string(root, dict, maxids, gamefolder):
     if (check_name_exists(root, "g_class_name", "string") == True):
@@ -58,6 +59,11 @@ def add_company_string(root, dict, maxids, gamefolder):
     if (check_name_exists(root, "PARTNER_NAME", "string") == True):
         return []
 
+    company_name = config_parser.getcompany()
+    log("[Logging...] 使用配置的公司名称 : [%s]" % company_name, True)
+    if (company_name == None or company_name == ""):
+        return []
+
     type = "string"
     hexid = get_next_id(type, dict, maxids)
     element = ET.Element("public")
@@ -66,7 +72,6 @@ def add_company_string(root, dict, maxids, gamefolder):
     element.attrib["type"] = "string"
     root.append(element)
 
-    company_name = "上海触控有限公司"
     doc = Document()  #创建DOM文档对象
     gbstring = doc.createElement("string")
     gbstring.setAttribute("name", "PARTNER_NAME")

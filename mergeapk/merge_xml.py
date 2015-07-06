@@ -9,6 +9,8 @@ import xml.etree.ElementTree as ET
 from xml.etree import cElementTree as ET
 from xml.dom import minidom
 
+import config_parser
+
 RE_STRING = "PACKAGE_NAME"
 #RE_STRING = "XXX"
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
@@ -63,6 +65,11 @@ def merge_xml(gamefolder, payfolder):
     f = open(gamemanifest, "r")
     strinfo = re.compile(RE_STRING)
     rc = strinfo.sub(pkgname, f.read())
+    newpkgname = config_parser.getpackage()
+    if (newpkgname != None and newpkgname != ""):
+        log("[Logging...] 使用配置的包名 : [%s]" % newpkgname, True)
+        strinfo = re.compile(pkgname)
+        rc = strinfo.sub(newpkgname, rc)
     f.close()
     f = open(gamemanifest, "w")
     f.write(rc)
