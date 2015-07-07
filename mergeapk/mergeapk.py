@@ -52,6 +52,9 @@ gamemergedapk = gamename + "-merged.apk"
 (payname, ext) = os.path.splitext(payapk)
 payfolder = payname
 
+if (len(args) >= 3):
+    gamemergedapk = args[2]
+
 def signapk_use_testkey(apkloaderfile):
     log("")
     cmdlist = ["python", SIGNAPK_FILE, "-t", apkloaderfile]
