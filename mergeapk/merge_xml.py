@@ -10,7 +10,7 @@ from xml.etree import cElementTree as ET
 from xml.dom import minidom
 
 RE_STRING = "PACKAGE_NAME"
-#RE_STRING = "XXX"
+RE_STRING = "XXX"
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
 
 def log(str, show=False):
@@ -35,6 +35,7 @@ def merge_xml(gamefolder, payfolder):
     merge_xml_change_pkg(gamefolder, payfolder, None)
 
 def modify_pay_action(rc, pkgname):
+    log("[Logging...] 替换真实包名 : [%s] --> [%s]" % (RE_STRING, pkgname), True)
     strinfo = re.compile(RE_STRING)
     rc = strinfo.sub(pkgname, rc)
     return rc

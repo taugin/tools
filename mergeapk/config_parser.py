@@ -24,18 +24,18 @@ CONFIG_FILE = "config.xml"
 def log(str, show=True):
     if (show):
         print(str)
-        
+
 class ConfigParer:
     root = None
     instance = None
-    mutex=threading.Lock()
+    mutex = threading.Lock()
 
     @staticmethod
     def getInstance():
-        if(ConfigParer.instance==None):
+        if(ConfigParer.instance == None):
             ConfigParer.mutex.acquire()
-            if(ConfigParer.instance==None):
-                ConfigParer.instance=ConfigParer()
+            if(ConfigParer.instance == None):
+                ConfigParer.instance = ConfigParer()
             ConfigParer.mutex.release()
         return ConfigParer.instance
 
