@@ -5,7 +5,6 @@ import os
 import sys
 import platform
 import subprocess
-import msvcrt
 import shutil
 import getopt
 
@@ -17,6 +16,11 @@ import copy_res
 import merge_xml
 import copy_fromapk
 import config_parser
+import platform
+
+if (platform.system().lower() == "windows"):
+    import msvcrt
+
 
 TRY_CONFIG = "mergeapk.tryagain"
 SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "signtool", "signapk.py")

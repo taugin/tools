@@ -34,6 +34,18 @@ def indent(elem, level=0):
 def merge_xml(gamefolder, payfolder):
     merge_xml_change_pkg(gamefolder, payfolder, None)
 
+def modify_pay_action(rc, pkgname):
+    strinfo = re.compile(RE_STRING)
+    rc = strinfo.sub(pkgname, rc)
+    return rc
+
+def modify_pkgname(rc, pkgname, newpkgname):
+    if (newpkgname != None and newpkgname != ""):
+        log("[Logging...] 使用配置的包名 : [%s]" % newpkgname, True)
+        strinfo = re.compile(pkgname)
+        rc = strinfo.sub(newpkgname, rc)
+    return rc
+
 def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
     log("[Logging...] 正在合并AndroidManifest.xml文件", True)
     if (os.path.exists(gamefolder) == False):
@@ -63,14 +75,15 @@ def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
 
     indent(gameroot)
     gametree.write(gamemanifest, encoding='utf-8', xml_declaration=True)
-    f = open(gamemanifest, "r")
-    strinfo = re.compile(RE_STRING)
-    rc = strinfo.sub(pkgname, f.read())
 
-    if (newpkgname != None and newpkgname != ""):
-        log("[Logging...] 使用配置的包名 : [%s]" % newpkgname, True)
-        strinfo = re.compile(pkgname)
-        rc = strinfo.sub(newpkgname, rc)
+    f = open(gamemanifest, "r")
+    rc = f.read()
+
+    #修改pay action
+    rc = modify_pay_action(rc, pkgname)
+    #修改包名
+    rc = modify_pkgname(rc, pkgname, newpkgname)
+
     f.close()
     f = open(gamemanifest, "w")
     f.write(rc)
