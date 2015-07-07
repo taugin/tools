@@ -1,7 +1,14 @@
 #!/usr/bin/python
 # coding: UTF-8
-
-
+'''
+配置文件模板
+<?xml version='1.0' encoding='utf-8'?>
+<config>
+    <package>com.bhvr.homejam.egame1</package>
+    <package>com.bhvr.homejam.egame2</package>
+    <company>上海触控</company>
+</config>
+'''
 import os
 import re
 import subprocess
