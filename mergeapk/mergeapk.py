@@ -70,6 +70,7 @@ def clean_tmp_folders(gamefolder, payfolder):
     log("[Logging...] 临时文件清除完成")
 
 def mergeapk_batch(newpkgname):
+    global gamemergedapk
     if (newpkgname != None and newpkgname != ""):
         gamemergedapk = gamename + "-" + newpkgname + "-merged.apk"
 
