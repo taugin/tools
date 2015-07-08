@@ -9,8 +9,7 @@ import xml.etree.ElementTree as ET
 from xml.etree import cElementTree as ET
 from xml.dom import minidom
 
-RE_STRING = "PACKAGE_NAME"
-RE_STRING = "XXX"
+RE_STRING = "PACKAGE_NAME_ABC"
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
 COCOSPAY_ACTIVITY = "com.cocospay.CocosPayActivity"
 COCOSPAYACTIVITY_ENTRY_NAME = "dest_activity"
