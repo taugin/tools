@@ -12,6 +12,11 @@ from xml.dom import minidom
 RE_STRING = "PACKAGE_NAME"
 RE_STRING = "XXX"
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
+COCOSPAY_ACTIVITY = "com.cocospay.CocosPayActivity"
+COCOSPAYACTIVITY_ENTRY_NAME = "dest_activity"
+
+UNICOM_ACTIVITY = "com.unicom.dcLoader.welcomeview"
+UNICOMPAYACTIVITY_ENTRY_NAME = "UNICOM_DIST_ACTIVITY"
 
 def log(str, show=False):
     if (show):
@@ -47,6 +52,17 @@ def modify_pkgname(rc, pkgname, newpkgname):
         rc = strinfo.sub(newpkgname, rc)
     return rc
 
+def modify_unicom_metadata(gameroot):
+    cocospaymetadata = gameroot.find(".//activity/[@{%s}name='%s']/meta-data[@{%s}name='%s']" % (XML_NAMESPACE, COCOSPAY_ACTIVITY, XML_NAMESPACE, COCOSPAYACTIVITY_ENTRY_NAME))
+    if (cocospaymetadata == None):
+        return
+    unicommetadata = gameroot.find(".//activity/[@{%s}name='%s']/meta-data[@{%s}name='%s']" % (XML_NAMESPACE, UNICOM_ACTIVITY, XML_NAMESPACE, UNICOMPAYACTIVITY_ENTRY_NAME))
+    if (unicommetadata != None):
+        value = cocospaymetadata.attrib["{%s}value" % XML_NAMESPACE]
+        if (value != None):
+            log("[Logging...] 添加联通入口 : [%s]" % value, True)
+            unicommetadata.set("{%s}value" % XML_NAMESPACE, value)
+
 def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
     log("[Logging...] 正在合并文件 : [AndroidManifest.xml]", True)
     if (os.path.exists(gamefolder) == False):
@@ -74,6 +90,8 @@ def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
     for item in payapplication.getchildren():
         gameapplication.append(item)
 
+    #修改联通
+    modify_unicom_metadata(gameroot)
     indent(gameroot)
     gametree.write(gamemanifest, encoding='utf-8', xml_declaration=True)
 

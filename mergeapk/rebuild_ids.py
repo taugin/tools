@@ -9,7 +9,9 @@ from xml.dom import minidom
 from xml.dom.minidom import Document
 
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
-ACTIVITY_ENTRY_NAME = "dest_activity"
+
+COCOSPAY_ACTIVITY = "com.cocospay.CocosPayActivity"
+COCOSPAYACTIVITY_ENTRY_NAME = "dest_activity"
 
 def log(str, show=False):
     if (show):
@@ -24,9 +26,9 @@ def add_gb_string(root, dict, maxids, gamefolder):
     gametree = ET.parse(gamemanifest)
     gameroot = gametree.getroot()
     activity_entry_value = None
-    for item in gameroot.iter('meta-data'):
-        if (item.get("{%s}name" % XML_NAMESPACE) == ACTIVITY_ENTRY_NAME):
-            activity_entry_value = item.get("{%s}value" % XML_NAMESPACE)
+    cocospaymetadata = gameroot.find(".//activity/[@{%s}name='%s']/meta-data[@{%s}name='%s']" % (XML_NAMESPACE, COCOSPAY_ACTIVITY, XML_NAMESPACE, COCOSPAYACTIVITY_ENTRY_NAME))
+    if (cocospaymetadata != None):
+        activity_entry_value = cocospaymetadata.get("{%s}value" % XML_NAMESPACE)
     if (activity_entry_value == None):
         return []
 
@@ -44,7 +46,7 @@ def add_gb_string(root, dict, maxids, gamefolder):
     gbstring.setAttribute("name", "g_class_name")
     textnode = doc.createTextNode(activity_entry_value)
     gbstring.appendChild(textnode)
-
+    log("[Logging...] 添加基地入口 : [%s]" % activity_entry_value, True)
     return [gbstring]
 
 def check_name_exists(root, name, type):
@@ -57,7 +59,7 @@ def add_company_string(root, dict, maxids, gamefolder, company_name):
     if (check_name_exists(root, "PARTNER_NAME", "string") == True):
         return []
 
-    log("[Logging...] 配置的公司名称 : [%s]" % company_name, True)
+    log("[Logging...] 配置公司名称 : [%s]" % company_name, True)
     if (company_name == None or company_name == ""):
         return []
 
@@ -169,7 +171,7 @@ def rebuild_ids(gamefolder, payfolder, company_name):
     if (os.path.exists(payfolder) == False):
         log("[Error...] 无法定位文件夹 %s" % payfolder, True)
         sys.exit(0)
-    log("[Logging...] 正在重建资源ID", True)
+    log("[Logging...] 重建资源编号", True)
     gamepublic = "%s/res/values/public.xml" % gamefolder;
     paypublic = "%s/res/values/public.xml" % payfolder;
     if (os.path.exists(gamepublic) == False):
@@ -206,7 +208,7 @@ def rebuild_ids(gamefolder, payfolder, company_name):
     add_extra_string(gameroot, dict, maxids, gamefolder, company_name)
     indent(gameroot)
     gametree.write(gamepublic, encoding="utf-8", xml_declaration=True)
-    log("[Logging...] 重建资源ID完成\n", True)
+    log("[Logging...] 重建资源完成\n", True)
     return True
 
 if __name__ == "__main__":
