@@ -21,39 +21,14 @@ import platform
 if (platform.system().lower() == "windows"):
     import msvcrt
 
-
 TRY_CONFIG = "mergeapk.tryagain"
 SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "signtool", "signapk.py")
 ONLY_CHECK_DUP = False
+MERGE_BY_CONFIG = False
 
 def log(str, show=True):
     if (show):
         print(str)
-
-try:
-    opts, args = getopt.getopt(sys.argv[1:], "c")
-    for op, value in opts:
-        if (op == "-c"):
-            ONLY_CHECK_DUP = True
-except getopt.GetoptError as err:
-    log(err)
-    sys.exit()
-
-if (len(args) < 2):
-    log("[Logging...] 缺少参数: %s [-c] apk1 apk2" % os.path.basename(sys.argv[0]), True);
-    sys.exit()
-
-gameapk = os.path.abspath(args[0])
-payapk = os.path.abspath(args[1])
-
-(gamename, ext) = os.path.splitext(gameapk)
-gamefolder = gamename
-gamemergedapk = gamename + "-merged.apk"
-(payname, ext) = os.path.splitext(payapk)
-payfolder = payname
-
-if (len(args) >= 3):
-    gamemergedapk = args[2]
 
 def signapk_use_testkey(apkloaderfile):
     log("")
@@ -69,8 +44,16 @@ def clean_tmp_folders(gamefolder, payfolder):
     shutil.rmtree(payfolder, ignore_errors = True)
     log("[Logging...] 临时文件清除完成")
 
-def mergeapk_batch(newpkgname):
-    global gamemergedapk
+def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
+    (gamename, ext) = os.path.splitext(gameapk)
+    gamefolder = gamename
+    gamemergedapk = gamename + "-merged.apk"
+    (payname, ext) = os.path.splitext(payapk)
+    payfolder = payname
+
+    if (output != None and output != ""):
+        gamemergedapk = output
+
     if (newpkgname != None and newpkgname != ""):
         gamemergedapk = gamename + "-" + newpkgname + "-merged.apk"
 
@@ -80,7 +63,7 @@ def mergeapk_batch(newpkgname):
     functions += ["check_dup.check_dup(gamefolder, payfolder)"]
 
     if (ONLY_CHECK_DUP == False):
-        functions += ["rebuild_ids.rebuild_ids(gamefolder, payfolder)"]
+        functions += ["rebuild_ids.rebuild_ids(gamefolder, payfolder, company)"]
         functions += ["copy_res.copy_res(gamefolder, payfolder)"]
         functions += ["merge_xml.merge_xml_change_pkg(gamefolder, payfolder, newpkgname)"]
         functions += ["compile_apk.apk_compile(gamefolder, gamemergedapk)"]
@@ -116,11 +99,42 @@ def mergeapk_batch(newpkgname):
         log("--------------------------------------------")
         clean_tmp_folders(gamefolder, payfolder)
 
-list = config_parser.readpkglist()
-if (list == None or len(list) <=0 ):
-    mergeapk_batch(None)
-    sys.exit(0)
+def merge_according_cmdline(args):
+    if (len(args) < 2):
+        log("[Logging...] 缺少参数: %s [-c] apk1 apk2" % os.path.basename(sys.argv[0]), True);
+        sys.exit()
+    gameapk = os.path.abspath(args[0])
+    payapk = os.path.abspath(args[1])
+    mergeapk_batch(gameapk, payapk, None, None, None)
 
-for item in list:
-    log("[Logging...] 合并APK并使用新包名 : [%s]" % item)
-    mergeapk_batch(item)
+def merge_according_config():
+    list = config_parser.readmergelist()
+    for item in list:
+        gameapk = item.get("gameapk")
+        payapk = item.get("payapk")
+        output = item.get("output")
+        package = item.get("package")
+        company = item.get("company")
+        if (gameapk != None and gameapk != "" and payapk != None and payapk != ""):
+            log("[Logging...] 处理合并APK")
+            mergeapk_batch(gameapk, payapk, output, package, company)
+        else:
+            log("[Logging...] 请至少配置 <gameapk> 和 <payapk>项")
+
+#############################################################################
+if (__name__ == "__main__"):
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "cf")
+        for op, value in opts:
+            if (op == "-c"):
+                ONLY_CHECK_DUP = True
+            elif (op == "-f"):
+                MERGE_BY_CONFIG = True
+    except getopt.GetoptError as err:
+        log(err)
+        sys.exit()
+
+    if (MERGE_BY_CONFIG):
+        merge_according_config()
+    else:
+        merge_according_cmdline(args)

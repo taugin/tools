@@ -4,9 +4,20 @@
 配置文件模板
 <?xml version='1.0' encoding='utf-8'?>
 <config>
-    <package>com.bhvr.homejam.egame1</package>
-    <package>com.bhvr.homejam.egame2</package>
-    <company>上海触控</company>
+    <merge>
+        <gameapk>HomeCP_R_2015-07-06-14-58-52_v3.0.0.apk</gameapk>
+        <payapk>E:\CkSourceCode\CocosPaySdk\release\MM-release-unsigned.apk</payapk>
+        <package></package>
+        <output>mm.apk</output>
+        <company>上海触控</company>
+    </merge>
+    <merge>
+        <gameapk>HomeCP_R_2015-07-06-14-58-52_v3.0.0.apk</gameapk>
+        <payapk>E:\CkSourceCode\CocosPaySdk\release\MM-release-unsigned.apk</payapk>
+        <package></package>
+        <output>mm.apk</output>
+        <company>上海触控</company>
+    </merge>
 </config>
 '''
 import os
@@ -54,21 +65,28 @@ class ConfigParer:
     def readpkglist(self):
         list = []
         if (ConfigParer.root != None):
-            pkgs = ConfigParer.root.findall("package")
+            pkgs = ConfigParer.root.findall("merge")
             for pkg in pkgs:
-                list += [pkg.text]
+                dict = {}
+                gameapk = pkg.find("gameapk")
+                if (gameapk != None):
+                    dict["gameapk"] = gameapk.text
+                payapk = pkg.find("payapk")
+                if (payapk != None):
+                    dict["payapk"] = payapk.text
+                package = pkg.find("package")
+                if (package != None):
+                    dict["package"] = package.text
+                company = pkg.find("company")
+                if (company != None):
+                    dict["company"] = company.text
+                output = pkg.find("output")
+                if (output != None):
+                    dict["output"] = output.text
+                list += [dict]
         return list
 
-def getpackage():
-    config_parser = ConfigParer.getInstance()
-    pkgname = config_parser.readconfig("package")
-    return pkgname
-
-def getcompany():
-    config_parser = ConfigParer.getInstance()
-    company = config_parser.readconfig("company")
-    return company
-
-def readpkglist():
+def readmergelist():
     config_parser = ConfigParer.getInstance()
     return config_parser.readpkglist()
+readmergelist()

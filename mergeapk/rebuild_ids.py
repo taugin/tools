@@ -8,8 +8,6 @@ from xml.etree import cElementTree as ET
 from xml.dom import minidom
 from xml.dom.minidom import Document
 
-import config_parser
-
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
 ACTIVITY_ENTRY_NAME = "dest_activity"
 
@@ -55,11 +53,10 @@ def check_name_exists(root, name, type):
         return False
     return True
 
-def add_company_string(root, dict, maxids, gamefolder):
+def add_company_string(root, dict, maxids, gamefolder, company_name):
     if (check_name_exists(root, "PARTNER_NAME", "string") == True):
         return []
 
-    company_name = config_parser.getcompany()
     log("[Logging...] 使用配置的公司名称 : [%s]" % company_name, True)
     if (company_name == None or company_name == ""):
         return []
@@ -80,10 +77,10 @@ def add_company_string(root, dict, maxids, gamefolder):
 
     return [gbstring]
 
-def add_extra_string(root, dict, maxids, gamefolder):
+def add_extra_string(root, dict, maxids, gamefolder, company_name):
     list = []
     list += add_gb_string(root, dict, maxids, gamefolder)
-    list += add_company_string(root, dict, maxids, gamefolder)
+    list += add_company_string(root, dict, maxids, gamefolder, company_name)
 
     if (len(list) <= 0):
         return
@@ -165,7 +162,7 @@ def get_next_id(type, dict, maxids):
     maxids[type] = hexid
     return hexid
 
-def rebuild_ids(gamefolder, payfolder):
+def rebuild_ids(gamefolder, payfolder, company_name):
     if (os.path.exists(gamefolder) == False):
         log("[Error...] 无法定位文件夹 %s" % gamefolder, True)
         sys.exit(0)
@@ -206,7 +203,7 @@ def rebuild_ids(gamefolder, payfolder):
         element.attrib["name"] = name
         element.attrib["type"] = type
         gameroot.append(element)
-    add_extra_string(gameroot, dict, maxids, gamefolder)
+    add_extra_string(gameroot, dict, maxids, gamefolder, company_name)
     indent(gameroot)
     gametree.write(gamepublic, encoding="utf-8", xml_declaration=True)
     log("[Logging...] 重建资源ID完成\n", True)
