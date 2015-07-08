@@ -47,15 +47,20 @@ def clean_tmp_folders(gamefolder, payfolder):
 def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
     (gamename, ext) = os.path.splitext(gameapk)
     gamefolder = gamename
-    gamemergedapk = gamename + "-merged.apk"
+
     (payname, ext) = os.path.splitext(payapk)
     payfolder = payname
 
-    if (newpkgname != None and newpkgname != ""):
-        gamemergedapk = gamename + "-" + newpkgname + "-merged.apk"
-
+    #生成合并后的apk名称
+    tmpapk = gameapk
     if (output != None and output != ""):
-        gamemergedapk = output
+        tmpapk = output
+
+    (tmpname, ext) = os.path.splitext(tmpapk)
+    gamemergedapk = tmpname + "-merged.apk"
+
+    if (newpkgname != None and newpkgname != ""):
+        gamemergedapk = tmpname + "-" + newpkgname + "-merged.apk"
 
     functions = []
     functions += ["decompile_apk.apk_decompile(gameapk, gamefolder)"]

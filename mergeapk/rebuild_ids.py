@@ -57,7 +57,7 @@ def add_company_string(root, dict, maxids, gamefolder, company_name):
     if (check_name_exists(root, "PARTNER_NAME", "string") == True):
         return []
 
-    log("[Logging...] 配置公司名称 : [%s]" % company_name, True)
+    log("[Logging...] 配置的公司名称 : [%s]" % company_name, True)
     if (company_name == None or company_name == ""):
         return []
 
