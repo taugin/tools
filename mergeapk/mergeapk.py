@@ -51,11 +51,11 @@ def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
     (payname, ext) = os.path.splitext(payapk)
     payfolder = payname
 
-    if (output != None and output != ""):
-        gamemergedapk = output
-
     if (newpkgname != None and newpkgname != ""):
         gamemergedapk = gamename + "-" + newpkgname + "-merged.apk"
+
+    if (output != None and output != ""):
+        gamemergedapk = output
 
     functions = []
     functions += ["decompile_apk.apk_decompile(gameapk, gamefolder)"]
@@ -69,7 +69,7 @@ def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
         functions += ["compile_apk.apk_compile(gamefolder, gamemergedapk)"]
         functions += ["copy_fromapk.copy_fromapk(gamemergedapk, gameapk, payapk)"]
         functions += ["clean_tmp_folders(gamefolder, payfolder)"]
-        if (platform.system().lower() == "windows" and newpkgname == None):
+        if (platform.system().lower() == "windows"):
             functions += ["signapk_use_testkey(gamemergedapk)"]
 
     result = False

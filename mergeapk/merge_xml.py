@@ -42,13 +42,13 @@ def modify_pay_action(rc, pkgname):
 
 def modify_pkgname(rc, pkgname, newpkgname):
     if (newpkgname != None and newpkgname != ""):
-        log("[Logging...] 使用配置的包名 : [%s]" % newpkgname, True)
+        log("[Logging...] 使用配置包名 : [%s]" % newpkgname, True)
         strinfo = re.compile(pkgname)
         rc = strinfo.sub(newpkgname, rc)
     return rc
 
 def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
-    log("[Logging...] 正在合并AndroidManifest.xml文件", True)
+    log("[Logging...] 正在合并文件 : [AndroidManifest.xml]", True)
     if (os.path.exists(gamefolder) == False):
         log("[Error...] 无法定位文件夹 %s" % gamefolder, True)
         sys.exit(0)
@@ -89,7 +89,7 @@ def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
     f = open(gamemanifest, "w")
     f.write(rc)
     f.close()
-    log("[Logging...] AndroidManifest.xml文件合并完成\n", True)
+    log("[Logging...] 文件合并完成\n", True)
     return True
 
 if __name__ == "__main__":
