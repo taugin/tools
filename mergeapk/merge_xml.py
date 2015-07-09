@@ -17,6 +17,9 @@ COCOSPAYACTIVITY_ENTRY_NAME = "dest_activity"
 UNICOM_ACTIVITY = "com.unicom.dcLoader.welcomeview"
 UNICOMPAYACTIVITY_ENTRY_NAME = "UNICOM_DIST_ACTIVITY"
 
+MAIN_ACTIVITY_XPATH = ".//action/[@{%s}name='android.intent.action.MAIN']/../category/[@{%s}name='android.intent.category.LAUNCHER']/../.." % (XML_NAMESPACE, XML_NAMESPACE)
+CATEGORY_XPATH = ".//action/[@{%s}name='android.intent.action.MAIN']/../category/[@{%s}name='android.intent.category.LAUNCHER']/.." % (XML_NAMESPACE, XML_NAMESPACE)
+
 def log(str, show=False):
     if (show):
         print(str)
@@ -52,10 +55,39 @@ def remove_dup_permission(gameroot):
                 list += [permisson_name]
 
 def add_entry_activity(gameroot):
-    #element = gameroot.findall(".//activity//intent-filter//action[@{%s}name='android.intent.action.MAIN']..//category[@{%s}name='android.intent.category.LAUNCHER']" %(XML_NAMESPACE, XML_NAMESPACE))
-    #element = gameroot.findall(".//activity/..[@{%s}name='android.intent.action.MAIN' and @{%s}name='android.intent.category.LAUNCHER']" %(XML_NAMESPACE, XML_NAMESPACE))
-    element = gameroot.findall(".//action/[@{%s}name=android.intent.action.MAIN]/../category/[@{%s}name='android.intent.category.LAUNCHER']" % (XML_NAMESPACE, XML_NAMESPACE))
-    log(element, True)
+    log("[Logging...] 设置程序入口", True)
+    mainactivity = gameroot.findall(MAIN_ACTIVITY_XPATH)
+    if (mainactivity == None or len(mainactivity) <= 0):
+        return
+
+    entry_activity = None
+    screenOritation = None
+    old_entry_class = None
+    for activity in mainactivity:
+        activityname = activity.attrib["{%s}name" % XML_NAMESPACE]
+        if (activityname == COCOSPAY_ACTIVITY):
+            entry_activity = activity
+            mainactivity.remove(activity)
+        else:
+            screenOritation = activity.get("{%s}screenOrientation" % XML_NAMESPACE)
+            old_entry_class = activity.attrib["{%s}name" % XML_NAMESPACE]
+            launcher_filter = activity.find(CATEGORY_XPATH)
+            category = launcher_filter.find(".//category")
+            launcher_filter.remove(category)
+
+    if (entry_activity != None):
+        if (screenOritation != None):
+            entry_activity.set("{%s}screenOrientation" % XML_NAMESPACE, screenOritation)
+        dest_activity = entry_activity.find("meta-data[@{%s}name='%s']" % (XML_NAMESPACE, COCOSPAYACTIVITY_ENTRY_NAME))
+        if (old_entry_class != None):
+            if (dest_activity != None):
+                dest_activity.set("{%s}value" % XML_NAMESPACE, old_entry_class)
+            else:
+                element = ET.Element("meta-data")
+                element.attrib["{%s}name" % XML_NAMESPACE] = "dest_activity"
+                element.attrib["{%s}value" % XML_NAMESPACE] = old_entry_class
+                entry_activity.append(element)
+
 
 def modify_pay_action(rc, pkgname):
     log("[Logging...] 替换真实包名 : [%s] --> [%s]" % (RE_STRING, pkgname), True)
