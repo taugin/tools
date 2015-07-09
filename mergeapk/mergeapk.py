@@ -16,6 +16,7 @@ import copy_res
 import merge_xml
 import copy_fromapk
 import config_parser
+import apk_check
 import platform
 
 if (platform.system().lower() == "windows"):
@@ -65,6 +66,7 @@ def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
     functions = []
     functions += ["decompile_apk.apk_decompile(gameapk, gamefolder)"]
     functions += ["decompile_apk.apk_decompile(payapk, payfolder)"]
+    functions += ["apk_check.apk_check(gamefolder, payfolder)"]
     functions += ["check_dup.check_dup(gamefolder, payfolder)"]
 
     if (ONLY_CHECK_DUP == False):
