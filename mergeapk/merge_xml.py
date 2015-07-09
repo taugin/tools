@@ -51,6 +51,12 @@ def remove_dup_permission(gameroot):
             else:
                 list += [permisson_name]
 
+def add_entry_activity(gameroot):
+    #element = gameroot.findall(".//activity//intent-filter//action[@{%s}name='android.intent.action.MAIN']..//category[@{%s}name='android.intent.category.LAUNCHER']" %(XML_NAMESPACE, XML_NAMESPACE))
+    #element = gameroot.findall(".//activity/..[@{%s}name='android.intent.action.MAIN' and @{%s}name='android.intent.category.LAUNCHER']" %(XML_NAMESPACE, XML_NAMESPACE))
+    element = gameroot.findall(".//action/[@{%s}name=android.intent.action.MAIN]/../category/[@{%s}name='android.intent.category.LAUNCHER']" % (XML_NAMESPACE, XML_NAMESPACE))
+    log(element, True)
+
 def modify_pay_action(rc, pkgname):
     log("[Logging...] 替换真实包名 : [%s] --> [%s]" % (RE_STRING, pkgname), True)
     strinfo = re.compile(RE_STRING)
@@ -106,6 +112,7 @@ def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
     modify_unicom_metadata(gameroot)
     #去除重复的权限
     remove_dup_permission(gameroot)
+    add_entry_activity(gameroot)
     indent(gameroot)
     gametree.write(gamemanifest, encoding='utf-8', xml_declaration=True)
 
