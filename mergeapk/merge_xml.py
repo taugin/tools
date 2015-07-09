@@ -38,6 +38,19 @@ def indent(elem, level=0):
 def merge_xml(gamefolder, payfolder):
     merge_xml_change_pkg(gamefolder, payfolder, None)
 
+
+def remove_dup_permission(gameroot):
+    log("[Logging...] 去除重复权限", True)
+    permissions = gameroot.findall(".//uses-permission")
+    list = []
+    if (permissions != None):
+        for item in permissions:
+            permisson_name = item.attrib["{%s}name" % XML_NAMESPACE]
+            if (permisson_name in list):
+                gameroot.remove(item)
+            else:
+                list += [permisson_name]
+
 def modify_pay_action(rc, pkgname):
     log("[Logging...] 替换真实包名 : [%s] --> [%s]" % (RE_STRING, pkgname), True)
     strinfo = re.compile(RE_STRING)
@@ -91,6 +104,8 @@ def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
 
     #修改联通
     modify_unicom_metadata(gameroot)
+    #去除重复的权限
+    remove_dup_permission(gameroot)
     indent(gameroot)
     gametree.write(gamemanifest, encoding='utf-8', xml_declaration=True)
 
