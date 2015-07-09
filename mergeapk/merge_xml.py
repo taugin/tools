@@ -55,7 +55,6 @@ def remove_dup_permission(gameroot):
                 list += [permisson_name]
 
 def add_entry_activity(gameroot):
-    log("[Logging...] 设置程序入口", True)
     mainactivity = gameroot.findall(MAIN_ACTIVITY_XPATH)
     if (mainactivity == None or len(mainactivity) <= 0):
         return
@@ -80,6 +79,7 @@ def add_entry_activity(gameroot):
             entry_activity.set("{%s}screenOrientation" % XML_NAMESPACE, screenOritation)
         dest_activity = entry_activity.find("meta-data[@{%s}name='%s']" % (XML_NAMESPACE, COCOSPAYACTIVITY_ENTRY_NAME))
         if (old_entry_class != None):
+            log("[Logging...] 设置程序入口 : [%s]" % old_entry_class, True)
             if (dest_activity != None):
                 dest_activity.set("{%s}value" % XML_NAMESPACE, old_entry_class)
             else:

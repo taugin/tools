@@ -43,9 +43,9 @@ def apk_check(gamefolder, payfolder):
     finalcheck =  activitycheck and servicecheck
     if (finalcheck == False):
         if (activitycheck == False):
-            log("[Logging...] 缺失 [%s]" % COCOSPAY_ACTIVITY)
+            log("[Eroring...] 缺失 [%s]" % COCOSPAY_ACTIVITY)
         if (servicecheck == False):
-            log("[Logging...] 缺失 [%s]" % COCOSPAY_SERVICE)
+            log("[Eroring...] 缺失 [%s]" % COCOSPAY_SERVICE)
     log("[Logging...] 检测完成\n")
     return True
 
