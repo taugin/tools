@@ -47,8 +47,6 @@ def apk_check(gamefolder, payfolder):
         if (paycheck == False):
             log("[Logging...] 缺失 [%s]" % COCOSPAY_SERVICE)
     log("[Logging...] 检测完成\n")
-    if (finalcheck == False):
-        sys.exit(0)
     return finalcheck
 
 if (__name__ == "__main__"):
