@@ -14,23 +14,23 @@ def log(str, show=True):
     if (show):
         print(str)
 
-def activity_check(payfolder):
-    paymanifest = "%s/AndroidManifest.xml" % payfolder;
+def activity_check(folder):
+    manifest = "%s/AndroidManifest.xml" % folder;
     ET.register_namespace('android', XML_NAMESPACE)
-    paytree = ET.parse(paymanifest)
-    payroot = paytree.getroot()
-    cocospay_activity = payroot.find(".//activity/[@{%s}name='%s']" % (XML_NAMESPACE, COCOSPAY_ACTIVITY))
+    tree = ET.parse(manifest)
+    root = tree.getroot()
+    cocospay_activity = root.find(".//activity/[@{%s}name='%s']" % (XML_NAMESPACE, COCOSPAY_ACTIVITY))
     if (cocospay_activity != None):
         return True
     else:
         return False
 
-def service_check(payfolder):
-    paymanifest = "%s/AndroidManifest.xml" % payfolder;
+def service_check(folder):
+    manifest = "%s/AndroidManifest.xml" % folder;
     ET.register_namespace('android', XML_NAMESPACE)
-    paytree = ET.parse(paymanifest)
-    payroot = paytree.getroot()
-    cocospay_service = payroot.find(".//service/[@{%s}name='%s']" % (XML_NAMESPACE, COCOSPAY_SERVICE))
+    tree = ET.parse(manifest)
+    root = tree.getroot()
+    cocospay_service = root.find(".//service/[@{%s}name='%s']" % (XML_NAMESPACE, COCOSPAY_SERVICE))
     if (cocospay_service != None):
         return True
     else:
@@ -38,7 +38,7 @@ def service_check(payfolder):
 
 def apk_check(gamefolder, payfolder):
     log("[Logging...] 关键组件检测")
-    activitycheck = activity_check(payfolder)
+    activitycheck = activity_check(gamefolder)
     servicecheck = service_check(payfolder)
     finalcheck =  activitycheck and servicecheck
     if (finalcheck == False):

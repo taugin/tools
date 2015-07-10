@@ -70,9 +70,9 @@ def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
     functions += [{"function":"check_dup.check_dup(gamefolder, payfolder)", "saveonfalse":"True"}]
 
     if (ONLY_CHECK_DUP == False):
+        functions += [{"function":"merge_xml.merge_xml_change_pkg(gamefolder, payfolder, newpkgname)", "saveonfalse":"False"}]
         functions += [{"function":"rebuild_ids.rebuild_ids(gamefolder, payfolder, company)", "saveonfalse":"False"}]
         functions += [{"function":"copy_res.copy_res(gamefolder, payfolder)", "saveonfalse":"False"}]
-        functions += [{"function":"merge_xml.merge_xml_change_pkg(gamefolder, payfolder, newpkgname)", "saveonfalse":"False"}]
         functions += [{"function":"compile_apk.apk_compile(gamefolder, gamemergedapk)", "saveonfalse":"True"}]
         functions += [{"function":"copy_fromapk.copy_fromapk(gamemergedapk, gameapk, payapk)", "saveonfalse":"False"}]
         if (platform.system().lower() == "windows"):
