@@ -11,6 +11,9 @@ from xml.dom import minidom
 
 RE_STRING = "PACKAGE_NAME_ABC"
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
+
+COCOSPAY_SERVICE = "com.cocospay.CocosPayService"
+
 COCOSPAY_ACTIVITY = "com.cocospay.CocosPayActivity"
 COCOSPAYACTIVITY_ENTRY_NAME = "dest_activity"
 
@@ -41,6 +44,13 @@ def indent(elem, level=0):
 def merge_xml(gamefolder, payfolder):
     merge_xml_change_pkg(gamefolder, payfolder, None)
 
+def key_component_check(gameroot):
+    cocospay_activity = gameroot.find(".//activity/[@{%s}name='%s']" % (XML_NAMESPACE, COCOSPAY_ACTIVITY))
+    if (cocospay_activity == None):
+        log("[Eroring...] 缺失重要组件 : [%s]" % COCOSPAY_ACTIVITY, True)
+    cocospay_service = gameroot.find(".//service/[@{%s}name='%s']" % (XML_NAMESPACE, COCOSPAY_SERVICE))
+    if (cocospay_service == None):
+        log("[Eroring...] 缺失重要组件 : [%s]" % COCOSPAY_SERVICE, True)
 
 def remove_dup_permission(gameroot):
     log("[Logging...] 去除重复权限", True)
@@ -124,15 +134,10 @@ def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
     gamemanifest = "%s/AndroidManifest.xml" % gamefolder;
     paymanifest = "%s/AndroidManifest.xml" % payfolder;
     ET.register_namespace('android', XML_NAMESPACE)
+
     gametree = ET.parse(gamemanifest)
     gameroot = gametree.getroot()
     gameapplication = gameroot.find("application")
-    pkgname = gameroot.get("package")
-    if (newpkgname != None and newpkgname != ""):
-        #修改包名
-        log("[Logging...] 使用配置包名 : [%s]" % newpkgname, True)
-        gameroot.set("package", newpkgname)
-        pkgname = newpkgname
 
     paytree = ET.parse(paymanifest)
     payroot = paytree.getroot()
@@ -145,11 +150,18 @@ def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
     for item in payapplication.getchildren():
         gameapplication.append(item)
 
+    pkgname = gameroot.get("package")
+    if (newpkgname != None and newpkgname != ""):
+        #修改包名
+        log("[Logging...] 使用配置包名 : [%s]" % newpkgname, True)
+        gameroot.set("package", newpkgname)
+        pkgname = newpkgname
     #修改联通
     modify_unicom_metadata(gameroot)
     #去除重复的权限
     remove_dup_permission(gameroot)
     #add_entry_activity(gameroot)
+    key_component_check(gameroot)
     indent(gameroot)
     gametree.write(gamemanifest, encoding='utf-8', xml_declaration=True)
 
