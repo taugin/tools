@@ -144,7 +144,7 @@ def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
     modify_unicom_metadata(gameroot)
     #去除重复的权限
     remove_dup_permission(gameroot)
-    add_entry_activity(gameroot)
+    #add_entry_activity(gameroot)
     indent(gameroot)
     gametree.write(gamemanifest, encoding='utf-8', xml_declaration=True)
 
