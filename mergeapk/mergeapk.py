@@ -67,7 +67,7 @@ def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
     functions += [{"function":"decompile_apk.apk_decompile(gameapk, gamefolder)", "saveonfalse":"False"}]
     functions += [{"function":"decompile_apk.apk_decompile(payapk, payfolder)", "saveonfalse":"False"}]
     functions += [{"function":"apk_check.apk_check(gamefolder, payfolder)", "saveonfalse":"False"}]
-    functions += [{"function":"check_dup.check_dup(gamefolder, payfolder)", "saveonfalse":"True"}]
+    functions += [{"function":"check_dup.check_dup(gamefolder, payfolder)", "saveonfalse":"False"}]
 
     if (ONLY_CHECK_DUP == False):
         functions += [{"function":"merge_xml.merge_xml_change_pkg(gamefolder, payfolder, newpkgname)", "saveonfalse":"False"}]
