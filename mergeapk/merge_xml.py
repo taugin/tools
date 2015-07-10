@@ -128,6 +128,11 @@ def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
     gameroot = gametree.getroot()
     gameapplication = gameroot.find("application")
     pkgname = gameroot.get("package")
+    if (newpkgname != None and newpkgname != ""):
+        #修改包名
+        log("[Logging...] 使用配置包名 : [%s]" % newpkgname, True)
+        gameroot.set("package", newpkgname)
+        pkgname = newpkgname
 
     paytree = ET.parse(paymanifest)
     payroot = paytree.getroot()
@@ -154,7 +159,7 @@ def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
     #修改pay action
     rc = modify_pay_action(rc, pkgname)
     #修改包名
-    rc = modify_pkgname(rc, pkgname, newpkgname)
+    #rc = modify_pkgname(rc, pkgname, newpkgname)
 
     f.close()
     f = open(gamemanifest, "w")
