@@ -82,7 +82,7 @@ def add_company_string(root, dict, maxids, gamefolder, company_name):
 def add_extra_string(root, dict, maxids, gamefolder, company_name):
     list = []
     list += add_gb_string(root, dict, maxids, gamefolder)
-    list += add_company_string(root, dict, maxids, gamefolder, company_name)
+    #list += add_company_string(root, dict, maxids, gamefolder, company_name)
 
     if (len(list) <= 0):
         return
