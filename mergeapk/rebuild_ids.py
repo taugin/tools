@@ -99,7 +99,8 @@ def add_extra_string(root, dict, maxids, gamefolder, company_name):
     indent(tree.getroot())
     tree.write(gbstringfile, encoding="utf-8", xml_declaration=True)
 
-def gettypeid(publicfile):
+#获取所有的ID
+def get_all_ids(publicfile):
     tree = ET.parse(publicfile)
     root = tree.getroot()
     dict = {}
@@ -111,6 +112,7 @@ def gettypeid(publicfile):
             dict[type].append(id)
         else:
             dict[type] = [id]
+
     return dict;
 
 ## Get pretty look
@@ -127,32 +129,37 @@ def indent(elem, level=0):
         elem.tail = i
     return elem
 
+#查找public中类型的最大ID，如果ID不存在，则
+#在所有类型的最大值中+1
+#如：layout不存在public中，则找出所有类型的最大ID
+#即0x7f03，然后将此值+1为0x7f04，最后将此值与0000
+#合并成ID ：0x7f040000
 def process_maxid(maxid, dict, type):
-    if (maxid != "0x0"):
+    if (maxid != "unknown"):
         return maxid
 
-    #log("maxid : %s" % maxid)
     idlist = []
     for key in dict:
         list = dict[key]
         list.sort()
-        #log("type : %s, key : %s, item : %s" % (type, key,list[0]))
         idlist.append(list[0][0:6])
     idlist.sort()
     intid = int(eval(idlist[-1]))
     intid = intid + 1
     hexid = hex(intid) + "0000"
     dict[type] = [hexid]
-    log("unfind id : %s" % hexid)
     return hexid
 
+#获取特定类型的最大ID，如果不存在返回unknown
 def getmaxids(dict, key):
     if (key not in dict):
-        return "0x0"
+        return "unknown"
     list = dict[key]
     list.sort()
     return list[-1]
 
+#获取当前最大的ID值，然后+1，作为下一个
+#ID值
 def get_next_id(type, dict, maxids):
     if (type not in maxids):
         maxid = getmaxids(dict, type)
@@ -180,7 +187,7 @@ def rebuild_ids(gamefolder, payfolder, company_name):
     if (os.path.exists(paypublic) == False):
         log("[Error...] 无法定位文件 %s" % paypublic, True)
         sys.exit(0)
-    dict = gettypeid(gamepublic)
+    dict = get_all_ids(gamepublic)
 
     tree = ET.parse(paypublic)
     root = tree.getroot();
@@ -199,7 +206,7 @@ def rebuild_ids(gamefolder, payfolder, company_name):
         id = child.attrib["id"]
 
         hexid = get_next_id(type, dict, maxids)
-        #element = ET.XML('<public type="%s" name="%s" id="%s" />' % (type, name, hexid))
+
         element = ET.Element("public")
         element.attrib["id"] = hexid
         element.attrib["name"] = name
