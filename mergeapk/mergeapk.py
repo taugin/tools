@@ -63,18 +63,18 @@ def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
         gamemergedapk = tmpname + "-" + newpkgname + "-merged.apk"
 
     functions = []
-    functions += [{"function":"decompile_apk.apk_decompile(gameapk, gamefolder)", "saveonfalse":"False"}]
-    functions += [{"function":"decompile_apk.apk_decompile(payapk, payfolder)", "saveonfalse":"False"}]
-    functions += [{"function":"check_dup.check_dup(gamefolder, payfolder)", "saveonfalse":"False"}]
+    functions += [{"function":"decompile_apk.apk_decompile(gameapk, gamefolder)"}]
+    functions += [{"function":"decompile_apk.apk_decompile(payapk, payfolder)"}]
+    functions += [{"function":"check_dup.check_dup(gamefolder, payfolder)"}]
 
     if (ONLY_CHECK_DUP == False):
-        functions += [{"function":"merge_xml.merge_xml_change_pkg(gamefolder, payfolder, newpkgname)", "saveonfalse":"False"}]
-        functions += [{"function":"rebuild_ids.rebuild_ids(gamefolder, payfolder, company)", "saveonfalse":"False"}]
-        functions += [{"function":"copy_res.copy_res(gamefolder, payfolder)", "saveonfalse":"False"}]
+        functions += [{"function":"merge_xml.merge_xml_change_pkg(gamefolder, payfolder, newpkgname)"}]
+        functions += [{"function":"rebuild_ids.rebuild_ids(gamefolder, payfolder, company)"}]
+        functions += [{"function":"copy_res.copy_res(gamefolder, payfolder)"}]
         functions += [{"function":"compile_apk.apk_compile(gamefolder, gamemergedapk)", "saveonfalse":"True"}]
-        functions += [{"function":"copy_fromapk.copy_fromapk(gamemergedapk, gameapk, payapk, company)", "saveonfalse":"False"}]
+        functions += [{"function":"copy_fromapk.copy_fromapk(gamemergedapk, gameapk, payapk, company)"}]
         if (platform.system().lower() == "windows"):
-            functions += [{"function":"signapk_use_testkey(gamemergedapk)", "saveonfalse":"False"}]
+            functions += [{"function":"signapk_use_testkey(gamemergedapk)"}]
 
     result = False
     length = len(functions)
@@ -93,7 +93,11 @@ def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
     for item in range(0, length):
         if (item >= func_exec_pos):
             log("--------------------------------------------")
-            saveonfalse = eval(functions[item]["saveonfalse"])
+            saveonfalse = False
+            try:
+                saveonfalse = eval(functions[item]["saveonfalse"])
+            except:
+                pass
             SAVE_ON_FALSE = saveonfalse
             result = eval(functions[item]["function"])
             if (result == False):
@@ -125,7 +129,8 @@ def merge_according_config():
         company = item.get("company")
         if (gameapk != None and gameapk != "" and payapk != None and payapk != ""):
             log("[Logging...] ================================================")
-            log("[Logging...] 合并 [%s] 和 [%s]\n" % (gameapk, payapk))
+            log("[Logging...] 游戏APK : [%s]" % gameapk)
+            log("[Logging...] 支付APK : [%s]\n" % payapk)
             mergeapk_batch(gameapk, payapk, output, package, company)
         else:
             log("[Logging...] 请至少配置 <gameapk> 和 <payapk>项")
