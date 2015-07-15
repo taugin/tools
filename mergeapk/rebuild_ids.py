@@ -55,34 +55,9 @@ def check_name_exists(root, name, type):
         return False
     return True
 
-def add_company_string(root, dict, maxids, gamefolder, company_name):
-    if (check_name_exists(root, "PARTNER_NAME", "string") == True):
-        return []
-
-    log("[Logging...] 配置公司名称 : [%s]" % company_name, True)
-    if (company_name == None or company_name == ""):
-        return []
-
-    type = "string"
-    hexid = get_next_id(type, dict, maxids)
-    element = ET.Element("public")
-    element.attrib["id"] = hexid
-    element.attrib["name"] = "PARTNER_NAME"
-    element.attrib["type"] = "string"
-    root.append(element)
-
-    doc = Document()  #创建DOM文档对象
-    gbstring = doc.createElement("string")
-    gbstring.setAttribute("name", "PARTNER_NAME")
-    textnode = doc.createTextNode(company_name)
-    gbstring.appendChild(textnode)
-
-    return [gbstring]
-
 def add_extra_string(root, dict, maxids, gamefolder, company_name):
     list = []
     list += add_gb_string(root, dict, maxids, gamefolder)
-    #list += add_company_string(root, dict, maxids, gamefolder, company_name)
 
     if (len(list) <= 0):
         return

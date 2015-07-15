@@ -42,7 +42,7 @@ def signapk_use_testkey(apkloaderfile):
 def clean_tmp_folders(gamefolder, payfolder):
     log("[Logging...] 清除临时文件")
     shutil.rmtree(payfolder, ignore_errors = True)
-    log("[Logging...] 临时文件清除完成\n")
+    log("[Logging...] 文件清除完成\n")
 
 def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
     (gamename, ext) = os.path.splitext(gameapk)
@@ -125,7 +125,7 @@ def merge_according_config():
         company = item.get("company")
         if (gameapk != None and gameapk != "" and payapk != None and payapk != ""):
             log("[Logging...] ================================================")
-            log("[Logging...] 处理合并APK")
+            log("[Logging...] 合并 [%s] 和 [%s]\n" % (gameapk, payapk))
             mergeapk_batch(gameapk, payapk, output, package, company)
         else:
             log("[Logging...] 请至少配置 <gameapk> 和 <payapk>项")

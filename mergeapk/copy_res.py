@@ -11,7 +11,7 @@ def log(str, show=False):
 
 
 def copy_res(gamefolder, payfolder):
-    log("[Logging...] 正在拷贝资源文件", True)
+    log("[Logging...] 拷贝资源文件 : [res]", True)
     if (os.path.exists(gamefolder) == False):
         log("[Error...] 无法定位文件夹 %s" % gamefolder, True)
         sys.exit(0)
@@ -39,7 +39,7 @@ def copy_res(gamefolder, payfolder):
                     gamefile = tmp.replace(payfolder, gamefolder)
                     #log("payfile : %s , gamefile : %s " % (payfile, gamefile))
                     shutil.copy2(payfile, gamefile)
-    log("[Logging...] 拷贝资源文件完成\n", True)
+    log("[Logging...] 拷贝资源完成\n", True)
     return True
 
 if __name__ == "__main__":

@@ -60,6 +60,7 @@ def should_copypayapklibfile(name, liblist):
     return True
 
 def copy_payapk(mergedapk, payapk):
+    log("[Logging...] 拷贝支付文件", True)
     mergedzip = zipfile.ZipFile(mergedapk, "a")
     liblist = get_lib_dirs(mergedapk)
     payzip = zipfile.ZipFile(payapk, "r")
@@ -94,6 +95,7 @@ def exists_in_gameapk(zip, name):
         return False
 
 def copy_gameapk(mergedapk, gameapk):
+    log("[Logging...] 拷贝游戏文件", True)
     mergedzip = zipfile.ZipFile(mergedapk, "a")
     gamezip = zipfile.ZipFile(gameapk, "r")
     for name in gamezip.namelist():
@@ -135,6 +137,7 @@ def indent(elem, level=0):
 def add_company_info(mergedapk, company_name):
     if (company_name == None or company_name == ""):
         return
+    log("[Logging...] 配置公司名称 : [%s]" % company_name, True)
     mergedzip = zipfile.ZipFile(mergedapk, "a")
     doc = Document()  #创建DOM文档对象
     root = doc.createElement('resources') #创建根元素
@@ -157,7 +160,6 @@ def add_company_info(mergedapk, company_name):
         os.remove(gbstringfile)
 
 def copy_fromapk(mergedapk, gameapk, payapk, company_name):
-    log("[Logging...] 正在拷贝APK相关文件", True)
     if (os.path.exists(mergedapk) == False):
         log("[Error...] 无法定位文件 %s" % mergedapk, True)
         sys.exit(0)
@@ -176,7 +178,7 @@ def copy_fromapk(mergedapk, gameapk, payapk, company_name):
     copy_payapk(mergedapk, payapk)
     generate_cocospay(mergedapk, payapk)
     add_company_info(mergedapk, company_name)
-    log("[Logging...] APK相关文件拷贝完成\n", True)
+    log("[Logging...] 文件拷贝完成\n", True)
     return True
 
 if __name__ == "__main__":
