@@ -37,11 +37,30 @@ def should_copypayapkfile(name):
         return False
     return True
 
+def get_lib_dirs(mergedapk):
+    mergedzip = zipfile.ZipFile(mergedapk, "r")
+    liblist = []
+    for name in mergedzip.namelist():
+        if (name.startswith("lib")):
+            dirname = os.path.dirname(name)
+            if (dirname not in liblist):
+                liblist += [dirname]
+    return liblist
+
+def should_copypayapklibfile(name, liblist):
+    if (liblist == None or len(liblist) <= 0):
+        return True
+    dirname = os.path.dirname(name)
+    if (dirname.startswith("lib") and dirname not in liblist):
+        return False
+    return True
+
 def copy_payapk(mergedapk, payapk):
     mergedzip = zipfile.ZipFile(mergedapk, "a")
+    liblist = get_lib_dirs(mergedapk)
     payzip = zipfile.ZipFile(payapk, "r")
     for name in payzip.namelist():
-        if (should_copypayapkfile(name)):
+        if (should_copypayapkfile(name) and should_copypayapklibfile(name, liblist)):
             mergedzip.writestr(name, payzip.read(name))
     mergedzip.close()
     payzip.close()
