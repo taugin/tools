@@ -21,7 +21,7 @@ import platform
 if (platform.system().lower() == "windows"):
     import msvcrt
 
-TRY_CONFIG = "mergeapk.tryagain"
+TRY_CONFIG = "error.json"
 SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "signtool", "signapk.py")
 ONLY_CHECK_DUP = False
 MERGE_BY_CONFIG = False
@@ -84,9 +84,14 @@ def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
         string = f.read()
         f.close()
         saveflag = eval(string)
-        filename = saveflag["filename"]
+        filename = None
+        try:
+            filename = saveflag["filename"]
+        except:
+            pass
         if (filename != None and filename == os.path.abspath(gamemergedapk)):
-            func_exec_pos = saveflag["function_pos"]
+            pass
+        func_exec_pos = saveflag["position"]
         os.remove(TRY_CONFIG)
 
     SAVE_ON_FALSE = False
@@ -99,10 +104,11 @@ def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
             except:
                 pass
             SAVE_ON_FALSE = saveonfalse
+            log("[Logging...] 当前函数编号 : [%d]" % item)
             result = eval(functions[item]["function"])
             if (result == False):
                 if (saveonfalse == True):
-                    savestr = '{"function_pos":%d,"filename":r"%s"}' % (item, os.path.abspath(gamemergedapk))
+                    savestr = '{"position":%d,"filename":r"%s"}' % (item, os.path.abspath(gamemergedapk))
                     fd = open(TRY_CONFIG, "w")
                     fd.write(savestr)
                     fd.close()
