@@ -7,6 +7,10 @@ import shutil
 import zipfile
 import platform
 import subprocess
+import xml.etree.ElementTree as ET
+from xml.etree import cElementTree as ET
+from xml.dom import minidom
+from xml.dom.minidom import Document
 
 PLUGIN_FILE = "assets/plugins.xml"
 ITEM_MAPPER = "assets/ItemMapper.xml"
@@ -114,7 +118,45 @@ def generate_cocospay(mergedapk, payapk):
     if (os.path.exists(tmpzipfile)):
         os.remove(tmpzipfile)
 
-def copy_fromapk(mergedapk, gameapk, payapk):
+## Get pretty look
+def indent(elem, level=0):
+    i = "\n" + level*"    "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "    "
+        for e in elem:
+            indent(e, level+1)
+        if not e.tail or not e.tail.strip():
+            e.tail = i
+    if level and (not elem.tail or not elem.tail.strip()):
+        elem.tail = i
+    return elem
+
+def add_company_info(mergedapk, company_name):
+    if (company_name == None or company_name == ""):
+        return
+    mergedzip = zipfile.ZipFile(mergedapk, "a")
+    doc = Document()  #创建DOM文档对象
+    root = doc.createElement('resources') #创建根元素
+    doc.appendChild(root)
+    gbstring = doc.createElement("string")
+    gbstring.setAttribute("name", "PARTNER_NAME")
+    textnode = doc.createTextNode(company_name)
+    gbstring.appendChild(textnode)
+    root.appendChild(gbstring)
+    gbstringfile = "ccp_strings.xml"
+    f = open(gbstringfile,'wb')
+    f.write(doc.toxml(encoding = "utf-8"))
+    f.close()
+    tree = ET.parse(gbstringfile)
+    indent(tree.getroot())
+    tree.write(gbstringfile, encoding="utf-8", xml_declaration=True)
+    mergedzip.write(gbstringfile, "assets/%s" % gbstringfile, zipfile.ZIP_DEFLATED)
+    mergedzip.close()
+    if (os.path.exists(gbstringfile)):
+        os.remove(gbstringfile)
+
+def copy_fromapk(mergedapk, gameapk, payapk, company_name):
     log("[Logging...] 正在拷贝APK相关文件", True)
     if (os.path.exists(mergedapk) == False):
         log("[Error...] 无法定位文件 %s" % mergedapk, True)
@@ -133,7 +175,7 @@ def copy_fromapk(mergedapk, gameapk, payapk):
     copy_gameapk(mergedapk, gameapk)
     copy_payapk(mergedapk, payapk)
     generate_cocospay(mergedapk, payapk)
-
+    add_company_info(mergedapk, company_name)
     log("[Logging...] APK相关文件拷贝完成\n", True)
     return True
 
