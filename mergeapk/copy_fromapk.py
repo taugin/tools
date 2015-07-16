@@ -139,6 +139,7 @@ def add_company_info(mergedapk, company_name):
     if (company_name == None or company_name == ""):
         return
     log("[Logging...] 配置公司名称 : [%s]" % company_name, True)
+    subprocess.call([AAPT_FILE, "r", mergedapk, COMPANYFILE], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     mergedzip = zipfile.ZipFile(mergedapk, "a")
     doc = Document()  #创建DOM文档对象
     root = doc.createElement('resources') #创建根元素
@@ -177,7 +178,7 @@ def copy_fromapk(mergedapk, gameapk, payapk, company_name):
     copy_gameapk(mergedapk, gameapk)
     copy_payapk(mergedapk, payapk)
     generate_cocospay(mergedapk, payapk)
-    subprocess.call([AAPT_FILE, "r", mergedapk, COMPANYFILE], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
     add_company_info(mergedapk, company_name)
     log("[Logging...] 文件拷贝完成\n", True)
     return True
