@@ -142,8 +142,7 @@ def add_company_info(mergedapk, company_name):
     doc = Document()  #创建DOM文档对象
     root = doc.createElement('resources') #创建根元素
     doc.appendChild(root)
-    gbstring = doc.createElement("string")
-    gbstring.setAttribute("name", "PARTNER_NAME")
+    gbstring = doc.createElement("partner_name")
     textnode = doc.createTextNode(company_name)
     gbstring.appendChild(textnode)
     root.appendChild(gbstring)
