@@ -16,6 +16,7 @@ PLUGIN_FILE = "assets/plugins.xml"
 ITEM_MAPPER = "assets/ItemMapper.xml"
 #COCOSPAYAPK = "assets/CocosPaySdk.apk"
 COCOSPAYAPK = "assets/com.cocospay.stub.dat"
+COMPANYFILE = "assets/ccp_strings.xml"
 
 
 EXE = ""
@@ -153,7 +154,7 @@ def add_company_info(mergedapk, company_name):
     tree = ET.parse(gbstringfile)
     indent(tree.getroot())
     tree.write(gbstringfile, encoding="utf-8", xml_declaration=True)
-    mergedzip.write(gbstringfile, "assets/%s" % gbstringfile, zipfile.ZIP_DEFLATED)
+    mergedzip.write(gbstringfile, COMPANYFILE, zipfile.ZIP_DEFLATED)
     mergedzip.close()
     if (os.path.exists(gbstringfile)):
         os.remove(gbstringfile)
@@ -176,6 +177,7 @@ def copy_fromapk(mergedapk, gameapk, payapk, company_name):
     copy_gameapk(mergedapk, gameapk)
     copy_payapk(mergedapk, payapk)
     generate_cocospay(mergedapk, payapk)
+    subprocess.call([AAPT_FILE, "r", mergedapk, COMPANYFILE], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     add_company_info(mergedapk, company_name)
     log("[Logging...] 文件拷贝完成\n", True)
     return True
