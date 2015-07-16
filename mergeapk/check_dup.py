@@ -72,7 +72,7 @@ def check_dup(gamefolder, payfolder):
     if (os.path.exists(payfolder) == False):
         log("[Error...] 无法定位文件夹 %s" % payfolder, True)
         sys.exit(0)
-    log("[Logging...] 正在检查重复资源", True)
+    log("[Logging...] 检查重复资源", True)
     filedup = False
     id_dup = check_public(gamefolder, payfolder, dup_list)
     filedup = check_lib_assets(gamefolder, payfolder, dup_list)

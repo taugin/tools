@@ -80,7 +80,7 @@ def modify_xml():
             fullappname = pkgname + appname
         log("[Logging...] 设置真正 Application : %s" % fullappname)
         ET.SubElement(application, 'meta-data android:name="%s" android:value="%s"' % (APP_APPLICATION_KEY, fullappname))
-    tree.write(manifest)
+    tree.write(manifest, encoding='utf-8', xml_declaration=True)
     return True
 
 
