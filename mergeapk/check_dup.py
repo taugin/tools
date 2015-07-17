@@ -78,7 +78,7 @@ def check_dup(gamefolder, payfolder):
     filedup = check_lib_assets(gamefolder, payfolder, dup_list)
     all_dup = id_dup or filedup
     if (all_dup == True):
-        log("[Logging...] 有重复资源, 请检查\n", True)
+        log("[Logging...] 存在重复资源, 请检查\n", True)
         f = open("dup.txt", "w")
         for s in dup_list:
             f.write(s)
@@ -87,7 +87,7 @@ def check_dup(gamefolder, payfolder):
     else:
         if (os.path.exists("dup.txt")):
             os.remove("dup.txt")
-        log("[Logging...] 无重复资源 \n", True)
+        log("[Logging...] 没有重复资源 \n", True)
         return True
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ import sys
 import xml.etree.ElementTree as ET
 from xml.etree import cElementTree as ET
 from xml.dom import minidom
+import config_parser
 
 RE_STRING = "PACKAGE_NAME_ABC"
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
@@ -52,6 +53,7 @@ def key_component_check(gameroot):
     if (cocospay_service == None):
         log("[Eroring...] 缺失重要组件 : [%s]" % COCOSPAY_SERVICE, True)
 
+#去除重复权限
 def remove_dup_permission(gameroot):
     log("[Logging...] 去除重复权限", True)
     permissions = gameroot.findall(".//uses-permission")
@@ -63,6 +65,20 @@ def remove_dup_permission(gameroot):
                 gameroot.remove(item)
             else:
                 list += [permisson_name]
+
+#去除敏感权限
+def remove_sensitive_permission(gameroot):
+    log("[Logging...] 去除敏感权限", True)
+    list = config_parser.get_sensitive_permissions()
+    if (list == None or len(list) <= 0):
+        return
+    permissions = gameroot.findall(".//uses-permission")
+    if (permissions != None):
+        for item in permissions:
+            permisson_name = item.attrib["{%s}name" % XML_NAMESPACE]
+            if (permisson_name in list):
+                log("[Logging...] 敏感权限名称 : [%s]" % permisson_name, True)
+                gameroot.remove(item)
 
 def add_entry_activity(gameroot):
     mainactivity = gameroot.findall(MAIN_ACTIVITY_XPATH)
@@ -173,6 +189,7 @@ def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
     modify_unicom_metadata(gameroot)
     #去除重复的权限
     remove_dup_permission(gameroot)
+    remove_sensitive_permission(gameroot)
     add_entry_activity(gameroot)
     key_component_check(gameroot)
     indent(gameroot)

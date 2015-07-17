@@ -31,6 +31,7 @@ from xml.etree import cElementTree as ET
 from xml.dom import minidom
 
 CONFIG_FILE = "config.xml"
+PERMISSIONS = "permissions.xml"
 
 def log(str, show=True):
     if (show):
@@ -52,8 +53,11 @@ class ConfigParer:
 
     def __init__(self):
         if (os.path.exists(CONFIG_FILE)):
-            tree = ET.parse(CONFIG_FILE)
-            ConfigParer.root = tree.getroot()
+            try:
+                tree = ET.parse(CONFIG_FILE)
+                ConfigParer.root = tree.getroot()
+            except:
+                log("[Logging...] 解析文件出错 : [%s]" % CONFIG_FILE, True)
 
     def readconfig(self, tag):
         if (ConfigParer.root != None):
@@ -89,4 +93,44 @@ class ConfigParer:
 def readmergelist():
     config_parser = ConfigParer.getInstance()
     return config_parser.readpkglist()
-readmergelist()
+
+'''
+<permissions>
+    <permission>android.intent.action.SEND_SMS</permisssion>
+</permissions>
+'''
+class PermissionParer:
+    root = None
+    instance = None
+    mutex = threading.Lock()
+
+    @staticmethod
+    def getInstance():
+        if(PermissionParer.instance == None):
+            PermissionParer.mutex.acquire()
+            if(PermissionParer.instance == None):
+                PermissionParer.instance = PermissionParer()
+            PermissionParer.mutex.release()
+        return PermissionParer.instance
+
+    def __init__(self):
+        if (os.path.exists(PERMISSIONS)):
+            try:
+                tree = ET.parse(PERMISSIONS)
+                PermissionParer.root = tree.getroot()
+            except:
+                log("[Logging...] 解析文件出错 : [%s]" % PERMISSIONS, True)
+
+    def getlist(self):
+        list = []
+        if (PermissionParer.root != None):
+            allElement = PermissionParer.root.findall("permission")
+            if (allElement != None):
+                for element in allElement:
+                    list += [element.text]
+        return list
+
+def get_sensitive_permissions():
+    permissionParser = PermissionParer.getInstance()
+    list = permissionParser.getlist()
+    return list
