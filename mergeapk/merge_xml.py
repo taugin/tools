@@ -70,7 +70,6 @@ def add_entry_activity(gameroot):
         return
 
     entry_activity = None
-    screenOritation = None
     old_entry_class = None
     for activity in mainactivity:
         activityname = activity.attrib["{%s}name" % XML_NAMESPACE]
@@ -78,15 +77,14 @@ def add_entry_activity(gameroot):
             entry_activity = activity
             mainactivity.remove(activity)
         else:
-            screenOritation = activity.get("{%s}screenOrientation" % XML_NAMESPACE)
             old_entry_class = activity.attrib["{%s}name" % XML_NAMESPACE]
             launcher_filter = activity.find(CATEGORY_XPATH)
             category = launcher_filter.find(".//category")
             launcher_filter.remove(category)
 
+    #设置游戏真正入口Activity
     if (entry_activity != None):
-        if (screenOritation != None):
-            entry_activity.set("{%s}screenOrientation" % XML_NAMESPACE, screenOritation)
+        #查找meta-data
         dest_activity = entry_activity.find("meta-data[@{%s}name='%s']" % (XML_NAMESPACE, COCOSPAYACTIVITY_ENTRY_NAME))
         if (old_entry_class != None):
             log("[Logging...] 设置程序入口 : [%s]" % old_entry_class, True)
@@ -97,6 +95,21 @@ def add_entry_activity(gameroot):
                 element.attrib["{%s}name" % XML_NAMESPACE] = "dest_activity"
                 element.attrib["{%s}value" % XML_NAMESPACE] = old_entry_class
                 entry_activity.append(element)
+
+    #设置程序入口Activity属性值
+    if (entry_activity != None):
+        dest_activity = entry_activity.find("meta-data[@{%s}name='%s']" % (XML_NAMESPACE, COCOSPAYACTIVITY_ENTRY_NAME))
+        if (dest_activity == None):
+            return
+        entry_activity_class = dest_activity.get("{%s}value" % XML_NAMESPACE)
+        if (entry_activity_class == None or entry_activity_class == ""):
+            return
+        real_entry_activity = gameroot.find(".//activity[@{%s}name='%s']" % (XML_NAMESPACE, entry_activity_class))
+        if (real_entry_activity == None):
+            return
+        screenOritation = real_entry_activity.get("{%s}screenOrientation" % XML_NAMESPACE)
+        if (screenOritation != None):
+            entry_activity.set("{%s}screenOrientation" % XML_NAMESPACE, screenOritation)
 
 
 def modify_pay_action(rc, pkgname):
@@ -160,7 +173,7 @@ def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
     modify_unicom_metadata(gameroot)
     #去除重复的权限
     remove_dup_permission(gameroot)
-    #add_entry_activity(gameroot)
+    add_entry_activity(gameroot)
     key_component_check(gameroot)
     indent(gameroot)
     gametree.write(gamemanifest, encoding='utf-8', xml_declaration=True)
