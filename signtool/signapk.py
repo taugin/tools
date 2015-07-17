@@ -6,7 +6,6 @@ import getopt
 import platform
 import zipfile
 import subprocess;
-import msvcrt
 
 SEPERATER = os.path.sep
 KEYTOOL = "keytool"
@@ -17,6 +16,13 @@ USE_TESTSIGN_FILE = False
 def log(str, show=False):
     if (show):
         print(str)
+
+def pause():
+    if (platform.system().lower() == "windows"):
+        import msvcrt
+        log("操作完成，按任意键退出", True)
+        msvcrt.getch()
+
 def inputvalue(prompt, max) :
     while True:
         p = input(prompt)
@@ -56,8 +62,7 @@ def sign_apk(src_apk, dst_apk, keystoreinfo):
             log("[Signing...] 签名成功 : %s" % dst_apk, True)
         else:
             log("[Signing...] 签名失败", True)
-            log("操作完成，按任意键退出", True)
-            msvcrt.getch()
+            pause()
     else:
         log("[Logging...] 签名信息 : keystore : [%s], storepass : [%s] , keyalias : [%s], keypass : [%s]" % (keystoreinfo[0],keystoreinfo[1], keystoreinfo[2], keystoreinfo[3]), True)
 
@@ -86,8 +91,7 @@ def sign_apk(src_apk, dst_apk, keystoreinfo):
             log("[Signing...] 签名成功 : %s" % dst_apk, True)
         else:
             log("[Signing...] 签名失败", True)
-            log("操作完成，按任意键退出", True)
-            msvcrt.getch()
+            pause()
     log("---------------------------------------", True);
 
 def exec_sign_process(src_apk, USE_TESTSIGN_FILE):

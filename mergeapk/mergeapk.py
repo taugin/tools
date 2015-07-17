@@ -18,9 +18,6 @@ import copy_fromapk
 import config_parser
 import platform
 
-if (platform.system().lower() == "windows"):
-    import msvcrt
-
 TRY_CONFIG = "error.json"
 SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "signtool", "signapk.py")
 ONLY_CHECK_DUP = False
@@ -73,8 +70,7 @@ def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
         functions += [{"function":"copy_res.copy_res(gamefolder, payfolder)"}]
         functions += [{"function":"compile_apk.apk_compile(gamefolder, gamemergedapk)", "saveonfalse":"True"}]
         functions += [{"function":"copy_fromapk.copy_fromapk(gamemergedapk, gameapk, payapk, company)"}]
-        if (platform.system().lower() == "windows"):
-            functions += [{"function":"signapk_use_testkey(gamemergedapk)"}]
+        functions += [{"function":"signapk_use_testkey(gamemergedapk)"}]
 
     result = False
     length = len(functions)

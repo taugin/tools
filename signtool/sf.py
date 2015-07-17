@@ -9,7 +9,6 @@ import getopt
 import zipfile
 import hashlib
 import subprocess
-import msvcrt
 
 SIGNINFO_MD5 = False
 FILE_MD5 = False
@@ -24,6 +23,12 @@ JAVA = "java"
 def log(str, show=True):
     if (show):
         print(str)
+
+def pause():
+    if (platform.system().lower() == "windows"):
+        import msvcrt
+        log("操作完成，按任意键退出", True)
+        msvcrt.getch()
 
 def md5_classes(apkFile):
     signfile = ""
@@ -159,8 +164,7 @@ def install_apk(args):
                 success = True
         log(allret)
         if (success == False):
-            log("操作完成，按任意键退出", True)
-            msvcrt.getch()
+            pause()
 
 def print_xml(args):
     manifest = ""
@@ -236,5 +240,4 @@ if APK_INFO == True:
     log("--------------------------------------------")
     processapk(args, md5_signfile)
     log("--------------------------------------------")
-log("操作完成，按任意键退出", True)
-msvcrt.getch()
+pause()

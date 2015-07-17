@@ -7,7 +7,6 @@ import zipfile
 import xml.etree.ElementTree as ET
 import shutil
 import platform
-import msvcrt
 
 MANIFEST_FILE = "AndroidManifest.xml"
 TMP_DECOMPILE_FOLDER = "debuild"
@@ -32,6 +31,12 @@ AAPT_FILE = os.path.join(os.path.dirname(sys.argv[0]), AAPT)
 def log(str, show=True):
     if (show):
         print(str)
+
+def pause():
+    if (platform.system().lower() == "windows"):
+        import msvcrt
+        log("操作完成，按任意键退出", True)
+        msvcrt.getch()
 
 def apk_decompile(apkfile):
     thisdir = os.path.dirname(sys.argv[0])
@@ -145,8 +150,7 @@ def process_addloader(file, apkloaderfile):
     functions += ["generate_loaderapk(apkloaderfile)"]
     functions += ["zip_loaderanddat(apkloaderfile)"]
     functions += ["clear_tmp_folder()"]
-    if (platform.system().lower() == "windows"):
-        functions += ["signapk_use_testkey(apkloaderfile)"]
+    functions += ["signapk_use_testkey(apkloaderfile)"]
 
     result = False
     length = len(functions)
@@ -170,7 +174,7 @@ def process_addloader(file, apkloaderfile):
                 fd = open(TRY_CONFIG, "w")
                 fd.write(savestr)
                 fd.close()
-                msvcrt.getch()
+                pause()
                 return;
 
 
