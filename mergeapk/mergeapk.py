@@ -38,7 +38,11 @@ def signapk_use_testkey(apkloaderfile):
 
 def clean_tmp_folders(gamefolder, payfolder):
     log("[Logging...] 清除临时文件")
-    shutil.rmtree(payfolder, ignore_errors = True)
+    try:
+        shutil.rmtree(gamefolder, ignore_errors = True)
+        shutil.rmtree(payfolder, ignore_errors = True)
+    except:
+        pass
     log("[Logging...] 文件清除完成\n")
 
 def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
