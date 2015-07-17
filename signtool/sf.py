@@ -8,6 +8,7 @@ import hashlib
 import getopt
 import zipfile
 import hashlib
+import platform
 import subprocess
 
 SIGNINFO_MD5 = False
@@ -73,7 +74,7 @@ def md5_signfile(apkFile):
 
 def getpkg(apkFile):
     cmdlist = ["aapt", "d", "badging", apkFile]
-    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
 
     tmppkg = ""
     tmp = ""
@@ -83,7 +84,6 @@ def getpkg(apkFile):
         if (tmp.startswith("package")):
             tmppkg = tmp
             break;
-    tmppkg = str(line, "utf-8")
     tmppkg = tmppkg.replace("\r", "")
     tmppkg = tmppkg.replace("\n", "")
     tmppkg = tmppkg.replace("'", "")
