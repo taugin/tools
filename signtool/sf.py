@@ -21,6 +21,12 @@ KEYTOOL = "keytool"
 ADB = "adb"
 JAVA = "java"
 
+EXE = ""
+if (platform.system().lower() == "windows"):
+    EXE = ".exe"
+AAPT = "aapt%s" % EXE
+AAPT_FILE = os.path.join(os.path.dirname(sys.argv[0]), AAPT)
+
 def log(str, show=True):
     if (show):
         print(str)
@@ -73,7 +79,7 @@ def md5_signfile(apkFile):
     z.close()
 
 def getpkg(apkFile):
-    cmdlist = ["aapt", "d", "badging", apkFile]
+    cmdlist = [AAPT_FILE, "d", "badging", apkFile]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
 
     tmppkg = ""
