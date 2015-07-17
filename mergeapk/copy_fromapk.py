@@ -66,7 +66,10 @@ def copy_payapk(mergedapk, payapk):
     liblist = get_lib_dirs(mergedapk)
     payzip = zipfile.ZipFile(payapk, "r")
     for name in payzip.namelist():
-        if (should_copypayapkfile(name) and should_copypayapklibfile(name, liblist)):
+        should_copy = should_copypayapkfile(name)
+        should_copy_lib = should_copypayapklibfile(name, liblist)
+        exists_in = exists_in_gameapk(mergedzip, name)
+        if (should_copy and should_copy_lib and exists_in == False):
             mergedzip.writestr(name, payzip.read(name))
     mergedzip.close()
     payzip.close()
@@ -172,7 +175,7 @@ def copy_fromapk(mergedapk, gameapk, payapk, company_name):
         sys.exit(0)
 
     subprocess.call([AAPT_FILE, "r", mergedapk, PLUGIN_FILE], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    subprocess.call([AAPT_FILE, "r", mergedapk, ITEM_MAPPER], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    #subprocess.call([AAPT_FILE, "r", mergedapk, ITEM_MAPPER], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     subprocess.call([AAPT_FILE, "r", mergedapk, COCOSPAYAPK], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     copy_gameapk(mergedapk, gameapk)
