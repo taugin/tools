@@ -35,9 +35,12 @@ def getapkfile(package):
             string = line.decode().replace("\n", "")
             string = string.strip()
             if (string.startswith("package:")):
-                string = string[len("package:"):-(len(package) + 1)]
-                log("[Logging...] 顶层APK文件 : [%s]" % string)
-                apkfile = string
+                tmp = string[len("package:"):]
+                tmp = tmp.split("=")
+                if (tmp != None and len(tmp) > 1):
+                    if (tmp[1] == package):
+                        log("[Logging...] 顶层APK文件 : [%s]" % tmp[0])
+                        apkfile = tmp[0]
     return apkfile
 
 def pullspecapk(apkfile):
@@ -50,6 +53,5 @@ def pullapk():
     package = getpackage()
     apkfile = getapkfile(package)
     pullspecapk(apkfile)
-    log(apkfile)
 
 pullapk()
