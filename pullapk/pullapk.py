@@ -51,7 +51,8 @@ def pullspecapk(apkfile):
 
 def pullapk():
     package = getpackage()
-    apkfile = getapkfile(package)
-    pullspecapk(apkfile)
+    if (package != None):
+        apkfile = getapkfile(package)
+        pullspecapk(apkfile)
 
 pullapk()
