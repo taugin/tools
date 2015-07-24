@@ -119,7 +119,11 @@ def process_maxid(maxid, dict, type):
         list.sort()
         idlist.append(list[0][0:6])
     idlist.sort()
-    intid = int(eval(idlist[-1]))
+    intid = 0
+    if (len(idlist) > 0):
+        intid = int(eval(idlist[-1]))
+    else:
+        intid = int(eval("0x7f01"))
     intid = intid + 1
     hexid = hex(intid) + "0000"
     dict[type] = [hexid]
@@ -146,22 +150,44 @@ def get_next_id(type, dict, maxids):
     maxids[type] = hexid
     return hexid
 
+#生成空的public.xml文件
+def generate_xml(public_xml):
+    dir = os.path.dirname(public_xml)
+    os.makedirs(dir)
+    doc = Document()  #创建DOM文档对象
+    root = doc.createElement('resources') #创建根元素
+    doc.appendChild(root)
+    #element = doc.createElement("public")
+    #element.setAttribute("id", "0x7f000000")
+    #element.setAttribute("name", "empty")
+    #element.setAttribute("type", "undefine")
+    #root.appendChild(element)
+
+    f = open(public_xml,'wb')
+    f.write(doc.toxml(encoding = "utf-8"))
+    f.close()
+    tree = ET.parse(public_xml)
+    indent(tree.getroot())
+    tree.write(public_xml, encoding="utf-8", xml_declaration=True)
+
 def rebuild_ids(gamefolder, payfolder, company_name):
     if (os.path.exists(gamefolder) == False):
-        log("[Error...] 无法定位文件夹 %s" % gamefolder, True)
+        log("[Warning...] 无法定位文件夹 %s" % gamefolder, True)
         sys.exit(0)
     if (os.path.exists(payfolder) == False):
-        log("[Error...] 无法定位文件夹 %s" % payfolder, True)
+        log("[Warning...] 无法定位文件夹 %s" % payfolder, True)
         sys.exit(0)
     log("[Logging...] 重建资源编号", True)
     gamepublic = "%s/res/values/public.xml" % gamefolder;
     paypublic = "%s/res/values/public.xml" % payfolder;
     if (os.path.exists(gamepublic) == False):
-        log("[Error...] 无法定位文件 %s" % gamepublic, True)
-        sys.exit(0)
+        log("[Warning...] 无法定位文件 %s\n" % gamepublic, True)
+        generate_xml(gamepublic)
+
     if (os.path.exists(paypublic) == False):
-        log("[Error...] 无法定位文件 %s" % paypublic, True)
-        sys.exit(0)
+        log("[Warning...] 无法定位文件 %s\n" % paypublic, True)
+        generate_xml(paypublic)
+
     dict = get_all_ids(gamepublic)
 
     tree = ET.parse(paypublic)
