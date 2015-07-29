@@ -18,7 +18,7 @@ XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
 
 '''
 <config>
-    <payapk name="gb.apk">
+    <payapk name="gb.apk" filter="0|103,201$1">
         <path></path>
     </payapk>
     <payapk name="mm.apk">
