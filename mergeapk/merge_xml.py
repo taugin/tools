@@ -120,13 +120,30 @@ def add_entry_activity(gameroot):
         entry_activity_class = dest_activity.get("{%s}value" % XML_NAMESPACE)
         if (entry_activity_class == None or entry_activity_class == ""):
             return
-        real_entry_activity = gameroot.find(".//activity[@{%s}name='%s']" % (XML_NAMESPACE, entry_activity_class))
-        if (real_entry_activity == None):
-            return
-        screenOritation = real_entry_activity.get("{%s}screenOrientation" % XML_NAMESPACE)
-        if (screenOritation != None):
-            entry_activity.set("{%s}screenOrientation" % XML_NAMESPACE, screenOritation)
 
+        #设置程序入口屏幕方向
+        real_entry_activity = gameroot.find(".//activity[@{%s}name='%s']" % (XML_NAMESPACE, entry_activity_class))
+        if (real_entry_activity != None):
+            screenOritation = real_entry_activity.get("{%s}screenOrientation" % XML_NAMESPACE)
+            if (screenOritation == None):
+                return
+            entry_activity.set("{%s}screenOrientation" % XML_NAMESPACE, screenOritation)
+            set_orientation(gameroot, screenOritation)
+
+def set_orientation(gameroot, screenOritation):
+    if (screenOritation == None):
+        return
+    activity_class = "cn.cmgame.billing.api.GameOpenActivity"
+    activity = gameroot.find(".//activity[@{%s}name='%s']" % (XML_NAMESPACE, activity_class))
+    if (activity != None):
+        log("[Logging...] 基地屏幕方向 : [%s]" % screenOritation, True)
+        activity.set("{%s}screenOrientation" % XML_NAMESPACE, screenOritation)
+
+    activity_class = "com.unicom.dcLoader.welcomeview"
+    activity = gameroot.find(".//activity[@{%s}name='%s']" % (XML_NAMESPACE, activity_class))
+    if (activity != None):
+        log("[Logging...] 联通屏幕方向 : [%s]" % screenOritation, True)
+        activity.set("{%s}screenOrientation" % XML_NAMESPACE, screenOritation)
 
 def modify_pay_action(rc, pkgname):
     log("[Logging...] 替换真实包名 : [%s] --> [%s]" % (RE_STRING, pkgname), True)
