@@ -54,7 +54,7 @@ def clear_manifest():
 
 def generate_android():
     cmdlist = ["android", "create", "project", "--target", "7", "--name", TMP_NAME, "--path", TMP_PROJECT, "--activity", TMP_ACTIVITY, "--package", "com.cocospay"]
-    ret = subprocess.call(cmdlist, shell=True, stdout=subprocess.PIPE)
+    ret = subprocess.call(cmdlist, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if (ret == 0):
         shutil.rmtree("%s/src" % TMP_PROJECT, ignore_errors = True)
         shutil.rmtree("%s/res" % TMP_PROJECT, ignore_errors = True)
@@ -102,8 +102,11 @@ def build_apk(key):
     finafile = os.path.join(os.getcwd(), key)
     buildfile = os.path.join(TMP_PROJECT, "build.xml")
     cmdlist = ["ant", "debug", "-buildfile", buildfile, "-Dout.final.file=%s" % finafile]
-    log(str(cmdlist))
-    subprocess.call(cmdlist, shell=True)
+    cmdstr = ""
+    for cmd in cmdlist:
+        cmdstr += cmd + " "
+    log(cmdstr)
+    subprocess.call(cmdlist, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 def add_filter(filter, apkfile):
     if (filter == None or filter == ""):
