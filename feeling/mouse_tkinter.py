@@ -131,7 +131,7 @@ class ScreenTranform:
     def __init__(self):
         dict = {}
         dict["command"] = "request_screensize"
-        tcp_socket.senddata(str(dict) + "#")
+        tcp_socket.senddata(str(dict) + "\r\n")
     
     def get_x(self, event):
         if (getoriention() == "landscape"):
@@ -143,15 +143,15 @@ class ScreenTranform:
             return str(scaled(event.x))
         return str(scaled(event.y))
 
-class PhoneEvent:
+class TouchEvent:
     def __init__(self, device, type, code, value):
         self.device = device;
         self.type = type;
         self.code = code;
         self.value = value;
 
-def sendevent(phoneevent):
-    cmdlist = ["adb", "shell", "sendevent", phoneevent.device, phoneevent.type, phoneevent.code, phoneevent.value]
+def sendevent(touch_event):
+    cmdlist = ["adb", "shell", "sendevent", touch_event.device, touch_event.type, touch_event.code, touch_event.value]
     string = ""
     for item in range(0, len(cmdlist)):
         showstr = cmdlist[item]
@@ -163,30 +163,40 @@ def sendevent(phoneevent):
             else:
                 showstr = showstr.rjust(8, '0')
         string += showstr + " "
-    #log(" ".join(cmdlist))
-    log(string)
-    subprocess.call(cmdlist)
+    log(" ".join(cmdlist))
+    #log(string)
+    data = {}
+    data["touch_pos"] = {}
+    data["touch_pos"]["device"] = touch_event.device
+    data["touch_pos"]["type"] = touch_event.type
+    data["touch_pos"]["code"] = touch_event.code
+    data["touch_pos"]["value"] = touch_event.value
+    global udp_socket
+    if (udp_socket != None):
+        udp_socket.senddata(str(data))
+    #subprocess.call(cmdlist)
 
 def mousenevent(event):
     #log("[Move] x : %d, y : %d" % (event.x, event.y))
     global udp_socket
     data = {}
-    data["x"] = scaled(event.x)
-    data["y"] = scaled(event.y)
+    data["update_pos"] = {}
+    data["update_pos"]["x"] = scaled(event.x)
+    data["update_pos"]["y"] = scaled(event.y)
     if (udp_socket != None):
         udp_socket.senddata(str(data))
 
     if (pressing):
-        phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_POSITION_X, screenTransform.get_x(event))
-        sendevent(phoneevent)
-        phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_POSITION_Y, screenTransform.get_y(event))
-        sendevent(phoneevent)
+        touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_POSITION_X, screenTransform.get_x(event))
+        sendevent(touch_event)
+        touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_POSITION_Y, screenTransform.get_y(event))
+        sendevent(touch_event)
 
-        phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_PRESSURE, "%d" % 0x35)
-        sendevent(phoneevent)
+        touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_PRESSURE, "%d" % 0x35)
+        sendevent(touch_event)
 
-        phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_SYN, SYN_REPORT, "0")
-        sendevent(phoneevent)
+        touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_SYN, SYN_REPORT, "0")
+        sendevent(touch_event)
 
 def mouse_left_down(event):
     global pressing
@@ -194,27 +204,27 @@ def mouse_left_down(event):
     TRACKING_ID = TRACKING_ID + 1
     
     #huawei
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, "1", "%d" % int(eval("0x14a")), "%d" % 1)
-    sendevent(phoneevent)
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_ABS, "%d" % int(eval("0x2f")), "%d" % 0)
-    sendevent(phoneevent)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, "1", "%d" % int(eval("0x14a")), "%d" % 1)
+    sendevent(touch_event)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, "%d" % int(eval("0x2f")), "%d" % 0)
+    sendevent(touch_event)
     
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_TRACKING_ID, "%d" % TRACKING_ID)
-    sendevent(phoneevent)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_TRACKING_ID, "%d" % TRACKING_ID)
+    sendevent(touch_event)
 
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_POSITION_X, screenTransform.get_x(event))
-    sendevent(phoneevent)
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_POSITION_Y, screenTransform.get_y(event))
-    sendevent(phoneevent)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_POSITION_X, screenTransform.get_x(event))
+    sendevent(touch_event)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_POSITION_Y, screenTransform.get_y(event))
+    sendevent(touch_event)
 
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_PRESSURE, "%d" % 0x350)
-    sendevent(phoneevent)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_PRESSURE, "%d" % 0x350)
+    sendevent(touch_event)
 
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_TOUCH_MAJOR, "%d" % 0x6)
-    sendevent(phoneevent)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_TOUCH_MAJOR, "%d" % 0x6)
+    sendevent(touch_event)
 
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_SYN, SYN_REPORT, "0")
-    sendevent(phoneevent)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_SYN, SYN_REPORT, "0")
+    sendevent(touch_event)
 
     pressing = True
 
@@ -222,27 +232,27 @@ def mouse_left_up(event):
     global pressing
     #log("[Up] x : %d, y : %d, state : %d" % (event.x, event.y, event.state))
     pressing = False
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_TRACKING_ID, "%d" % -1)
-    sendevent(phoneevent)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_TRACKING_ID, "%d" % -1)
+    sendevent(touch_event)
 
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_SYN, SYN_REPORT, "0")
-    sendevent(phoneevent)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_SYN, SYN_REPORT, "0")
+    sendevent(touch_event)
     
     #Add for huawei
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, "1", "%d" % int(eval("0x14a")), "%d" % 0)
-    sendevent(phoneevent)
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_SYN, SYN_REPORT, "0")
-    sendevent(phoneevent)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, "1", "%d" % int(eval("0x14a")), "%d" % 0)
+    sendevent(touch_event)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_SYN, SYN_REPORT, "0")
+    sendevent(touch_event)
 
 def process_click(key):
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_KEY, key, DOWN)
-    sendevent(phoneevent)
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_SYN, SYN_REPORT, "0")
-    sendevent(phoneevent)
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_KEY, key, UP)
-    sendevent(phoneevent)
-    phoneevent = PhoneEvent(EV_TOUCH_DEVICE, EV_SYN, SYN_REPORT, "0")
-    sendevent(phoneevent)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_KEY, key, DOWN)
+    sendevent(touch_event)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_SYN, SYN_REPORT, "0")
+    sendevent(touch_event)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_KEY, key, UP)
+    sendevent(touch_event)
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_SYN, SYN_REPORT, "0")
+    sendevent(touch_event)
 
 def mouse_right_click(event):
     process_click(KEY_BACK)
@@ -273,7 +283,7 @@ def connect_phone():
 def request_udp_server():
     data = {}
     data["command"] = "request_udpserver"
-    tcp_socket.senddata(str(data) + "#")
+    tcp_socket.senddata(str(data) + "\r\n")
 
 top = tkinter.Tk()
 
