@@ -166,11 +166,11 @@ def sendevent(touch_event):
     log(" ".join(cmdlist))
     #log(string)
     data = {}
-    data["touch_pos"] = {}
-    data["touch_pos"]["device"] = touch_event.device
-    data["touch_pos"]["type"] = touch_event.type
-    data["touch_pos"]["code"] = touch_event.code
-    data["touch_pos"]["value"] = touch_event.value
+    data["command"] = "request_touch"
+    data["device"] = touch_event.device
+    data["type"] = touch_event.type
+    data["code"] = touch_event.code
+    data["value"] = touch_event.value
     global udp_socket
     if (udp_socket != None):
         udp_socket.senddata(str(data))
@@ -180,9 +180,9 @@ def mousenevent(event):
     #log("[Move] x : %d, y : %d" % (event.x, event.y))
     global udp_socket
     data = {}
-    data["update_pos"] = {}
-    data["update_pos"]["x"] = scaled(event.x)
-    data["update_pos"]["y"] = scaled(event.y)
+    data["command"] = "request_position"
+    data["x"] = scaled(event.x)
+    data["y"] = scaled(event.y)
     if (udp_socket != None):
         udp_socket.senddata(str(data))
 
