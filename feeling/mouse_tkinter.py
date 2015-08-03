@@ -13,6 +13,9 @@ import subprocess
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 TRACKING_ID = 1000
 EV_TOUCH_DEVICE = "/dev/input/event0"
+
+ABS_MT_SLOT = "%d" % int(eval("0x2f"))
+
 ABS_MT_POSITION_X = "%d" % int(eval("0x35"))
 ABS_MT_POSITION_Y = "%d" % int(eval("0x36"))
 
@@ -131,7 +134,8 @@ class ScreenTranform:
     def __init__(self):
         dict = {}
         dict["command"] = "request_screensize"
-        tcp_socket.senddata(str(dict) + "\r\n")
+        if (tcp_socket != None):
+            tcp_socket.senddata(str(dict) + "\r\n")
     
     def get_x(self, event):
         if (getoriention() == "landscape"):
@@ -163,8 +167,8 @@ def sendevent(touch_event):
             else:
                 showstr = showstr.rjust(8, '0')
         string += showstr + " "
-    log(" ".join(cmdlist))
-    #log(string)
+    #log(" ".join(cmdlist))
+    log(string)
     data = {}
     data["command"] = "request_touch"
     data["device"] = touch_event.device
@@ -209,6 +213,10 @@ def mouse_left_down(event):
     touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, "%d" % int(eval("0x2f")), "%d" % 0)
     sendevent(touch_event)
     
+
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_SLOT, "0")
+    sendevent(touch_event)
+
     touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_TRACKING_ID, "%d" % TRACKING_ID)
     sendevent(touch_event)
 
@@ -232,6 +240,9 @@ def mouse_left_up(event):
     global pressing
     #log("[Up] x : %d, y : %d, state : %d" % (event.x, event.y, event.state))
     pressing = False
+    touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_SLOT, "0")
+    sendevent(touch_event)
+
     touch_event = TouchEvent(EV_TOUCH_DEVICE, EV_ABS, ABS_MT_TRACKING_ID, "%d" % -1)
     sendevent(touch_event)
 
@@ -283,7 +294,8 @@ def connect_phone():
 def request_udp_server():
     data = {}
     data["command"] = "request_udpserver"
-    tcp_socket.senddata(str(data) + "\r\n")
+    if (tcp_socket != None):
+        tcp_socket.senddata(str(data) + "\r\n")
 
 top = tkinter.Tk()
 
