@@ -138,6 +138,7 @@ if __name__=="__main__":
         name = s.get("name")
         path = s.get("path")
         filter = s.get("filter")
+        clear_project()
         generate_android()
         copy_files(path, TMP_PROJECT)
         copy_manifest(path, TMP_PROJECT)
