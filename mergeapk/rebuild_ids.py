@@ -18,8 +18,6 @@ def log(str, show=False):
         print(str)
 
 def add_gb_string(root, dict, maxids, gamefolder):
-    if (check_name_exists(root, "g_class_name", "string") == True):
-        return []
 
     gamemanifest = "%s/AndroidManifest.xml" % gamefolder;
     ET.register_namespace('android', XML_NAMESPACE)
@@ -32,13 +30,14 @@ def add_gb_string(root, dict, maxids, gamefolder):
     if (activity_entry_value == None):
         return []
 
-    type = "string"
-    hexid = get_next_id(type, dict, maxids)
-    element = ET.Element("public")
-    element.attrib["id"] = hexid
-    element.attrib["name"] = "g_class_name"
-    element.attrib["type"] = "string"
-    root.append(element)
+    if (check_name_exists(root, "g_class_name", "string") == False):
+        type = "string"
+        hexid = get_next_id(type, dict, maxids)
+        element = ET.Element("public")
+        element.attrib["id"] = hexid
+        element.attrib["name"] = "g_class_name"
+        element.attrib["type"] = "string"
+        root.append(element)
     
     gbstringfile = "%s/res/values/njck1_strings.xml" % gamefolder
     doc = Document()  #创建DOM文档对象
