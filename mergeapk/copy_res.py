@@ -55,13 +55,14 @@ def copy_res(gamefolder, payfolder):
                     #log("payfile : %s , gamefile : %s " % (payfile, gamefile))
                     shutil.copy2(payfile, gamefile)
     njck_stringfile = "%s/res/values/njck_strings.xml" % gamefolder
-    tree = ET.parse(njck_stringfile)
-    root = tree.getroot()
-    element = root.find(".//string[@name='g_class_name']")
-    if (element != None):
-        root.remove(element)
-        indent(root)
-        tree.write(njck_stringfile, encoding="utf-8", xml_declaration=True)
+    if (os.path.exists(njck_stringfile)):
+        tree = ET.parse(njck_stringfile)
+        root = tree.getroot()
+        element = root.find(".//string[@name='g_class_name']")
+        if (element != None):
+            root.remove(element)
+            indent(root)
+            tree.write(njck_stringfile, encoding="utf-8", xml_declaration=True)
     log("[Logging...] 拷贝资源完成\n", True)
     return True
 
