@@ -60,6 +60,7 @@ def copy_res(gamefolder, payfolder):
         root = tree.getroot()
         element = root.find(".//string[@name='g_class_name']")
         if (element != None):
+            log("[Logging...] 删除基地入口 : [%s]" % element.text, True)
             root.remove(element)
             indent(root)
             tree.write(njck_stringfile, encoding="utf-8", xml_declaration=True)
