@@ -8,33 +8,6 @@ import socket
 import time
 import subprocess
 
-
-#事件定义
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++
-TRACKING_ID = 1000
-EV_TOUCH_DEVICE = "/dev/input/event0"
-
-ABS_MT_SLOT = "%d" % int(eval("0x2f"))
-
-ABS_MT_POSITION_X = "%d" % int(eval("0x35"))
-ABS_MT_POSITION_Y = "%d" % int(eval("0x36"))
-
-ABS_MT_TRACKING_ID = "%d" % int(eval("0x39"))
-ABS_MT_PRESSURE = "%d" % int(eval("0x3a"))
-ABS_MT_TOUCH_MAJOR = "%d" % int(eval("0x30"))
-
-EV_ABS = "%d" % int(eval("0x3"))
-
-EV_KEY = "%d" % int(eval("0x1"))
-KEY_BACK = "%d" % int(eval("0x9e"))
-KEY_HOMEPAGE = "%d" % int(eval("0xac"))
-
-DOWN = "%d" % int(eval("0x1"))
-UP = "%d" % int(eval("0x0"))
-
-EV_SYN = "%d" % int(eval("0x0"))
-SYN_REPORT = "%d" % int(eval("0x0"))
-#======================================================
 SENDEVENT_FROMADB = False
 scale = 1
 pressing = False
@@ -190,69 +163,60 @@ def mousenevent(event):
     #log("[Move] x : %d, y : %d" % (event.x, event.y))
     global udp_socket
     data = {}
-    data["cmd"] = "request_position"
+    data["source"] = 1
+    data["type"] = 0
+    data["slot"] = 0
+    data["action"] = 2
+    data["pressed"] = 0
+    if (pressing):
+        data["pressed"] = 1
     data["x"] = scaled(event.x)
     data["y"] = scaled(event.y)
     if (udp_socket != None):
         udp_socket.senddata(str(data))
 
-    if (pressing):
-        touch_event = TouchEvent()
-        touch_event.addEvent(EV_ABS, ABS_MT_POSITION_X, screenTransform.get_x(event))
-        touch_event.addEvent(EV_ABS, ABS_MT_POSITION_Y, screenTransform.get_y(event))
-        touch_event.addEvent(EV_ABS, ABS_MT_PRESSURE, "%d" % 0x35)
-        touch_event.addEvent(EV_SYN, SYN_REPORT, "0")
-        touch_event.sendEvent()
-    
-
 def mouse_left_down(event):
     global pressing
-    global TRACKING_ID
-    TRACKING_ID = TRACKING_ID + 1
-    
-    #huawei
-    touch_event = TouchEvent()
-    touch_event.addEvent("1", "%d" % int(eval("0x14a")), "%d" % 1)
-    touch_event.addEvent(EV_ABS, "%d" % int(eval("0x2f")), "%d" % 0)
-    touch_event.addEvent(EV_ABS, ABS_MT_SLOT, "0")
-    touch_event.addEvent(EV_ABS, ABS_MT_TRACKING_ID, "%d" % TRACKING_ID)
-    touch_event.addEvent(EV_ABS, ABS_MT_POSITION_X, screenTransform.get_x(event))
-    touch_event.addEvent(EV_ABS, ABS_MT_POSITION_Y, screenTransform.get_y(event))
-    touch_event.addEvent(EV_ABS, ABS_MT_PRESSURE, "%d" % 0x350)
-    touch_event.addEvent(EV_ABS, ABS_MT_TOUCH_MAJOR, "%d" % 0x6)
-    touch_event.addEvent(EV_SYN, SYN_REPORT, "0")
-    touch_event.sendEvent()
+    data = {}
+    data["source"] = 1
+    data["type"] = 0
+    data["slot"] = 0
+    data["action"] = 1
+    data["x"] = scaled(event.x)
+    data["y"] = scaled(event.y)
+    if (udp_socket != None):
+        udp_socket.senddata(str(data))
     pressing = True
 
 def mouse_left_up(event):
     global pressing
     #log("[Up] x : %d, y : %d, state : %d" % (event.x, event.y, event.state))
     pressing = False
-    touch_event = TouchEvent()
-    touch_event.addEvent(EV_ABS, ABS_MT_SLOT, "0")
-    touch_event.addEvent(EV_ABS, ABS_MT_TRACKING_ID, "%d" % -1)
-    touch_event.addEvent(EV_SYN, SYN_REPORT, "0")
-
-    #Add for huawei
-    touch_event.addEvent("1", "%d" % int(eval("0x14a")), "%d" % 0)
-    touch_event.addEvent(EV_SYN, SYN_REPORT, "0")
-    touch_event.sendEvent()
-
+    data = {}
+    data["source"] = 1
+    data["type"] = 0
+    data["slot"] = 0
+    data["action"] = 0
+    data["x"] = scaled(event.x)
+    data["y"] = scaled(event.y)
+    if (udp_socket != None):
+        udp_socket.senddata(str(data))
 
 def process_click(key):
-    touch_event = TouchEvent()
-    touch_event.addEvent(EV_KEY, key, DOWN)
-    touch_event.addEvent(EV_SYN, SYN_REPORT, "0")
-    touch_event.addEvent(EV_KEY, key, UP)
-    touch_event.addEvent(EV_SYN, SYN_REPORT, "0")
-    touch_event.sendEvent()
+    data = {}
+    data["source"] = 1
+    data["type"] = 1
+    data["key"] = key
+    data["state"] = 2
+    if (udp_socket != None):
+        udp_socket.senddata(str(data))
 
 
 def mouse_right_click(event):
-    process_click(KEY_BACK)
+    process_click(0)
 
 def mouse_middle_click(event):
-    process_click(KEY_HOMEPAGE)
+    process_click(1)
 
 def f2_click(event):
     global pressing
