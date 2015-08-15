@@ -184,6 +184,7 @@ def mouse_left_down(event):
     data["action"] = 1
     data["x"] = scaled(event.x)
     data["y"] = scaled(event.y)
+    data["pressed"] = 1
     if (udp_socket != None):
         udp_socket.senddata(str(data))
     pressing = True
@@ -197,6 +198,7 @@ def mouse_left_up(event):
     data["type"] = 0
     data["slot"] = 0
     data["action"] = 0
+    data["pressed"] = 0
     data["x"] = scaled(event.x)
     data["y"] = scaled(event.y)
     if (udp_socket != None):
