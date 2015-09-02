@@ -13,6 +13,9 @@ scale = 1
 pressing = False
 WIDTH = 0
 HEIGHT = 0
+AUTO_PRESS = False
+AUTO_PRESS_X = 0
+AUTO_PRESS_Y = 0
 
 def log(str, show=True):
     if (show):
@@ -160,45 +163,32 @@ def sendevent(touch_event):
     subprocess.call(cmdlist)
 
 def mousenevent(event):
-    #log("[Move] x : %d, y : %d" % (event.x, event.y))
     global udp_socket
-    data = {}
-    data["source"] = 1
-    data["type"] = 0
-    data["slot"] = 0
-    data["action"] = 2
-    data["pressed"] = 0
-    if (pressing):
-        data["pressed"] = 1
-    data["x"] = scaled(event.x)
-    data["y"] = scaled(event.y)
-    if (udp_socket != None):
-        udp_socket.senddata(str(data))
+    send_touch_data(event, 2)
 
 def mouse_left_down(event):
     global pressing
-    data = {}
-    data["source"] = 1
-    data["type"] = 0
-    data["slot"] = 0
-    data["action"] = 1
-    data["x"] = scaled(event.x)
-    data["y"] = scaled(event.y)
-    data["pressed"] = 1
-    if (udp_socket != None):
-        udp_socket.senddata(str(data))
+    send_touch_data(event, 1)
     pressing = True
 
 def mouse_left_up(event):
+    global AUTO_PRESS_X
+    global AUTO_PRESS_Y
     global pressing
-    #log("[Up] x : %d, y : %d, state : %d" % (event.x, event.y, event.state))
     pressing = False
+    send_touch_data(event, 0)
+    AUTO_PRESS_X = event.x
+    AUTO_PRESS_Y = event.y
+
+def send_touch_data(event, action):
     data = {}
     data["source"] = 1
     data["type"] = 0
     data["slot"] = 0
-    data["action"] = 0
+    data["action"] = action
     data["pressed"] = 0
+    if (pressing):
+        data["pressed"] = 1
     data["x"] = scaled(event.x)
     data["y"] = scaled(event.y)
     if (udp_socket != None):
@@ -246,6 +236,28 @@ def request_udp_server():
     if (tcp_socket != None):
         tcp_socket.senddata(str(data) + "\r\n")
 
+def click_automaticly():
+    global AUTO_PRESS
+    global AUTO_PRESS_X
+    global AUTO_PRESS_Y
+    event = tkinter.Event()
+    while AUTO_PRESS:
+        event.x = AUTO_PRESS_X
+        event.y = AUTO_PRESS_Y
+        mouse_left_up(event)
+        mouse_left_down(event)
+
+def start_thread(event):
+    global AUTO_PRESS
+    AUTO_PRESS = True
+    th1 = threading.Thread(target=click_automaticly, args=())
+    th1.setDaemon(True)
+    th1.start()
+
+def stop_thread(event):
+    global AUTO_PRESS
+    AUTO_PRESS = False
+
 top = tkinter.Tk()
 
 connect_phone()
@@ -253,9 +265,7 @@ tcp_socket = TcpSocket()
 udp_socket = None
 #udp_socket = UdpSocket()
 request_udp_server()
-#th1 = threading.Thread(target=request_udp_server, args=())
-#th1.setDaemon(True)
-#th1.start()
+
 
 
 screenTransform = ScreenTranform()
@@ -269,6 +279,8 @@ top.bind("<ButtonRelease-1>", mouse_left_up)
 top.bind("<Button-2>", mouse_middle_click)
 top.bind("<Button-3>", mouse_right_click)
 top.bind("<Key-F2>", f2_click)
+top.bind("<Key-F3>", lambda event:start_thread(event))
+top.bind("<Key-F4>", lambda event:stop_thread(event))
 #top.bind("<Key-F12>", f12_click)
 top.bind("<Key-Escape>", esc_click)
 
