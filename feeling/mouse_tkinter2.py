@@ -16,6 +16,7 @@ HEIGHT = 0
 AUTO_PRESS = False
 AUTO_PRESS_X = 0
 AUTO_PRESS_Y = 0
+SENDEVENT_PROTOCOL = "tcp"
 
 def log(str, show=True):
     if (show):
@@ -90,7 +91,7 @@ class TcpSocket:
         th = threading.Thread(target=recvfrom, args=(list))
         th.setDaemon(True)
         th.start()
-    def senddata(self, data):
+    def sendTcpData(self, data):
         self.s.sendall(data.encode("utf-8"))
 
 class UdpSocket:
@@ -99,7 +100,7 @@ class UdpSocket:
         #self.s.connect(("10.0.1.114", 8990))
         self.s.connect((addr, port))
 
-    def senddata(self, data):
+    def sendUdpData(self, data):
         self.s.sendall(data.encode("utf-8"))
 
 def scaled(value):
@@ -112,7 +113,7 @@ class ScreenTranform:
         dict = {}
         dict["cmd"] = "request_screensize"
         if (tcp_socket != None):
-            tcp_socket.senddata(str(dict) + "\r\n")
+            tcp_socket.sendTcpData(str(dict) + "\r\n")
     
     def get_x(self, event):
         if (getoriention() == "landscape"):
@@ -134,7 +135,7 @@ class TouchEvent:
         data["code"] = code
         data["value"] = value
         if (SENDEVENT_FROMADB):
-            sendevent(data)
+            sendEventFromUSB(data)
         TouchEvent.EventJsonArray += [data]
     def sendEvent(self):
         data = {}
@@ -143,10 +144,10 @@ class TouchEvent:
 
         global udp_socket
         if (udp_socket != None and SENDEVENT_FROMADB == False):
-            udp_socket.senddata(str(data))
+            udp_socket.sendUdpData(str(data))
         TouchEvent.EventJsonArray = None
 
-def sendevent(touch_event):
+def sendEventFromUSB(touch_event):
     cmdlist = ["adb", "shell", "sendevent", EV_TOUCH_DEVICE, touch_event["type"], touch_event["code"], touch_event["value"]]
     string = ""
     for item in range(0, len(cmdlist)):
@@ -168,8 +169,8 @@ def mousenevent(event):
 
 def mouse_left_down(event):
     global pressing
-    send_touch_data(event, 1)
     pressing = True
+    send_touch_data(event, 1)
 
 def mouse_left_up(event):
     global AUTO_PRESS_X
@@ -191,8 +192,7 @@ def send_touch_data(event, action):
         data["pressed"] = 1
     data["x"] = scaled(event.x)
     data["y"] = scaled(event.y)
-    if (udp_socket != None):
-        udp_socket.senddata(str(data))
+    sendTouchOrKeyData(data)
 
 def process_click(key):
     data = {}
@@ -200,9 +200,18 @@ def process_click(key):
     data["type"] = 1
     data["key"] = key
     data["state"] = 2
-    if (udp_socket != None):
-        udp_socket.senddata(str(data))
+    sendTouchOrKeyData(data)
 
+def sendTouchOrKeyData(data):
+    if (SENDEVENT_PROTOCOL == "udp"):
+        if (udp_socket != None):
+            udp_socket.sendUdpData(str(data))
+    elif (SENDEVENT_PROTOCOL == "tcp"):
+        tcpdata = {}
+        tcpdata["cmd"] = "touch"
+        tcpdata["touch"] = str(data)
+        if (tcp_socket != None):
+            tcp_socket.sendTcpData(str(tcpdata) + "\r\n")
 
 def mouse_right_click(event):
     process_click(0)
@@ -234,7 +243,7 @@ def request_udp_server():
     data = {}
     data["cmd"] = "request_udpserver"
     if (tcp_socket != None):
-        tcp_socket.senddata(str(data) + "\r\n")
+        tcp_socket.sendTcpData(str(data) + "\r\n")
 
 def click_automaticly():
     global AUTO_PRESS
