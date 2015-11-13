@@ -213,7 +213,6 @@ if (len(args) < 1):
     log("[Logging...] 缺少参数: %s [-p newpkgname] [-l labelname] <*.apk>" % os.path.basename(sys.argv[0]), True);
     sys.exit()
 
-log(args)
 file = args[0]
 if (len(file) < 4 or file[-4:].lower() != ".apk"):
     log("[Error...] %s 不是一个apk文件" % file)
