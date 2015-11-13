@@ -7,6 +7,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 import shutil
 import platform
+import getopt
 
 MANIFEST_FILE = "AndroidManifest.xml"
 TMP_DECOMPILE_FOLDER = "debuild"
@@ -20,6 +21,7 @@ SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "signtool", "sig
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
 APKTOOL_JAR = "apktool_2.0.0.jar"
 TRY_CONFIG = "addloader.tryagain"
+NEW_PKGNAME = ""
 
 
 EXE = ""
@@ -64,6 +66,12 @@ def apk_compile():
     else:
         return True
 
+
+def modify_packagename_ifneed(root):
+    if (NEW_PKGNAME != None and NEW_PKGNAME != ""):
+        log("[Logging...] 修改包名 " + NEW_PKGNAME)
+        root.set("package", NEW_PKGNAME)
+
 def modify_xml():
     log("[Logging...] 正在编辑 AndrodManifest.xml")
     manifest = "%s/AndroidManifest.xml" % TMP_DECOMPILE_FOLDER
@@ -85,6 +93,8 @@ def modify_xml():
             fullappname = pkgname + appname
         log("[Logging...] 设置真正 Application : %s" % fullappname)
         ET.SubElement(application, 'meta-data android:name="%s" android:value="%s"' % (APP_APPLICATION_KEY, fullappname))
+    # Modify package name for apk
+    modify_packagename_ifneed(root)
     tree.write(manifest, encoding='utf-8', xml_declaration=True)
     return True
 
@@ -179,10 +189,22 @@ def process_addloader(file, apkloaderfile):
 
 
 
-if (len(sys.argv) < 2):
-    log("[Logging...] 缺少参数: %s <*.apk>" % os.path.basename(sys.argv[0]), True);
+#############################################################################
+if (__name__ == "__main__"):
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "p:")
+        for op, value in opts:
+            if (op == "-p"):
+                NEW_PKGNAME = value
+    except getopt.GetoptError as err:
+        log(err)
+        sys.exit()
+log("args : " + "".join(args))
+if (len(args) < 1):
+    log("[Logging...] 缺少参数: %s [-p newpkgname] <*.apk>" % os.path.basename(sys.argv[0]), True);
     sys.exit()
-file = sys.argv[1]
+
+file = args[0]
 if (len(file) < 4 or file[-4:].lower() != ".apk"):
     log("[Error...] %s 不是一个apk文件" % file)
     sys.exit(0)
@@ -192,7 +214,10 @@ if (os.path.exists(file) == False):
     sys.exit(0)
 basename = os.path.basename(file)
 (name, ext) = os.path.splitext(basename)
-apkloaderfile = name + "-loader.apk"
+if (NEW_PKGNAME != None and NEW_PKGNAME != ""):
+    apkloaderfile = name + "-" + NEW_PKGNAME + "-loader.apk"
+else:
+    apkloaderfile = name + "-loader.apk"
 
 #更改当前目录为源文件所在目录
 os.chdir(os.path.dirname(os.path.abspath(file)))
