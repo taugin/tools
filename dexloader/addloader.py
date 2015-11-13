@@ -22,6 +22,7 @@ XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
 APKTOOL_JAR = "apktool_2.0.0.jar"
 TRY_CONFIG = "addloader.tryagain"
 NEW_PKGNAME = ""
+APP_LABEL = ""
 
 
 EXE = ""
@@ -72,6 +73,12 @@ def modify_packagename_ifneed(root):
         log("[Logging...] 修改包名 " + NEW_PKGNAME)
         root.set("package", NEW_PKGNAME)
 
+def modify_applabel_ifneed(root):
+    if (APP_LABEL != None and APP_LABEL != ""):
+        log("[Logging...] 修改应用名称 " + APP_LABEL)
+        application = root.find("application");
+        application.set("{%s}label" % XML_NAMESPACE, APP_LABEL)
+
 def modify_xml():
     log("[Logging...] 正在编辑 AndrodManifest.xml")
     manifest = "%s/AndroidManifest.xml" % TMP_DECOMPILE_FOLDER
@@ -95,6 +102,7 @@ def modify_xml():
         ET.SubElement(application, 'meta-data android:name="%s" android:value="%s"' % (APP_APPLICATION_KEY, fullappname))
     # Modify package name for apk
     modify_packagename_ifneed(root)
+    modify_applabel_ifneed(root);
     tree.write(manifest, encoding='utf-8', xml_declaration=True)
     return True
 
@@ -192,18 +200,20 @@ def process_addloader(file, apkloaderfile):
 #############################################################################
 if (__name__ == "__main__"):
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "p:")
+        opts, args = getopt.getopt(sys.argv[1:], "p:l:")
         for op, value in opts:
             if (op == "-p"):
                 NEW_PKGNAME = value
+            elif (op == "-l"):
+                APP_LABEL = value
     except getopt.GetoptError as err:
         log(err)
         sys.exit()
-log("args : " + "".join(args))
 if (len(args) < 1):
-    log("[Logging...] 缺少参数: %s [-p newpkgname] <*.apk>" % os.path.basename(sys.argv[0]), True);
+    log("[Logging...] 缺少参数: %s [-p newpkgname] [-l labelname] <*.apk>" % os.path.basename(sys.argv[0]), True);
     sys.exit()
 
+log(args)
 file = args[0]
 if (len(file) < 4 or file[-4:].lower() != ".apk"):
     log("[Error...] %s 不是一个apk文件" % file)
