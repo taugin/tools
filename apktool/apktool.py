@@ -10,7 +10,7 @@ def log(str, show=True):
 
 def apktool_cmd():
     thisdir = os.path.dirname(sys.argv[0])
-    apktoolfile = os.path.join(thisdir, "apktool_2.0.0.jar")
+    apktoolfile = os.path.join(thisdir, "apktool_2.0.3.jar")
     sys.argv[0] = apktoolfile
     cmdlist = ["java", "-jar", apktoolfile]
     cmdlist += sys.argv[1:]

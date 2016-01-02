@@ -5,7 +5,7 @@ import os
 import subprocess
 import sys
 
-APKTOOL_JAR = "apktool_2.0.0.jar"
+APKTOOL_JAR = "apktool_2.0.3.jar"
 
 def log(str, show=True):
     if (show):
