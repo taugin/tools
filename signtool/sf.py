@@ -95,7 +95,26 @@ def getpkg(apkFile):
     tmppkg = tmppkg.replace("'", "")
     log("apkfile: " + apkFile)
     log(tmppkg)
-    log("--------------------------------------------")
+    #log("--------------------------------------------")
+
+def getlabel(apkFile):
+    cmdlist = [AAPT_FILE, "d", "badging", apkFile]
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
+
+    tmppkg = ""
+    tmp = ""
+    alllines = process.stdout.readlines()
+    for line in alllines :
+        tmp = str(line, "utf-8")
+        if (tmp.startswith("application-label")):
+            tmppkg = tmp
+            break;
+    tmppkg = tmppkg.replace("\r", "")
+    tmppkg = tmppkg.replace("\n", "")
+    tmppkg = tmppkg.replace("'", "")
+    log("apkfile: " + apkFile)
+    log(tmppkg)
+    #log("--------------------------------------------")
 
 def readapkinfo(apkFile, function):
     function(apkFile)
@@ -233,17 +252,24 @@ if FILE_MD5 == True:
     processFileMd5(args)
 
 if APK_INFO == True:
+    log("显示包文件是的应用名称 : ")
+    #log("--------------------------------------------")
+    processapk(args, getlabel)
+    log("\n")
+
     log("显示包文件是的包名信息 : ")
-    log("--------------------------------------------")
+    #log("--------------------------------------------")
     processapk(args, getpkg)
+    log("\n")
 
     log("显示classes.dex的MD5值 : ")
-    log("--------------------------------------------")
+    #log("--------------------------------------------")
     processapk(args, md5_classes)
-    log("--------------------------------------------")
+    log("\n")
+    #log("--------------------------------------------")
 
     log("显示APK文件签名的MD5值 : ")
-    log("--------------------------------------------")
+    #log("--------------------------------------------")
     processapk(args, md5_signfile)
-    log("--------------------------------------------")
+    #log("--------------------------------------------")
 pause()
