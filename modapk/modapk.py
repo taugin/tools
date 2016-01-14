@@ -221,13 +221,13 @@ def modifyapk(srcapk, dstapk):
                 return;
 
 
-
+USAGE = "[Logging...] 缺少参数: %s [-e] [-p newpkgname] [-l labelname] <*.apk>" % os.path.basename(sys.argv[0])
 #############################################################################
 if (__name__ == "__main__"):
     try:
         opts, args = getopt.getopt(sys.argv[1:], "p:l:e")
         if (len(opts) == 0):
-            log("[Logging...] 缺少参数: %s [-e] [-p newpkgname] [-l labelname] <*.apk>" % os.path.basename(sys.argv[0]), True);
+            log(USAGE, True);
             sys.exit()
         for op, value in opts:
             if (op == "-p"):
@@ -241,7 +241,7 @@ if (__name__ == "__main__"):
         log(err)
         sys.exit()
 if (len(args) < 1):
-    log("[Logging...] 缺少参数: %s [-e] [-p newpkgname] [-l labelname] <*.apk>" % os.path.basename(sys.argv[0]), True);
+    log(USAGE, True);
     sys.exit()
 
 sysdir = os.path.dirname(sys.argv[0])
