@@ -9,6 +9,7 @@ import shutil
 import platform
 import getopt
 
+USAGE = "[Logging...] 缺少参数: %s [-e] [-p newpkgname] [-l labelname] <*.apk>" % os.path.basename(sys.argv[0])
 MANIFEST_FILE = "AndroidManifest.xml"
 TMP_DECOMPILE_FOLDER = "debuild"
 TMP_DECOMPILE_APKFILE = "debuild.apk"
@@ -22,9 +23,10 @@ XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
 APKTOOL_JAR = "apktool_2.0.3.jar"
 TRY_CONFIG = "modapk.tryagain"
 
-NEW_PKGNAME = ""
-APP_LABEL = ""
-ENCRY_APK = False
+APK_SRCFILE = ""
+APK_NEWPKG = ""
+APK_NEWLABEL = ""
+APK_ENCRYPT = False
 
 
 EXE = ""
@@ -36,6 +38,9 @@ AAPT_FILE = os.path.join(os.path.dirname(sys.argv[0]), AAPT)
 def log(str, show=True):
     if (show):
         print(str)
+
+def inputArguement(prompt):
+    return input(prompt)
 
 def pause():
     if (platform.system().lower() == "windows"):
@@ -71,21 +76,21 @@ def apk_compile():
 
 #修改应用程序包名
 def modify_packagename_ifneed(root):
-    if (NEW_PKGNAME != None and NEW_PKGNAME != ""):
-        log("[Logging...] 修改包名 " + NEW_PKGNAME)
-        root.set("package", NEW_PKGNAME)
+    if (APK_NEWPKG != None and APK_NEWPKG != ""):
+        log("[Logging...] 修改包名 " + APK_NEWPKG)
+        root.set("package", APK_NEWPKG)
 
 #修改应用程序名称
 def modify_applabel_ifneed(root):
-    if (APP_LABEL != None and APP_LABEL != ""):
-        log("[Logging...] 修改应用名称 " + APP_LABEL)
+    if (APK_NEWLABEL != None and APK_NEWLABEL != ""):
+        log("[Logging...] 修改名称 " + APK_NEWLABEL)
         application = root.find("application");
-        application.set("{%s}label" % XML_NAMESPACE, APP_LABEL)
+        application.set("{%s}label" % XML_NAMESPACE, APK_NEWLABEL)
 
 #增加关于loader的一些信息
 def modify_appname_forloader(root):
     # 不加密Apk时直接返回
-    if (ENCRY_APK == False):
+    if (APK_ENCRYPT == False):
         return
 
     pkgname = root.get("package")
@@ -133,29 +138,26 @@ def generate_encryptdata():
     return DEX_ENCRYPTDATA
 
 def addloader(dstapk):
-    # 不加密Apk时直接返回
-    if (ENCRY_APK == False):
-        return True
-
     subprocess.call([AAPT_FILE, "r", dstapk, MANIFEST_FILE], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    subprocess.call([AAPT_FILE, "r", dstapk, "classes.dex"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    subprocess.call([AAPT_FILE, "r", dstapk, "assets/%s" % DEX_ENCRYPTDATA], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
     szf = zipfile.ZipFile(TMP_DECOMPILE_APKFILE, "r")
-    
-
     zf = zipfile.ZipFile(dstapk, "a")
 
-    #将原classes.dex文件压缩改名后写入assets文件夹
-    log("[Logging...] 正在拷贝 assets/%s" % DEX_ENCRYPTDATA)
-    encryptdata_file = generate_encryptdata();
-    zf.write(encryptdata_file, "assets/%s" % DEX_ENCRYPTDATA, zipfile.ZIP_DEFLATED)
+    ###############################################################################
+    #加密Apk时加入壳classes.dex
+    if (APK_ENCRYPT == True):
+        subprocess.call([AAPT_FILE, "r", dstapk, "classes.dex"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.call([AAPT_FILE, "r", dstapk, "assets/%s" % DEX_ENCRYPTDATA], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    #将壳classes.dex文件写入
-    log("[Logging...] 正在拷贝 %s" % "classes.dex")
-    srcclassdex = os.path.join(sysdir, "classes.dex")
-    zf.write(srcclassdex, "classes.dex")
+        #将原classes.dex文件压缩改名后写入assets文件夹
+        log("[Logging...] 正在拷贝 assets/%s" % DEX_ENCRYPTDATA)
+        encryptdata_file = generate_encryptdata();
+        zf.write(encryptdata_file, "assets/%s" % DEX_ENCRYPTDATA, zipfile.ZIP_DEFLATED)
 
+        #将壳classes.dex文件写入
+        log("[Logging...] 正在拷贝 %s" % "classes.dex")
+        srcclassdex = os.path.join(MODAPK_DIR, "classes.dex")
+        zf.write(srcclassdex, "classes.dex")
+    ###############################################################################
     #将修改后的AndroidManifest.xml写入
     log("[Logging...] 正在拷贝 %s" % MANIFEST_FILE)
     zf.writestr(MANIFEST_FILE, szf.read(MANIFEST_FILE))
@@ -220,46 +222,85 @@ def modifyapk(srcapk, dstapk):
                 pause()
                 return;
 
+def readEncryptArguement():
+    s = inputArguement("确认apk是否加壳 : (Y/N) ")
+    if (s == None or len(s) <= 0):
+        return False
+    while s.lower() != "y" and s.lower() != "n":
+        s = inputArguement("确认apk是否加壳 : (Y/N) ")
+    if (s.lower() == "y"):
+        return True
+    return False
 
-USAGE = "[Logging...] 缺少参数: %s [-e] [-p newpkgname] [-l labelname] <*.apk>" % os.path.basename(sys.argv[0])
-#############################################################################
-if (__name__ == "__main__"):
+#解析命令行参数
+def parseArguement(argv):
+    global APK_SRCFILE
+    global APK_NEWPKG
+    global APK_NEWLABEL
+    global APK_ENCRYPT
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "p:l:e")
-        if (len(opts) == 0):
-            log(USAGE, True);
-            sys.exit()
+        opts, args = getopt.getopt(argv[1:], "p:l:e")
+        if (len(args) == 0):
+            return
         for op, value in opts:
             if (op == "-p"):
-                NEW_PKGNAME = value
+                APK_NEWPKG = value
             elif (op == "-l"):
-                APP_LABEL = value
+                APK_NEWLABEL = value
             elif (op == "-e"):
-                ENCRY_APK = True
+                APK_ENCRYPT = True
 
     except getopt.GetoptError as err:
         log(err)
         sys.exit()
-if (len(args) < 1):
-    log(USAGE, True);
-    sys.exit()
+    APK_SRCFILE = args[0]
 
-sysdir = os.path.dirname(sys.argv[0])
-file = args[0]
-if (len(file) < 4 or file[-4:].lower() != ".apk"):
-    log("[Error...] %s 不是一个apk文件" % file)
-    sys.exit(0)
+#交互式读取参数
+def readArguementFromCmd():
+    global APK_SRCFILE
+    global APK_NEWPKG
+    global APK_NEWLABEL
+    global APK_ENCRYPT
+    APK_SRCFILE = inputArguement("输入apk文件路径 : ")
+    APK_NEWPKG = inputArguement("输入apk新的包名 : ")
+    APK_NEWLABEL = inputArguement("输入apk新的名称 : ")
+    APK_ENCRYPT = readEncryptArguement()
 
-if (os.path.exists(file) == False):
-    log("[Error...] 无法定位文件 %s" % file)
-    sys.exit(0)
-srcapkname = os.path.basename(file)
+#检查参数状态
+def checkArguement():
+    if (APK_SRCFILE == None or len(APK_SRCFILE) <= 0):
+        log("[Error...] 缺少apk文件")
+        sys.exit(0)
+    if (len(APK_SRCFILE) < 4 or APK_SRCFILE[-4:].lower() != ".apk"):
+        log("[Error...] %s 不是一个apk文件" % APK_SRCFILE)
+        sys.exit(0)
+    if (os.path.exists(APK_SRCFILE) == False):
+        log("[Error...] 无法定位文件 %s" % APK_SRCFILE)
+        sys.exit(0)
+
+    mod_pkgname = APK_NEWPKG != None and len(APK_NEWPKG) > 0
+    mod_applabel = APK_NEWLABEL != None and len(APK_NEWLABEL) > 0
+    if ((mod_pkgname or mod_applabel or APK_ENCRYPT) == False):
+        log("[Error...] APK无任何修改")
+        sys.exit(0)
+#############################################################################
+if (__name__ == "__main__"):
+    global MODAPK_DIR
+    MODAPK_DIR = os.path.dirname(sys.argv[0])
+    if(len(sys.argv) > 1):
+        parseArguement(sys.argv)
+    else:
+        readArguementFromCmd()
+
+checkArguement()
+
+srcapkname = os.path.basename(APK_SRCFILE)
 (name, ext) = os.path.splitext(srcapkname)
-if (NEW_PKGNAME != None and NEW_PKGNAME != ""):
-    dstapk = name + "-" + NEW_PKGNAME + "-mod.apk"
+if (APK_NEWPKG != None and APK_NEWPKG != ""):
+    dstapk = name + "-" + APK_NEWPKG + "-mod.apk"
 else:
     dstapk = name + "-mod.apk"
 
 #更改当前目录为源文件所在目录
-os.chdir(os.path.dirname(os.path.abspath(file)))
-modifyapk(file, dstapk)
+os.chdir(os.path.dirname(os.path.abspath(APK_SRCFILE)))
+modifyapk(APK_SRCFILE, dstapk)
