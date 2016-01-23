@@ -139,15 +139,16 @@ def generate_encryptdata():
 
 def addloader(dstapk):
     subprocess.call([AAPT_FILE, "r", dstapk, MANIFEST_FILE], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if (APK_ENCRYPT == True):
+        subprocess.call([AAPT_FILE, "r", dstapk, "classes.dex"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.call([AAPT_FILE, "r", dstapk, "assets/%s" % DEX_ENCRYPTDATA], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
     szf = zipfile.ZipFile(TMP_DECOMPILE_APKFILE, "r")
     zf = zipfile.ZipFile(dstapk, "a")
 
     ###############################################################################
     #加密Apk时加入壳classes.dex
     if (APK_ENCRYPT == True):
-        subprocess.call([AAPT_FILE, "r", dstapk, "classes.dex"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        subprocess.call([AAPT_FILE, "r", dstapk, "assets/%s" % DEX_ENCRYPTDATA], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
         #将原classes.dex文件压缩改名后写入assets文件夹
         log("[Logging...] 正在拷贝 assets/%s" % DEX_ENCRYPTDATA)
         encryptdata_file = generate_encryptdata();
