@@ -140,8 +140,8 @@ def readkeystore(dir):
         log("[Logging...] 无法获取签名文件信息,请重命名签名文件格式 <[alias]_[storepass]_[aliaspass].keystore>", True)
         sys.exit()
     keystorealias = splits[0]
-    if (split[1] != "pwd"):
-        keystorepass = split[1]
+    if (splits[1] != "pwd"):
+        keystorepass = splits[1]
     else:
         keystorepass = splits[2]
     keyaliaspass = splits[2]
