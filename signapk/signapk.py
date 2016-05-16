@@ -12,6 +12,12 @@ KEYTOOL = "keytool"
 JARSIGNER="jarsigner"
 JDK7ARG="-tsa https://timestamp.geotrust.com/tsa -digestalg SHA1 -sigalg MD5withRSA"
 USE_TESTSIGN_FILE = False
+EXE = ""
+if (platform.system().lower() == "windows"):
+    EXE = ".exe"
+AAPT = "aapt%s" % EXE
+AAPT_FILE = os.path.join(os.path.dirname(sys.argv[0]), AAPT)
+
 
 def log(str, show=False):
     if (show):
@@ -45,7 +51,7 @@ def deletemetainf(src_apk):
         output += " "
     if (output != "") :
         log("[Logging...] 正在删除 : %s" % output, True)
-        subprocess.call(["aapt", "r", src_apk] + signfilelist)
+        subprocess.call([AAPT_FILE, "r", src_apk] + signfilelist)
 
 def sign_apk(src_apk, dst_apk, keystoreinfo):
     deletemetainf(src_apk)
