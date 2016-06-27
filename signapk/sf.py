@@ -174,7 +174,7 @@ def check_arg(args):
 
 def install_apk(args):
     if (len(args) > 0):
-        cmd = [ADB, "install", "-r", args[0]]
+        cmd = [ADB, "-d", "install", "-r", args[0]]
         log("正在安装 : " + os.path.abspath(args[0]))
         result = subprocess.Popen(cmd, stdout=subprocess.PIPE)
         execret = result.stdout.readlines();
