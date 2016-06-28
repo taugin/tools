@@ -1,9 +1,3 @@
-script/mergeapk/__pycache__/check_dup.cpython-33.pyc
-script/mergeapk/__pycache__/compile_apk.cpython-33.pyc
-script/mergeapk/__pycache__/copy_fromapk.cpython-33.pyc
-script/mergeapk/__pycache__/copy_res.cpython-33.pyc
-script/mergeapk/__pycache__/decompile_apk.cpython-33.pyc
-script/mergeapk/__pycache__/merge_xml.cpython-33.pyc
-script/mergeapk/__pycache__/rebuild_ids.cpython-33.pyc
-script/winreg/mytool.reg
 script/mergeapk/__pycache__/
+script/common/__pycache__/
+script/winreg/mytool.reg
