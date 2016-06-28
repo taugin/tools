@@ -37,11 +37,11 @@ def merge_xml(gamefolder, payfolder):
     merge_xml_change_pkg(gamefolder, payfolder, None)
 
 def key_component_check(gameroot):
-    cocospay_activity = gameroot.find(".//activity/[@{%s}name='%s']" % (Common.XML_NAMESPACE, Common.PAY_ACTIVITY))
-    if (cocospay_activity == None):
+    pay_activity = gameroot.find(".//activity/[@{%s}name='%s']" % (Common.XML_NAMESPACE, Common.PAY_ACTIVITY))
+    if (pay_activity == None):
         Log.out("[Eroring...] 缺失重要组件 : [%s]" % Common.PAY_ACTIVITY, True)
-    cocospay_service = gameroot.find(".//service/[@{%s}name='%s']" % (Common.XML_NAMESPACE, Common.PAY_SERVICE))
-    if (cocospay_service == None):
+    pay_service = gameroot.find(".//service/[@{%s}name='%s']" % (Common.XML_NAMESPACE, Common.PAY_SERVICE))
+    if (pay_service == None):
         Log.out("[Eroring...] 缺失重要组件 : [%s]" % Common.PAY_SERVICE, True)
 
 #去除重复权限
@@ -150,12 +150,12 @@ def modify_pkgname(rc, pkgname, newpkgname):
     return rc
 
 def modify_unicom_metadata(gameroot):
-    cocospaymetadata = gameroot.find(".//activity/[@{%s}name='%s']/meta-data[@{%s}name='%s']" % (Common.XML_NAMESPACE, Common.PAY_ACTIVITY, Common.XML_NAMESPACE, Common.PAYACTIVITY_ENTRY_NAME))
-    if (cocospaymetadata == None):
+    paymetadata = gameroot.find(".//activity/[@{%s}name='%s']/meta-data[@{%s}name='%s']" % (Common.XML_NAMESPACE, Common.PAY_ACTIVITY, Common.XML_NAMESPACE, Common.PAYACTIVITY_ENTRY_NAME))
+    if (paymetadata == None):
         return
     unicommetadata = gameroot.find(".//activity/[@{%s}name='%s']/meta-data[@{%s}name='%s']" % (Common.XML_NAMESPACE, Common.UNICOM_ACTIVITY, Common.XML_NAMESPACE, Common.UNICOMPAYACTIVITY_ENTRY_NAME))
     if (unicommetadata != None):
-        value = cocospaymetadata.attrib["{%s}value" % Common.XML_NAMESPACE]
+        value = paymetadata.attrib["{%s}value" % Common.XML_NAMESPACE]
         if (value != None):
             Log.out("[Logging...] 添加联通入口 : [%s]" % value, True)
             unicommetadata.set("{%s}value" % Common.XML_NAMESPACE, value)

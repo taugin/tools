@@ -1,32 +1,32 @@
 #!/usr/bin/python
 # coding: UTF-8
 # encoding:utf-8
-import os
 import sys
+import os
+#引入别的文件夹的模块
+DIR = os.path.dirname(sys.argv[0])
+COM_DIR = os.path.join(DIR, "..", "common")
+COM_DIR = os.path.normpath(COM_DIR)
+sys.path.append(COM_DIR)
+
+import Common
+import Log
+
 import xml.etree.ElementTree as ET
 from xml.etree import cElementTree as ET
 from xml.dom import minidom
 from xml.dom.minidom import Document
 
-XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
-
-COCOSPAY_ACTIVITY = "com.cocospay.CocosPayActivity"
-COCOSPAYACTIVITY_ENTRY_NAME = "dest_activity"
-
-def log(str, show=False):
-    if (show):
-        print(str)
-
 def add_gb_string(root, dict, maxids, gamefolder):
 
     gamemanifest = "%s/AndroidManifest.xml" % gamefolder;
-    ET.register_namespace('android', XML_NAMESPACE)
+    ET.register_namespace('android', Common.XML_NAMESPACE)
     gametree = ET.parse(gamemanifest)
     gameroot = gametree.getroot()
     activity_entry_value = None
-    cocospaymetadata = gameroot.find(".//activity/[@{%s}name='%s']/meta-data[@{%s}name='%s']" % (XML_NAMESPACE, COCOSPAY_ACTIVITY, XML_NAMESPACE, COCOSPAYACTIVITY_ENTRY_NAME))
-    if (cocospaymetadata != None):
-        activity_entry_value = cocospaymetadata.get("{%s}value" % XML_NAMESPACE)
+    paymetadata = gameroot.find(".//activity/[@{%s}name='%s']/meta-data[@{%s}name='%s']" % (Common.XML_NAMESPACE, Common.PAY_ACTIVITY, Common.XML_NAMESPACE, Common.PAYACTIVITY_ENTRY_NAME))
+    if (paymetadata != None):
+        activity_entry_value = paymetadata.get("{%s}value" % Common.XML_NAMESPACE)
     if (activity_entry_value == None):
         return []
 
@@ -45,7 +45,7 @@ def add_gb_string(root, dict, maxids, gamefolder):
     gbstring.setAttribute("name", "g_class_name")
     textnode = doc.createTextNode(activity_entry_value)
     gbstring.appendChild(textnode)
-    log("[Logging...] 添加基地入口 : [%s]" % activity_entry_value, True)
+    Log.out("[Logging...] 添加基地入口 : [%s]" % activity_entry_value, True)
     return [gbstring]
 
 def check_name_exists(root, name, type):
@@ -171,20 +171,20 @@ def generate_xml(public_xml):
 
 def rebuild_ids(gamefolder, payfolder, company_name):
     if (os.path.exists(gamefolder) == False):
-        log("[Warning...] 无法定位文件夹 %s" % gamefolder, True)
+        Log.out("[Warning...] 无法定位文件夹 %s" % gamefolder, True)
         sys.exit(0)
     if (os.path.exists(payfolder) == False):
-        log("[Warning...] 无法定位文件夹 %s" % payfolder, True)
+        Log.out("[Warning...] 无法定位文件夹 %s" % payfolder, True)
         sys.exit(0)
-    log("[Logging...] 重建资源编号", True)
+    Log.out("[Logging...] 重建资源编号", True)
     gamepublic = "%s/res/values/public.xml" % gamefolder;
     paypublic = "%s/res/values/public.xml" % payfolder;
     if (os.path.exists(gamepublic) == False):
-        log("[Warning...] 无法定位文件 %s\n" % gamepublic, True)
+        Log.out("[Warning...] 无法定位文件 %s\n" % gamepublic, True)
         generate_xml(gamepublic)
 
     if (os.path.exists(paypublic) == False):
-        log("[Warning...] 无法定位文件 %s\n" % paypublic, True)
+        Log.out("[Warning...] 无法定位文件 %s\n" % paypublic, True)
         generate_xml(paypublic)
 
     dict = get_all_ids(gamepublic)
@@ -215,7 +215,7 @@ def rebuild_ids(gamefolder, payfolder, company_name):
     add_extra_string(gameroot, dict, maxids, gamefolder, company_name)
     indent(gameroot)
     gametree.write(gamepublic, encoding="utf-8", xml_declaration=True)
-    log("[Logging...] 重建资源完成\n", True)
+    Log.out("[Logging...] 重建资源完成\n", True)
     return True
 
 if __name__ == "__main__":

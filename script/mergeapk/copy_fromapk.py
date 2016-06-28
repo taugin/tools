@@ -102,7 +102,7 @@ def copy_gameapk(mergedapk, gameapk):
     mergedzip.close()
     gamezip.close()
 
-def generate_cocospay(mergedapk, payapk):
+def generate_pay(mergedapk, payapk):
     payzip = zipfile.ZipFile(payapk, "r")
     tmpzipfile = "tmp.apk"
     tmpzip = zipfile.ZipFile(tmpzipfile, "w")
@@ -172,7 +172,7 @@ def copy_fromapk(mergedapk, gameapk, payapk, company_name):
 
     copy_gameapk(mergedapk, gameapk)
     copy_payapk(mergedapk, payapk)
-    generate_cocospay(mergedapk, payapk)
+    generate_pay(mergedapk, payapk)
 
     add_company_info(mergedapk, company_name)
     Log.out("[Logging...] 文件拷贝完成\n", True)
