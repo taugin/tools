@@ -53,6 +53,9 @@ SIGNAPK_JAR = os.path.join(LIB_DIR, "signapk.jar")
 #AXMLPrinter2的jar包
 AXMLPRINTER_JAR = os.path.join(LIB_DIR, "AXMLPrinter2.jar")
 
+#壳DEX文件
+SHELL_DEX = os.path.join(LIB_DIR, "classes.dex");
+
 
 #########################可执行文件文件路径定义#################################
 

@@ -28,7 +28,7 @@ import config_parser
 import platform
 
 TRY_CONFIG = "error.json"
-SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "signapk", "signapk.py")
+SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "base", "signapk.py")
 ONLY_CHECK_DUP = False
 MERGE_BY_CONFIG = False
 

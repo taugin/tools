@@ -1,5 +1,8 @@
 #!/usr/bin/python
 # coding: UTF-8
+'''
+给apk加壳，是apk的classes.dex文件保持不变
+'''
 import sys
 import os
 #引入别的文件夹的模块
@@ -28,7 +31,7 @@ APP_APPLICATION_KEY = "APPLICATION_CLASS_NAME"
 DEX_ENCRYPTDATA = "encryptdata.dat"
 DEX_DECRYPTDATA_PATH = os.path.join(TMP_DECOMPILE_FOLDER, "assets", DEX_ENCRYPTDATA)
 APP_MODIFIED_MANIFEST = os.path.join(TMP_DECOMPILE_FOLDER, MANIFEST_FILE)
-SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "signapk", "signapk.py")
+SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "signapk.py")
 XML_NAMESPACE = "http://schemas.android.com/apk/res/android"
 TRY_CONFIG = "modapk.tryagain"
 
@@ -157,8 +160,7 @@ def addloader(dstapk):
 
         #将壳classes.dex文件写入
         Log.out("[Logging...] 正在拷贝 %s" % "classes.dex")
-        srcclassdex = os.path.join(MODAPK_DIR, "classes.dex")
-        zf.write(srcclassdex, "classes.dex")
+        zf.write(Common.SHELL_DEX, "classes.dex")
     ###############################################################################
     #将修改后的AndroidManifest.xml写入
     Log.out("[Logging...] 正在拷贝 %s" % MANIFEST_FILE)
