@@ -1,0 +1,27 @@
+#!/usr/bin/python
+# coding: UTF-8
+import sys
+import os
+#引入别的文件夹的模块
+DIR = os.path.dirname(sys.argv[0])
+COM_DIR = os.path.join(DIR, "..", "common")
+COM_DIR = os.path.normpath(COM_DIR) 
+sys.path.append(COM_DIR)
+
+import Common
+import Log
+
+import subprocess
+
+def apk_compile(folder, compileapk):
+    thisdir = os.path.dirname(sys.argv[0])
+    cmdlist = ["java", "-jar", Common.APKTOOL_JAR, "b", folder, "-o", compileapk]
+    Log.out("[Logging...] 回编文件名称 : [%s]" % compileapk)
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
+    ret = process.wait()
+    if (ret != 0):
+        Log.out("[Error...] 回编文件失败")
+        return False
+    else:
+        Log.out("[Logging...] 回编文件成功\n")
+        return True
