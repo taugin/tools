@@ -16,7 +16,7 @@ import subprocess
 
 
 def getpackage():
-    cmdlist = ["adb", "shell", "dumpsys", "activity", "top"]
+    cmdlist = [Common.ADB, "shell", "dumpsys", "activity", "top"]
     p = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     #p.wait()
     package = None
@@ -34,7 +34,7 @@ def getpackage():
     return package
 
 def getapkfile(package):
-    cmdlist = ["adb", "shell", "pm", "list", "packages", "-f", package]
+    cmdlist = [Common.ADB, "shell", "pm", "list", "packages", "-f", package]
     p = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     apkfile = None
     if (p != None):
@@ -53,7 +53,7 @@ def getapkfile(package):
 def pullspecapk(apkfile):
     if (apkfile != None and apkfile != ""):
         Log.out("[Logging...] 正在获取APK")
-        cmdlist = ["adb", "pull", apkfile]
+        cmdlist = [Common.ADB, "pull", apkfile]
         subprocess.call(cmdlist)
 
 def pullapk():

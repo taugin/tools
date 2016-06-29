@@ -69,7 +69,7 @@ KEYTOOL = "keytool"
 JARSIGNER="jarsigner"
 
 #adb
-ADB = "adb"
+ADB = os.path.join(BIN_DIR, "adb%s" % BIN_SUFFIX);
 
 #java
 JAVA = "java"

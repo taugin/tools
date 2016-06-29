@@ -54,7 +54,7 @@ def sign_apk(src_apk, dst_apk, keystoreinfo):
     if (len(keystoreinfo) <= 0):
         Log.out ("[Logging...] 签名信息 : [testkey.x509.pem], [testkey.pk8]", True)
         #deletemetainf "$1"
-        retcode = subprocess.call(["java", "-jar", Common.SIGNAPK_JAR, Common.X509, Common.PK8, src_apk, dst_apk], stdout=subprocess.PIPE)
+        retcode = subprocess.call([Common.JAVA, "-jar", Common.SIGNAPK_JAR, Common.X509, Common.PK8, src_apk, dst_apk], stdout=subprocess.PIPE)
         if (retcode == 0):
             Log.out("[Signing...] 签名成功 : %s" % dst_apk, True)
         else:

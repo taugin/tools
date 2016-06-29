@@ -15,7 +15,7 @@ import subprocess
 
 
 def apktool_cmd():
-    cmdlist = ["java", "-jar", Common.APKTOOL_JAR]
+    cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR]
     cmdlist += sys.argv[1:]
     subprocess.call(cmdlist)
 

@@ -15,7 +15,7 @@ import subprocess
 
 def apk_compile(folder, compileapk):
     thisdir = os.path.dirname(sys.argv[0])
-    cmdlist = ["java", "-jar", Common.APKTOOL_JAR, "b", folder, "-o", compileapk]
+    cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "b", folder, "-o", compileapk]
     Log.out("[Logging...] 回编文件名称 : [%s]" % compileapk)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()

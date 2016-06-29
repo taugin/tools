@@ -19,7 +19,7 @@ def apk_decompile(apkfile, decompiled_folder=None):
         (name, ext) = os.path.splitext(apkfile)
         decompiled_folder = name
 
-    cmdlist = ["java", "-jar", Common.APKTOOL_JAR, "d", "-s", "-f" , apkfile, "-o", decompiled_folder]
+    cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "d", "-s", "-f" , apkfile, "-o", decompiled_folder]
     Log.out("[Logging...] 反编文件名称 : [%s]" % apkfile)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
