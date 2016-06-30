@@ -1,6 +1,10 @@
 #!/usr/bin/python
 # coding: UTF-8
 
+'''
+从支付apk和游戏apk中拷贝必要的文件到
+已经合并的apk
+'''
 import sys
 import os
 #引入别的文件夹的模块
@@ -52,6 +56,7 @@ def should_copypayapklibfile(name, liblist):
         return False
     return True
 
+#从支付apk中拷贝文件
 def copy_payapk(mergedapk, payapk):
     Log.out("[Logging...] 拷贝支付文件", True)
     mergedzip = zipfile.ZipFile(mergedapk, "a")
@@ -90,6 +95,7 @@ def exists_in_gameapk(zip, name):
     except:
         return False
 
+#从游戏apk中拷贝文件
 def copy_gameapk(mergedapk, gameapk):
     Log.out("[Logging...] 拷贝游戏文件", True)
     mergedzip = zipfile.ZipFile(mergedapk, "a")
@@ -102,6 +108,8 @@ def copy_gameapk(mergedapk, gameapk):
     mergedzip.close()
     gamezip.close()
 
+#将支付apk中的classes.dex文件，压缩成Common.PAY_STUBDATA，并且放置到合并的apk
+#的assets文件夹内
 def generate_pay(mergedapk, payapk):
     payzip = zipfile.ZipFile(payapk, "r")
     tmpzipfile = "tmp.apk"
@@ -117,6 +125,7 @@ def generate_pay(mergedapk, payapk):
         os.remove(tmpzipfile)
 
 ## Get pretty look
+#美化xml文件
 def indent(elem, level=0):
     i = "\n" + level*"    "
     if len(elem):
@@ -130,6 +139,7 @@ def indent(elem, level=0):
         elem.tail = i
     return elem
 
+#添加公司信息到合并的apk中的assets文件内
 def add_company_info(mergedapk, company_name):
     if (company_name == None or company_name == ""):
         return
