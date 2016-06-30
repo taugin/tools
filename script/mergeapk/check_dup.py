@@ -43,7 +43,6 @@ def check_public(gamefolder, payfolder, dup_list):
         if (exist == True):
             idexist = True
             dup_list.append(text + "\n")
-            Log.out("%s exist : %s" % (text, exist_in(text, payidlist)))
     return idexist;
 
 def check_lib_assets(gamefolder, payfolder, dup_list):
@@ -89,7 +88,7 @@ def check_dup(gamefolder, payfolder):
             f.write(s)
         f.close()
         #return False
-		return True #只检测是否有重复资源，不影响后续的apk合并
+        return True #只检测是否有重复资源，不影响后续的apk合并
     else:
         if (os.path.exists("dup.txt")):
             os.remove("dup.txt")
