@@ -25,3 +25,19 @@ def apk_compile(folder, compileapk):
     else:
         Log.out("[Logging...] 回编文件成功\n")
         return True
+
+def apk_decompile(apkfile, decompiled_folder=None):
+    if (decompiled_folder == None):
+        (name, ext) = os.path.splitext(apkfile)
+        decompiled_folder = name
+
+    cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "d", "-s", "-f" , apkfile, "-o", decompiled_folder]
+    Log.out("[Logging...] 反编文件名称 : [%s]" % apkfile)
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
+    ret = process.wait()
+    if (ret != 0):
+        Log.out("[Error...] 反编文件失败")
+        return False
+    else:
+        Log.out("[Logging...] 反编文件成功\n")
+        return True

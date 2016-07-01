@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # coding: UTF-8
 
+'''
+检测是否有重复资源，检测的目录包括assets,res,lib
+'''
 import sys
 import os
 #引入别的文件夹的模块
@@ -25,6 +28,8 @@ def readislist(publicfile):
 def exist_in(text, list):
     return text in list
 
+#检测res中是否有重复的资源，包括layout,drawable,strings,color 等等
+#通过检测public.xml可以完成
 def check_public(gamefolder, payfolder, dup_list):
     gamepublic = "%s/res/values/public.xml" % gamefolder;
     paypublic = "%s/res/values/public.xml" % payfolder;
@@ -68,7 +73,7 @@ def check_lib_assets(gamefolder, payfolder, dup_list):
                 exist = True
     return exist;
 
-def check_dup(gamefolder, payfolder):
+def check_resdup(gamefolder, payfolder):
     dup_list = []
     if (os.path.exists(gamefolder) == False):
         Log.out("[Error...] 无法定位文件夹 %s" % gamefolder, True)
@@ -79,7 +84,7 @@ def check_dup(gamefolder, payfolder):
     Log.out("[Logging...] 检查重复资源", True)
     filedup = False
     id_dup = check_public(gamefolder, payfolder, dup_list)
-    filedup = check_lib_assets(gamefolder, payfolder, dup_list)
+    #filedup = check_lib_assets(gamefolder, payfolder, dup_list)
     all_dup = id_dup or filedup
     if (all_dup == True):
         Log.out("[Logging...] 存在重复资源, 请检查\n", True)
@@ -87,7 +92,7 @@ def check_dup(gamefolder, payfolder):
         for s in dup_list:
             f.write(s)
         f.close()
-        return False
+        return True
     else:
         if (os.path.exists("dup.txt")):
             os.remove("dup.txt")

@@ -17,15 +17,14 @@ import subprocess
 import shutil
 import getopt
 
-import decompile_apk
-import compile_apk
-import check_dup
-import rebuild_ids
-import copy_res
+import apkbuilder
+import check_resdup
+import merge_public
+import merge_extra
+import merge_res
 import merge_xml
 import copy_fromapk
 import config_parser
-import platform
 
 TRY_CONFIG = "error.json"
 SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "base", "signapk.py")
@@ -69,15 +68,16 @@ def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
         gamemergedapk = tmpname + "-" + newpkgname + "-merged.apk"
 
     functions = []
-    functions += [{"function":"decompile_apk.apk_decompile(gameapk, gamefolder)"}]
-    functions += [{"function":"decompile_apk.apk_decompile(payapk, payfolder)"}]
-    functions += [{"function":"check_dup.check_dup(gamefolder, payfolder)"}]
+    functions += [{"function":"apkbuilder.apk_decompile(gameapk, gamefolder)"}]
+    functions += [{"function":"apkbuilder.apk_decompile(payapk, payfolder)"}]
+    functions += [{"function":"check_resdup.check_resdup(gamefolder, payfolder)"}]
 
     if (ONLY_CHECK_DUP == False):
         functions += [{"function":"merge_xml.merge_xml_change_pkg(gamefolder, payfolder, newpkgname)"}]
-        functions += [{"function":"rebuild_ids.rebuild_ids(gamefolder, payfolder, company)"}]
-        functions += [{"function":"copy_res.copy_res(gamefolder, payfolder)"}]
-        functions += [{"function":"compile_apk.apk_compile(gamefolder, gamemergedapk)", "saveonfalse":"True"}]
+        functions += [{"function":"merge_public.rebuild_ids(gamefolder, payfolder)"}]
+        functions += [{"function":"merge_extra.merge_extra(gamefolder, company)"}]
+        functions += [{"function":"merge_res.merge_res(gamefolder, payfolder)"}]
+        functions += [{"function":"apkbuilder.apk_compile(gamefolder, gamemergedapk)", "saveonfalse":"True"}]
         functions += [{"function":"copy_fromapk.copy_fromapk(gamemergedapk, gameapk, payapk, company)"}]
         functions += [{"function":"signapk_use_testkey(gamemergedapk)"}]
 
@@ -109,7 +109,7 @@ def mergeapk_batch(gameapk, payapk, output, newpkgname, company):
             except:
                 pass
             SAVE_ON_FALSE = saveonfalse
-            Log.out("[Logging...] 当前函数编号 : [%d]" % item)
+            Log.out("[Logging...] 当前函数编号 : [%d] [%s]" % (item, functions[item]["function"].split(".")[0]))
             result = eval(functions[item]["function"])
             if (result == False):
                 if (saveonfalse == True):

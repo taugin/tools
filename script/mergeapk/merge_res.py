@@ -31,7 +31,7 @@ def indent(elem, level=0):
         elem.tail = i
     return elem
 
-def copy_res(gamefolder, payfolder):
+def merge_res(gamefolder, payfolder):
     Log.out("[Logging...] 拷贝资源文件 : [res]", True)
     if (os.path.exists(gamefolder) == False):
         Log.out("[Error...] 无法定位文件夹 %s" % gamefolder, True)

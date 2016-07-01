@@ -1,6 +1,11 @@
 #!/usr/bin/python
 # coding: UTF-8
 # encoding:utf-8
+'''
+合并res/values/public.xml文件，将2个apk的
+public.xml文件进行id重新整合，将支付apk的
+id编号排在游戏apk的后面
+'''
 import sys
 import os
 #引入别的文件夹的模块
@@ -16,62 +21,6 @@ import xml.etree.ElementTree as ET
 from xml.etree import cElementTree as ET
 from xml.dom import minidom
 from xml.dom.minidom import Document
-
-def add_gb_string(root, dict, maxids, gamefolder):
-
-    gamemanifest = "%s/AndroidManifest.xml" % gamefolder;
-    ET.register_namespace('android', Common.XML_NAMESPACE)
-    gametree = ET.parse(gamemanifest)
-    gameroot = gametree.getroot()
-    activity_entry_value = None
-    paymetadata = gameroot.find(".//activity/[@{%s}name='%s']/meta-data[@{%s}name='%s']" % (Common.XML_NAMESPACE, Common.PAY_ACTIVITY, Common.XML_NAMESPACE, Common.PAYACTIVITY_ENTRY_NAME))
-    if (paymetadata != None):
-        activity_entry_value = paymetadata.get("{%s}value" % Common.XML_NAMESPACE)
-    if (activity_entry_value == None):
-        return []
-
-    if (check_name_exists(root, "g_class_name", "string") == False):
-        type = "string"
-        hexid = get_next_id(type, dict, maxids)
-        element = ET.Element("public")
-        element.attrib["id"] = hexid
-        element.attrib["name"] = "g_class_name"
-        element.attrib["type"] = "string"
-        root.append(element)
-    
-    gbstringfile = "%s/res/values/njck1_strings.xml" % gamefolder
-    doc = Document()  #创建DOM文档对象
-    gbstring = doc.createElement("string")
-    gbstring.setAttribute("name", "g_class_name")
-    textnode = doc.createTextNode(activity_entry_value)
-    gbstring.appendChild(textnode)
-    Log.out("[Logging...] 添加基地入口 : [%s]" % activity_entry_value, True)
-    return [gbstring]
-
-def check_name_exists(root, name, type):
-    list = root.findall(".//public[@name='%s'][@type='%s']" % (name, type))
-    if (len(list) <= 0):
-        return False
-    return True
-
-def add_extra_string(root, dict, maxids, gamefolder, company_name):
-    list = []
-    list += add_gb_string(root, dict, maxids, gamefolder)
-
-    if (len(list) <= 0):
-        return
-    gbstringfile = "%s/res/values/njck_extra_strings.xml" % gamefolder
-    doc = Document()  #创建DOM文档对象
-    root = doc.createElement('resources') #创建根元素
-    doc.appendChild(root)
-    for item in list:
-        root.appendChild(item)
-    f = open(gbstringfile,'wb')
-    f.write(doc.toxml(encoding = "utf-8"))
-    f.close()
-    tree = ET.parse(gbstringfile)
-    indent(tree.getroot())
-    tree.write(gbstringfile, encoding="utf-8", xml_declaration=True)
 
 #获取所有的ID
 def get_all_ids(publicfile):
@@ -169,14 +118,14 @@ def generate_xml(public_xml):
     indent(tree.getroot())
     tree.write(public_xml, encoding="utf-8", xml_declaration=True)
 
-def rebuild_ids(gamefolder, payfolder, company_name):
+def rebuild_ids(gamefolder, payfolder):
     if (os.path.exists(gamefolder) == False):
         Log.out("[Warning...] 无法定位文件夹 %s" % gamefolder, True)
         sys.exit(0)
     if (os.path.exists(payfolder) == False):
         Log.out("[Warning...] 无法定位文件夹 %s" % payfolder, True)
         sys.exit(0)
-    Log.out("[Logging...] 重建资源编号", True)
+    Log.out("[Logging...] 合并资源编号", True)
     gamepublic = "%s/res/values/public.xml" % gamefolder;
     paypublic = "%s/res/values/public.xml" % payfolder;
     if (os.path.exists(gamepublic) == False):
@@ -212,7 +161,6 @@ def rebuild_ids(gamefolder, payfolder, company_name):
         element.attrib["name"] = name
         element.attrib["type"] = type
         gameroot.append(element)
-    add_extra_string(gameroot, dict, maxids, gamefolder, company_name)
     indent(gameroot)
     gametree.write(gamepublic, encoding="utf-8", xml_declaration=True)
     Log.out("[Logging...] 重建资源完成\n", True)
