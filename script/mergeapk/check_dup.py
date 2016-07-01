@@ -87,8 +87,7 @@ def check_dup(gamefolder, payfolder):
         for s in dup_list:
             f.write(s)
         f.close()
-        #return False
-        return True #只检测是否有重复资源，不影响后续的apk合并
+        return False
     else:
         if (os.path.exists("dup.txt")):
             os.remove("dup.txt")
