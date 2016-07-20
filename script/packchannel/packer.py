@@ -20,7 +20,7 @@ import getopt
 
 import apkbuilder
 import merge_xml
-import copy_sdkfile
+import process_config
 
 #反编译游戏文件
 def decompilegameapk(gameapk, decompiledfolder):
@@ -32,7 +32,13 @@ def merge_androidmanifest(decompiledfolder, sdkfolder):
 
 #拷贝sdk某些文件到反编译文件夹中
 def copy_sdk_files(decompiledfolder, sdkfolder):
-    return copy_sdkfile.copy_sdkfiles(decompiledfolder, sdkfolder)
+    return process_config.process_config(decompiledfolder, sdkfolder)
+
+#渠道DEX转smali
+def dex2smali(decompiledfolder, sdkfolder):
+    dexfile = os.path.join(sdkfolder, "classes.dex")
+    outdir = os.path.join(decompiledfolder, "smali");
+    apkbuilder.baksmali(dexfile, outdir)
 
 #回编译游戏
 def recompilegameapk(decompiledfolder, recompiledfile):
@@ -41,11 +47,11 @@ def recompilegameapk(decompiledfolder, recompiledfile):
 def pack(gameapk, channel):
     decompiledfolder = os.path.join(Common.WORKSPACE, channel)
     outapk = os.path.join(Common.PACKAGES, channel + ".apk")
-    Log.out("outapk : " + outapk)
     sdkfolder = os.path.join(Common.SDK, channel)
     decompilegameapk(gameapk, decompiledfolder)
     merge_androidmanifest(decompiledfolder, sdkfolder)
     copy_sdk_files(decompiledfolder, sdkfolder)
+    dex2smali(decompiledfolder, sdkfolder)
     recompilegameapk(decompiledfolder, outapk)
     
-pack("E:\\Github\\tools\\games\\AbchDemo.apk", "ucsdk")
+pack("D:\\Github\\tools\\games\\AbchDemo.apk", "ucsdk")

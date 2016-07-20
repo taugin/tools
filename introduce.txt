@@ -7,3 +7,6 @@ libs            :       jar和dex文件存放目录
 packages        :       生成的最终apk文件存放目录
 script          :       脚本文件存放目录
 sdk             :       SDK文件存放目录
+
+smali和baksmali下载地址
+https://bitbucket.org/JesusFreke/smali

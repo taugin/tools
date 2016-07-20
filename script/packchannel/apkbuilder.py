@@ -30,8 +30,11 @@ def apk_decompile(apkfile, decompiled_folder=None):
     if (decompiled_folder == None):
         (name, ext) = os.path.splitext(apkfile)
         decompiled_folder = name
+    if (not os.path.exists(decompiled_folder)):
+        os.makedirs(decompiled_folder)
 
-    cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "d", "-s", "-f" , apkfile, "-o", decompiled_folder]
+    #cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "d", "-s", "-f" , apkfile, "-o", decompiled_folder]
+    cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "d", "-f" , apkfile, "-o", decompiled_folder]
     Log.out("[Logging...] 反编文件名称 : [%s]" % apkfile)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
@@ -40,4 +43,15 @@ def apk_decompile(apkfile, decompiled_folder=None):
         return False
     else:
         Log.out("[Logging...] 反编文件成功\n")
+        return True
+
+def baksmali(dexfile, outdir):
+    cmdlist = [Common.JAVA, "-jar", Common.BAKSMALI_JAR, "-o", outdir, dexfile]
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
+    ret = process.wait()
+    if (ret != 0):
+        Log.out("[Error...] DEX转换失败")
+        return False
+    else:
+        Log.out("[Logging...] DEX转换成功\n")
         return True

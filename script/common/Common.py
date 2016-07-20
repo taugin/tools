@@ -56,6 +56,12 @@ AXMLPRINTER_JAR = os.path.join(LIB_DIR, "AXMLPrinter2.jar")
 #壳DEX文件
 SHELL_DEX = os.path.join(LIB_DIR, "classes.dex");
 
+#smali-2.1.3
+SMALI_JAR = os.path.join(LIB_DIR, "smali-2.1.3.jar");
+
+#baksmali-2.1.3
+BAKSMALI_JAR = os.path.join(LIB_DIR, "baksmali-2.1.3.jar");
+
 
 #########################可执行文件文件路径定义#################################
 
