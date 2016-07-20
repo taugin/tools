@@ -44,7 +44,7 @@ def pack(gameapk, channel):
     Log.out("outapk : " + outapk)
     sdkfolder = os.path.join(Common.SDK, channel)
     decompilegameapk(gameapk, decompiledfolder)
-    merge_androidmanifest(decompiledfolder, decompiledfolder)
+    merge_androidmanifest(decompiledfolder, sdkfolder)
     copy_sdk_files(decompiledfolder, sdkfolder)
     recompilegameapk(decompiledfolder, outapk)
     
