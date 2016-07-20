@@ -40,6 +40,10 @@ def dex2smali(decompiledfolder, sdkfolder):
     outdir = os.path.join(decompiledfolder, "smali");
     apkbuilder.baksmali(dexfile, outdir)
 
+#apk对齐
+def aliginApk(finalapk):
+    pass
+
 #回编译游戏
 def recompilegameapk(decompiledfolder, recompiledfile):
     return apkbuilder.apk_compile(decompiledfolder, recompiledfile)
