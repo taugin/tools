@@ -1,0 +1,9 @@
+﻿目录介绍：
+introduce.txt   :       指导文件
+bin             :       可执行文件的存放目录
+extra           :       额外文件存放目录
+keystores       :       签名文件存放目录
+libs            :       jar和dex文件存放目录
+packages        :       生成的最终apk文件存放目录
+script          :       脚本文件存放目录
+sdk             :       SDK文件存放目录
