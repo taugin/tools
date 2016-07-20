@@ -1,3 +1,5 @@
 script/mergeapk/__pycache__/*
 script/common/__pycache__/*
 extra/winreg/mytool.reg
+.project
+.pydevproject
