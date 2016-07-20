@@ -113,3 +113,12 @@ ITEM_MAPPER = "assets/ItemMapper.xml"
 PAY_STUBDATA = "assets/com.coco.iap.stub.dat"
 #ccp_strings文件
 COMPANYFILE = "assets/ccp_strings.xml"
+
+
+################################################################################
+#pack
+WORKSPACE = os.path.join(HOME_DIR, "workspace")
+
+PACKAGES = os.path.join(HOME_DIR, "packages")
+
+SDK = os.path.join(HOME_DIR, "sdk")

@@ -1,5 +1,10 @@
-script/mergeapk/__pycache__/*
-script/common/__pycache__/*
+**/__pycache__/*
+**/__pycache__/*
 extra/winreg/mytool.reg
 .project
 .pydevproject
+**/.settings/*
+workspace
+packages
+games
+sdk
