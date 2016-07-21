@@ -48,7 +48,7 @@ def deletemetainf(src_apk):
         Log.out("[Logging...] 正在删除 : %s" % output, True)
         subprocess.call([Common.AAPT_BIN, "r", src_apk] + signfilelist)
 
-def sign_apk(src_apk, dst_apk, keystoreinfo):
+def signapk(src_apk, dst_apk, keystoreinfo):
     deletemetainf(src_apk)
     Log.out("[Signing...] 执行签名 : %s -> %s" % (os.path.basename(src_apk), os.path.basename(dst_apk)), True)
     if (len(keystoreinfo) <= 0):
@@ -103,7 +103,7 @@ def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     keystoreinfo = []
     if(USE_TESTSIGN_FILE == False):
         keystoreinfo = readkeystore(os.path.dirname(src_apk))
-    sign_apk(src_apk, dst_apk, keystoreinfo)
+    signapk(src_apk, dst_apk, keystoreinfo)
 
 def readkeystore(dir):
     listfile=os.listdir(dir)

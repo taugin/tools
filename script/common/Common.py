@@ -80,6 +80,9 @@ ADB = os.path.join(BIN_DIR, "adb%s" % BIN_SUFFIX);
 #java
 JAVA = "java"
 
+#apk对齐工具
+ZIPALIGN = os.path.join(BIN_DIR, "zipalign%s" % BIN_SUFFIX)
+
 #########################apk签名参数#################################
 #jarsigner 在JDK7上需要的参数
 JDK7ARG="-tsa https://timestamp.geotrust.com/tsa -digestalg SHA1 -sigalg MD5withRSA"
@@ -126,5 +129,7 @@ COMPANYFILE = "assets/ccp_strings.xml"
 WORKSPACE = os.path.join(HOME_DIR, "workspace")
 
 PACKAGES = os.path.join(HOME_DIR, "packages")
+
+GAMES = os.path.join(HOME_DIR, "games")
 
 SDK = os.path.join(HOME_DIR, "sdk")

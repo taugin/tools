@@ -14,7 +14,6 @@ def copydir(fromdir, todir):
             #sdk文件夹内的文件
             fromdirfile = os.path.join(root, file)
             todirfile = fromdirfile.replace(fromdir, todir)
-            #print(fromdirfile + " : " + todirfile)
             copyfile(fromdirfile, todirfile)
 
 def copyfile(fromfile, tofile):
@@ -22,3 +21,17 @@ def copyfile(fromfile, tofile):
         shutil.copy2(fromfile, tofile)
     except:
         pass
+
+## Get pretty look
+def indent(elem, level=0):
+    i = "\n" + level*"    "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "    "
+        for e in elem:
+            indent(e, level+1)
+        if not e.tail or not e.tail.strip():
+            e.tail = i
+    if level and (not elem.tail or not elem.tail.strip()):
+        elem.tail = i
+    return elem

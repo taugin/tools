@@ -192,6 +192,23 @@ def merge_androidmanifest(decompiledfoler, sdkfolder):
     gametree.write(gamemanifest, encoding='utf-8', xml_declaration=True)
     Log.out("[Logging...] 文件合并完成\n", True)
     return True
+
+#修改AndroidManifest.xml包名
+def modify_package(decompiledfolder, pkg_suffix):
+    if (pkg_suffix == None or pkg_suffix == ""):
+        return
+    gamemanifest = "%s/AndroidManifest.xml" % decompiledfolder;
+    ET.register_namespace('android', Common.XML_NAMESPACE)
+
+    tree = ET.parse(gamemanifest)
+    root = tree.getroot()
+    oldpkg = root.get("package")
+    if (oldpkg != None and oldpkg != ""):
+        newpkg = oldpkg + pkg_suffix
+        Log.out("[Logging...] 修改配置包名 : [%s]" % newpkg, True)
+        root.set("package", newpkg)
+        indent(root)
+        tree.write(gamemanifest, encoding='utf-8', xml_declaration=True)
 ###############################################################################
 if __name__ == "__main__":
     merge_xml(sys.argv[1], sys.argv[2])
