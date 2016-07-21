@@ -26,8 +26,14 @@ class PackConfig:
         self.root = tree.getroot()
         self.channelList = []
         self.globalPlugin = []
+        self.signapkinfo = {}
+        self.gameapk = None
 
     def parse(self):
+        gameapkele = self.root.find("gameapk")
+        if (gameapkele != None):
+            self.gameapk = gameapkele.text
+
         globalPlugin = self.root.findall("global-plugins/plugin")
         dict = {}
         for plugin in globalPlugin:
@@ -46,39 +52,67 @@ class PackConfig:
     def getGlobalPlugin(self):
         return self.globalPlugin
 
+    def getsignapkinfo(self):
+        return self.signapkinfo
+
+    def getgameapk(self):
+        return self.gameapk
+
 class Channel:
     def __init__(self, root, globalPlugin):
         self.sdkparams = []
         self.plugins = []
         self.globalPugins = globalPlugin
         self.map = {}
+        self.root = root
+        self.keystoreinfo = {}
+        self.parseChannel()
+        self.parseKeystore()
 
+    #解析渠道
+    def parseChannel(self):
         #获取params
-        params = root.findall("param")
+        params = self.root.findall("param")
         if (params != None):
             for param in params:
                 self.set(param.attrib["name"], param.attrib["value"])
 
-        verCode = root.find("sdk-version/versionCode")
-        verName = root.find("sdk-version/versionName")
+        verCode = self.root.find("sdk-version/versionCode")
+        verName = self.root.find("sdk-version/versionName")
         if (verCode != None):
             self.set("vercode", verCode.text);
         if (verName != None):
             self.set("vername", verName.text);
         #获取sdkparams
-        sdkparams = root.findall("sdk-params/param")
+        sdkparams = self.root.findall("sdk-params/param")
         dict = {}
         for sdkp in sdkparams:
             dict["name"] = sdkp.attrib["name"]
             dict["value"] = sdkp.attrib["value"]
             dict["desc"] = sdkp.attrib["desc"]
             self.sdkparams += [dict]
-        plugins = root.findall("plugins/plugin")
+        plugins = self.root.findall("plugins/plugin")
         dict = {}
         for plugin in plugins:
             dict["name"] = plugin.attrib["name"]
             dict["desc"] = plugin.attrib["desc"]
             self.plugins += [dict]
+
+    #解析渠道签名
+    def parseKeystore(self):
+        keystore = os.path.join(Common.SDK, "keystore/keystore.xml")
+        if (os.path.exists(keystore) == False):
+            return
+        tree = ET.parse(keystore)
+        root = tree.getroot()
+        channel = root.find(".//param[@name='channelName'][@value='%s']/.." % self.getsdkname())
+        if (channel == None):
+            return
+        params = channel.findall("param")
+        if (params == None):
+            return
+        for p in params:
+            self.keystoreinfo[p.attrib["name"]] = p.attrib["value"]
 
     def getitem(self, key):
         try:
@@ -135,3 +169,6 @@ class Channel:
 
     def getvername(self):
         return self.getitem("vername")
+
+    def getkeystore(self):
+        return self.keystoreinfo

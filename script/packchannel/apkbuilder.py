@@ -99,7 +99,7 @@ def signapk(src_apk, dst_apk, keystoreinfo = None):
         cmdlist.append("MD5withRSA")
         
         cmdlist.append("-keystore")
-        cmdlist.append(dir + Common.SEPERATER + keystoreinfo["keystore"])
+        cmdlist.append(os.path.join(Common.HOME_DIR, keystoreinfo["keystore"]))
         cmdlist.append("-storepass")
         cmdlist.append(keystoreinfo["storepass"])
         cmdlist.append("-keypass")

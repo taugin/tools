@@ -31,7 +31,7 @@ SCRIPT_DIR = os.path.join(HOME_DIR, "script")
 LIB_DIR = os.path.join(HOME_DIR, "libs")
 
 #签名文件存放目录
-KEYSTORES_DIR = os.path.join(HOME_DIR, "keystores")
+KEYSTORES_DIR = os.path.join(HOME_DIR, "sdks/keystore")
 
 #可执行文件后缀
 BIN_SUFFIX = ""
@@ -132,4 +132,4 @@ PACKAGES = os.path.join(HOME_DIR, "packages")
 
 GAMES = os.path.join(HOME_DIR, "games")
 
-SDK = os.path.join(HOME_DIR, "sdk")
+SDK = os.path.join(HOME_DIR, "sdks")

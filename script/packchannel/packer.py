@@ -73,19 +73,27 @@ def getvalue(item, key):
     except:
         return None
 
-def packapk(channel):
+def packapk(packconfig, channel):
+    #获取当前渠道配置的游戏名称
     gamename = channel.getgamename()
-    sdkdir = channel.getsdkdir();
+    #获取渠道的SDK目录
+    sdkdirname = channel.getsdkdir();
+    #获取所有sdk插件
     pluginlist = channel.getPlugin()
+    #获取包名后缀
     suffix = channel.getsdksuffix()
-    gameapk = os.path.join(Common.GAMES, gamename, gamename + ".apk")
-    Log.out(gameapk)
+    #获取签名信息
+    keystore = channel.getkeystore()
+    #获取母包路径
+    gameapkpath = packconfig.getgameapk()
 
-    decompiledfolder = os.path.join(Common.WORKSPACE, sdkdir)
-    unsigned_apk = os.path.join(Common.PACKAGES, sdkdir + "-unsigned.apk")
-    signed_apk = os.path.join(Common.PACKAGES, sdkdir + "-signed.apk")
-    final_apk = os.path.join(Common.PACKAGES, sdkdir + "-final.apk")
-    sdk_channel = os.path.join(Common.SDK, sdkdir)
+    gameapk = os.path.join(Common.HOME_DIR, gameapkpath)
+
+    decompiledfolder = os.path.join(Common.WORKSPACE, sdkdirname)
+    unsigned_apk = os.path.join(Common.PACKAGES, sdkdirname + "-unsigned.apk")
+    signed_apk = os.path.join(Common.PACKAGES, sdkdirname + "-signed.apk")
+    final_apk = os.path.join(Common.PACKAGES, sdkdirname + "-final.apk")
+    sdk_channel = os.path.join(Common.SDK, sdkdirname)
 
     #反编译APK
     decompilegameapk(gameapk, decompiledfolder)
@@ -100,7 +108,7 @@ def packapk(channel):
     #################################################
 
     recompilegameapk(decompiledfolder, unsigned_apk)
-    signapk(unsigned_apk, signed_apk, None)
+    signapk(unsigned_apk, signed_apk, keystore)
     alignapk(signed_apk, final_apk)
     clear_tmp(unsigned_apk, signed_apk)
 
@@ -127,8 +135,10 @@ def packplugins(decompiledfolder, pluginlist):
                 dex2smali(decompiledfolder, sdkfolder)
 
 def pack():
-    packConfig = packconfig.PackConfig("E:\\Github\\tools\\games\\AbchDemo\\config\\channels.xml");
+    channelFile = os.path.join(Common.HOME_DIR, "sdks/config/AbchDemo/channels.xml")
+    packConfig = packconfig.PackConfig(channelFile);
     packConfig.parse()
-    packapk(packConfig.getChannelList()[0])
+    channel = packConfig.getChannelList()[0]
+    packapk(packConfig, channel)
 
 pack()

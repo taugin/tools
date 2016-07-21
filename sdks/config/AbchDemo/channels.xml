@@ -4,6 +4,8 @@
         <plugin name="pushsdk" desc="推送插件"/>
     </global-plugins>
 
+    <gameapk>games/AbchDemo.apk</gameapk>
+
     <channels>
         <channel>
             <param name="id" value="10"/>

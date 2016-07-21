@@ -7,4 +7,4 @@ extra/winreg/mytool.reg
 workspace
 packages
 games
-sdk
+sdks/*sdk/
