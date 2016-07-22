@@ -54,10 +54,10 @@ def baksmali(dexfile, outdir):
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
-        Log.out("[Error...] DEX转换失败\n")
+        Log.out("[Error...] DEX转换失败")
         return False
     else:
-        Log.out("[Logging...] DEX转换成功\n")
+        Log.out("[Logging...] DEX转换成功")
         return True
 
 #删除APK原有的签名文件
@@ -117,7 +117,7 @@ def signapk(src_apk, dst_apk, keystoreinfo = None):
 
 #apk对齐
 def alignapk(unalignapk, finalapk):
-    Log.out("[Logging...] 正在对齐APK", True)
+    Log.out("[Logging...] 正在对齐APK: [%s]" % finalapk, True)
     cmdlist = [Common.ZIPALIGN, "-f", "4", unalignapk, finalapk]
     subprocess.call(cmdlist, stdout=subprocess.PIPE)
     Log.out("[Logging...] APK对齐成功\n")

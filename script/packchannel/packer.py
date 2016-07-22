@@ -12,6 +12,7 @@ sys.path.append(COM_DIR)
 
 import Common
 import Log
+import Utils
 
 import platform
 import subprocess
@@ -67,12 +68,6 @@ def clear_tmp(unsigned_apk, signed_apk):
 def modifymanifest(decompiledfolder, pkg_suffix):
     merge_xml.modify_package(decompiledfolder, pkg_suffix)
 
-def getvalue(item, key):
-    try:
-        return item[key]
-    except:
-        return None
-
 def packapk(packconfig, channel):
     #获取当前渠道配置的游戏名称
     gamename = channel.getgamename()
@@ -86,13 +81,15 @@ def packapk(packconfig, channel):
     keystore = channel.getkeystore()
     #获取母包路径
     gameapkpath = packconfig.getgameapk()
+    #获取SDK名字
+    sdkname = channel.getsdkname()
 
     gameapk = os.path.join(Common.HOME_DIR, gameapkpath)
 
     decompiledfolder = os.path.join(Common.WORKSPACE, sdkdirname)
     unsigned_apk = os.path.join(Common.PACKAGES, sdkdirname + "-unsigned.apk")
     signed_apk = os.path.join(Common.PACKAGES, sdkdirname + "-signed.apk")
-    final_apk = os.path.join(Common.PACKAGES, sdkdirname + "-final.apk")
+    final_apk = os.path.join(Common.PACKAGES, gamename + ".apk")
     sdk_channel = os.path.join(Common.SDK, sdkdirname)
 
     #反编译APK
@@ -100,7 +97,7 @@ def packapk(packconfig, channel):
 
     #################################################
     #打渠道包
-    packchannel(decompiledfolder, sdk_channel)
+    packchannel(decompiledfolder, sdk_channel, sdkname)
     #打包插件
     packplugins(decompiledfolder, pluginlist)
     #修改AndroidManifest.xml里面的包名
@@ -113,26 +110,30 @@ def packapk(packconfig, channel):
     clear_tmp(unsigned_apk, signed_apk)
 
 #打包渠道sdk
-def packchannel(decompiledfolder, sdkfolder):
-    Log.out("[Logging...] 打包渠道SDK ##############################");
+def packchannel(decompiledfolder, sdkfolder, sdkname):
+    Log.out("[Logging...] +++++++++++++++++++++++++++++++++++++++");
+    Log.out("[Logging...] 打包渠道SDK: [%s]" % sdkname);
     merge_androidmanifest(decompiledfolder, sdkfolder)
     copy_sdk_files(decompiledfolder, sdkfolder)
     dex2smali(decompiledfolder, sdkfolder)
+    Log.out("[Logging...] =======================================\n");
 
 #打包插件sdk
 def packplugins(decompiledfolder, pluginlist):
-    Log.out("[Logging...] 打包插件SDK ##############################");
+    Log.out("[Logging...] +++++++++++++++++++++++++++++++++++++++");
     sdkfolder = None
     if (pluginlist != None):
         for plugin in pluginlist:
-            pname = getvalue(plugin, "name")
+            pname = Utils.getvalue(plugin, "name")
             if (pname == None) :
                 continue
             sdkfolder = os.path.join(Common.SDK, pname)
             if (os.path.exists(sdkfolder)):
+                Log.out("[Logging...] 打包插件SDK: [%s]" % pname);
                 merge_androidmanifest(decompiledfolder, sdkfolder)
                 copy_sdk_files(decompiledfolder, sdkfolder)
                 dex2smali(decompiledfolder, sdkfolder)
+    Log.out("[Logging...] =======================================\n");
 
 def pack():
     channelFile = os.path.join(Common.HOME_DIR, "sdks/config/AbchDemo/channels.xml")

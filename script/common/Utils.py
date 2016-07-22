@@ -35,3 +35,10 @@ def indent(elem, level=0):
     if level and (not elem.tail or not elem.tail.strip()):
         elem.tail = i
     return elem
+
+#安全获取字典的值
+def getvalue(item, key):
+    try:
+        return item[key]
+    except:
+        return None

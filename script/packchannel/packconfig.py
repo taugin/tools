@@ -60,7 +60,7 @@ class PackConfig:
 
 class Channel:
     def __init__(self, root, globalPlugin):
-        self.sdkparams = []
+        self.properties = []
         self.plugins = []
         self.globalPugins = globalPlugin
         self.map = {}
@@ -84,13 +84,13 @@ class Channel:
         if (verName != None):
             self.set("vername", verName.text);
         #获取sdkparams
-        sdkparams = self.root.findall("sdk-params/param")
+        properties = self.root.findall("properties/param")
         dict = {}
-        for sdkp in sdkparams:
+        for sdkp in properties:
             dict["name"] = sdkp.attrib["name"]
             dict["value"] = sdkp.attrib["value"]
             dict["desc"] = sdkp.attrib["desc"]
-            self.sdkparams += [dict]
+            self.properties += [dict]
         plugins = self.root.findall("plugins/plugin")
         dict = {}
         for plugin in plugins:

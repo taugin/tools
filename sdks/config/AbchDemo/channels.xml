@@ -18,11 +18,13 @@
             <param name="icon" value="rb"/>
             <param name="gamename" value="AbchDemo"/>
             <!-- sdk-params 参数是写入到developer_config.properties中 -->
-            <sdk-params>
+            <properties>
                 <param name="UCGameId" value="544156" desc="GameId"/>
                 <param name="UCCpId" value="22398" desc="CPId"/>
                 <param name="UCDebugMode" value="false" desc="是否开启调试模式"/>
-            </sdk-params>
+            </properties>
+            <manifest>
+            </manifest>
             <!-- 渠道插件 -->
             <plugins>
                 <plugin name="sharesdk" desc="分享插件"/>
