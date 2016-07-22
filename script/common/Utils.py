@@ -3,10 +3,17 @@
 
 import os
 import shutil
+import platform
+
+def pause():
+    if (platform.system().lower() == "windows"):
+        import msvcrt
+        print("操作完成，按任意键退出")
+        msvcrt.getch()
 
 def copydir(fromdir, todir):
-    list = os.walk(fromdir, True)
-    for root, dirs, files in list:
+    mylist = os.walk(fromdir, True)
+    for root, filedir, files in mylist:
         for file in files:
             todirname = root.replace(fromdir, todir)
             if (os.path.exists(todirname) == False):
@@ -42,3 +49,6 @@ def getvalue(item, key):
         return item[key]
     except:
         return None
+
+def normalPath(path):
+    return os.path.normpath(path)

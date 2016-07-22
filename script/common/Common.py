@@ -1,25 +1,15 @@
 ﻿import os
-import sys
 import platform
 
 ##############################通用函数###########################
-#日志输出函数
-def log(str, show=True):
-    if (show):
-        print(str)
-
-def pause():
-    if (platform.system().lower() == "windows"):
-        import msvcrt
-        log("操作完成，按任意键退出", True)
-        msvcrt.getch()
+__all__ = []
 
 #主目录
 #获取Common.py文件所在的目录
-DIR = os.path.dirname(__file__)
-HOME_DIR = os.path.join(DIR, "..", "..")
+_DIR = os.path.dirname(__file__)
+_HOME_DIR = os.path.join(_DIR, "..", "..")
 #规范化路径显示，如A/foo/../B 变成 A/B
-HOME_DIR = os.path.normpath(HOME_DIR)
+HOME_DIR = os.path.normpath(_HOME_DIR)
 
 #执行文件存放目录
 BIN_DIR = os.path.join(HOME_DIR, "bin")

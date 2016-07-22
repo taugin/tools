@@ -1,22 +1,17 @@
 #!/usr/bin/python
 # coding: UTF-8
-import sys
-import os
-#引入别的文件夹的模块
-DIR = os.path.dirname(sys.argv[0])
-COM_DIR = os.path.join(DIR, "..", "common")
-COM_DIR = os.path.normpath(COM_DIR) 
-sys.path.append(COM_DIR)
 
+import moduleconfig
 import Common
 import Log
+import Utils
 
+import os
 import subprocess
 import zipfile
 
 #编译apk
 def apk_compile(folder, compileapk):
-    thisdir = os.path.dirname(sys.argv[0])
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "b", folder, "-o", compileapk]
     Log.out("[Logging...] 回编文件名称 : [%s]" % compileapk)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
@@ -31,14 +26,14 @@ def apk_compile(folder, compileapk):
 #反编译apk
 def apk_decompile(apkfile, decompiled_folder=None):
     if (decompiled_folder == None):
-        (name, ext) = os.path.splitext(apkfile)
+        (name, ) = os.path.splitext(apkfile)
         decompiled_folder = name
     if (not os.path.exists(decompiled_folder)):
         os.makedirs(decompiled_folder)
 
     #cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "d", "-s", "-f" , apkfile, "-o", decompiled_folder]
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "d", "-f" , apkfile, "-o", decompiled_folder]
-    Log.out("[Logging...] 反编文件名称 : [%s]" % apkfile)
+    Log.out("[Logging...] 反编文件名称 : [%s]" % Utils.normalPath(apkfile))
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
@@ -81,14 +76,14 @@ def deletemetainf(src_apk):
 #为APK签名
 def signapk(src_apk, dst_apk, keystoreinfo = None):
     deletemetainf(src_apk)
-    Log.out("[Signing...] 执行签名 : %s -> %s" % (os.path.basename(src_apk), os.path.basename(dst_apk)), True)
+    Log.out("[Signing...] 安卓文件签名 : [%s -> %s]" % (os.path.basename(src_apk), os.path.basename(dst_apk)), True)
     if (keystoreinfo == None):
-        Log.out ("[Logging...] 签名信息 : [testkey.x509.pem], [testkey.pk8]", True)
+        Log.out ("[Logging...] 签名文件信息 : [testkey.x509.pem], [testkey.pk8]", True)
         retcode = subprocess.call([Common.JAVA, "-jar", Common.SIGNAPK_JAR, Common.X509, Common.PK8, src_apk, dst_apk], stdout=subprocess.PIPE)
         if (retcode == 0):
-            Log.out("[Signing...] 签名成功 : %s" % dst_apk, True)
+            Log.out("[Signing...] 安卓签名成功 : %s" % dst_apk, True)
         else:
-            Log.out("[Signing...] 签名失败", True)
+            Log.out("[Signing...] 安卓签名失败", True)
     else:
         cmdlist = []
         cmdlist.append(Common.JARSIGNER)
@@ -97,7 +92,7 @@ def signapk(src_apk, dst_apk, keystoreinfo = None):
         cmdlist.append("SHA1")
         cmdlist.append("-sigalg")
         cmdlist.append("MD5withRSA")
-        
+
         cmdlist.append("-keystore")
         cmdlist.append(os.path.join(Common.HOME_DIR, keystoreinfo["keystore"]))
         cmdlist.append("-storepass")
@@ -108,11 +103,12 @@ def signapk(src_apk, dst_apk, keystoreinfo = None):
         cmdlist.append(dst_apk)
         cmdlist.append(src_apk)
         cmdlist.append(keystoreinfo["alias"])
+        Log.out ("[Logging...] 签名文件信息 : [%s]" % Utils.normalPath(keystoreinfo["keystore"]), True)
         retcode = subprocess.call(cmdlist, stdout=subprocess.PIPE)
         if (retcode == 0):
-            Log.out("[Signing...] 签名成功 : %s" % dst_apk, True)
+            Log.out("[Signing...] 安卓签名成功 : [%s]" % dst_apk, True)
         else:
-            Log.out("[Signing...] 签名失败", True)
+            Log.out("[Signing...] 安卓签名失败", True)
     Log.out("", True)
 
 #apk对齐

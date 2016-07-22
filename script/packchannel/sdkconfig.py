@@ -1,23 +1,14 @@
 ﻿#!/usr/bin/python
 # coding: UTF-8
 
-import sys
-import os
-#引入别的文件夹的模块
-DIR = os.path.dirname(sys.argv[0])
-COM_DIR = os.path.join(DIR, "..", "common")
-COM_DIR = os.path.normpath(COM_DIR)
-sys.path.append(COM_DIR)
-
-import Common
+import moduleconfig
 import Log
 import Utils
 
-import re
-import subprocess
+import os
 import xml.etree.ElementTree as ET
-from xml.etree import cElementTree as ET
-from xml.dom import minidom
+#from xml.etree import cElementTree as ET
+#from xml.dom import minidom
 from xml.dom.minidom import Document
 
 
@@ -54,39 +45,39 @@ class SdkConfig:
         return None
 
     def getplugins(self):
-        list = []
+        mylist = []
         if (self.root != None):
             plugins = self.root.findall("plugins/plugin")
             if (plugins != None):
                 for plugin in plugins:
-                    list += [plugin]
-        return list
+                    mylist += [plugin]
+        return mylist
 
     def getparams(self):
-        list = []
+        mylist = []
         if (self.root != None):
             params = self.root.findall("params/param")
             if (params != None):
                 for param in params:
-                    dict = {}
+                    mydict = {}
                     if (param != None):
-                        dict["name"] = self.getattrib(param, "name")
-                        dict["type"] = self.getattrib(param, "type")
-                    list += [dict]
-        return list
+                        mydict["name"] = self.getattrib(param, "name")
+                        mydict["type"] = self.getattrib(param, "type")
+                    mylist += [mydict]
+        return mylist
 
     def getcopylist(self):
-        list = []
+        mylist = []
         if (self.root != None):
             params = self.root.findall("copylist/param")
             if (params != None):
                 for param in params:
                     if (param != None):
-                        list += [param.text]
-        return list
+                        mylist += [param.text]
+        return mylist
 
     def process_config(self, decompiledfolder, sdkfolder):
-        Log.out("[Logging...] 拷贝资源文件 : [res]", True)
+        Log.out("[Logging...] 拷贝资源文件 ", True)
         if (os.path.exists(decompiledfolder) == False):
             Log.out("[Error...] 无法定位文件夹 %s" % decompiledfolder, True)
             return False
@@ -94,12 +85,13 @@ class SdkConfig:
         if (os.path.exists(sdkfolder) == False):
             Log.out("[Error...] 无法定位文件夹 %s" % sdkfolder, True)
             return False
-    
+
         copylist = self.getcopylist()
         if (copylist != None):
             for d in copylist:
                 file = os.path.join(sdkfolder, d);
                 dest = os.path.join(decompiledfolder, d)
+                Log.out("[Logging...] 正在拷贝文件  : [%s]" % d)
                 if (os.path.isfile(file)):
                     Utils.copyfile(file, dest)
                 else:

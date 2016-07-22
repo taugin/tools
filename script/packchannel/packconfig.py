@@ -1,24 +1,12 @@
 ﻿#!/usr/bin/python
 # coding: UTF-8
 
-import sys
-import os
-#引入别的文件夹的模块
-DIR = os.path.dirname(sys.argv[0])
-COM_DIR = os.path.join(DIR, "..", "common")
-COM_DIR = os.path.normpath(COM_DIR) 
-sys.path.append(COM_DIR)
-
+import moduleconfig
 import Common
-import Log
 import Utils
 
-import re
-import subprocess
+import os
 import xml.etree.ElementTree as ET
-from xml.etree import cElementTree as ET
-from xml.dom import minidom
-from xml.dom.minidom import Document
 
 class PackConfig:
     def __init__(self, configfile):
@@ -35,11 +23,11 @@ class PackConfig:
             self.gameapk = gameapkele.text
 
         globalPlugin = self.root.findall("global-plugins/plugin")
-        dict = {}
+        mydict = {}
         for plugin in globalPlugin:
-            dict["name"] = plugin.attrib["name"]
-            dict["desc"] = plugin.attrib["desc"]
-            self.globalPlugin += [dict]
+            mydict["name"] = plugin.attrib["name"]
+            mydict["desc"] = plugin.attrib["desc"]
+            self.globalPlugin += [mydict]
 
         allchannels = self.root.findall("channels/channel")
         for channel in allchannels:
@@ -60,12 +48,18 @@ class PackConfig:
 
 class Channel:
     def __init__(self, root, globalPlugin):
+        #developer_config.properties文件配置
         self.properties = []
+        #渠道插件
         self.plugins = []
+        #全局插件
         self.globalPugins = globalPlugin
+        #基本参数
         self.map = {}
         self.root = root
+        #签名信息
         self.keystoreinfo = {}
+
         self.parseChannel()
         self.parseKeystore()
 
@@ -83,20 +77,20 @@ class Channel:
             self.set("vercode", verCode.text);
         if (verName != None):
             self.set("vername", verName.text);
-        #获取sdkparams
+        #获取properties
         properties = self.root.findall("properties/param")
-        dict = {}
+        mydict = {}
         for sdkp in properties:
-            dict["name"] = sdkp.attrib["name"]
-            dict["value"] = sdkp.attrib["value"]
-            dict["desc"] = sdkp.attrib["desc"]
-            self.properties += [dict]
+            mydict["name"] = sdkp.attrib["name"]
+            mydict["value"] = sdkp.attrib["value"]
+            mydict["desc"] = sdkp.attrib["desc"]
+            self.properties += [mydict]
         plugins = self.root.findall("plugins/plugin")
-        dict = {}
+        mydict = {}
         for plugin in plugins:
-            dict["name"] = plugin.attrib["name"]
-            dict["desc"] = plugin.attrib["desc"]
-            self.plugins += [dict]
+            mydict["name"] = plugin.attrib["name"]
+            mydict["desc"] = plugin.attrib["desc"]
+            self.plugins += [mydict]
 
     #解析渠道签名
     def parseKeystore(self):
@@ -114,61 +108,55 @@ class Channel:
         for p in params:
             self.keystoreinfo[p.attrib["name"]] = p.attrib["value"]
 
-    def getitem(self, key):
-        try:
-            return self.map[key]
-        except:
-            return ""
-
     def set(self, key, value):
         self.map[key] = value
 
-    def getSdkParams(self):
-        return self.sdkparams
+    def getProperties(self):
+        return self.properties
 
     def getPlugin(self):
         return self.plugins + self.globalPugins
 
     def getsdkid(self):
-        return self.getitem("id")
+        return Utils.getvalue(self.map, "id")
 
     def getsdkname(self):
-        return self.getitem("name")
+        return Utils.getvalue(self.map, "name")
 
     def getsdkdir(self):
-        return self.getitem("sdk")
+        return Utils.getvalue(self.map, "sdk")
 
     def getsdkdesc(self):
-        return self.getitem("desc")
+        return Utils.getvalue(self.map, "desc")
 
     def getsdksuffix(self):
-        return self.getitem("suffix")
+        return Utils.getvalue(self.map, "suffix")
 
     def isSplash(self):
-        tmp = self.getitem("splash")
+        tmp = Utils.getvalue(self.map, "splash")
         if (tmp != None and tmp != "0"):
             return True
         else:
             return False
 
     def isUnitySplash(self):
-        tmp = self.getitem("unity_splash")
+        tmp = Utils.getvalue(self.map, "unity_splash")
         if (tmp != None and tmp != "0"):
             return True
         else:
             return False
 
     def getsdkicon(self):
-        return self.getitem("icon")
+        return Utils.getvalue(self.map, "icon")
 
     def getgamename(self):
-        return self.getitem("gamename")
+        return Utils.getvalue(self.map, "gamename")
 
     def getvercode(self):
-        return self.getitem("vercode")
+        return Utils.getvalue(self.map, "vercode")
 
     def getvername(self):
-        return self.getitem("vername")
+        return Utils.getvalue(self.map, "vername")
 
     def getkeystore(self):
         return self.keystoreinfo

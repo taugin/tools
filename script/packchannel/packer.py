@@ -2,25 +2,15 @@
 # coding: UTF-8
 
 
-import sys
-import os
-#引入别的文件夹的模块
-DIR = os.path.dirname(sys.argv[0])
-COM_DIR = os.path.join(DIR, "..", "common")
-COM_DIR = os.path.normpath(COM_DIR) 
-sys.path.append(COM_DIR)
-
+import moduleconfig
 import Common
 import Log
 import Utils
 
-import platform
-import subprocess
-import shutil
-import getopt
+import os
 
 import apkbuilder
-import merge_xml
+import mergeaxml
 import sdkconfig
 import packconfig
 
@@ -30,7 +20,7 @@ def decompilegameapk(gameapk, decompiledfolder):
 
 #合并AndroidManifest.xml文件
 def merge_androidmanifest(decompiledfolder, sdkfolder):
-    return merge_xml.merge_androidmanifest(decompiledfolder, sdkfolder)
+    return mergeaxml.merge_androidmanifest(decompiledfolder, sdkfolder)
 
 #拷贝sdk某些文件到反编译文件夹中
 def copy_sdk_files(decompiledfolder, sdkfolder):
@@ -66,7 +56,7 @@ def clear_tmp(unsigned_apk, signed_apk):
         pass
 
 def modifymanifest(decompiledfolder, pkg_suffix):
-    merge_xml.modify_package(decompiledfolder, pkg_suffix)
+    mergeaxml.modify_package(decompiledfolder, pkg_suffix)
 
 def packapk(packconfig, channel):
     #获取当前渠道配置的游戏名称

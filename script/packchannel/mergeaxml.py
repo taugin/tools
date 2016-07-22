@@ -1,23 +1,17 @@
 #!/usr/bin/python
 # coding: UTF-8
-
-import sys
-import os
 #引入别的文件夹的模块
-DIR = os.path.dirname(sys.argv[0])
-COM_DIR = os.path.join(DIR, "..", "common")
-COM_DIR = os.path.normpath(COM_DIR) 
-sys.path.append(COM_DIR)
 
+import moduleconfig
 import Common
 import Log
 import Utils
 
-import re
-import subprocess
+
+import os
 import xml.etree.ElementTree as ET
-from xml.etree import cElementTree as ET
-from xml.dom import minidom
+#from xml.etree import cElementTree as ET
+#from xml.dom import minidom
 
 ###############################################################################
 #合并AndroidManifest.xml文件
