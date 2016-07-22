@@ -44,6 +44,7 @@ def apk_decompile(apkfile, decompiled_folder=None):
         return True
 
 def baksmali(dexfile, outdir):
+    '''dex文件转smali文件，并且输出到outdir'''
     Log.out("[Logging...] 开始转换DEX")
     cmdlist = [Common.JAVA, "-jar", Common.BAKSMALI_JAR, "-o", outdir, dexfile]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
@@ -55,8 +56,8 @@ def baksmali(dexfile, outdir):
         Log.out("[Logging...] DEX转换成功")
         return True
 
-#删除APK原有的签名文件
 def deletemetainf(src_apk):
+    '''删除APK原有的签名文件'''
     signfilelist = []
     z = zipfile.ZipFile(src_apk, "r")
     for file in z.namelist():
@@ -118,3 +119,17 @@ def alignapk(unalignapk, finalapk):
     subprocess.call(cmdlist, stdout=subprocess.PIPE)
     Log.out("[Logging...] APK对齐成功\n")
     return True
+
+#写developer_config.properties文件
+def writeProperties(decompiledfolder, properties):
+    if (len(properties) <= 0):
+        return
+    propertiesFile = os.path.join(decompiledfolder, "assets", "developer_config.properties")
+    Log.out("[Logging...] 写入配置文件 : [%s]\n" % propertiesFile)
+    plist = []
+    for p in properties:
+        plist += p["name"] + "=" + p["value"] + "\n"
+    pstring = "".join(plist)
+    f = open(propertiesFile, "w")
+    f.write(pstring)
+    f.close()

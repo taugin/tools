@@ -58,6 +58,9 @@ def clear_tmp(unsigned_apk, signed_apk):
 def modifymanifest(decompiledfolder, pkg_suffix):
     mergeaxml.modify_package(decompiledfolder, pkg_suffix)
 
+def writeProperties(decompiledfolder, properties):
+    apkbuilder.writeProperties(decompiledfolder, properties)
+
 def packapk(packconfig, channel):
     #获取当前渠道配置的游戏名称
     gamename = channel.getgamename()
@@ -74,6 +77,9 @@ def packapk(packconfig, channel):
     #获取SDK名字
     sdkname = channel.getsdkname()
 
+    properties = channel.getProperties()
+
+    #游戏文件路径
     gameapk = os.path.join(Common.HOME_DIR, gameapkpath)
 
     decompiledfolder = os.path.join(Common.WORKSPACE, sdkdirname)
@@ -92,6 +98,9 @@ def packapk(packconfig, channel):
     packplugins(decompiledfolder, pluginlist)
     #修改AndroidManifest.xml里面的包名
     modifymanifest(decompiledfolder, suffix)
+
+    #修改developer_config.properties
+    writeProperties(decompiledfolder, properties)
     #################################################
 
     recompilegameapk(decompiledfolder, unsigned_apk)

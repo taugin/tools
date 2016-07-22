@@ -79,15 +79,16 @@ class Channel:
             self.set("vername", verName.text);
         #获取properties
         properties = self.root.findall("properties/param")
-        mydict = {}
         for sdkp in properties:
+            mydict = {}
             mydict["name"] = sdkp.attrib["name"]
             mydict["value"] = sdkp.attrib["value"]
             mydict["desc"] = sdkp.attrib["desc"]
             self.properties += [mydict]
+
         plugins = self.root.findall("plugins/plugin")
-        mydict = {}
         for plugin in plugins:
+            mydict = {}
             mydict["name"] = plugin.attrib["name"]
             mydict["desc"] = plugin.attrib["desc"]
             self.plugins += [mydict]
