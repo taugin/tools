@@ -18,21 +18,10 @@ import packconfig
 def decompilegameapk(gameapk, decompiledfolder):
     return apkbuilder.apk_decompile(gameapk, decompiledfolder)
 
-#合并AndroidManifest.xml文件
-def merge_androidmanifest(decompiledfolder, sdkfolder):
-    return mergeaxml.merge_androidmanifest(decompiledfolder, sdkfolder)
-
 #拷贝sdk某些文件到反编译文件夹中
-def copy_sdk_files(decompiledfolder, sdkfolder):
-    configFile = os.path.join(sdkfolder, "sdk_config.xml")
-    config = sdkconfig.SdkConfig(configFile)
-    return config.process_config(decompiledfolder, sdkfolder) and config.process_plugin(decompiledfolder, sdkfolder)
-
-#渠道DEX转smali
-def dex2smali(decompiledfolder, sdkfolder):
-    dexfile = os.path.join(sdkfolder, "classes.dex")
-    outdir = os.path.join(decompiledfolder, "smali");
-    apkbuilder.baksmali(dexfile, outdir)
+def process_sdk(decompiledfolder, sdkfolder):
+    config = sdkconfig.SdkConfig(decompiledfolder, sdkfolder)
+    config.process()
 
 #回编译游戏
 def recompilegameapk(decompiledfolder, recompiledfile):
@@ -55,7 +44,7 @@ def clear_tmp(unsigned_apk, signed_apk):
     except:
         pass
 
-def modifymanifest(decompiledfolder, pkg_suffix):
+def modifypkgname(decompiledfolder, pkg_suffix):
     mergeaxml.modify_package(decompiledfolder, pkg_suffix)
 
 def writeProperties(decompiledfolder, properties):
@@ -97,7 +86,7 @@ def packapk(packconfig, channel):
     #打包插件
     packplugins(decompiledfolder, pluginlist)
     #修改AndroidManifest.xml里面的包名
-    modifymanifest(decompiledfolder, suffix)
+    modifypkgname(decompiledfolder, suffix)
 
     #修改developer_config.properties
     writeProperties(decompiledfolder, properties)
@@ -111,10 +100,8 @@ def packapk(packconfig, channel):
 #打包渠道sdk
 def packchannel(decompiledfolder, sdkfolder, sdkname):
     Log.out("[Logging...] +++++++++++++++++++++++++++++++++++++++");
-    Log.out("[Logging...] 打包渠道SDK: [%s]" % sdkname);
-    merge_androidmanifest(decompiledfolder, sdkfolder)
-    copy_sdk_files(decompiledfolder, sdkfolder)
-    dex2smali(decompiledfolder, sdkfolder)
+    Log.out("[Logging...] 打包渠道sdk: [%s]" % sdkname);
+    process_sdk(decompiledfolder, sdkfolder)
     Log.out("[Logging...] =======================================\n");
 
 #打包插件sdk
@@ -128,10 +115,8 @@ def packplugins(decompiledfolder, pluginlist):
                 continue
             sdkfolder = os.path.join(Common.SDK, pname)
             if (os.path.exists(sdkfolder)):
-                Log.out("[Logging...] 打包插件SDK: [%s]" % pname);
-                merge_androidmanifest(decompiledfolder, sdkfolder)
-                copy_sdk_files(decompiledfolder, sdkfolder)
-                dex2smali(decompiledfolder, sdkfolder)
+                Log.out("[Logging...] 打包插件sdk: [%s]" % pname);
+                process_sdk(decompiledfolder, sdkfolder)
     Log.out("[Logging...] =======================================\n");
 
 def pack():

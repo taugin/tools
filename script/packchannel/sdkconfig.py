@@ -10,11 +10,16 @@ import xml.etree.ElementTree as ET
 #from xml.etree import cElementTree as ET
 #from xml.dom import minidom
 from xml.dom.minidom import Document
+import mergeaxml
+import apkbuilder
 
 
 class SdkConfig:
-    def __init__(self, config):
-        tree = ET.parse(config)
+    def __init__(self, decompiledfolder, sdkfolder):
+        self.decompiledfolder = decompiledfolder
+        self.sdkfolder = sdkfolder
+        configFile = os.path.join(sdkfolder, "sdk_config.xml")
+        tree = ET.parse(configFile)
         self.root = tree.getroot()
 
     def getattrib(self, item, attr):
@@ -76,21 +81,29 @@ class SdkConfig:
                         mylist += [param.text]
         return mylist
 
-    def process_config(self, decompiledfolder, sdkfolder):
+    def process(self):
+        mergeaxml.merge_manifest(self.decompiledfolder, self.sdkfolder)
+        self.process_copylist()
+        self.process_plugin()
+        dexfile = os.path.join(self.sdkfolder, "classes.dex")
+        outdir = os.path.join(self.decompiledfolder, "smali");
+        apkbuilder.baksmali(dexfile, outdir)
+
+    def process_copylist(self):
         Log.out("[Logging...] 拷贝资源文件 ", True)
-        if (os.path.exists(decompiledfolder) == False):
-            Log.out("[Error...] 无法定位文件夹 %s" % decompiledfolder, True)
+        if (os.path.exists(self.decompiledfolder) == False):
+            Log.out("[Error...] 无法定位文件夹 %s" % self.decompiledfolder, True)
             return False
     
-        if (os.path.exists(sdkfolder) == False):
-            Log.out("[Error...] 无法定位文件夹 %s" % sdkfolder, True)
+        if (os.path.exists(self.sdkfolder) == False):
+            Log.out("[Error...] 无法定位文件夹 %s" % self.sdkfolder, True)
             return False
 
         copylist = self.getcopylist()
         if (copylist != None):
             for d in copylist:
-                file = os.path.join(sdkfolder, d);
-                dest = os.path.join(decompiledfolder, d)
+                file = os.path.join(self.sdkfolder, d);
+                dest = os.path.join(self.decompiledfolder, d)
                 Log.out("[Logging...] 正在拷贝文件  : [%s]" % d)
                 if (os.path.isfile(file)):
                     Utils.copyfile(file, dest)
@@ -99,14 +112,14 @@ class SdkConfig:
         Log.out("[Logging...] 拷贝资源完成\n", True)
         return True
 
-    def process_plugin(self, decompiledfolder, sdkfolder):
-        pluginfile = os.path.join(decompiledfolder, "assets", "plugin_config.xml")
+    def process_plugin(self):
+        pluginfile = os.path.join(self.decompiledfolder, "assets", "plugin_config.xml")
         if (os.path.exists(pluginfile) == False):
             self.create_plugin(pluginfile)
-
         self.append_plugin(pluginfile)
+
     def append_plugin(self, pluginfile):
-        Log.out("[Logging...] 添加插件文件");
+        Log.out("[Logging...] 添加插件文件 : [%s]" % pluginfile);
         tree = ET.parse(pluginfile)
         root = tree.getroot()
         pluginlist = self.getplugins()
@@ -117,7 +130,7 @@ class SdkConfig:
             tree.write(pluginfile, encoding='utf-8')
 
     def create_plugin(self, pluginfile):
-        Log.out("[Logging...] 创建插件文件");
+        Log.out("[Logging...] 创建插件文件 : [%s]" % pluginfile);
         doc = Document()  #创建DOM文档对象
         root = doc.createElement('plugins') #创建根元素
         doc.appendChild(root)

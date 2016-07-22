@@ -15,15 +15,15 @@ import xml.etree.ElementTree as ET
 
 ###############################################################################
 #合并AndroidManifest.xml文件
-def merge_androidmanifest(decompiledfoler, sdkfolder):
+def merge_manifest(decompiledfolder, sdkfolder):
     Log.out("[Logging...] 正在合并文件 : [AndroidManifest.xml]", True)
-    if (os.path.exists(decompiledfoler) == False):
-        Log.out("[Error...] 无法定位文件夹 %s" % decompiledfoler, True)
+    if (os.path.exists(decompiledfolder) == False):
+        Log.out("[Error...] 无法定位文件夹 %s" % decompiledfolder, True)
         return False
     if (os.path.exists(sdkfolder) == False):
         Log.out("[Error...] 无法定位文件夹 %s" % sdkfolder, True)
         return False
-    gamemanifest = "%s/AndroidManifest.xml" % decompiledfoler;
+    gamemanifest = "%s/AndroidManifest.xml" % decompiledfolder;
     paymanifest = "%s/AndroidManifest.xml" % sdkfolder;
     ET.register_namespace('android', Common.XML_NAMESPACE)
 

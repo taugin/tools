@@ -45,15 +45,15 @@ def apk_decompile(apkfile, decompiled_folder=None):
 
 def baksmali(dexfile, outdir):
     '''dex文件转smali文件，并且输出到outdir'''
-    Log.out("[Logging...] 开始转换DEX")
+    Log.out("[Logging...] 开始转换dex: [%s] --> [%s]" % (dexfile, outdir))
     cmdlist = [Common.JAVA, "-jar", Common.BAKSMALI_JAR, "-o", outdir, dexfile]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
-        Log.out("[Error...] DEX转换失败")
+        Log.out("[Error...] dex转换失败")
         return False
     else:
-        Log.out("[Logging...] DEX转换成功")
+        Log.out("[Logging...] dex转换成功")
         return True
 
 def deletemetainf(src_apk):
