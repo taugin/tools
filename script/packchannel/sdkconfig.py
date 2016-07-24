@@ -22,12 +22,6 @@ class SdkConfig:
         tree = ET.parse(configFile)
         self.root = tree.getroot()
 
-    def getattrib(self, item, attr):
-        try:
-            return item.attrib[attr]
-        except:
-            return None
-        
     def getsdkname(self):
         if (self.root != None):
             element = self.root.find("name")
@@ -66,8 +60,8 @@ class SdkConfig:
                 for param in params:
                     mydict = {}
                     if (param != None):
-                        mydict["name"] = self.getattrib(param, "name")
-                        mydict["type"] = self.getattrib(param, "type")
+                        mydict["name"] = Utils.getattrib(param, "name")
+                        mydict["type"] = Utils.getattrib(param, "type")
                     mylist += [mydict]
         return mylist
 
@@ -85,6 +79,7 @@ class SdkConfig:
         mergeaxml.merge_manifest(self.decompiledfolder, self.sdkfolder)
         self.process_copylist()
         self.process_plugin()
+
         dexfile = os.path.join(self.sdkfolder, "classes.dex")
         outdir = os.path.join(self.decompiledfolder, "smali");
         apkbuilder.baksmali(dexfile, outdir)
