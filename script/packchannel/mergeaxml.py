@@ -23,27 +23,27 @@ def merge_manifest(decompiledfolder, sdkfolder):
     if (os.path.exists(sdkfolder) == False):
         Log.out("[Error...] 无法定位文件夹 %s" % sdkfolder, True)
         return False
-    gamemanifest = "%s/AndroidManifest.xml" % decompiledfolder;
-    paymanifest = "%s/AndroidManifest.xml" % sdkfolder;
+    manifestfile = "%s/AndroidManifest.xml" % decompiledfolder;
+    sdkmanifest = "%s/AndroidManifest.xml" % sdkfolder;
     ET.register_namespace('android', Common.XML_NAMESPACE)
 
-    gametree = ET.parse(gamemanifest)
+    gametree = ET.parse(manifestfile)
     gameroot = gametree.getroot()
     gameapplication = gameroot.find("application")
 
-    paytree = ET.parse(paymanifest)
-    payroot = paytree.getroot()
-    payapplication = payroot.find("application")
+    sdktree = ET.parse(sdkmanifest)
+    sdkroot = sdktree.getroot()
+    sdkapplication = sdkroot.find("application")
 
-    for item in payroot.getchildren():
+    for item in sdkroot.getchildren():
         if (item.tag == "uses-permission"):
             gameroot.append(item)
 
-    for item in payapplication.getchildren():
+    for item in sdkapplication.getchildren():
         gameapplication.append(item)
 
     Utils.indent(gameroot)
-    gametree.write(gamemanifest, encoding='utf-8', xml_declaration=True)
+    gametree.write(manifestfile, encoding='utf-8', xml_declaration=True)
     Log.out("[Logging...] 文件合并完成\n", True)
     return True
 
@@ -51,10 +51,10 @@ def merge_manifest(decompiledfolder, sdkfolder):
 def modify_package(decompiledfolder, pkg_suffix):
     if (pkg_suffix == None or pkg_suffix == ""):
         return
-    gamemanifest = "%s/AndroidManifest.xml" % decompiledfolder;
+    manifestfile = "%s/AndroidManifest.xml" % decompiledfolder;
     ET.register_namespace('android', Common.XML_NAMESPACE)
 
-    tree = ET.parse(gamemanifest)
+    tree = ET.parse(manifestfile)
     root = tree.getroot()
     oldpkg = root.get("package")
     if (oldpkg != None and oldpkg != ""):
@@ -62,5 +62,24 @@ def modify_package(decompiledfolder, pkg_suffix):
         Log.out("[Logging...] 修改配置包名 : [%s]" % newpkg, True)
         root.set("package", newpkg)
         Utils.indent(root)
-        tree.write(gamemanifest, encoding='utf-8', xml_declaration=True)
+        tree.write(manifestfile, encoding='utf-8', xml_declaration=True)
+
+#添加meta到Application标签下面
+def add_meta(decompiledfolder, meta_data):
+    if (len(meta_data) <= 0):
+        return
+    manifestfile = "%s/AndroidManifest.xml" % decompiledfolder;
+    ET.register_namespace('android', Common.XML_NAMESPACE)
+
+    tree = ET.parse(manifestfile)
+    root = tree.getroot()
+    application = root.find("application")
+    for data in meta_data:
+        element = ET.Element("meta-data")
+        element.set("{%s}name" % Common.XML_NAMESPACE, Utils.getvalue(data, "name"))
+        element.set("{%s}value" % Common.XML_NAMESPACE, Utils.getvalue(data, "value"))
+        application.append(element)
+    Log.out("[Logging...] 添加metadata\n", True)
+    Utils.indent(root)
+    tree.write(manifestfile, encoding='utf-8', xml_declaration=True)
 ###############################################################################

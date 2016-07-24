@@ -24,6 +24,8 @@
                 <param name="UCDebugMode" value="false" desc="是否开启调试模式"/>
             </properties>
             <manifest>
+                <param name="APPID" value="1212u3i2uu12oui"/>
+                <param name="APPSECRIT" value="ksdfjakjfajfkajfkajfk23rj2rkwfk3jfkjfkwjfkjrkjkjdkwjkjfk"/>
             </manifest>
             <!-- 渠道插件 -->
             <plugins>

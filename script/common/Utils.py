@@ -2,6 +2,7 @@
 # coding: UTF-8
 
 import os
+import sys
 import shutil
 import platform
 
@@ -50,5 +51,22 @@ def getvalue(item, key):
     except:
         return None
 
+#获取xml的节点属性
+def getattrib(item, key):
+    try:
+        return item.attrib[key];
+    except:
+        return None
+
+#规范化路径名称
 def normalPath(path):
     return os.path.normpath(path)
+
+def exitOnFalse(ret):
+    if (ret == False):
+        sys.exit()
+
+def isEmpty(string):
+    if (string == None or string.strip() == ""):
+        return True
+    return False

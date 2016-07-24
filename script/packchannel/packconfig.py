@@ -50,6 +50,8 @@ class Channel:
     def __init__(self, root, globalPlugin):
         #developer_config.properties文件配置
         self.properties = []
+        #manifest meta信息
+        self.manifest = []
         #渠道插件
         self.plugins = []
         #全局插件
@@ -69,7 +71,7 @@ class Channel:
         params = self.root.findall("param")
         if (params != None):
             for param in params:
-                self.set(param.attrib["name"], param.attrib["value"])
+                self.set(Utils.getattrib(param, "name"), Utils.getattrib(param, "value"))
 
         verCode = self.root.find("sdk-version/versionCode")
         verName = self.root.find("sdk-version/versionName")
@@ -81,16 +83,25 @@ class Channel:
         properties = self.root.findall("properties/param")
         for sdkp in properties:
             mydict = {}
-            mydict["name"] = sdkp.attrib["name"]
-            mydict["value"] = sdkp.attrib["value"]
-            mydict["desc"] = sdkp.attrib["desc"]
+            mydict["name"] = Utils.getattrib(sdkp, "name")
+            mydict["value"] = Utils.getattrib(sdkp, "value")
+            mydict["desc"] = Utils.getattrib(sdkp, "desc")
             self.properties += [mydict]
+
+        #获取manifest
+        manifest = self.root.findall("manifest/param")
+        for sdkp in manifest:
+            mydict = {}
+            mydict["name"] = Utils.getattrib(sdkp, "name")
+            mydict["value"] = Utils.getattrib(sdkp, "value")
+            mydict["desc"] = Utils.getattrib(sdkp, "desc")
+            self.manifest += [mydict]
 
         plugins = self.root.findall("plugins/plugin")
         for plugin in plugins:
             mydict = {}
-            mydict["name"] = plugin.attrib["name"]
-            mydict["desc"] = plugin.attrib["desc"]
+            mydict["name"] = Utils.getattrib(plugin, "name")
+            mydict["desc"] = Utils.getattrib(plugin, "desc")
             self.plugins += [mydict]
 
     #解析渠道签名
@@ -114,6 +125,9 @@ class Channel:
 
     def getProperties(self):
         return self.properties
+
+    def getManifest(self):
+        return self.manifest
 
     def getPlugin(self):
         return self.plugins + self.globalPugins

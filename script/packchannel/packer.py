@@ -16,7 +16,8 @@ import packconfig
 
 #反编译游戏文件
 def decompilegameapk(gameapk, decompiledfolder):
-    return apkbuilder.apk_decompile(gameapk, decompiledfolder)
+    ret = apkbuilder.apk_decompile(gameapk, decompiledfolder)
+    Utils.exitOnFalse(ret)
 
 #拷贝sdk某些文件到反编译文件夹中
 def process_sdk(decompiledfolder, sdkfolder):
@@ -25,7 +26,8 @@ def process_sdk(decompiledfolder, sdkfolder):
 
 #回编译游戏
 def recompilegameapk(decompiledfolder, recompiledfile):
-    return apkbuilder.apk_compile(decompiledfolder, recompiledfile)
+    ret = apkbuilder.apk_compile(decompiledfolder, recompiledfile)
+    Utils.exitOnFalse(ret)
 
 #APK签名
 def signapk(unsignapk, signedapk, keystore):
@@ -35,7 +37,7 @@ def signapk(unsignapk, signedapk, keystore):
 def alignapk(unalignapk, finalapk):
     apkbuilder.alignapk(unalignapk, finalapk)
 
-def clear_tmp(unsigned_apk, signed_apk):
+def cleartmp(unsigned_apk, signed_apk):
     try:
         if (os.path.exists(unsigned_apk)):
             os.remove(unsigned_apk)
@@ -49,6 +51,9 @@ def modifypkgname(decompiledfolder, pkg_suffix):
 
 def writeProperties(decompiledfolder, properties):
     apkbuilder.writeProperties(decompiledfolder, properties)
+
+def writeManifest(decompiledfolder, manifest):
+    mergeaxml.add_meta(decompiledfolder, manifest)
 
 def packapk(packconfig, channel):
     #获取当前渠道配置的游戏名称
@@ -65,8 +70,10 @@ def packapk(packconfig, channel):
     gameapkpath = packconfig.getgameapk()
     #获取SDK名字
     sdkname = channel.getsdkname()
-
+    #获取Properties
     properties = channel.getProperties()
+    #获取manifest
+    manifest = channel.getManifest()
 
     #游戏文件路径
     gameapk = os.path.join(Common.HOME_DIR, gameapkpath)
@@ -90,12 +97,14 @@ def packapk(packconfig, channel):
 
     #修改developer_config.properties
     writeProperties(decompiledfolder, properties)
+    #添加manifest
+    writeManifest(decompiledfolder, manifest)
     #################################################
 
     recompilegameapk(decompiledfolder, unsigned_apk)
     signapk(unsigned_apk, signed_apk, keystore)
     alignapk(signed_apk, final_apk)
-    clear_tmp(unsigned_apk, signed_apk)
+    cleartmp(unsigned_apk, signed_apk)
 
 #打包渠道sdk
 def packchannel(decompiledfolder, sdkfolder, sdkname):
@@ -111,7 +120,7 @@ def packplugins(decompiledfolder, pluginlist):
     if (pluginlist != None):
         for plugin in pluginlist:
             pname = Utils.getvalue(plugin, "name")
-            if (pname == None) :
+            if (Utils.isEmpty(pname)) :
                 continue
             sdkfolder = os.path.join(Common.SDK, pname)
             if (os.path.exists(sdkfolder)):
