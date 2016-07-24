@@ -109,7 +109,7 @@ def packapk(packconfig, channel):
 #打包渠道sdk
 def packchannel(decompiledfolder, sdkfolder, sdkname):
     Log.out("[Logging...] +++++++++++++++++++++++++++++++++++++++");
-    Log.out("[Logging...] 打包渠道sdk: [%s]" % sdkname);
+    Log.out("[Logging...] 打包配置渠道 : [%s]" % sdkname);
     process_sdk(decompiledfolder, sdkfolder)
     Log.out("[Logging...] =======================================\n");
 
@@ -124,7 +124,7 @@ def packplugins(decompiledfolder, pluginlist):
                 continue
             sdkfolder = os.path.join(Common.SDK, pname)
             if (os.path.exists(sdkfolder)):
-                Log.out("[Logging...] 打包插件sdk: [%s]" % pname);
+                Log.out("[Logging...] 打包配置插件 : [%s]" % pname);
                 process_sdk(decompiledfolder, sdkfolder)
     Log.out("[Logging...] =======================================\n");
 

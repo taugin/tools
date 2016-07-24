@@ -76,10 +76,13 @@ def add_meta(decompiledfolder, meta_data):
     application = root.find("application")
     for data in meta_data:
         element = ET.Element("meta-data")
-        element.set("{%s}name" % Common.XML_NAMESPACE, Utils.getvalue(data, "name"))
-        element.set("{%s}value" % Common.XML_NAMESPACE, Utils.getvalue(data, "value"))
+        name = Utils.getvalue(data, "name")
+        value = Utils.getvalue(data, "value")
+        element.set("{%s}name" % Common.XML_NAMESPACE, name)
+        element.set("{%s}value" % Common.XML_NAMESPACE, value)
         application.append(element)
-    Log.out("[Logging...] 添加metadata\n", True)
+        Log.out("[Logging...] 添加元始数据 : [%s] --> [%s]" % (name, value), True)
     Utils.indent(root)
     tree.write(manifestfile, encoding='utf-8', xml_declaration=True)
+    Log.out("[Logging...] 添加据据完成\n")
 ###############################################################################

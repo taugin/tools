@@ -104,7 +104,7 @@ class SdkConfig:
             for d in copylist:
                 file = os.path.join(self.sdkfolder, d);
                 dest = os.path.join(self.decompiledfolder, d)
-                Log.out("[Logging...] 正在拷贝文件  : [%s]" % d)
+                Log.out("[Logging...] 正在拷贝文件 : [%s]" % d)
                 if (os.path.isfile(file)):
                     Utils.copyfile(file, dest)
                 else:
@@ -119,15 +119,16 @@ class SdkConfig:
         self.append_plugin(pluginfile)
 
     def append_plugin(self, pluginfile):
+        pluginlist = self.getplugins()
+        if (len(pluginfile) <= 0):
+            return
         Log.out("[Logging...] 添加插件文件 : [%s]" % pluginfile);
         tree = ET.parse(pluginfile)
         root = tree.getroot()
-        pluginlist = self.getplugins()
-        if (len(pluginlist) > 0):
-            for p in pluginlist:
-                root.append(p)
-            Utils.indent(root)
-            tree.write(pluginfile, encoding='utf-8')
+        for p in pluginlist:
+            root.append(p)
+        Utils.indent(root)
+        tree.write(pluginfile, encoding='utf-8')
 
     def create_plugin(self, pluginfile):
         Log.out("[Logging...] 创建插件文件 : [%s]" % pluginfile);

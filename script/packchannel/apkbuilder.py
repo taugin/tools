@@ -45,15 +45,15 @@ def apk_decompile(apkfile, decompiled_folder=None):
 
 def baksmali(dexfile, outdir):
     '''dex文件转smali文件，并且输出到outdir'''
-    Log.out("[Logging...] 开始转换dex: [%s] --> [%s]" % (dexfile, outdir))
+    Log.out("[Logging...] 开始转换文件 : [%s] --> [%s]" % (dexfile, outdir))
     cmdlist = [Common.JAVA, "-jar", Common.BAKSMALI_JAR, "-o", outdir, dexfile]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
-        Log.out("[Error...] dex转换失败")
+        Log.out("[Error...] 文件转换失败")
         return False
     else:
-        Log.out("[Logging...] dex转换成功")
+        Log.out("[Logging...] 文件转换成功")
         return True
 
 def deletemetainf(src_apk):
@@ -114,10 +114,10 @@ def signapk(src_apk, dst_apk, keystoreinfo = None):
 
 #apk对齐
 def alignapk(unalignapk, finalapk):
-    Log.out("[Logging...] 正在对齐APK: [%s]" % finalapk, True)
+    Log.out("[Logging...] 正在对齐文件 : [%s]" % finalapk, True)
     cmdlist = [Common.ZIPALIGN, "-f", "4", unalignapk, finalapk]
     subprocess.call(cmdlist, stdout=subprocess.PIPE)
-    Log.out("[Logging...] APK对齐成功\n")
+    Log.out("[Logging...] 文件对齐成功\n")
     return True
 
 #写developer_config.properties文件
