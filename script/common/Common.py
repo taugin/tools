@@ -123,3 +123,8 @@ PACKAGES = os.path.join(HOME_DIR, "packages")
 GAMES = os.path.join(HOME_DIR, "games")
 
 SDK = os.path.join(HOME_DIR, "sdks")
+
+
+###########################################################################
+def pause():
+    input("按回车键退出...")
