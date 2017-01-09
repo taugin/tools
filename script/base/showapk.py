@@ -259,5 +259,11 @@ if APK_INFO == True:
     Log.out("显示APK文件签名的MD5值 : ")
     #Log.out("--------------------------------------------")
     processapk(args, md5_signfile)
+    Log.out("\n")
+    #Log.out("--------------------------------------------")
+
+    Log.out("显示APK文件的MD5值 : ")
+    #Log.out("--------------------------------------------")
+    processapk(args, file_md5)
     #Log.out("--------------------------------------------")
 Common.pause()
