@@ -43,11 +43,15 @@ def usage():
     sys.exit()
 
 def test_port(dst, port):
-    os.system('title ' + SCANNING_STATUS % (SCANNING_IP, str(port)))
+    sys.stdout.write(SCANNING_STATUS % (SCANNING_IP, str(port)) + '\r')
+    sys.stdout.flush()
     cli_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         indicator = cli_sock.connect_ex((dst, port))
         if indicator == 0:
+            sys.stdout.write(' ' * 100 + '\r')
+            sys.stdout.write('已开启端口 : ')
+            sys.stdout.flush()
             log(port)
         #log(socket.errorTab[indicator])
         cli_sock.close()
@@ -62,9 +66,14 @@ def port_scan():
             Thread(target=test_port, args=(SCANNING_IP, i)).start()
             i = i + 1
             sleep(0.1)
+    log('')
+    log('')
     log("等待扫描线程退出")
+    log('')
     while True:
-        os.system("title 剩余活动线程数目 : [%d]" % activeCount())
+        sys.stdout.write(' ' * 100 + '\r')
+        sys.stdout.write("剩余活动线程数目 : [%d]\r" % activeCount())
+        sys.stdout.flush()
         if activeCount() <= 2:
             break
         sleep(0.1)
