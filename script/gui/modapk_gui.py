@@ -10,7 +10,7 @@ import tkinter.scrolledtext;
 import tkinter.messagebox;
 import subprocess;
 import threading
-import win32ui
+import platform;
 
 '''
     在python 3.3.2中，tkinter模块可以创建一个窗口控件，如Java中的Swing
@@ -52,13 +52,20 @@ def center_window(root, width, height):
 
 
 def fileSelect():
-    #fd = tkinter.filedialog.LoadFileDialog(root) # 创建打开文件对话框
-    #filename = fd.go() # 显示打开文件对话框，并获取选择的文件名称
-
-    dlg = win32ui.CreateFileDialog(1) # 1表示打开文件对话框
-    dlg.SetOFNInitialDir('E:\\') # 设置打开文件对话框中的初始显示目录
-    dlg.DoModal()
-    filename = dlg.GetPathName() # 获取选择的文件名称
+    if (platform.system().lower() == "windows" and False):
+        import win32ui
+        dlg = win32ui.CreateFileDialog(1) # 1表示打开文件对话框
+        dlg.SetOFNInitialDir('E:\\') # 设置打开文件对话框中的初始显示目录
+        dlg.DoModal()
+        filename = dlg.GetPathName() # 获取选择的文件名称
+    else:
+        #fd = tkinter.filedialog.LoadFileDialog(root) # 创建打开文件对话框
+        #filename = fd.go() # 显示打开文件对话框，并获取选择的文件名称
+        fd = tkinter.filedialog.askopenfile(filetypes=[("text file", "*.apk"), ("all", "*.*")], )
+        if (fd != None):
+            filename = fd.name;
+            if (filename != None):
+                filename = os.path.normpath(filename);
     winWidget.entrySrc.delete('0', END);
     winWidget.entrySrc.insert(END, filename);
 
