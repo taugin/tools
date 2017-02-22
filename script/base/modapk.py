@@ -59,7 +59,7 @@ def apk_decompile(apkfile):
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
-        Log.out("[Error...] 反编译出错 ...")
+        Log.out("[Logging...] 反编译出错 ...")
         return False
     else:
         return True
@@ -72,7 +72,7 @@ def apk_compile():
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
-        Log.out("[Error...] 回编译出错 ...")
+        Log.out("[Logging...] 回编译出错 ...")
         return False
     else:
         return True
@@ -273,19 +273,19 @@ def readArguementFromCmd():
 #检查参数状态
 def checkArguement():
     if (APK_SRCFILE == None or len(APK_SRCFILE) <= 0):
-        Log.out("[Error...] 缺少apk文件")
+        Log.out("[Logging...] 缺少apk文件")
         sys.exit(0)
     if (len(APK_SRCFILE) < 4 or APK_SRCFILE[-4:].lower() != ".apk"):
-        Log.out("[Error...] %s 不是一个apk文件" % APK_SRCFILE)
+        Log.out("[Logging...] %s 不是一个apk文件" % APK_SRCFILE)
         sys.exit(0)
     if (os.path.exists(APK_SRCFILE) == False):
-        Log.out("[Error...] 无法定位文件 %s" % APK_SRCFILE)
+        Log.out("[Logging...] 无法定位文件 %s" % APK_SRCFILE)
         sys.exit(0)
 
     mod_pkgname = APK_NEWPKG != None and len(APK_NEWPKG) > 0
     mod_applabel = APK_NEWLABEL != None and len(APK_NEWLABEL) > 0
     if ((mod_pkgname or mod_applabel or APK_ENCRYPT) == False):
-        Log.out("[Error...] APK无任何修改")
+        Log.out("[Logging...] APK无任何修改")
         sys.exit(0)
 #############################################################################
 if (__name__ == "__main__"):
