@@ -18,6 +18,7 @@ import platform;
 __author__ = 'Hongten'
 MODAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "../base/modapk.py")
 MODAPK_FILE = os.path.normpath(MODAPK_FILE);
+bProcessing = False;
 
 def get_tk():
     '''获取一个Tk对象'''
@@ -53,6 +54,13 @@ def getEncoding():
         return "utf-8";
     return "gbk";
 
+def onWindowClose(*e):
+    global bProcessing;
+    if (bProcessing):
+        tkinter.messagebox.showwarning("警告", "程序正在处理中，请等待处理完毕")
+    else:
+        sys.exit(0)
+
 def fileSelect():
     '''apk文件选择'''
     if (platform.system().lower() == "windows" and False):
@@ -86,6 +94,8 @@ def thread_function(p):
             break;
         winWidget.msgOutput.insert(END, line.decode(getEncoding()));
     winWidget.msgOutput.insert(END, "\n");
+    global bProcessing;
+    bProcessing = False;
 
 def startModApk():
     winWidget.msgOutput.delete(0.0, END);
@@ -121,6 +131,8 @@ def startModApk():
     winWidget.msgOutput.insert(END, "[Logging...] " + " ".join(cmdlist));
     winWidget.msgOutput.insert(END, "\n");
     process = subprocess.Popen(cmdlist, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT);
+    global bProcessing;
+    bProcessing = True;
     t = threading.Thread(target=thread_function, args=(process,));
     t.start();
 
@@ -185,5 +197,7 @@ root.resizable(width=False, height=False)
 
 winWidget = WinWidget(root);
 winWidget.addWidget(root)
+
+root.protocol("WM_DELETE_WINDOW", onWindowClose)
 
 mainloop()
