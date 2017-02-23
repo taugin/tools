@@ -78,10 +78,10 @@ def packapk(packconfig, channel):
     #游戏文件路径
     gameapk = os.path.join(Common.HOME_DIR, gameapkpath)
 
-    decompiledfolder = os.path.join(Common.WORKSPACE, sdkdirname)
-    unsigned_apk = os.path.join(Common.PACKAGES, sdkdirname + "-unsigned.apk")
-    signed_apk = os.path.join(Common.PACKAGES, sdkdirname + "-signed.apk")
-    final_apk = os.path.join(Common.PACKAGES, gamename + ".apk")
+    decompiledfolder = os.path.join(Common.WORKSPACE, gamename + "-" + sdkdirname)
+    unsigned_apk = os.path.join(Common.PACKAGES, gamename + "-" + sdkname + "-unsigned.apk")
+    signed_apk = os.path.join(Common.PACKAGES, gamename + "-" + sdkname + "-signed.apk")
+    final_apk = os.path.join(Common.PACKAGES, gamename + "-" + sdkname + ".apk")
     sdk_channel = os.path.join(Common.CHANNEL_SDK_DIR, sdkdirname)
 
     #反编译APK
