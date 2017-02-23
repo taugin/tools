@@ -52,6 +52,7 @@ def center_window(root, width, height):
 
 
 def fileSelect():
+    '''apk文件选择'''
     if (platform.system().lower() == "windows" and False):
         import win32ui
         dlg = win32ui.CreateFileDialog(1) # 1表示打开文件对话框
@@ -66,15 +67,14 @@ def fileSelect():
             filename = fd.name;
             if (filename != None):
                 filename = os.path.normpath(filename);
-    winWidget.entrySrc.delete('0', END);
-    winWidget.entrySrc.insert(END, filename);
+    winWidget.entrySrcVar.set(filename);
 
 def callCheckbutton():
     value = winWidget.checkVarValue.get();
     if (value == 1):
-        winWidget.checkVar.set("开启加固");
+        winWidget.checkVar.set("开启加壳");
     else:
-        winWidget.checkVar.set("关闭加固");
+        winWidget.checkVar.set("关闭加壳");
 
 def thread_function(p):
     while True:
@@ -101,7 +101,7 @@ def startModApk():
         tkinter.messagebox.showerror(title="错误", message="缺少源文件");
         return;
 
-    debugText = "源 A P K : %s\n新 包 名 : %s\n新应用名 : %s\n是否加固 : %s\n" % (srcApkPath, newPkgName, newLabelName, reinforce);
+    debugText = "源 A P K : %s\n新 包 名 : %s\n新应用名 : %s\n是否加壳 : %s\n" % (srcApkPath, newPkgName, newLabelName, reinforce);
     winWidget.msgOutput.insert(END, debugText);
     cmdlist = [];
     cmdlist.append("python");
@@ -125,10 +125,12 @@ def startModApk():
 class WinWidget:
     def __init__(self, tk):
         self.frame1 = Frame(tk, bg='gray');
-        self.frame1["width"] = 50
-        self.frame1.pack();
+        #self.frame1["width"] = 50
+        self.frame1.pack(fill=X);
 
-        self.entrySrc = Entry(self.frame1, width="90");
+        self.entrySrcVar = StringVar();
+        self.entrySrc = Entry(self.frame1, width="90", textvariable=self.entrySrcVar);
+        self.entrySrc['state'] = 'readonly'
         #self.entrySrc.bind("<KeyPress>", lambda e:"break") # 只读
 
         self.entryPkg = Entry(self.frame1, width="90");
@@ -136,7 +138,7 @@ class WinWidget:
         self.entryTitle = Entry(self.frame1, width="90");
 
         self.checkVar = StringVar();
-        self.checkVar.set("关闭加固")
+        self.checkVar.set("关闭加壳")
         self.checkVarValue = IntVar();
         self.checkEncrypt = Checkbutton(self.frame1, textvariable = self.checkVar, variable = self.checkVarValue, bg='gray', command = callCheckbutton);
 
@@ -159,7 +161,7 @@ class WinWidget:
         labelTitle.grid(row=2, column=0, padx=5, pady=5, ipadx=3, ipady=3);
         self.entryTitle.grid(row=2, column=1, padx=5, pady=5, ipadx=5, ipady=5);
 
-        labelEncrypt = Label(self.frame1, text="加   固");
+        labelEncrypt = Label(self.frame1, text="加   壳");
         labelEncrypt.grid(row=3, column=0, padx=5, pady=5, ipadx=3, ipady=3);
         self.checkEncrypt.grid(row=3, column=1, padx=5, pady=5, sticky='w');
     
@@ -176,6 +178,7 @@ set_tk_geometry(root, '')
 #设置窗口title
 set_tk_title(root, 'APK修改工具')
 
+#禁止缩放
 root.resizable(width=False, height=False)
 
 winWidget = WinWidget(root);
