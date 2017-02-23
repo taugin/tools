@@ -112,7 +112,7 @@ def startModApk():
     cmdlist.append(srcApkPath);
     winWidget.msgOutput.insert(END, "[Logging...] " + " ".join(cmdlist));
     winWidget.msgOutput.insert(END, "\n");
-    process = subprocess.Popen(cmdlist, shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT);
+    process = subprocess.Popen(cmdlist, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT);
     t = threading.Thread(target=thread_function, args=(process,));
     t.start();
 
