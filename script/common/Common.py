@@ -122,8 +122,11 @@ PACKAGES = os.path.join(HOME_DIR, "packages")
 
 GAMES = os.path.join(HOME_DIR, "games")
 
-SDK = os.path.join(HOME_DIR, "sdks")
+SDK_DIR = os.path.join(HOME_DIR, "sdks")
 
+CHANNEL_SDK_DIR = os.path.join(HOME_DIR, "sdks", "channels")
+
+PLUGINS_SDK_DIR = os.path.join(HOME_DIR, "sdks", "plugins")
 
 ###########################################################################
 def pause():

@@ -167,13 +167,13 @@ def add_company_info(mergedapk, company_name):
 
 def copy_fromapk(mergedapk, gameapk, payapk, company_name):
     if (os.path.exists(mergedapk) == False):
-        Log.out("[Error...] 无法定位文件 %s" % mergedapk, True)
+        Log.out("[Logging...] 无法定位文件 %s" % mergedapk, True)
         sys.exit(0)
     if (os.path.exists(gameapk) == False):
-        Log.out("[Error...] 无法定位文件 %s" % gameapk, True)
+        Log.out("[Logging...] 无法定位文件 %s" % gameapk, True)
         sys.exit(0)
     if (os.path.exists(payapk) == False):
-        Log.out("[Error...] 无法定位文件 %s" % payapk, True)
+        Log.out("[Logging...] 无法定位文件 %s" % payapk, True)
         sys.exit(0)
 
     subprocess.call([Common.AAPT_BIN, "r", mergedapk, Common.PLUGIN_FILE], stdout=subprocess.PIPE, stderr=subprocess.PIPE)

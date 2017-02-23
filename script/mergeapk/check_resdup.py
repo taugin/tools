@@ -76,10 +76,10 @@ def check_lib_assets(gamefolder, payfolder, dup_list):
 def check_resdup(gamefolder, payfolder):
     dup_list = []
     if (os.path.exists(gamefolder) == False):
-        Log.out("[Error...] 无法定位文件夹 %s" % gamefolder, True)
+        Log.out("[Logging...] 无法定位文件夹 %s" % gamefolder, True)
         sys.exit(0)
     if (os.path.exists(payfolder) == False):
-        Log.out("[Error...] 无法定位文件夹 %s" % payfolder, True)
+        Log.out("[Logging...] 无法定位文件夹 %s" % payfolder, True)
         sys.exit(0)
     Log.out("[Logging...] 检查重复资源", True)
     filedup = False

@@ -87,11 +87,11 @@ class SdkConfig:
     def process_copylist(self):
         Log.out("[Logging...] 拷贝资源文件 ", True)
         if (os.path.exists(self.decompiledfolder) == False):
-            Log.out("[Error...] 无法定位文件夹 %s" % self.decompiledfolder, True)
+            Log.out("[Logging...] 无法定位文件夹 %s" % self.decompiledfolder, True)
             return False
     
         if (os.path.exists(self.sdkfolder) == False):
-            Log.out("[Error...] 无法定位文件夹 %s" % self.sdkfolder, True)
+            Log.out("[Logging...] 无法定位文件夹 %s" % self.sdkfolder, True)
             return False
 
         copylist = self.getcopylist()

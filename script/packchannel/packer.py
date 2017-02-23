@@ -58,7 +58,7 @@ def writeManifest(decompiledfolder, manifest):
 def packapk(packconfig, channel):
     #获取当前渠道配置的游戏名称
     gamename = channel.getgamename()
-    #获取渠道的SDK目录
+    #获取SDK目录
     sdkdirname = channel.getsdkdir();
     #获取所有sdk插件
     pluginlist = channel.getPlugin()
@@ -82,7 +82,7 @@ def packapk(packconfig, channel):
     unsigned_apk = os.path.join(Common.PACKAGES, sdkdirname + "-unsigned.apk")
     signed_apk = os.path.join(Common.PACKAGES, sdkdirname + "-signed.apk")
     final_apk = os.path.join(Common.PACKAGES, gamename + ".apk")
-    sdk_channel = os.path.join(Common.SDK, sdkdirname)
+    sdk_channel = os.path.join(Common.CHANNEL_SDK_DIR, sdkdirname)
 
     #反编译APK
     decompilegameapk(gameapk, decompiledfolder)
@@ -122,7 +122,7 @@ def packplugins(decompiledfolder, pluginlist):
             pname = Utils.getvalue(plugin, "name")
             if (Utils.isEmpty(pname)) :
                 continue
-            sdkfolder = os.path.join(Common.SDK, pname)
+            sdkfolder = os.path.join(Common.PLUGINS_SDK_DIR, pname)
             if (os.path.exists(sdkfolder)):
                 Log.out("[Logging...] 打包配置插件 : [%s]" % pname);
                 process_sdk(decompiledfolder, sdkfolder)

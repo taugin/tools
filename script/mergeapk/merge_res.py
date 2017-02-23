@@ -34,10 +34,10 @@ def indent(elem, level=0):
 def merge_res(gamefolder, payfolder):
     Log.out("[Logging...] 拷贝资源文件 : [res]", True)
     if (os.path.exists(gamefolder) == False):
-        Log.out("[Error...] 无法定位文件夹 %s" % gamefolder, True)
+        Log.out("[Logging...] 无法定位文件夹 %s" % gamefolder, True)
         sys.exit(0)
     if (os.path.exists(payfolder) == False):
-        Log.out("[Error...] 无法定位文件夹 %s" % payfolder, True)
+        Log.out("[Logging...] 无法定位文件夹 %s" % payfolder, True)
         sys.exit(0)
     gameres = os.path.join(gamefolder, "res")
     payres = os.path.join(payfolder, "res")

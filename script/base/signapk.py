@@ -94,7 +94,7 @@ def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     Log.out("[Logging...] APK 文件 : " + src_apk, True)
     index = src_apk.rfind(".apk")
     if (index == -1):
-        Log.out("[Error...] 无法识别的的apk压缩包 : %s" % src_apk, True)
+        Log.out("[Logging...] 无法识别的的apk压缩包 : %s" % src_apk, True)
         return
     #Log.out("index : %d " % index)
     #Log.out("substring : %s " % src_apk[0:index])
@@ -143,7 +143,7 @@ def readkeystore(dir):
     keyaliaspass = splits[2]
 
     if (keystorealias == "" or keystorepass == ""):
-        Log.out("[Error...] keystorealias or keystorepass is empty")
+        Log.out("[Logging...] keystorealias or keystorepass is empty")
         sys.exit()
 
     retcode = subprocess.call([Common.KEYTOOL, "-list", "-keystore", dir + Common.SEPERATER + keystorefile, "-storepass", keystorepass], stdout=subprocess.PIPE)

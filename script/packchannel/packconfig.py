@@ -106,7 +106,7 @@ class Channel:
 
     #解析渠道签名
     def parseKeystore(self):
-        keystore = os.path.join(Common.SDK, "keystore/keystore.xml")
+        keystore = os.path.join(Common.SDK_DIR, "keystore/keystore.xml")
         if (os.path.exists(keystore) == False):
             return
         tree = ET.parse(keystore)

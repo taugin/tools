@@ -17,7 +17,7 @@ def apk_compile(folder, compileapk):
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
-        Log.out("[Error...] 回编文件失败")
+        Log.out("[Logging...] 回编文件失败")
         return False
     else:
         Log.out("[Logging...] 回编文件成功\n")
@@ -37,7 +37,7 @@ def apk_decompile(apkfile, decompiled_folder=None):
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
-        Log.out("[Error...] 反编文件失败")
+        Log.out("[Logging...] 反编文件失败")
         return False
     else:
         Log.out("[Logging...] 反编文件成功\n")
@@ -50,7 +50,7 @@ def baksmali(dexfile, outdir):
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
-        Log.out("[Error...] 文件转换失败")
+        Log.out("[Logging...] 文件转换失败")
         return False
     else:
         Log.out("[Logging...] 文件转换成功")

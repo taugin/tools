@@ -163,10 +163,10 @@ def modify_unicom_metadata(gameroot):
 def merge_xml_change_pkg(gamefolder, payfolder, newpkgname):
     Log.out("[Logging...] 正在合并文件 : [AndroidManifest.xml]", True)
     if (os.path.exists(gamefolder) == False):
-        Log.out("[Error...] 无法定位文件夹 %s" % gamefolder, True)
+        Log.out("[Logging...] 无法定位文件夹 %s" % gamefolder, True)
         sys.exit(0)
     if (os.path.exists(payfolder) == False):
-        Log.out("[Error...] 无法定位文件夹 %s" % payfolder, True)
+        Log.out("[Logging...] 无法定位文件夹 %s" % payfolder, True)
         sys.exit(0)
     gamemanifest = "%s/AndroidManifest.xml" % gamefolder;
     paymanifest = "%s/AndroidManifest.xml" % payfolder;
