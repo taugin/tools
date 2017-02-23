@@ -1,7 +1,10 @@
+#!/usr/bin/python
+# coding: UTF-8
 # -*- coding: UTF-8 -*-
 #python tkinter menu
 #python version 3.3.2
 #EN = Window 7
+
 
 import os;
 from tkinter import *
@@ -11,15 +14,6 @@ import tkinter.messagebox;
 import subprocess;
 import threading
 import platform;
-
-'''
-    在python 3.3.2中，tkinter模块可以创建一个窗口控件，如Java中的Swing
-    功能描述：
-        根据Python 3.3.2 IDEL的菜单，创建出一个tkinter窗口
-        File-Exit    :  退出功能完成
-        Help-About IDEL     ： 打印相应信息
-        其他的菜单项，当点击时，会打印出相应菜单项的名称
-'''
 
 __author__ = 'Hongten'
 MODAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "../base/modapk.py")
@@ -82,7 +76,7 @@ def thread_function(p):
         #print(line);
         if not line:
             break;
-        winWidget.msgOutput.insert(END, line);
+        winWidget.msgOutput.insert(END, line.decode("gbk"));
     winWidget.msgOutput.insert(END, "\n");
 
 def startModApk():
