@@ -44,6 +44,14 @@ def center_window(root, width, height):
     size = '%dx%d+%d+%d' % (width, height, (screenwidth - width)/2, (screenheight - height)/2 - 40)
     root.geometry(size) 
 
+def getEncoding():
+    if sys.stdout == None:
+        return "gbk";
+    if sys.stdout.encoding == None:
+        return "gbk";
+    if (sys.stdout.encoding.lower() == "utf-8"):
+        return "utf-8";
+    return "gbk";
 
 def fileSelect():
     '''apk文件选择'''
@@ -76,7 +84,7 @@ def thread_function(p):
         #print(line);
         if not line:
             break;
-        winWidget.msgOutput.insert(END, line.decode("gbk"));
+        winWidget.msgOutput.insert(END, line.decode(getEncoding()));
     winWidget.msgOutput.insert(END, "\n");
 
 def startModApk():
