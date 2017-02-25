@@ -64,11 +64,12 @@ def onWindowClose(*e):
 def fileSelect():
     '''apk文件选择'''
     if (platform.system().lower() == "windows" and False):
-        import win32ui
-        dlg = win32ui.CreateFileDialog(1) # 1表示打开文件对话框
-        dlg.SetOFNInitialDir('E:\\') # 设置打开文件对话框中的初始显示目录
-        dlg.DoModal()
-        filename = dlg.GetPathName() # 获取选择的文件名称
+        #import win32ui
+        #dlg = win32ui.CreateFileDialog(1) # 1表示打开文件对话框
+        #dlg.SetOFNInitialDir('E:\\') # 设置打开文件对话框中的初始显示目录
+        #dlg.DoModal()
+        #filename = dlg.GetPathName() # 获取选择的文件名称
+        pass
     else:
         #fd = tkinter.filedialog.LoadFileDialog(root) # 创建打开文件对话框
         #filename = fd.go() # 显示打开文件对话框，并获取选择的文件名称
@@ -78,13 +79,6 @@ def fileSelect():
             if (filename != None):
                 filename = os.path.normpath(filename);
     winWidget.entrySrcVar.set(filename);
-
-def callCheckbutton():
-    value = winWidget.checkVarValue.get();
-    if (value == 1):
-        winWidget.checkVar.set("开启加壳");
-    else:
-        winWidget.checkVar.set("关闭加壳");
 
 def thread_function(p):
     while True:
@@ -103,11 +97,13 @@ def startModApk():
     newPkgName = winWidget.entryPkg.get();
     newLabelName = winWidget.entryTitle.get();
     reinforce = False;
-    value = winWidget.checkVarValue.get();
-    if (value == 1):
-        reinforce = True;
-    else:
-        reinforce = False;
+    onlyDecompile = False;
+    value = winWidget.loaderVarValue.get();
+    if (value == 1): reinforce = True;
+    else: reinforce = False;
+    value = winWidget.onlyDecompileVarValue.get();
+    if (value == 1): onlyDecompile = True;
+    else: onlyDecompile = False;
 
     if (srcApkPath == None or srcApkPath == ""):
         tkinter.messagebox.showerror(title="错误", message="缺少源文件");
@@ -127,6 +123,9 @@ def startModApk():
         cmdlist.append(newLabelName);
     if (reinforce):
         cmdlist.append("-e");
+    if (onlyDecompile):
+        cmdlist.append("-d");
+    cmdlist.append("-g");
     cmdlist.append(srcApkPath);
     winWidget.msgOutput.insert(END, "[Logging...] " + " ".join(cmdlist));
     winWidget.msgOutput.insert(END, "\n");
@@ -151,10 +150,12 @@ class WinWidget:
 
         self.entryTitle = Entry(self.frame1, width="90");
 
-        self.checkVar = StringVar();
-        self.checkVar.set("关闭加壳")
-        self.checkVarValue = IntVar();
-        self.checkEncrypt = Checkbutton(self.frame1, textvariable = self.checkVar, variable = self.checkVarValue, bg='gray', command = callCheckbutton);
+        self.checkFrame = Frame(self.frame1, bg='gray');
+        self.loaderVarValue = IntVar();
+        self.loaderEncryptCheck = Checkbutton(self.checkFrame, text="加壳", variable = self.loaderVarValue, bg='gray');
+
+        self.onlyDecompileVarValue = IntVar();
+        self.onlyDecompileEncrypt = Checkbutton(self.checkFrame, text="仅反编译", variable = self.onlyDecompileVarValue, bg='gray');
 
         self.msgOutput = tkinter.scrolledtext.ScrolledText(tk, bg='white', relief=SUNKEN);
         self.msgOutput.bind("<KeyPress>", lambda e:"break") # 只读
@@ -175,9 +176,11 @@ class WinWidget:
         labelTitle.grid(row=2, column=0, padx=5, pady=5, ipadx=3, ipady=3);
         self.entryTitle.grid(row=2, column=1, padx=5, pady=5, ipadx=5, ipady=5);
 
-        labelEncrypt = Label(self.frame1, text="加   壳");
+        labelEncrypt = Label(self.frame1, text="选   项");
         labelEncrypt.grid(row=3, column=0, padx=5, pady=5, ipadx=3, ipady=3);
-        self.checkEncrypt.grid(row=3, column=1, padx=5, pady=5, sticky='w');
+        self.checkFrame.grid(row=3, column=1, padx=5, pady=5, sticky='w');
+        self.loaderEncryptCheck.pack(side=LEFT);
+        self.onlyDecompileEncrypt.pack(padx=10);
     
         buttonStart = Button(self.frame1, text="开  始", command=startModApk);
         #buttonStart['width'] = 20;

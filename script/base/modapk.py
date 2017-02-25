@@ -39,6 +39,8 @@ APK_SRCFILE = ""
 APK_NEWPKG = ""
 APK_NEWLABEL = ""
 APK_ENCRYPT = False
+APK_ONLYDECOMPILE = False;
+IS_GRAPHIC = False;
 
 #输入参数封装
 def inputArguement(prompt):
@@ -46,14 +48,14 @@ def inputArguement(prompt):
 
 #暂停参数封装
 def pause():
-    if (platform.system().lower() == "windows"):
+    global IS_GRAPHIC;
+    if (platform.system().lower() == "windows" and not IS_GRAPHIC):
         import msvcrt
         Log.out("操作完成，按任意键退出", True)
         msvcrt.getch()
 
 #反编译apk
 def apk_decompile(apkfile):
-    thisdir = os.path.dirname(sys.argv[0])
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "d", "-s", "-f" , apkfile, "-o", TMP_DECOMPILE_FOLDER]
     Log.out("[Logging...] 反编译中 %s" % apkfile)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
@@ -61,6 +63,9 @@ def apk_decompile(apkfile):
     if (ret != 0):
         Log.out("[Logging...] 反编译出错 ...")
         return False
+    elif (APK_ONLYDECOMPILE == True):
+        Log.out("[Logging...] 反编译完成 ...")
+        return False;
     else:
         return True
 
@@ -242,8 +247,10 @@ def parseArguement(argv):
     global APK_NEWPKG
     global APK_NEWLABEL
     global APK_ENCRYPT
+    global APK_ONLYDECOMPILE
+    global IS_GRAPHIC
     try:
-        opts, args = getopt.getopt(argv[1:], "p:l:e")
+        opts, args = getopt.getopt(argv[1:], "p:l:edg")
         if (len(args) == 0):
             return
         for op, value in opts:
@@ -253,6 +260,10 @@ def parseArguement(argv):
                 APK_NEWLABEL = value
             elif (op == "-e"):
                 APK_ENCRYPT = True
+            elif (op == "-d"):
+                APK_ONLYDECOMPILE = True
+            elif (op == "-g"):
+                IS_GRAPHIC = True
 
     except getopt.GetoptError as err:
         Log.out(err)
@@ -284,7 +295,7 @@ def checkArguement():
 
     mod_pkgname = APK_NEWPKG != None and len(APK_NEWPKG) > 0
     mod_applabel = APK_NEWLABEL != None and len(APK_NEWLABEL) > 0
-    if ((mod_pkgname or mod_applabel or APK_ENCRYPT) == False):
+    if ((mod_pkgname or mod_applabel or APK_ENCRYPT or APK_ONLYDECOMPILE) == False):
         Log.out("[Logging...] APK无任何修改")
         sys.exit(0)
 #############################################################################
