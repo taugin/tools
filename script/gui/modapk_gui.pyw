@@ -109,7 +109,11 @@ def startModApk():
         tkinter.messagebox.showerror(title="错误", message="缺少源文件");
         return;
 
-    debugText = "源 A P K : %s\n新 包 名 : %s\n新应用名 : %s\n是否加壳 : %s\n" % (srcApkPath, newPkgName, newLabelName, reinforce);
+    debugText = "";
+    debugText += "[Logging...] 源 A P K : %s\n" % srcApkPath;
+    debugText += "[Logging...] 新 包 名 : %s\n" % newPkgName;
+    debugText += "[Logging...] 新应用名 : %s\n" % newLabelName;
+    debugText += "[Logging...] 是否加壳 : %s\n" % reinforce;
     winWidget.msgOutput.insert(END, debugText);
     cmdlist = [];
     cmdlist.append("python");
