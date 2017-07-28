@@ -76,12 +76,12 @@ def packapk(packconfig, channel):
     manifest = channel.getManifest()
 
     #游戏文件路径
-    gameapk = os.path.join(Common.HOME_DIR, gameapkpath)
+    gameapk = os.path.join(Common.PACK_HOME, gameapkpath)
 
     decompiledfolder = os.path.join(Common.WORKSPACE, gamename + "-" + sdkdirname)
     unsigned_apk = os.path.join(Common.PACKAGES, gamename + "-" + sdkname + "-unsigned.apk")
     signed_apk = os.path.join(Common.PACKAGES, gamename + "-" + sdkname + "-signed.apk")
-    final_apk = os.path.join(Common.PACKAGES, gamename + "-" + sdkname + ".apk")
+    final_apk = os.path.join(Common.PACKAGES, gamename + "-" + sdkname + "-final.apk")
     sdk_channel = os.path.join(Common.CHANNEL_SDK_DIR, sdkdirname)
 
     #反编译APK
@@ -129,7 +129,7 @@ def packplugins(decompiledfolder, pluginlist):
     Log.out("[Logging...] =======================================\n");
 
 def pack():
-    channelFile = os.path.join(Common.HOME_DIR, "sdks/config/AbchDemo/channels.xml")
+    channelFile = os.path.join(Common.PACK_HOME, "sdks/config/AbchDemo/channels.xml")
     packConfig = packconfig.PackConfig(channelFile);
     packConfig.parse()
     channel = packConfig.getChannelList()[0]

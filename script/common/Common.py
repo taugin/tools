@@ -116,17 +116,20 @@ COMPANYFILE = "assets/ccp_strings.xml"
 
 ################################################################################
 #pack
-WORKSPACE = os.path.join(HOME_DIR, "workspace")
+#游戏打包主目录
+PACK_HOME = os.path.join(HOME_DIR, "packhome");
 
-PACKAGES = os.path.join(HOME_DIR, "packages")
+WORKSPACE = os.path.join(PACK_HOME, "workspace")
 
-GAMES = os.path.join(HOME_DIR, "games")
+PACKAGES = os.path.join(PACK_HOME, "packages")
 
-SDK_DIR = os.path.join(HOME_DIR, "sdks")
+GAMES = os.path.join(PACK_HOME, "games")
 
-CHANNEL_SDK_DIR = os.path.join(HOME_DIR, "sdks", "channels")
+SDK_DIR = os.path.join(PACK_HOME, "sdks")
 
-PLUGINS_SDK_DIR = os.path.join(HOME_DIR, "sdks", "plugins")
+CHANNEL_SDK_DIR = os.path.join(PACK_HOME, "sdks", "channels")
+
+PLUGINS_SDK_DIR = os.path.join(PACK_HOME, "sdks", "plugins")
 
 ###########################################################################
 def pause():

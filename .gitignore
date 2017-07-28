@@ -7,5 +7,6 @@ extra/winreg/mytool.reg
 workspace
 packages
 games
-sdks/channels/
-sdks/plugins/
+packhome/sdks/channels/
+packhome/sdks/plugins/
+**.pyc

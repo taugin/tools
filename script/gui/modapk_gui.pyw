@@ -63,6 +63,7 @@ def onWindowClose(*e):
 
 def fileSelect():
     '''apk文件选择'''
+    filename = "";
     if (platform.system().lower() == "windows" and False):
         #import win32ui
         #dlg = win32ui.CreateFileDialog(1) # 1表示打开文件对话框
