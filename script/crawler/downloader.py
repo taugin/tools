@@ -14,14 +14,15 @@ class Downloader:
         res = urllib.request.urlopen(self.url, None, timeout=10 * 1000);
         charset = self.parseCharset(res);
         logger.debug("charset : %s" % charset)
-        content = res.read().decode(charset);
+        resbytes = res.read()
+        content = resbytes.decode(charset);
         res.close();
         return content;
     def downloadHttps(self):
         pass
     def parseCharset(self, res):
         contentType = res.getheader("Content-Type")
-        charset = "utf-8"
+        charset = None
         if contentType != None:
             tmp = contentType.split(";")
             for t in tmp:

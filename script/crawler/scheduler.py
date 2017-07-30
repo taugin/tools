@@ -7,17 +7,18 @@ import urlmanager
 import threading
 from commoncfg import logger
 import downloader
+import htmlparser
 import time
 
-threadNum = 3
+threadNum = 5
 condition = threading.Condition()
 urlManager = urlmanager.UrlManager()
 
-urlManager.pushOne("http://www.baidu.com");
-urlManager.pushOne("http://www.xiaonei.com");
-urlManager.pushOne("http://www.126.com");
+#urlManager.pushOne("http://www.baidu.com");
+#urlManager.pushOne("http://www.xiaonei.com");
+#urlManager.pushOne("http://www.126.com");
 urlManager.pushOne("http://www.csdn.com");
-urlManager.pushOne("http://www.jd.com");
+#urlManager.pushOne("http://www.jokeji.cn/JokeHtml/mj/201707292319522.htm");
 
 def hasForGrabbingUrl():
     '''查看是否有可抓取的URL'''
@@ -31,15 +32,20 @@ def pushNewGrabUrl(urllist):
     '''防止新的待抓取的URL'''
     urlManager.pushList(urllist)
 
+def setGrabbedUrl(url):
+    urlManager.setGrabbedUrl(url)
+
 def fetchWebContent(url):
     '''抓取内容'''
     down = downloader.Downloader(url)
     content = down.download();
     return content
 
-def parseContent():
+def parseContent(url, content):
     '''解析抓取的内容'''
-    pass
+    parser = htmlparser.HtmlParse()
+    newurl, newdata = parser.parse(url, content)
+    return newurl, newdata
 
 class GrabThread(threading.Thread):
     def __init__(self, url):
@@ -47,12 +53,23 @@ class GrabThread(threading.Thread):
         self.url = url
 
     def run(self):
-        content = fetchWebContent(self.url)
+        content = None
+        try:
+            content = fetchWebContent(self.url)
+        except Exception as e:
+            logger.debug("e : %s" % e)
+
+        '''
         f = open(self.name + ".html", mode="w", encoding="utf-8")
         f.write(content)
         f.close()
+        '''
+        newurl, newdata = parseContent(self.url, content)
+        setGrabbedUrl(self.url)
+        newList = list(newurl)
+        urlManager.pushList(newList)
         logger.debug(self.name + " over")
-        urlManager.setGrabbedUrl(self.url)
+        time.sleep(2)
         #工作线程结束，通知主线程
         if condition.acquire():
             condition.notify()
@@ -65,13 +82,13 @@ if __name__ == "__main__":
         if continueGrab:
             activeCount = threading.activeCount()
             if activeCount < threadNum + 1:
-                logger.debug("开启抓取线程")
                 grabUrl = fetchForGrabbingUrl()
+                logger.debug("开启抓取线程 leftsize : %d , grabsize : %d , url :%s" % (urlManager.size(), len(urlManager.grabbedList()), grabUrl))
                 t = GrabThread(grabUrl)
                 threadList.append(t)
                 t.start()
             else:
-                logger.debug("等待有线程运行结束")
+                #logger.debug("等待有线程运行结束")
                 if condition.acquire():
                     condition.wait();
                     condition.release()
@@ -83,4 +100,4 @@ if __name__ == "__main__":
             else:
                 logger.debug("抓取完毕，退出循环")
                 break;
-    logger.debug("Crawler over, grabbedList : %s" % urlManager.grabbedList());
+    logger.debug("Crawler over, grabbedSize : %s" % len(urlManager.grabbedList()));

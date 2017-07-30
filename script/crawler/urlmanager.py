@@ -40,7 +40,6 @@ class UrlManager:
         UrlManager._threadLock.release()
 
     def setGrabbedUrl(self, grabbedUrl):
-        logger.debug("grabbedUrl : %s" % (grabbedUrl))
         UrlManager._threadLock.acquire()
         self._pushUrlInternal(self._urlGrabbed, grabbedUrl)
         UrlManager._threadLock.release()
