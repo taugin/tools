@@ -9,63 +9,63 @@ import threading
 下载器
 '''
 class UrlManager:
-    __instance = None
-    __threadLock = threading.Lock()
+    _instance = None
+    _threadLock = threading.Lock()
 
     @staticmethod
     def getInstance():
-        if(UrlManager.__instance == None):
-            UrlManager.__threadLock.acquire()
-            if(UrlManager.__instance == None):
-                UrlManager.__instance = UrlManager()
-            UrlManager.__threadLock.release()
-        return UrlManager.__instance
+        if(UrlManager._instance == None):
+            UrlManager._threadLock.acquire()
+            if(UrlManager._instance == None):
+                UrlManager._instance = UrlManager()
+            UrlManager._threadLock.release()
+        return UrlManager._instance
 
     def __init__(self):
-        self.__urlWithGrab = []
-        self.__urlGrabbed = []
+        self._urlWithGrab = []
+        self._urlGrabbed = []
 
     def pushOne(self, url):
         logger.debug("pushOne : %s" % (url))
-        UrlManager.__threadLock.acquire()
-        if self.__exist(self.__urlGrabbed, url) == False:
-            self.__pushUrlInternal(self.__urlWithGrab, url)
-        UrlManager.__threadLock.release()
+        UrlManager._threadLock.acquire()
+        if self._exist(self._urlGrabbed, url) == False:
+            self._pushUrlInternal(self._urlWithGrab, url)
+        UrlManager._threadLock.release()
 
     def pushList(self, urllist):
-        UrlManager.__threadLock.acquire()
+        UrlManager._threadLock.acquire()
         if urllist != None and len(urllist) > 0:
             for url in urllist:
-                self.__pushUrlInternal(self.__urlWithGrab, url)
-        UrlManager.__threadLock.release()
+                self._pushUrlInternal(self._urlWithGrab, url)
+        UrlManager._threadLock.release()
 
     def setGrabbedUrl(self, grabbedUrl):
         logger.debug("grabbedUrl : %s" % (grabbedUrl))
-        UrlManager.__threadLock.acquire()
-        self.__pushUrlInternal(self.__urlGrabbed, grabbedUrl)
-        UrlManager.__threadLock.release()
+        UrlManager._threadLock.acquire()
+        self._pushUrlInternal(self._urlGrabbed, grabbedUrl)
+        UrlManager._threadLock.release()
 
     def pop(self):
-        return self.__popFirst()
+        return self._popFirst()
 
     def size(self):
-        return len(self.__urlWithGrab)
+        return len(self._urlWithGrab)
     
     def hasUrl(self):
-        return len(self.__urlWithGrab) > 0
+        return len(self._urlWithGrab) > 0
 
     def grabbedList(self):
-        return self.__urlGrabbed
+        return self._urlGrabbed
 
-    def __pushUrlInternal(self, urllist, url):
-        exist = self.__exist(urllist, url)
+    def _pushUrlInternal(self, urllist, url):
+        exist = self._exist(urllist, url)
         if exist == False:
             urllist.append(url)
 
-    def __popFirst(self):
-        return self.__urlWithGrab.pop(0)
+    def _popFirst(self):
+        return self._urlWithGrab.pop(0)
 
-    def __exist(self, l, item):
+    def _exist(self, l, item):
         try:
             return l.index(item) > -1
         except:
