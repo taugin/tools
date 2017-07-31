@@ -102,6 +102,7 @@ class JokejiHtmlParser(HtmlParse):
             allJokeNode = soup.find("span", id="text110").find_all("p")
         except:
             pass
+
         if allJokeNode != None:
             for node in allJokeNode:
                 data_list.append(node.get_text().strip())
@@ -118,7 +119,10 @@ class JokejiHtmlParser(HtmlParse):
         except:
             pub_timestamp = int(time.time())
 
-        res_data['title'] = soup.title.get_text().strip()
-        res_data['pubtime'] = pub_timestamp
-        res_data['content'] = data_list
-        return res_data
+        if data_list != None and len(data_list) > 0:
+            res_data['title'] = soup.title.get_text().strip()
+            res_data['pubtime'] = pub_timestamp
+            res_data['content'] = data_list
+            res_data['pageurl'] = page_url
+            return res_data
+        return None

@@ -11,23 +11,13 @@ https://github.com/PyMySQL/PyMySQL
 from commoncfg import logger
 import pymysql
 import threading
-'''
-    def process(self, data):
-        f = open("result.txt", "a", encoding="utf-8");
-        if data != None and data['content'] != None:
-            for d in data['content']:
-                logger.debug("data : %s" % d)
-                f.write(d)
-                f.write("\n")
-        f.close()
-'''
 threadLock = threading.Lock()
 def createProcesser():
     return JokeProcesser()
 
 class Processer:
     def __init__(self):
-        self.db = pymysql.connect("localhost","root","123456","taugin", charset="utf8")
+        self.db = pymysql.connect("106.14.185.49","root","taugin0426","taugin", charset="utf8")
         self.cursor = self.db.cursor()
 
     def __del__(self):
@@ -37,21 +27,25 @@ class Processer:
         pass
 class JokeProcesser(Processer):
     def process(self, data):
-        threadLock.acquire()
+        logger.debug("start process...")
+        #threadLock.acquire()
         values = ""
         if data != None and data['content'] != None and len(data['content']) > 0:
             for d in data['content']:
-                values += " ('%s', '%s', FROM_UNIXTIME(%d))," % (data['title'], d, data['pubtime'])
+                values += " ('%s', '%s', '%s', FROM_UNIXTIME(%d))," % (data['title'], d, data['pageurl'], data['pubtime'])
         else:
-            threadLock.release()
+            #threadLock.release()
+            logger.debug("end process null data...")
             return
-        sql = "insert into joke(category, content, pubtime) values"
+        sql = "insert into joke(category, content, pageurl, pubtime) values"
         values = values[0:-1]
         sql = sql + values;
         print(sql)
         try:
             self.cursor.execute(sql)
             self.db.commit()
-        except:
+        except Exception as e:
             self.db.rollback()
+            logger.debug("rollback e : %s" % e)
         threadLock.release()
+        #logger.debug("end process...")

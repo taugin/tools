@@ -11,6 +11,7 @@ import htmlparser
 import time
 import threadpool
 import processer
+from distutils.command.config import config
 
 RUNNING = True
 threadNum = 1
@@ -19,8 +20,9 @@ urlManager = urlmanager.UrlManager()
 downLoader = downloader.Downloader()
 htmlParser = htmlparser.createParser()
 htmlProcesser = processer.createProcesser()
+#configWriter = open("config.json", "")
 
-urlManager.pushOne("http://www.jokeji.cn/");
+urlManager.pushOne("http://www.jokeji.cn/jokehtml/dn/20121018000607.htm");
 
 def hasForGrabbingUrl():
     '''查看是否有可抓取的URL'''
@@ -46,6 +48,7 @@ def parseContent(url, content):
     '''解析抓取的内容'''
     newurl, newdata = htmlParser.parse(url, content)
     logger.debug("newurl : %s" % newurl)
+    logger.debug("newdata : %s" % newdata)
     return newurl, newdata
 
 def processContent(data):
@@ -63,7 +66,7 @@ def grabbing(url):
         content = fetchWebContent(url)
     except Exception as e:
         logger.debug("e : %s" % e)
-    writeToFile(time.strftime("yyyyMMdd") + ".html", content)
+    #writeToFile(time.strftime("yyyyMMdd") + ".html", content)
     newurl, newdata = parseContent(url, content)
     setGrabbedUrl(url)
     newList = list(newurl)
@@ -126,10 +129,12 @@ def grabWithThreadPool():
         hasGrabUrl = hasForGrabbingUrl()
         if hasGrabUrl:
             grabUrl = fetchForGrabbingUrl()
-            logger.debug("开启抓取线程 leftsize : %d , grabsize : %d , url :%s" % (urlManager.size(), len(urlManager.grabbedList()), grabUrl))
+            logger.debug("开启抓取任务 leftsize : %d , grabsize : %d , url :%s" % (urlManager.size(), len(urlManager.grabbedList()), grabUrl))
             pool.addJob(grabbing, grabUrl)
         else:
-            if (pool.workSize() > 0):
+            size= pool.workSize()
+            logger.debug("size : %d" % size)
+            if (size > 0):
                 try:
                     time.sleep(5);
                 except:
