@@ -30,7 +30,7 @@ class JokeProcesser(Processer):
         logger.debug("start process...")
         #threadLock.acquire()
         values = ""
-        if data != None and data['content'] != None and len(data['content']) > 0:
+        if data != None and "content" in data and len(data['content']) > 0:
             for d in data['content']:
                 values += " ('%s', '%s', '%s', FROM_UNIXTIME(%d))," % (data['title'], d, data['pageurl'], data['pubtime'])
         else:
@@ -47,5 +47,5 @@ class JokeProcesser(Processer):
         except Exception as e:
             self.db.rollback()
             logger.debug("rollback e : %s" % e)
-        threadLock.release()
-        #logger.debug("end process...")
+        #threadLock.release()
+        logger.debug("end process...")
