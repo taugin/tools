@@ -3,15 +3,15 @@
 
 from commoncfg import logger
 import urllib.request;
+
 '''
+PyQt4 Download地址
+https://riverbankcomputing.com/software/pyqt/download
 下载器
 '''
 class Downloader:
-    def __init__(self, url):
-        self.url = url;
-
-    def download(self):
-        res = urllib.request.urlopen(self.url, None, timeout=10 * 1000);
+    def download(self, url):
+        res = urllib.request.urlopen(url, None, timeout=10 * 1000);
         charset = self.parseCharset(res);
         logger.debug("charset : %s" % charset)
         resbytes = res.read()
@@ -22,12 +22,13 @@ class Downloader:
         pass
     def parseCharset(self, res):
         contentType = res.getheader("Content-Type")
+        logger.debug("contentType : %s" % contentType)
         charset = None
         if contentType != None:
             tmp = contentType.split(";")
             for t in tmp:
-                if (t != None and t.startswith("charset")):
+                if (t != None and t.strip().find("charset") > -1):
                     charset = t.split("=")[1]
         if charset == None or charset.strip() == "":
-            charset = "iso-8859-1";
+            charset = "GB18030";
         return charset

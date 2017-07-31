@@ -1,6 +1,10 @@
 # coding: UTF-8
 # 引入别的文件夹的模块
-
+'''
+BeautifulSoup下载地址
+https://pypi.python.org/pypi/beautifulsoup4/4.3.2
+https://pypi.python.org/packages/30/bd/5405ba01391d06646de9ec90cadeb3893fa355a06438966afff44531219a/beautifulsoup4-4.3.2.tar.gz
+'''
 from commoncfg import logger
 import re
 
@@ -10,8 +14,26 @@ from bs4 import BeautifulSoup
 
 from urllib.parse import urljoin
 
+
+def createParser():
+    return JokejiHtmlParser()
+
 # 实现解析器的类
 class HtmlParse(object):
+    # 解析网页
+    def parse(self, page_url, html_content):
+        if page_url == None or html_content == None:
+            return set(), {}
+        # 使用beautifulsoup进行解析
+        soup = BeautifulSoup(html_content, "html.parser", from_encoding="utf-8")
+        new_urls = self._get_new_urls(page_url, soup)
+        new_data = self._get_new_data(page_url, soup)
+        if new_urls == None:
+            new_urls = set()
+        if new_data == None:
+            new_data = {}
+        return new_urls, new_data
+
     # 从网页解析中获得url
     def _get_new_urls(self, page_url, soup):
         new_urls = set()
@@ -49,12 +71,54 @@ class HtmlParse(object):
         res_data['title'] = title
         res_data['summary'] = summary
 
-    # 解析网页
-    def parse(self, page_url, html_content):
-        if page_url == None or html_content == None:
-            return set(), {}
-        # 使用beautifulsoup进行解析
-        soup = BeautifulSoup(html_content, "html.parser", from_encoding="utf-8")
-        new_urls = self._get_new_urls(page_url, soup)
-        new_data = None#self._get_new_data(page_url, soup)
-        return new_urls, new_data
+class JDHtmlParser(HtmlParse):
+    def __init__(self):
+        pass
+
+    def _get_new_data(self, page_url, soup):
+        res_data = {}
+        title_node = soup.find("h3", class_="tb-main-title")
+        title = title_node.get_text().strip()
+        print(title)
+        price_node = soup.find("em", class_="tb-rmb-num")
+        price = price_node.get_text().strip()
+        print(price)
+        desc_node = soup.find("p", class_="tb-subtitle")
+        desc = desc_node.get_text().strip()
+        print(desc)
+
+class JokejiHtmlParser(HtmlParse):
+    def __init__(self):
+        pass
+
+    def _get_new_data(self, page_url, soup):
+        import time
+        res_data = {}
+        data_list = []
+        pub_time = None
+        allJokeNode = None
+        pub_timestamp = None
+        try:
+            allJokeNode = soup.find("span", id="text110").find_all("p")
+        except:
+            pass
+        if allJokeNode != None:
+            for node in allJokeNode:
+                data_list.append(node.get_text().strip())
+
+        try:
+            allLiNode = soup.find("div", class_="pl_ad").find("ul").find_all("li")
+            pub_time = allLiNode[2].find("i").get_text().strip()[5:]
+        except:
+            pub_time = 0
+
+        try:
+            timeArray = time.strptime(pub_time, "%Y/%m/%d %H:%M:%S")
+            pub_timestamp = int(time.mktime(timeArray))
+        except:
+            pub_timestamp = int(time.time())
+
+        res_data['title'] = soup.title.get_text().strip()
+        res_data['pubtime'] = pub_timestamp
+        res_data['content'] = data_list
+        return res_data

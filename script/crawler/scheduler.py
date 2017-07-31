@@ -1,24 +1,26 @@
 # coding: UTF-8
 # 引入别的文件夹的模块
 
+from commoncfg import logger
 import Common
 import Utils
 import urlmanager
 import threading
-from commoncfg import logger
 import downloader
 import htmlparser
 import time
+import threadpool
+import processer
 
-threadNum = 5
+RUNNING = True
+threadNum = 1
 condition = threading.Condition()
 urlManager = urlmanager.UrlManager()
+downLoader = downloader.Downloader()
+htmlParser = htmlparser.createParser()
+htmlProcesser = processer.createProcesser()
 
-#urlManager.pushOne("http://www.baidu.com");
-#urlManager.pushOne("http://www.xiaonei.com");
-#urlManager.pushOne("http://www.126.com");
-urlManager.pushOne("http://www.csdn.com");
-#urlManager.pushOne("http://www.jokeji.cn/JokeHtml/mj/201707292319522.htm");
+urlManager.pushOne("http://www.jokeji.cn/");
 
 def hasForGrabbingUrl():
     '''查看是否有可抓取的URL'''
@@ -37,15 +39,37 @@ def setGrabbedUrl(url):
 
 def fetchWebContent(url):
     '''抓取内容'''
-    down = downloader.Downloader(url)
-    content = down.download();
+    content = downLoader.download(url);
     return content
 
 def parseContent(url, content):
     '''解析抓取的内容'''
-    parser = htmlparser.HtmlParse()
-    newurl, newdata = parser.parse(url, content)
+    newurl, newdata = htmlParser.parse(url, content)
+    logger.debug("newurl : %s" % newurl)
     return newurl, newdata
+
+def processContent(data):
+    htmlProcesser.process(data)
+
+def writeToFile(name, content):
+    f = open(name, mode="w", encoding="utf-8")
+    f.write(content)
+    f.close()
+
+def grabbing(url):
+    '''实际抓取函数'''
+    content = None
+    try:
+        content = fetchWebContent(url)
+    except Exception as e:
+        logger.debug("e : %s" % e)
+    writeToFile(time.strftime("yyyyMMdd") + ".html", content)
+    newurl, newdata = parseContent(url, content)
+    setGrabbedUrl(url)
+    newList = list(newurl)
+    urlManager.pushList(newList)
+    processContent(newdata)
+    time.sleep(1)
 
 class GrabThread(threading.Thread):
     def __init__(self, url):
@@ -53,40 +77,32 @@ class GrabThread(threading.Thread):
         self.url = url
 
     def run(self):
-        content = None
-        try:
-            content = fetchWebContent(self.url)
-        except Exception as e:
-            logger.debug("e : %s" % e)
-
-        '''
-        f = open(self.name + ".html", mode="w", encoding="utf-8")
-        f.write(content)
-        f.close()
-        '''
-        newurl, newdata = parseContent(self.url, content)
-        setGrabbedUrl(self.url)
-        newList = list(newurl)
-        urlManager.pushList(newList)
-        logger.debug(self.name + " over")
-        time.sleep(2)
+        grabbing(self.url)
         #工作线程结束，通知主线程
+        #logger.debug(self.name + " over")
         if condition.acquire():
             condition.notify()
             condition.release()
 
-if __name__ == "__main__":
-    threadList = []
-    while True:
-        continueGrab = hasForGrabbingUrl()
-        if continueGrab:
+def registerSignal():
+    import signal
+    signal.signal(signal.SIGINT, signal_handler) # 2
+    signal.signal(signal.SIGTERM, signal_handler) # 15
+
+def signal_handler(signum, frame):
+    global RUNNING
+    RUNNING = False
+    logger.debug("signum : %d" % signum)
+
+def grabWithMutilThread():
+    while RUNNING:
+        hasGrabUrl = hasForGrabbingUrl()
+        if hasGrabUrl:
             activeCount = threading.activeCount()
             if activeCount < threadNum + 1:
                 grabUrl = fetchForGrabbingUrl()
                 logger.debug("开启抓取线程 leftsize : %d , grabsize : %d , url :%s" % (urlManager.size(), len(urlManager.grabbedList()), grabUrl))
-                t = GrabThread(grabUrl)
-                threadList.append(t)
-                t.start()
+                GrabThread(grabUrl).start()
             else:
                 #logger.debug("等待有线程运行结束")
                 if condition.acquire():
@@ -94,10 +110,43 @@ if __name__ == "__main__":
                     condition.release()
         else:
             activeCount = threading.activeCount()
-            logger.debug("未找到抓取URL activeCount : %d" % activeCount)
+            logger.debug("未找到抓取URL 当前线程数 : %d" % activeCount)
             if activeCount > 1:
-                time.sleep(5);
+                try:
+                    time.sleep(5);
+                except:
+                    pass
             else:
                 logger.debug("抓取完毕，退出循环")
                 break;
+
+def grabWithThreadPool():
+    pool = threadpool.ThreadPool(threadNum)
+    while RUNNING:
+        hasGrabUrl = hasForGrabbingUrl()
+        if hasGrabUrl:
+            grabUrl = fetchForGrabbingUrl()
+            logger.debug("开启抓取线程 leftsize : %d , grabsize : %d , url :%s" % (urlManager.size(), len(urlManager.grabbedList()), grabUrl))
+            pool.addJob(grabbing, grabUrl)
+        else:
+            if (pool.workSize() > 0):
+                try:
+                    time.sleep(5);
+                except:
+                    pass
+            else:
+                logger.debug("抓取完毕，退出循环")
+                break;
+    logger.debug("等待所有任务退出")
+    pool.waitForComplete()
+
+def cleanup():
+    global htmlProcesser
+    del htmlProcesser
+
+if __name__ == "__main__":
+    registerSignal()
+    grabWithThreadPool()
+    #grabbing("http://www.jokeji.cn/jokehtml/bxnn/2017072923230416.htm")
+    cleanup()
     logger.debug("Crawler over, grabbedSize : %s" % len(urlManager.grabbedList()));
