@@ -11,7 +11,8 @@ import htmlparser
 import time
 import threadpool
 import processer
-from distutils.command.config import config
+import tempfile
+import os
 
 initUrl = "http://www.xiao688.com/"
 initUrl = "http://www.jokeji.cn/"
@@ -26,6 +27,28 @@ htmlProcesser = processer.createProcesser()
 
 htmlParser.setBaseUrl(initUrl)
 urlManager.pushOne(initUrl);
+
+def writeLastGrabUrl(url):
+    tmpdir = tempfile.gettempdir()
+    cfgfile = os.path.join(tmpdir, "crawler.cfg")
+    with open(cfgfile, "w", encoding="utf-8") as file:
+        file.write(url)
+
+def readLastGrabUrl():
+    tmpdir = tempfile.gettempdir()
+    cfgfile = os.path.join(tmpdir, "crawler.cfg")
+    if (os.path.exists(cfgfile) is False):
+        return None
+    with open(cfgfile, "r", encoding="utf-8") as file:
+        url = file.read()
+    return url
+
+def setLastGrabUrl():
+    url = readLastGrabUrl()
+    logger.debug("lastGrab : %s" % url)
+    if url != None:
+        urlManager.pushOne(url)
+        htmlParser.setBaseUrl(url)
 
 def hasForGrabbingUrl():
     '''查看是否有可抓取的URL'''
@@ -73,6 +96,7 @@ def grabbing(url):
         newList = list(newurl)
         urlManager.pushList(newList)
     processContent(newdata)
+    writeLastGrabUrl(url)
     time.sleep(1)
 
 def grabWorker(url):
@@ -140,7 +164,7 @@ def grabWithThreadPool():
             pool.addJob(grabWorker, grabUrl)
         else:
             size= pool.workSize()
-            logger.debug("size : %d" % size)
+            logger.debug("queueSize : %d, grabbedSize : %d" % (size, len(urlManager.grabbedList())))
             if (size > 0):
                 if condition.acquire():
                     condition.wait()
@@ -157,6 +181,7 @@ def cleanup():
 
 if __name__ == "__main__":
     registerSignal()
+    setLastGrabUrl()
     grabWithThreadPool()
     #grabbing("http://www.xiao688.com/cms/article/id-94652.html")
     #grabbing("http://www.jokeji.cn/jokehtml/bxnn/2017073116212095.htm")
