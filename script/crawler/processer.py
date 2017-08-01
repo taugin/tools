@@ -11,7 +11,11 @@ https://github.com/PyMySQL/PyMySQL
 from commoncfg import logger
 import pymysql
 import threading
+import tempfile
+import os
+
 threadLock = threading.Lock()
+
 def createProcesser():
     return JokeProcesser()
 
@@ -42,6 +46,7 @@ class JokeProcesser(Processer):
             self.db.commit()
         except Exception as e:
             self.db.rollback()
-            with open("rollback.txt", "a", encoding="utf-8") as f:
-                f.write("rollback e : %s\n" % e)
+            rollback = os.path.join(tempfile.gettempdir(), 'rollback.txt')
+            with open(rollback, "a", encoding="utf-8") as f:
+                f.write("%s\n" % e)
         threadLock.release()

@@ -11,8 +11,9 @@ sys.path.append(COM_DIR)
 
 import logging
 import logging.handlers
+import tempfile
 
-LOG_FILE = 'tst.log'
+LOG_FILE = os.path.join(tempfile.gettempdir(), 'tst.log')
 
 handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes=1024 * 1024, backupCount=5)# 实例化handler
 handler_c = logging.StreamHandler(); #输出到控制台
