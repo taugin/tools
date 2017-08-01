@@ -148,20 +148,20 @@ class Xiao688HtmlParser(HtmlParse):
         #获取内容
         try:
             allJokeNode = soup.find("div", class_="content")
-            datacontent = allJokeNode
-        except:
-            pass
+            datacontent = str(allJokeNode)
+        except Exception as e:
+            logger.debug("error : %s" % e)
 
         try:
             pubTimeNode = soup.find("span", id="d_udate")
             pub_time = pubTimeNode.get_text().strip()[1:-1]
-            logger.debug("pub_time : %s" % pub_time)
             timeArray = time.strptime(pub_time, "%Y-%m-%d %H:%M")
             pubTimestamp = int(time.mktime(timeArray))
         except:
             pubTimestamp = int(time.time())
 
         if datacontent != None:
+            datacontent = datacontent.replace("'", "\'")
             res_data['title'] = title
             res_data['pubtime'] = pubTimestamp
             res_data['content'] = datacontent

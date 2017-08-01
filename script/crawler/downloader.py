@@ -13,7 +13,7 @@ class Downloader:
     def download(self, url):
         res = urllib.request.urlopen(url, None, timeout=10 * 1000);
         charset = self.parseCharset(res);
-        logger.debug("charset : %s" % charset)
+        #logger.debug("charset : %s" % charset)
         resbytes = res.read()
         content = resbytes.decode(charset);
         res.close();

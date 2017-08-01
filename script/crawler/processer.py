@@ -27,14 +27,12 @@ class Processer:
         pass
 class JokeProcesser(Processer):
     def process(self, data):
-        logger.debug("start process...")
         threadLock.acquire()
         values = ""
         if data != None and 'title' in data and 'content' in data and 'pageurl' in data and 'pubtime' in data:
             values = " ('%s', '%s', '%s', FROM_UNIXTIME(%d))" % (data['title'], data['content'], data['pageurl'], data['pubtime'])
         else:
             threadLock.release()
-            logger.debug("end process null data...")
             return
         sql = "insert into joke_xiao688(category, content, pageurl, pubtime) values"
         sql = sql + values;
@@ -45,7 +43,6 @@ class JokeProcesser(Processer):
         except Exception as e:
             self.db.rollback()
             logger.debug("rollback e : %s" % e)
-            with open("tmp.file", "a") as f:
+            with open("rollback.txt", "a") as f:
                 f.write("rollback e : %s\n" % e)
         threadLock.release()
-        logger.debug("end process...")

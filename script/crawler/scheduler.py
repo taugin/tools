@@ -44,8 +44,7 @@ def fetchWebContent(url):
 def parseContent(url, content):
     '''解析抓取的内容'''
     newurl, newdata = htmlParser.parse(url, content)
-    logger.debug("newurl : %s" % newurl)
-    logger.debug("newdata : %s" % newdata)
+    logger.debug("url_size : %d, data_size : %d" % (len(newurl), len(newdata)))
     return newurl, newdata
 
 def processContent(data):
@@ -57,6 +56,7 @@ def writeToFile(name, content):
     f.close()
 
 def grabbing(url):
+    logger.debug("Grabbing : %s" % url)
     '''实际抓取函数'''
     content = None
     try:
@@ -131,7 +131,7 @@ def grabWithThreadPool():
         hasGrabUrl = hasForGrabbingUrl()
         if hasGrabUrl:
             grabUrl = fetchForGrabbingUrl()
-            logger.debug("开启抓取任务 leftsize : %d , grabsize : %d , url :%s" % (urlManager.size(), len(urlManager.grabbedList()), grabUrl))
+            #logger.debug("开启抓取任务 leftsize : %d , grabsize : %d , url :%s" % (urlManager.size(), len(urlManager.grabbedList()), grabUrl))
             pool.addJob(grabWorker, grabUrl)
         else:
             size= pool.workSize()
@@ -152,7 +152,7 @@ def cleanup():
 
 if __name__ == "__main__":
     registerSignal()
-    grabWithThreadPool()
-    #grabbing("http://www.xiao688.com/cms/article/id-115731.html")
+    #grabWithThreadPool()
+    grabbing("http://www.xiao688.com/cms/article/id-94652.html")
     cleanup()
     logger.debug("Crawler over, grabbedSize : %s" % len(urlManager.grabbedList()));
