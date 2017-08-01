@@ -17,7 +17,7 @@ def createProcesser():
 
 class Processer:
     def __init__(self):
-        self.db = pymysql.connect("106.14.185.49","root","taugin0426","taugin", charset="utf8")
+        self.db = pymysql.connect("localhost","root","taugin0426","taugin", charset="utf8")
         self.cursor = self.db.cursor()
 
     def __del__(self):
@@ -28,16 +28,16 @@ class Processer:
 class JokeProcesser(Processer):
     def process(self, data):
         logger.debug("start process...")
-        #threadLock.acquire()
+        threadLock.acquire()
         values = ""
         if data != None and "content" in data and len(data['content']) > 0:
             for d in data['content']:
                 values += " ('%s', '%s', '%s', FROM_UNIXTIME(%d))," % (data['title'], d, data['pageurl'], data['pubtime'])
         else:
-            #threadLock.release()
+            threadLock.release()
             logger.debug("end process null data...")
             return
-        sql = "insert into joke(category, content, pageurl, pubtime) values"
+        sql = "insert into joke_ji(category, content, pageurl, pubtime) values"
         values = values[0:-1]
         sql = sql + values;
         print(sql)
@@ -47,5 +47,5 @@ class JokeProcesser(Processer):
         except Exception as e:
             self.db.rollback()
             logger.debug("rollback e : %s" % e)
-        #threadLock.release()
+        threadLock.release()
         logger.debug("end process...")

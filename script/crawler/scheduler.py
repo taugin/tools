@@ -14,7 +14,7 @@ import processer
 from distutils.command.config import config
 
 RUNNING = True
-threadNum = 1
+threadNum = 10
 condition = threading.Condition()
 urlManager = urlmanager.UrlManager()
 downLoader = downloader.Downloader()
@@ -22,7 +22,7 @@ htmlParser = htmlparser.createParser()
 htmlProcesser = processer.createProcesser()
 #configWriter = open("config.json", "")
 
-urlManager.pushOne("http://www.jokeji.cn/jokehtml/dn/20121018000607.htm");
+urlManager.pushOne("http://www.jokeji.cn");
 
 def hasForGrabbingUrl():
     '''查看是否有可抓取的URL'''

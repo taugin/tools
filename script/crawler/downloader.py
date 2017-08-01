@@ -22,7 +22,6 @@ class Downloader:
         pass
     def parseCharset(self, res):
         contentType = res.getheader("Content-Type")
-        logger.debug("contentType : %s" % contentType)
         charset = None
         if contentType != None:
             tmp = contentType.split(";")
