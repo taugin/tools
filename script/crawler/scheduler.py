@@ -44,7 +44,8 @@ def fetchWebContent(url):
 def parseContent(url, content):
     '''解析抓取的内容'''
     newurl, newdata = htmlParser.parse(url, content)
-    logger.debug("url_size : %d, data_size : %d" % (len(newurl), len(newdata)))
+    if newurl == None:newurl = set()
+    logger.debug("url_size : %d" % len(newurl))
     return newurl, newdata
 
 def processContent(data):
@@ -65,8 +66,9 @@ def grabbing(url):
         logger.debug("e : %s" % e)
     #writeToFile(time.strftime("yyyyMMdd") + ".html", content)
     newurl, newdata = parseContent(url, content)
-    newList = list(newurl)
-    urlManager.pushList(newList)
+    if (newurl != None):
+        newList = list(newurl)
+        urlManager.pushList(newList)
     processContent(newdata)
     time.sleep(1)
 
@@ -152,7 +154,8 @@ def cleanup():
 
 if __name__ == "__main__":
     registerSignal()
-    #grabWithThreadPool()
-    grabbing("http://www.xiao688.com/cms/article/id-94652.html")
+    grabWithThreadPool()
+    #grabbing("http://www.xiao688.com/cms/article/id-94652.html")
+    #grabbing("http://www.xiao688.com/")
     cleanup()
     logger.debug("Crawler over, grabbedSize : %s" % len(urlManager.grabbedList()));

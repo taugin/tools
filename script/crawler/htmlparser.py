@@ -28,10 +28,6 @@ class HtmlParse(object):
         soup = BeautifulSoup(html_content, "html.parser", from_encoding="utf-8")
         new_urls = self._get_new_urls(page_url, soup)
         new_data = self._get_new_data(page_url, soup)
-        if new_urls == None:
-            new_urls = set()
-        if new_data == None:
-            new_data = {}
         return new_urls, new_data
 
     # 从网页解析中获得url
@@ -148,7 +144,10 @@ class Xiao688HtmlParser(HtmlParse):
         #获取内容
         try:
             allJokeNode = soup.find("div", class_="content")
-            datacontent = str(allJokeNode)
+            if allJokeNode != None:
+                datacontent = str(allJokeNode)
+            else:
+                datacontent = None
         except Exception as e:
             logger.debug("error : %s" % e)
 
