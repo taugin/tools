@@ -156,6 +156,6 @@ if __name__ == "__main__":
     registerSignal()
     grabWithThreadPool()
     #grabbing("http://www.xiao688.com/cms/article/id-94652.html")
-    #grabbing("http://www.xiao688.com/")
+    #grabbing("http://www.xiao688.com/cms/article/id-138100.html")
     cleanup()
     logger.debug("Crawler over, grabbedSize : %s" % len(urlManager.grabbedList()));

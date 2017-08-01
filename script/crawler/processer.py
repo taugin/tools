@@ -42,7 +42,6 @@ class JokeProcesser(Processer):
             self.db.commit()
         except Exception as e:
             self.db.rollback()
-            logger.debug("rollback e : %s" % e)
-            with open("rollback.txt", "a") as f:
+            with open("rollback.txt", "a", encoding="utf-8") as f:
                 f.write("rollback e : %s\n" % e)
         threadLock.release()
