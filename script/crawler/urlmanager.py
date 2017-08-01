@@ -36,16 +36,16 @@ class UrlManager:
         UrlManager._threadLock.acquire()
         if urllist != None and len(urllist) > 0:
             for url in urllist:
-                self._pushUrlInternal(self._urlWithGrab, url)
-        UrlManager._threadLock.release()
-
-    def setGrabbedUrl(self, grabbedUrl):
-        UrlManager._threadLock.acquire()
-        self._pushUrlInternal(self._urlGrabbed, grabbedUrl)
+                if self._exist(self._urlGrabbed, url) == False:
+                    self._pushUrlInternal(self._urlWithGrab, url)
         UrlManager._threadLock.release()
 
     def pop(self):
-        return self._popFirst()
+        UrlManager._threadLock.acquire()
+        item = self._popFirst()
+        self._pushUrlInternal(self._urlGrabbed, item)
+        UrlManager._threadLock.release()
+        return item
 
     def size(self):
         return len(self._urlWithGrab)

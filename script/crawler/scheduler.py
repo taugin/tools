@@ -22,7 +22,7 @@ htmlParser = htmlparser.createParser()
 htmlProcesser = processer.createProcesser()
 #configWriter = open("config.json", "")
 
-urlManager.pushOne("http://www.jokeji.cn");
+urlManager.pushOne("http://www.xiao688.com/");
 
 def hasForGrabbingUrl():
     '''查看是否有可抓取的URL'''
@@ -35,9 +35,6 @@ def fetchForGrabbingUrl():
 def pushNewGrabUrl(urllist):
     '''防止新的待抓取的URL'''
     urlManager.pushList(urllist)
-
-def setGrabbedUrl(url):
-    urlManager.setGrabbedUrl(url)
 
 def fetchWebContent(url):
     '''抓取内容'''
@@ -68,11 +65,16 @@ def grabbing(url):
         logger.debug("e : %s" % e)
     #writeToFile(time.strftime("yyyyMMdd") + ".html", content)
     newurl, newdata = parseContent(url, content)
-    setGrabbedUrl(url)
     newList = list(newurl)
     urlManager.pushList(newList)
     processContent(newdata)
     time.sleep(1)
+
+def grabWorker(url):
+    grabbing(url)
+    if condition.acquire():
+        condition.notify()
+        condition.release()
 
 class GrabThread(threading.Thread):
     def __init__(self, url):
@@ -130,15 +132,14 @@ def grabWithThreadPool():
         if hasGrabUrl:
             grabUrl = fetchForGrabbingUrl()
             logger.debug("开启抓取任务 leftsize : %d , grabsize : %d , url :%s" % (urlManager.size(), len(urlManager.grabbedList()), grabUrl))
-            pool.addJob(grabbing, grabUrl)
+            pool.addJob(grabWorker, grabUrl)
         else:
             size= pool.workSize()
             logger.debug("size : %d" % size)
             if (size > 0):
-                try:
-                    time.sleep(5);
-                except:
-                    pass
+                if condition.acquire():
+                    condition.wait()
+                    condition.release()
             else:
                 logger.debug("抓取完毕，退出循环")
                 break;
@@ -152,6 +153,6 @@ def cleanup():
 if __name__ == "__main__":
     registerSignal()
     grabWithThreadPool()
-    #grabbing("http://www.jokeji.cn/jokehtml/bxnn/2017072923230416.htm")
+    #grabbing("http://www.xiao688.com/cms/article/id-115731.html")
     cleanup()
     logger.debug("Crawler over, grabbedSize : %s" % len(urlManager.grabbedList()));

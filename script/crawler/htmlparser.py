@@ -16,7 +16,7 @@ from urllib.parse import urljoin
 
 
 def createParser():
-    return JokejiHtmlParser()
+    return Xiao688HtmlParser()
 
 # 实现解析器的类
 class HtmlParse(object):
@@ -124,5 +124,47 @@ class JokejiHtmlParser(HtmlParse):
             res_data['pubtime'] = pub_timestamp
             res_data['content'] = data_list
             res_data['pageurl'] = page_url
+            return res_data
+        return None
+class Xiao688HtmlParser(HtmlParse):
+    def __init__(self):
+        pass
+
+    def _get_new_data(self, page_url, soup):
+        import time
+        res_data = {}
+
+        datacontent = None
+        pubTimestamp = None
+        title = None
+        pageurl = page_url
+
+        #获取标题
+        try:
+            titleNode = soup.find("div", class_="title").find("h1")
+            title = titleNode.get_text().strip()
+        except:
+            pass
+        #获取内容
+        try:
+            allJokeNode = soup.find("div", class_="content")
+            datacontent = allJokeNode
+        except:
+            pass
+
+        try:
+            pubTimeNode = soup.find("span", id="d_udate")
+            pub_time = pubTimeNode.get_text().strip()[1:-1]
+            logger.debug("pub_time : %s" % pub_time)
+            timeArray = time.strptime(pub_time, "%Y-%m-%d %H:%M")
+            pubTimestamp = int(time.mktime(timeArray))
+        except:
+            pubTimestamp = int(time.time())
+
+        if datacontent != None:
+            res_data['title'] = title
+            res_data['pubtime'] = pubTimestamp
+            res_data['content'] = datacontent
+            res_data['pageurl'] = pageurl
             return res_data
         return None
