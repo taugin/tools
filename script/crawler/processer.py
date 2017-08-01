@@ -17,7 +17,7 @@ def createProcesser():
 
 class Processer:
     def __init__(self):
-        self.db = pymysql.connect("localhost","root","taugin0426","taugin", charset="utf8")
+        self.db = pymysql.connect("106.14.185.49","root","taugin0426","taugin", charset="utf8")
         self.cursor = self.db.cursor()
 
     def __del__(self):

@@ -17,7 +17,7 @@ initUrl = "http://www.xiao688.com/"
 initUrl = "http://www.jokeji.cn/"
 
 RUNNING = True
-threadNum = 10
+threadNum = 1
 condition = threading.Condition()
 urlManager = urlmanager.UrlManager()
 downLoader = downloader.Downloader()
