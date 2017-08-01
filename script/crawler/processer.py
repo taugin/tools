@@ -34,7 +34,7 @@ class JokeProcesser(Processer):
         else:
             threadLock.release()
             return
-        sql = "insert into joke_xiao688(category, content, pageurl, pubtime) values"
+        sql = "insert into joke_ji(category, content, pageurl, pubtime) values"
         sql = sql + values;
         print(sql)
         try:

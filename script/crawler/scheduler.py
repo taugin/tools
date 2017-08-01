@@ -13,6 +13,9 @@ import threadpool
 import processer
 from distutils.command.config import config
 
+initUrl = "http://www.xiao688.com/"
+initUrl = "http://www.jokeji.cn/"
+
 RUNNING = True
 threadNum = 10
 condition = threading.Condition()
@@ -20,9 +23,9 @@ urlManager = urlmanager.UrlManager()
 downLoader = downloader.Downloader()
 htmlParser = htmlparser.createParser()
 htmlProcesser = processer.createProcesser()
-#configWriter = open("config.json", "")
 
-urlManager.pushOne("http://www.xiao688.com/");
+htmlParser.setBaseUrl(initUrl)
+urlManager.pushOne(initUrl);
 
 def hasForGrabbingUrl():
     '''查看是否有可抓取的URL'''
@@ -156,6 +159,6 @@ if __name__ == "__main__":
     registerSignal()
     grabWithThreadPool()
     #grabbing("http://www.xiao688.com/cms/article/id-94652.html")
-    #grabbing("http://www.xiao688.com/cms/article/id-138100.html")
+    #grabbing("http://www.jokeji.cn/jokehtml/bxnn/2017073116212095.htm")
     cleanup()
     logger.debug("Crawler over, grabbedSize : %s" % len(urlManager.grabbedList()));

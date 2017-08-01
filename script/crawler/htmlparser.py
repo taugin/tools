@@ -8,18 +8,39 @@ https://pypi.python.org/packages/30/bd/5405ba01391d06646de9ec90cadeb3893fa355a06
 from commoncfg import logger
 import re
 
-import re
-
 from bs4 import BeautifulSoup
 
 from urllib.parse import urljoin
+from urllib.parse import urlparse
 
+topHostPostfix = (
+    '.com','.la','.io','.co','.info','.net','.org','.me','.mobi',
+    '.us','.biz','.xxx','.ca','.co.jp','.com.cn','.net.cn',
+    '.org.cn','.mx','.tv','.ws','.ag','.com.ag','.net.ag',
+    '.org.ag','.am','.asia','.at','.be','.com.br','.net.br',
+    '.bz','.com.bz','.net.bz','.cc','.com.co','.net.co',
+    '.nom.co','.de','.es','.com.es','.nom.es','.org.es',
+    '.eu','.fm','.fr','.gs','.in','.co.in','.firm.in','.gen.in',
+    '.ind.in','.net.in','.org.in','.it','.jobs','.jp','.ms',
+    '.com.mx','.nl','.nu','.co.nz','.net.nz','.org.nz',
+    '.se','.tc','.tk','.tw','.com.tw','.idv.tw','.org.tw',
+    '.hk','.co.uk','.me.uk','.org.uk','.vg', ".com.hk", ".cn")
+
+regx = r'[^\.]+('+'|'.join([h.replace('.',r'\.') for h in topHostPostfix])+')$'
+pattern = re.compile(regx,re.IGNORECASE)
 
 def createParser():
-    return Xiao688HtmlParser()
+    return JokejiHtmlParser()
 
 # 实现解析器的类
 class HtmlParse(object):
+    def setBaseUrl(self, url):
+        parts = urlparse(url)
+        host = parts.netloc
+        m = pattern.search(host)
+        self.domain =  m.group() if m else None
+        logger.debug("domain : %s" % self.domain)
+
     # 解析网页
     def parse(self, page_url, html_content):
         if page_url == None or html_content == None:
@@ -43,45 +64,20 @@ class HtmlParse(object):
             for link in links:
                 new_url = link['href']
                 new_full_url = urljoin(page_url, new_url)
-                new_urls.add(new_full_url)
+                if new_full_url.find(self.domain):
+                    new_urls.add(new_full_url)
         return new_urls
 
     # 从网页解析中获得数据
     def _get_new_data(self, page_url, soup):
-        # 存储数据的字典
-        res_data = {}
-
-        # 根据页面的特征，获取标题内容
-        title_node = soup.find("span", id="text110").find("p")
-        title = title_node.get_text()
-
-        # 根据页面的特征，获取摘要内容
-        summary_node = soup.find('div', class_="lemma-summary")
-        if summary_node is None:
-            summary = "None summary"
-        else:
-            summary = summary_node.get_text()
-
-        # 保存网页的内容
-        res_data['url'] = page_url
-        res_data['title'] = title
-        res_data['summary'] = summary
+        return None
 
 class JDHtmlParser(HtmlParse):
     def __init__(self):
         pass
 
     def _get_new_data(self, page_url, soup):
-        res_data = {}
-        title_node = soup.find("h3", class_="tb-main-title")
-        title = title_node.get_text().strip()
-        print(title)
-        price_node = soup.find("em", class_="tb-rmb-num")
-        price = price_node.get_text().strip()
-        print(price)
-        desc_node = soup.find("p", class_="tb-subtitle")
-        desc = desc_node.get_text().strip()
-        print(desc)
+        return None
 
 class JokejiHtmlParser(HtmlParse):
     def __init__(self):
@@ -90,38 +86,45 @@ class JokejiHtmlParser(HtmlParse):
     def _get_new_data(self, page_url, soup):
         import time
         res_data = {}
-        data_list = []
-        pub_time = None
-        allJokeNode = None
-        pub_timestamp = None
+
+        datacontent = None
+        pubTimestamp = None
+        title = None
+        pageurl = page_url
+
+        #获取标题
         try:
-            allJokeNode = soup.find("span", id="text110").find_all("p")
+            title = soup.title.get_text().strip()
         except:
             pass
 
-        if allJokeNode != None:
-            for node in allJokeNode:
-                data_list.append(node.get_text().strip())
+        #获取内容
+        try:
+            allJokeNode = soup.find("span", id="text110")
+            if allJokeNode != None:
+                datacontent = str(allJokeNode)
+            else:
+                datacontent = None
+        except Exception as e:
+            logger.debug("error : %s" % e)
 
         try:
             allLiNode = soup.find("div", class_="pl_ad").find("ul").find_all("li")
             pub_time = allLiNode[2].find("i").get_text().strip()[5:]
-        except:
-            pub_time = 0
-
-        try:
             timeArray = time.strptime(pub_time, "%Y/%m/%d %H:%M:%S")
-            pub_timestamp = int(time.mktime(timeArray))
+            pubTimestamp = int(time.mktime(timeArray))
         except:
-            pub_timestamp = int(time.time())
+            pubTimestamp = int(time.time())
 
-        if data_list != None and len(data_list) > 0:
-            res_data['title'] = soup.title.get_text().strip()
-            res_data['pubtime'] = pub_timestamp
-            res_data['content'] = data_list
-            res_data['pageurl'] = page_url
+        if datacontent != None:
+            datacontent = datacontent.replace("'", "\'")
+            res_data['title'] = title
+            res_data['pubtime'] = pubTimestamp
+            res_data['content'] = datacontent
+            res_data['pageurl'] = pageurl
             return res_data
         return None
+
 class Xiao688HtmlParser(HtmlParse):
     def __init__(self):
         pass
