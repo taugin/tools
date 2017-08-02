@@ -2,7 +2,9 @@
 # 引入别的文件夹的模块
 
 from commoncfg import logger
-import urllib.request;
+import urllib.request
+from urllib.parse import quote
+import  string
 
 '''
 PyQt4 Download地址
@@ -11,11 +13,9 @@ https://riverbankcomputing.com/software/pyqt/download
 '''
 class Downloader:
     def download(self, url):
-        res = urllib.request.urlopen(url, None, timeout=10 * 1000);
-        charset = self.parseCharset(res);
-        #logger.debug("charset : %s" % charset)
-        resbytes = res.read()
-        content = resbytes.decode(charset);
+        quotedurl = quote(url, safe = string.printable)
+        res = urllib.request.urlopen(quotedurl, None, timeout=10 * 1000);
+        content = self.decodeContent(res)
         res.close();
         return content;
     def downloadHttps(self):
@@ -31,3 +31,11 @@ class Downloader:
         if charset == None or charset.strip() == "":
             charset = "GB18030";
         return charset
+    def decodeContent(self, res):
+        charset = self.parseCharset(res);
+        resbytes = res.read()
+        try:
+            content = resbytes.decode(charset);
+        except:
+            content = resbytes.decode("GBK");
+        return content

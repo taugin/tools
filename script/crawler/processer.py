@@ -10,8 +10,6 @@ https://github.com/PyMySQL/PyMySQL
 '''
 from commoncfg import logger
 import threading
-import tempfile
-import os
 import dbaccess
 import hashlib
 
@@ -53,7 +51,7 @@ class JokeProcesser(Processer):
         sql = sql + values
         try:
             result = dbaccess.execSql(sql)
-            logger.debug("=========>> current insert id : %s" % result)
+            logger.info("=========>> current insert id : %s" % result)
         except Exception as e:
             dbaccess.rollback()
             logger.debug("error : %s" % str(e))

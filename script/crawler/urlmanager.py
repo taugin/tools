@@ -2,8 +2,6 @@
 # 引入别的文件夹的模块
 
 from commoncfg import logger
-import Common
-import Utils
 import threading
 '''
 下载器

@@ -7,12 +7,10 @@ created on 2016-04-14
 """
 
 import queue
-import sys
 import threading
 import time
 import io
 import traceback
-import os
 
 class MyThread(threading.Thread):
     """Background thread connected to the requests/results queues."""

@@ -11,9 +11,6 @@ https://github.com/PyMySQL/PyMySQL
 from commoncfg import logger
 import pymysql
 import threading
-import tempfile
-import os
-import hashlib
 
 dbinfo = {
           "host" : "106.14.185.49",

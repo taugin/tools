@@ -46,7 +46,7 @@ class HtmlParse(object):
     # 解析网页
     def parse(self, page_url, html_content):
         if page_url == None or html_content == None:
-            return set(), {}
+            return set(), None
         # 使用beautifulsoup进行解析
         soup = BeautifulSoup(html_content, "html.parser", from_encoding="utf-8")
         new_urls = self._get_new_urls(page_url, soup)
@@ -151,7 +151,6 @@ class Xiao688HtmlParser(HtmlParse):
         pass
 
     def _get_new_data(self, page_url, soup):
-        import time
         res_data = {}
 
         datacontent = None

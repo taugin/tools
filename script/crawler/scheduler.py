@@ -2,8 +2,6 @@
 # 引入别的文件夹的模块
 
 from commoncfg import logger
-import Common
-import Utils
 import urlmanager
 import threading
 import downloader
@@ -14,6 +12,7 @@ import processer
 import tempfile
 import os
 import dbaccess
+import traceback
 
 initUrl = "http://www.xiao688.com/"
 initUrl = "http://www.jokeji.cn/"
@@ -72,7 +71,9 @@ def parseContent(url, content):
     '''解析抓取的内容'''
     newurl, newdata = htmlParser.parse(url, content)
     if newurl == None:newurl = set()
-    logger.debug("url_size : %d" % len(newurl))
+    datalen = 0
+    if newdata != None: datalen = len(newdata)
+    logger.debug("url_size : %d, data_size : %d" % (len(newurl), datalen))
     return newurl, newdata
 
 def processContent(data):
@@ -90,6 +91,7 @@ def grabbing(url):
     try:
         content = fetchWebContent(url)
     except Exception as e:
+        #traceback.print_exc()
         logger.debug("e : %s" % e)
     #writeToFile(time.strftime("yyyyMMdd") + ".html", content)
     newurl, newdata = parseContent(url, content)
