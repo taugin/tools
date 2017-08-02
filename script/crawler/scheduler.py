@@ -183,7 +183,7 @@ if __name__ == "__main__":
     registerSignal()
     setLastGrabUrl()
     grabWithThreadPool()
-    #grabbing("http://www.xiao688.com/cms/article/id-94652.html")
+    #grabbing("http://www.jokeji.cn/yuanchuangxiaohua/jokehtml/xiaohuayoumo/2017080123561749.htm")
     #grabbing("http://www.jokeji.cn/jokehtml/bxnn/2017073116212095.htm")
     cleanup()
     logger.debug("Crawler over, grabbedSize : %s" % len(urlManager.grabbedList()));

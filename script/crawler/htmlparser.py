@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 
 from urllib.parse import urljoin
 from urllib.parse import urlparse
+import time
 
 topHostPostfix = (
     '.com','.la','.io','.co','.info','.net','.org','.me','.mobi',
@@ -83,38 +84,56 @@ class JokejiHtmlParser(HtmlParse):
     def __init__(self):
         pass
 
+    def _formatTime(self, pub_time):
+        try:
+            timeArray = time.strptime(pub_time, "%Y/%m/%d %H:%M:%S")
+            return int(time.mktime(timeArray))
+        except:
+            return int(time.time())
+
     def _get_new_data(self, page_url, soup):
-        import time
         res_data = {}
 
         datacontent = None
-        pubTimestamp = None
+        pubTimestamp = int(time.time())
         title = None
         pageurl = page_url
 
-        #获取标题
-        try:
-            title = soup.title.get_text().strip()
-        except:
-            pass
-
-        #获取内容
         try:
             allJokeNode = soup.find("span", id="text110")
             if allJokeNode != None:
                 datacontent = str(allJokeNode)
             else:
                 datacontent = None
+            if datacontent != None:
+                title = soup.title.get_text().strip()
+                allLiNode = soup.find("div", class_="pl_ad").find("ul").find_all("li")
+                pub_time = allLiNode[2].find("i").get_text().strip()[5:]
+                pubTimestamp = self._formatTime(pub_time)
         except Exception as e:
             logger.debug("error : %s" % e)
 
-        try:
-            allLiNode = soup.find("div", class_="pl_ad").find("ul").find_all("li")
-            pub_time = allLiNode[2].find("i").get_text().strip()[5:]
-            timeArray = time.strptime(pub_time, "%Y/%m/%d %H:%M:%S")
-            pubTimestamp = int(time.mktime(timeArray))
-        except:
-            pubTimestamp = int(time.time())
+        if datacontent == None:
+            try:
+                allJokeNode = soup.find("div", class_="txt")
+                if allJokeNode != None:
+                    cNode = allJokeNode.find("ul")
+                    if cNode !=None:
+                        datacontent = str(cNode)
+                    else:
+                        datacontent = None
+                    if datacontent != None:
+                        title = allJokeNode.find("h1").get_text()
+                        timeStr = allJokeNode.find("b").get_text()
+                        reg = r"([1-9]\d{3}/([1-9]|1[0-2])/([1-9]|[1-2][0-9]|3[0-1])\s+(20|21|22|23|[0-1]\d):[0-5]\d:[0-5]\d)";
+                        pattern = re.compile(reg,re.IGNORECASE)
+                        m = pattern.search(timeStr)
+                        pub_time =  m.group() if m else None
+                        pubTimestamp = self._formatTime(pub_time)
+                else:
+                    datacontent = None
+            except Exception as e:
+                logger.debug("error : %s" % e)
 
         if datacontent != None:
             datacontent = datacontent.replace("'", "\'")
