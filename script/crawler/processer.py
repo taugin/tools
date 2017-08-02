@@ -13,7 +13,9 @@ import threading
 import tempfile
 import os
 import dbaccess
+import hashlib
 
+md5 = hashlib.md5()
 threadLock = threading.Lock()
 
 def createProcesser():
@@ -31,11 +33,13 @@ class JokeProcesser(Processer):
         threadLock.acquire()
         values = ""
         if data != None and 'title' in data and 'content' in data and 'pageurl' in data and 'pubtime' in data:
-            values = " ('%s', '%s', '%s', FROM_UNIXTIME(%d))" % (data['title'], data['content'], data['pageurl'], data['pubtime'])
+            md5.update(data['pageurl'].encode('utf-8'))
+            urlmd5 = md5.hexdigest()
+            values = " ('%s', '%s', '%s', '%s', FROM_UNIXTIME(%d))" % (data['title'], data['content'], data['pageurl'], urlmd5, data['pubtime'])
         else:
             threadLock.release()
             return
-        sql = "insert into joke_ji(category, content, pageurl, pubtime) values"
+        sql = "insert into joke_ji(category, content, pageurl, urlmd5, pubtime) values"
         sql = sql + values;
         print(sql)
         try:

@@ -13,13 +13,21 @@ import pymysql
 import threading
 import tempfile
 import os
+import hashlib
 
+dbinfo = {
+          "host" : "106.14.185.49",
+          "username" : "root",
+          "password" : "taugin0426",
+          "dbname" : "taugin",
+          "tname" : "joke_ji"
+          }
 dbCursor = None
 dbConnection = None
 def getConnection():
     global dbConnection
     if dbConnection == None:
-        dbConnection = pymysql.connect("106.14.185.49","root","taugin0426","taugin", charset="utf8")
+        dbConnection = pymysql.connect(dbinfo["host"], dbinfo["username"], dbinfo["password"], dbinfo["dbname"], charset="utf8")
     return dbConnection
 
 def getCursor():
@@ -43,11 +51,6 @@ def fetchAll(sql):
     getCursor().execute(sql)
     rows = getCursor().fetchall()
     return rows
-
-def isGrabbed(url):
-    sql = "select id from joke_ji where pageurl='%s'" % url
-    row = fetchOne(sql)
-    return row != None
 
 def rollback():
     getConnection().rollback()
