@@ -9,10 +9,10 @@ https://github.com/PyMySQL/PyMySQL
 执行  python setup.py install 安装
 '''
 from commoncfg import logger
-import pymysql
 import threading
 import tempfile
 import os
+import dbaccess
 
 threadLock = threading.Lock()
 
@@ -21,12 +21,9 @@ def createProcesser():
 
 class Processer:
     def __init__(self):
-        self.db = pymysql.connect("106.14.185.49","root","taugin0426","taugin", charset="utf8")
-        self.cursor = self.db.cursor()
-
+        pass
     def __del__(self):
-        self.db.close()
-
+        pass
     def process(self, data):
         pass
 class JokeProcesser(Processer):
@@ -42,11 +39,13 @@ class JokeProcesser(Processer):
         sql = sql + values;
         print(sql)
         try:
-            self.cursor.execute(sql)
-            self.db.commit()
+            dbaccess.execSql(sql)
         except Exception as e:
-            self.db.rollback()
+            dbaccess.rollback()
+            logger.debug("error : %s" % str(e))
+            '''
             rollback = os.path.join(tempfile.gettempdir(), 'rollback.txt')
             with open(rollback, "a", encoding="utf-8") as f:
                 f.write("%s\n" % e)
+            '''
         threadLock.release()

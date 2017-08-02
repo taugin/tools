@@ -13,6 +13,7 @@ import threadpool
 import processer
 import tempfile
 import os
+import dbaccess
 
 initUrl = "http://www.xiao688.com/"
 initUrl = "http://www.jokeji.cn/"
@@ -160,7 +161,6 @@ def grabWithThreadPool():
         hasGrabUrl = hasForGrabbingUrl()
         if hasGrabUrl:
             grabUrl = fetchForGrabbingUrl()
-            #logger.debug("开启抓取任务 leftsize : %d , grabsize : %d , url :%s" % (urlManager.size(), len(urlManager.grabbedList()), grabUrl))
             pool.addJob(grabWorker, grabUrl)
         else:
             size= pool.workSize()
@@ -178,6 +178,7 @@ def grabWithThreadPool():
 def cleanup():
     global htmlProcesser
     del htmlProcesser
+    dbaccess.closeConnection()
 
 if __name__ == "__main__":
     registerSignal()
