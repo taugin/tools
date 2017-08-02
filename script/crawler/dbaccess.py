@@ -20,41 +20,57 @@ dbinfo = {
           "username" : "root",
           "password" : "taugin0426",
           "dbname" : "taugin",
-          "tname" : "joke_ji"
           }
 dbCursor = None
 dbConnection = None
-def getConnection():
+_threadLock = threading.Lock()
+
+def _getConnection():
     global dbConnection
     if dbConnection == None:
         dbConnection = pymysql.connect(dbinfo["host"], dbinfo["username"], dbinfo["password"], dbinfo["dbname"], charset="utf8")
     return dbConnection
 
-def getCursor():
+def _getCursor():
     global dbCursor
     if dbCursor == None:
-        connection = getConnection()
+        connection = _getConnection()
         if connection != None:
             dbCursor = connection.cursor(pymysql.cursors.DictCursor)
     return dbCursor
 
 def execSql(sql):
-    getCursor().execute(sql)
-    getConnection().commit()
+    '''执行数据库语句'''
+    _threadLock.acquire()
+    _getCursor().execute(sql)
+    result = _getCursor().lastrowid
+    _getConnection().commit()
+    _threadLock.release()
+    return result
 
 def fetchOne(sql):
-    getCursor().execute(sql)
-    row = getCursor().fetchone()
+    '''获取一条记录'''
+    _threadLock.acquire()
+    _getCursor().execute(sql)
+    row = _getCursor().fetchone()
+    _threadLock.release()
     return row
 
 def fetchAll(sql):
-    getCursor().execute(sql)
-    rows = getCursor().fetchall()
+    '''获取多条记录'''
+    _threadLock.acquire()
+    _getCursor().execute(sql)
+    rows = _getCursor().fetchall()
+    _threadLock.release()
     return rows
 
 def rollback():
-    getConnection().rollback()
+    _threadLock.acquire()
+    _getConnection().rollback()
+    _threadLock.release()
 
 def closeConnection():
+    _threadLock.acquire()
     if dbConnection != None:
         dbConnection.close()
+    _threadLock.release()

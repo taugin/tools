@@ -16,7 +16,7 @@ import dbaccess
 import hashlib
 
 md5 = hashlib.md5()
-threadLock = threading.Lock()
+_threadLock = threading.Lock()
 
 def createProcesser():
     return JokeProcesser()
@@ -24,32 +24,36 @@ def createProcesser():
 class Processer:
     def __init__(self):
         pass
+
     def __del__(self):
-        pass
+        dbaccess.closeConnection()
+
     def process(self, data):
         pass
+
 class JokeProcesser(Processer):
+    def __init__(self):
+        self.table = {}
+        self.table['grab'] = "joke_ji"
+
     def process(self, data):
-        threadLock.acquire()
-        values = ""
-        if data != None and 'title' in data and 'content' in data and 'pageurl' in data and 'pubtime' in data:
-            md5.update(data['pageurl'].encode('utf-8'))
-            urlmd5 = md5.hexdigest()
-            values = " ('%s', '%s', '%s', '%s', FROM_UNIXTIME(%d))" % (data['title'], data['content'], data['pageurl'], urlmd5, data['pubtime'])
-        else:
-            threadLock.release()
+        self.addGrabContent(data)
+
+    def isGrabUrl(self, url):
+        '''判断当前url是否被抓取过'''
+        md5=hashlib.md5(url.encode('utf-8')).hexdigest()
+        sql = "select id from %s where urlmd5='%s'" % (self.table['grab'], md5)
+        return dbaccess.fetchOne(sql) != None
+
+    def addGrabContent(self, data):
+        if data == None:
             return
-        sql = "insert into joke_ji(category, content, pageurl, urlmd5, pubtime) values"
-        sql = sql + values;
-        print(sql)
+        values = " ('%s', '%s', '%s', '%s', FROM_UNIXTIME(%d))" % (data['title'], data['content'], data['pageurl'], data['urlmd5'], data['pubtime'])
+        sql = "insert into %s(title, content, pageurl, urlmd5, pubtime) values" % self.table['grab']
+        sql = sql + values
         try:
-            dbaccess.execSql(sql)
+            result = dbaccess.execSql(sql)
+            logger.debug("=========>> current insert id : %s" % result)
         except Exception as e:
             dbaccess.rollback()
             logger.debug("error : %s" % str(e))
-            '''
-            rollback = os.path.join(tempfile.gettempdir(), 'rollback.txt')
-            with open(rollback, "a", encoding="utf-8") as f:
-                f.write("%s\n" % e)
-            '''
-        threadLock.release()

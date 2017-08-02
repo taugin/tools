@@ -13,7 +13,6 @@ import Log
 
 import io
 import re
-import hashlib
 import getopt
 import zipfile
 import hashlib

@@ -161,6 +161,8 @@ def grabWithThreadPool():
         hasGrabUrl = hasForGrabbingUrl()
         if hasGrabUrl:
             grabUrl = fetchForGrabbingUrl()
+            if htmlProcesser.isGrabUrl(grabUrl):
+                continue
             pool.addJob(grabWorker, grabUrl)
         else:
             size= pool.workSize()
@@ -178,7 +180,6 @@ def grabWithThreadPool():
 def cleanup():
     global htmlProcesser
     del htmlProcesser
-    dbaccess.closeConnection()
 
 if __name__ == "__main__":
     registerSignal()

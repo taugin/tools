@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from urllib.parse import urlparse
 import time
+import hashlib
 
 topHostPostfix = (
     '.com','.la','.io','.co','.info','.net','.org','.me','.mobi',
@@ -141,6 +142,7 @@ class JokejiHtmlParser(HtmlParse):
             res_data['pubtime'] = pubTimestamp
             res_data['content'] = datacontent
             res_data['pageurl'] = pageurl
+            res_data['urlmd5'] = hashlib.md5(pageurl.encode('utf-8')).hexdigest()
             return res_data
         return None
 
@@ -187,5 +189,6 @@ class Xiao688HtmlParser(HtmlParse):
             res_data['pubtime'] = pubTimestamp
             res_data['content'] = datacontent
             res_data['pageurl'] = pageurl
+            res_data['urlmd5'] = hashlib.md5(pageurl.encode('utf-8')).hexdigest()
             return res_data
         return None
