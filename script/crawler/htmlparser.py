@@ -32,7 +32,7 @@ regx = r'[^\.]+('+'|'.join([h.replace('.',r'\.') for h in topHostPostfix])+')$'
 pattern = re.compile(regx,re.IGNORECASE)
 
 def createParser():
-    return JokejiHtmlParser()
+    return Xiao688HtmlParser()
 
 # 实现解析器的类
 class HtmlParse(object):
@@ -66,7 +66,7 @@ class HtmlParse(object):
             for link in links:
                 new_url = link['href']
                 new_full_url = urljoin(page_url, new_url)
-                if new_full_url.find(self.domain):
+                if new_full_url.find(self.domain) > -1:
                     new_urls.add(new_full_url)
         return new_urls
 
@@ -137,7 +137,7 @@ class JokejiHtmlParser(HtmlParse):
                 logger.debug("error : %s" % e)
 
         if datacontent != None:
-            datacontent = datacontent.replace("'", "\'")
+            datacontent = datacontent.replace("'", "\\'")
             res_data['title'] = title
             res_data['pubtime'] = pubTimestamp
             res_data['content'] = datacontent
@@ -154,25 +154,21 @@ class Xiao688HtmlParser(HtmlParse):
         res_data = {}
 
         datacontent = None
-        pubTimestamp = None
+        pubTimestamp = int(time.time())
         title = None
         pageurl = page_url
 
-        #获取标题
-        try:
-            titleNode = soup.find("div", class_="title").find("h1")
-            title = titleNode.get_text().strip()
-        except:
-            pass
-        #获取内容
         try:
             allJokeNode = soup.find("div", class_="content")
             if allJokeNode != None:
                 datacontent = str(allJokeNode)
             else:
                 datacontent = None
+            if datacontent != None:
+                titleNode = soup.find("div", class_="title").find("h1")
+                title = titleNode.get_text().strip()
         except Exception as e:
-            logger.debug("error : %s" % e)
+            logger.debug("e : %s" % e)
 
         try:
             pubTimeNode = soup.find("span", id="d_udate")
@@ -183,7 +179,7 @@ class Xiao688HtmlParser(HtmlParse):
             pubTimestamp = int(time.time())
 
         if datacontent != None:
-            datacontent = datacontent.replace("'", "\'")
+            datacontent = datacontent.replace("'", "\\'")
             res_data['title'] = title
             res_data['pubtime'] = pubTimestamp
             res_data['content'] = datacontent

@@ -39,9 +39,15 @@ def _getCursor():
 def execSql(sql):
     '''执行数据库语句'''
     _threadLock.acquire()
-    _getCursor().execute(sql)
-    result = _getCursor().lastrowid
-    _getConnection().commit()
+    logger.debug("=========>> execSql Start")
+    result = -1
+    try:
+        _getCursor().execute(sql)
+        result = _getCursor().lastrowid
+        _getConnection().commit()
+    except Exception as e:
+        logger.debug("=========>> execSql e : %s" % e)
+    logger.debug("=========>> execSql KeyId : %s" % result)
     _threadLock.release()
     return result
 

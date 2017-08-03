@@ -50,8 +50,7 @@ class JokeProcesser(Processer):
         sql = "insert into %s(title, content, pageurl, urlmd5, pubtime) values" % self.table['grab']
         sql = sql + values
         try:
-            result = dbaccess.execSql(sql)
-            logger.info("=========>> current insert id : %s" % result)
+            dbaccess.execSql(sql)
         except Exception as e:
             dbaccess.rollback()
             logger.debug("error : %s" % str(e))

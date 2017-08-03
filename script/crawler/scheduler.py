@@ -13,9 +13,10 @@ import tempfile
 import os
 import dbaccess
 import traceback
+import sys
 
-initUrl = "http://www.xiao688.com/"
 initUrl = "http://www.jokeji.cn/"
+initUrl = "http://www.xiao688.com/"
 
 RUNNING = True
 threadNum = 1
@@ -24,9 +25,6 @@ urlManager = urlmanager.UrlManager()
 downLoader = downloader.Downloader()
 htmlParser = htmlparser.createParser()
 htmlProcesser = processer.createProcesser()
-
-htmlParser.setBaseUrl(initUrl)
-urlManager.pushOne(initUrl);
 
 def writeLastGrabUrl(url):
     tmpdir = tempfile.gettempdir()
@@ -41,14 +39,18 @@ def readLastGrabUrl():
         return None
     with open(cfgfile, "r", encoding="utf-8") as file:
         url = file.read()
+    os.remove(cfgfile)
     return url
 
-def setLastGrabUrl():
+def initGrabUrl():
     url = readLastGrabUrl()
     logger.debug("lastGrab : %s" % url)
     if url != None:
         urlManager.pushOne(url)
         htmlParser.setBaseUrl(url)
+    else:
+        htmlParser.setBaseUrl(initUrl)
+        urlManager.pushOne(initUrl);
 
 def hasForGrabbingUrl():
     '''查看是否有可抓取的URL'''
@@ -85,14 +87,20 @@ def writeToFile(name, content):
     f.close()
 
 def grabbing(url):
+    try:
+        grabbingInternal(url)
+    except:
+        traceback.print_exc()
+
+def grabbingInternal(url):
     logger.debug("Grabbing : %s" % url)
     '''实际抓取函数'''
     content = None
     try:
         content = fetchWebContent(url)
     except Exception as e:
-        #traceback.print_exc()
         logger.debug("e : %s" % e)
+
     #writeToFile(time.strftime("yyyyMMdd") + ".html", content)
     newurl, newdata = parseContent(url, content)
     if (newurl != None):
@@ -183,11 +191,17 @@ def cleanup():
     global htmlProcesser
     del htmlProcesser
 
+def excepthook(t, value, trace):
+    '''''write the unhandle exception to log'''
+    print('Unhandled Error: %s: %s'%(str(t), str(value)))
+    sys.__excepthook__(t, value, trace)
+
 if __name__ == "__main__":
     registerSignal()
-    setLastGrabUrl()
+    sys.excepthook = excepthook
+    initGrabUrl()
     grabWithThreadPool()
     #grabbing("http://www.jokeji.cn/yuanchuangxiaohua/jokehtml/xiaohuayoumo/2017080123561749.htm")
-    #grabbing("http://www.jokeji.cn/jokehtml/bxnn/2017073116212095.htm")
+    #grabbing("http://www.xiao688.com/cms/article/id-139121.html")
     cleanup()
     logger.debug("Crawler over, grabbedSize : %s" % len(urlManager.grabbedList()));

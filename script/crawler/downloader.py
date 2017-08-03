@@ -13,11 +13,15 @@ https://riverbankcomputing.com/software/pyqt/download
 '''
 class Downloader:
     def download(self, url):
-        quotedurl = quote(url, safe = string.printable)
-        res = urllib.request.urlopen(quotedurl, None, timeout=10 * 1000);
-        content = self.decodeContent(res)
-        res.close();
-        return content;
+        try:
+            quotedurl = quote(url, safe = string.printable)
+            res = urllib.request.urlopen(quotedurl, None, timeout=10 * 1000);
+            content = self.decodeContent(res)
+            res.close();
+            return content;
+        except:
+            pass
+        return None
     def downloadHttps(self):
         pass
     def parseCharset(self, res):
