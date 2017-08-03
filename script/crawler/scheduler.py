@@ -19,7 +19,7 @@ initUrl = "http://www.jokeji.cn/"
 initUrl = "http://www.xiao688.com/"
 
 RUNNING = True
-threadNum = 1
+threadNum = 2
 pool = None
 condition = threading.Condition()
 urlManager = urlmanager.UrlManager()
