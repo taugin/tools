@@ -9,7 +9,7 @@ LOG_FILE = os.path.join(tempfile.gettempdir(), 'tst.log')
 
 handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes=1024 * 1024, backupCount=5)# 实例化handler
 handler_c = logging.StreamHandler(); #输出到控制台
-fmt = '[%(asctime)s - %(filename)s:%(lineno)s - %(name)s] : %(message)s'
+fmt = '[%(asctime)s - %(filename)+13s:%(lineno)+3s - %(name)s] : %(message)s'
 
 formatter = logging.Formatter(fmt)# 实例化formatter
 handler.setFormatter(formatter)# 为handler添加formatter
