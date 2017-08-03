@@ -175,7 +175,7 @@ def grabWithThreadPool():
         hasGrabUrl = hasForGrabbingUrl()
         if hasGrabUrl:
             grabUrl = fetchForGrabbingUrl()
-            if htmlProcesser.isGrabUrl(grabUrl):
+            if htmlProcesser.hasGrabbed(grabUrl):
                 continue
             pool.addJob(grabWorker, grabUrl)
         else:

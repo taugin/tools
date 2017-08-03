@@ -37,7 +37,7 @@ class JokeProcesser(Processer):
     def process(self, data):
         self.addGrabContent(data)
 
-    def isGrabUrl(self, url):
+    def hasGrabbed(self, url):
         '''判断当前url是否被抓取过'''
         md5=hashlib.md5(url.encode('utf-8')).hexdigest()
         sql = "select id from %s where urlmd5='%s'" % (self.table['grab'], md5)
