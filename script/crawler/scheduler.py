@@ -20,6 +20,7 @@ initUrl = "http://www.xiao688.com/"
 
 RUNNING = True
 threadNum = 1
+pool = None
 condition = threading.Condition()
 urlManager = urlmanager.UrlManager()
 downLoader = downloader.Downloader()
@@ -94,6 +95,8 @@ def grabbing(url):
 
 def grabbingInternal(url):
     logger.debug("Grabbing : %s" % url)
+    if pool != None:
+        logger.debug("Worksize : %d" % pool.workSize())
     '''实际抓取函数'''
     content = None
     try:
@@ -103,7 +106,7 @@ def grabbingInternal(url):
 
     #writeToFile(time.strftime("yyyyMMdd") + ".html", content)
     newurl, newdata = parseContent(url, content)
-    if (newurl != None):
+    if (newurl != None and RUNNING):
         newList = list(newurl)
         urlManager.pushList(newList)
     processContent(newdata)
@@ -166,6 +169,7 @@ def grabWithMutilThread():
                 break;
 
 def grabWithThreadPool():
+    global pool
     pool = threadpool.ThreadPool(threadNum)
     while RUNNING:
         hasGrabUrl = hasForGrabbingUrl()
