@@ -16,33 +16,45 @@ import time
 import hashlib
 
 topHostPostfix = (
-    '.com','.la','.io','.co','.info','.net','.org','.me','.mobi',
-    '.us','.biz','.xxx','.ca','.co.jp','.com.cn','.net.cn',
-    '.org.cn','.mx','.tv','.ws','.ag','.com.ag','.net.ag',
-    '.org.ag','.am','.asia','.at','.be','.com.br','.net.br',
-    '.bz','.com.bz','.net.bz','.cc','.com.co','.net.co',
-    '.nom.co','.de','.es','.com.es','.nom.es','.org.es',
-    '.eu','.fm','.fr','.gs','.in','.co.in','.firm.in','.gen.in',
-    '.ind.in','.net.in','.org.in','.it','.jobs','.jp','.ms',
-    '.com.mx','.nl','.nu','.co.nz','.net.nz','.org.nz',
-    '.se','.tc','.tk','.tw','.com.tw','.idv.tw','.org.tw',
-    '.hk','.co.uk','.me.uk','.org.uk','.vg', ".com.hk", ".cn")
+    '.com', '.la', '.io', '.co', '.info', '.net', '.org', '.me', '.mobi',
+    '.us', '.biz', '.xxx', '.ca', '.co.jp', '.com.cn', '.net.cn',
+    '.org.cn', '.mx', '.tv', '.ws', '.ag', '.com.ag', '.net.ag',
+    '.org.ag', '.am', '.asia', '.at', '.be', '.com.br', '.net.br',
+    '.bz', '.com.bz', '.net.bz', '.cc', '.com.co', '.net.co',
+    '.nom.co', '.de', '.es', '.com.es', '.nom.es', '.org.es',
+    '.eu', '.fm', '.fr', '.gs', '.in', '.co.in', '.firm.in', '.gen.in',
+    '.ind.in', '.net.in', '.org.in', '.it', '.jobs', '.jp', '.ms',
+    '.com.mx', '.nl', '.nu', '.co.nz', '.net.nz', '.org.nz',
+    '.se', '.tc', '.tk', '.tw', '.com.tw', '.idv.tw', '.org.tw',
+    '.hk', '.co.uk', '.me.uk', '.org.uk', '.vg', ".com.hk", ".cn")
 
-regx = r'[^\.]+('+'|'.join([h.replace('.',r'\.') for h in topHostPostfix])+')$'
-pattern = re.compile(regx,re.IGNORECASE)
+regx = r'[^\.]+(' + '|'.join([h.replace('.', r'\.') for h in topHostPostfix]) + ')$'
+pattern = re.compile(regx, re.IGNORECASE)
 
-def createParser():
-    return Xiao688HtmlParser()
+def parseDomainName(url):
+    parts = urlparse(url)
+    host = parts.netloc
+    m = pattern.search(host)
+    return m.group() if m else None
+
+def createParser(url):
+    domain = parseDomainName(url)
+    logger.debug("domain : %s" % domain)
+    htmlParse = None
+    if domain == "xiao688.com":
+        htmlParse = Xiao688HtmlParser()
+    elif domain == "jokeji.cn":
+        htmlParse = JokejiHtmlParser()
+    else:
+        htmlParse = None
+    if htmlParse != None:
+        htmlParse.setDomain(domain)
+    return htmlParse
 
 # 实现解析器的类
 class HtmlParse(object):
-    def setBaseUrl(self, url):
-        parts = urlparse(url)
-        host = parts.netloc
-        m = pattern.search(host)
-        self.domain =  m.group() if m else None
-        logger.debug("domain : %s" % self.domain)
-
+    def setDomain(self, domain):
+        self.domain = domain
     # 解析网页
     def parse(self, page_url, html_content):
         if page_url == None or html_content == None:
@@ -71,13 +83,6 @@ class HtmlParse(object):
         return new_urls
 
     # 从网页解析中获得数据
-    def _get_new_data(self, page_url, soup):
-        return None
-
-class JDHtmlParser(HtmlParse):
-    def __init__(self):
-        pass
-
     def _get_new_data(self, page_url, soup):
         return None
 
@@ -119,7 +124,7 @@ class JokejiHtmlParser(HtmlParse):
                 allJokeNode = soup.find("div", class_="txt")
                 if allJokeNode != None:
                     cNode = allJokeNode.find("ul")
-                    if cNode !=None:
+                    if cNode != None:
                         datacontent = str(cNode)
                     else:
                         datacontent = None
@@ -127,9 +132,9 @@ class JokejiHtmlParser(HtmlParse):
                         title = allJokeNode.find("h1").get_text()
                         timeStr = allJokeNode.find("b").get_text()
                         reg = r"([1-9]\d{3}/([1-9]|1[0-2])/([1-9]|[1-2][0-9]|3[0-1])\s+(20|21|22|23|[0-1]\d):[0-5]\d:[0-5]\d)";
-                        pattern = re.compile(reg,re.IGNORECASE)
+                        pattern = re.compile(reg, re.IGNORECASE)
                         m = pattern.search(timeStr)
-                        pub_time =  m.group() if m else None
+                        pub_time = m.group() if m else None
                         pubTimestamp = self._formatTime(pub_time)
                 else:
                     datacontent = None

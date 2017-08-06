@@ -15,16 +15,17 @@ import dbaccess
 import traceback
 import sys
 
-initUrl = "http://www.jokeji.cn/"
 initUrl = "http://www.xiao688.com/"
+initUrl = "http://www.jokeji.cn/"
 
 RUNNING = True
 threadNum = 2
 pool = None
+htmlParser = None
+
 condition = threading.Condition()
 urlManager = urlmanager.UrlManager()
 downLoader = downloader.Downloader()
-htmlParser = htmlparser.createParser()
 htmlProcesser = processer.createProcesser()
 
 def writeLastGrabUrl(url):
@@ -44,14 +45,19 @@ def readLastGrabUrl():
     return url
 
 def initGrabUrl():
+    global htmlParser
     url = readLastGrabUrl()
     logger.debug("lastGrab : %s" % url)
     if url != None:
         urlManager.pushOne(url)
-        htmlParser.setBaseUrl(url)
     else:
-        htmlParser.setBaseUrl(initUrl)
         urlManager.pushOne(initUrl);
+    firstUrl = urlManager.peek()
+    logger.debug("firstUrl : %s" % firstUrl)
+    htmlParser = htmlparser.createParser(firstUrl)
+    if htmlParser == None:
+        logger.debug("Can not create html parser")
+        sys.exit(0)
 
 def hasForGrabbingUrl():
     '''查看是否有可抓取的URL'''

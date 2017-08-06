@@ -45,6 +45,15 @@ class UrlManager:
         UrlManager._threadLock.release()
         return item
 
+    def peek(self):
+        UrlManager._threadLock.acquire()
+        try:
+            item = self._urlWithGrab[0]
+        except:
+            pass
+        UrlManager._threadLock.release()
+        return item
+
     def size(self):
         return len(self._urlWithGrab)
     
