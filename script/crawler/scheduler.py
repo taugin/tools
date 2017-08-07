@@ -25,7 +25,6 @@ htmlParser = None
 
 condition = threading.Condition()
 urlManager = urlmanager.UrlManager()
-downLoader = downloader.Downloader()
 htmlProcesser = processer.createProcesser()
 
 def writeLastGrabUrl(url):
@@ -73,7 +72,7 @@ def pushNewGrabUrl(urllist):
 
 def fetchWebContent(url):
     '''抓取内容'''
-    content = downLoader.download(url);
+    content = downloader.Downloader().download(url);
     return content
 
 def parseContent(url, content):
