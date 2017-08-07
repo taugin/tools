@@ -15,7 +15,9 @@ class Downloader:
     def download(self, url):
         try:
             quotedurl = quote(url, safe = string.printable)
+            logger.debug("request start : %s" % url);
             res = urllib.request.urlopen(quotedurl, None, timeout=10 * 1000);
+            logger.debug("request  end  : %s" % url);
             content = self.decodeContent(res)
             res.close();
             return content;

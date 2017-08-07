@@ -100,7 +100,6 @@ def grabbing(url):
         traceback.print_exc()
 
 def grabbingInternal(url):
-    logger.debug("Grabbing : %s" % url)
     if pool != None:
         logger.debug("Worksize : %d" % pool.workSize())
     '''实际抓取函数'''
@@ -194,6 +193,9 @@ def grabWithThreadPool():
             else:
                 logger.debug("抓取完毕，退出循环")
                 break;
+
+    urlManager.removeAll()
+    pool.removeAll()
     logger.debug("等待所有任务退出")
     pool.waitForComplete()
 

@@ -120,6 +120,9 @@ class ThreadPool(object):
         except:
             raise
 
+    def removeAll(self):
+        self._workQueue.queue.clear()
+
     def waitForComplete(self, timeout=0.1):
         """
         Last function. To dismiss all worker threads. Delete ThreadPool.

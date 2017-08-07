@@ -54,6 +54,14 @@ class UrlManager:
         UrlManager._threadLock.release()
         return item
 
+    def removeAll(self):
+        UrlManager._threadLock.acquire()
+        try:
+            self._urlWithGrab.clear()
+        except Exception as e:
+            logger.debug("error : %s" % e)
+        UrlManager._threadLock.release()
+
     def size(self):
         return len(self._urlWithGrab)
     
