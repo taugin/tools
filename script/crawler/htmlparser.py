@@ -99,12 +99,28 @@ class JokejiHtmlParser(HtmlParse):
 
     def _get_new_data(self, page_url, soup):
         res_data = {}
+        datacontent, pubTimestamp, title = self.getData1(soup)
 
+        if datacontent == None:
+            datacontent, pubTimestamp, title = self.getData2(soup)
+
+        if datacontent == None:
+            datacontent, pubTimestamp, title = self.getData3(soup)
+
+        if datacontent != None:
+            datacontent = datacontent.replace("'", "\\'")
+            res_data['title'] = title
+            res_data['pubtime'] = pubTimestamp
+            res_data['content'] = datacontent
+            res_data['pageurl'] = page_url
+            res_data['urlmd5'] = hashlib.md5(page_url.encode('utf-8')).hexdigest()
+            return res_data
+        return None
+
+    def getData1(self, soup):
         datacontent = None
         pubTimestamp = int(time.time())
         title = None
-        pageurl = page_url
-
         try:
             allJokeNode = soup.find("span", id="text110")
             if allJokeNode != None:
@@ -118,38 +134,53 @@ class JokejiHtmlParser(HtmlParse):
                 pubTimestamp = self._formatTime(pub_time)
         except Exception as e:
             logger.debug("error : %s" % e)
+        return datacontent, pubTimestamp, title
 
-        if datacontent == None:
-            try:
-                allJokeNode = soup.find("div", class_="txt")
-                if allJokeNode != None:
-                    cNode = allJokeNode.find("ul")
-                    if cNode != None:
-                        datacontent = str(cNode)
-                    else:
-                        datacontent = None
-                    if datacontent != None:
-                        title = allJokeNode.find("h1").get_text()
-                        timeStr = allJokeNode.find("b").get_text()
-                        reg = r"([1-9]\d{3}/([1-9]|1[0-2])/([1-9]|[1-2][0-9]|3[0-1])\s+(20|21|22|23|[0-1]\d):[0-5]\d:[0-5]\d)";
-                        pattern = re.compile(reg, re.IGNORECASE)
-                        m = pattern.search(timeStr)
-                        pub_time = m.group() if m else None
-                        pubTimestamp = self._formatTime(pub_time)
+    def getData2(self, soup):
+        datacontent = None
+        pubTimestamp = int(time.time())
+        title = None
+        try:
+            allJokeNode = soup.find("div", class_="txt")
+            if allJokeNode != None:
+                cNode = allJokeNode.find("ul")
+                if cNode != None:
+                    datacontent = str(cNode)
                 else:
                     datacontent = None
-            except Exception as e:
-                logger.debug("error : %s" % e)
+                if datacontent != None:
+                    title = allJokeNode.find("h1").get_text()
+                    timeStr = allJokeNode.find("b").get_text()
+                    reg = r"([1-9]\d{3}/([1-9]|1[0-2])/([1-9]|[1-2][0-9]|3[0-1])\s+(20|21|22|23|[0-1]\d):[0-5]\d:[0-5]\d)";
+                    pattern = re.compile(reg, re.IGNORECASE)
+                    m = pattern.search(timeStr)
+                    pub_time = m.group() if m else None
+                    pubTimestamp = self._formatTime(pub_time)
+            else:
+                datacontent = None
+        except Exception as e:
+            logger.debug("error : %s" % e)
+        return datacontent, pubTimestamp, title
 
-        if datacontent != None:
-            datacontent = datacontent.replace("'", "\\'")
-            res_data['title'] = title
-            res_data['pubtime'] = pubTimestamp
-            res_data['content'] = datacontent
-            res_data['pageurl'] = pageurl
-            res_data['urlmd5'] = hashlib.md5(pageurl.encode('utf-8')).hexdigest()
-            return res_data
-        return None
+    def getData3(self, soup):
+        datacontent = None
+        pubTimestamp = int(time.time())
+        title = None
+        try:
+            allJokeNode = soup.find("div", class_="pic_pview")
+            if allJokeNode != None:
+                cNode = allJokeNode.find("ul")
+                if cNode != None:
+                    datacontent = str(cNode)
+                else:
+                    datacontent = None
+                if datacontent != None:
+                    title = soup.title.get_text().strip()
+                    pub_time = allJokeNode.find("div", class_="pic_fx").find("span").get_text().strip()[5:]
+                    pubTimestamp = self._formatTime(pub_time)
+        except Exception as e:
+            logger.debug("error : %s" % e)
+        return datacontent, pubTimestamp, title
 
 class Xiao688HtmlParser(HtmlParse):
     def __init__(self):

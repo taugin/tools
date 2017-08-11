@@ -40,13 +40,20 @@ def execSql(sql):
     '''执行数据库语句'''
     _threadLock.acquire()
     logger.debug("=========>> execSql Start")
-    result = -1
-    try:
-        _getCursor().execute(sql)
-        result = _getCursor().lastrowid
-        _getConnection().commit()
-    except Exception as e:
-        logger.debug("=========>> execSql e : %s" % e)
+    result = 0
+    timeToRetry = 1
+    while timeToRetry < 3:
+        try:
+            _getCursor().execute(sql)
+            result = _getCursor().lastrowid
+            _getConnection().commit()
+        except Exception as e:
+            result = -1
+            resetConnection();
+            logger.debug("=========>> execSql e : %s" % e)
+        if result >= 0:
+            break;
+        timeToRetry = timeToRetry + 1
     logger.debug("=========>> execSql KeyId : %s" % result)
     _threadLock.release()
     return result
@@ -54,16 +61,26 @@ def execSql(sql):
 def fetchOne(sql):
     '''获取一条记录'''
     _threadLock.acquire()
-    _getCursor().execute(sql)
-    row = _getCursor().fetchone()
+    row = None
+    try:
+        _getCursor().execute(sql)
+        row = _getCursor().fetchone()
+    except pymysql.err.Error as e:
+        resetConnection()
+        logger.debug("=========>> fetchOne e : %s" % e)
     _threadLock.release()
     return row
 
 def fetchAll(sql):
     '''获取多条记录'''
     _threadLock.acquire()
-    _getCursor().execute(sql)
-    rows = _getCursor().fetchall()
+    rows = None
+    try:
+        _getCursor().execute(sql)
+        rows = _getCursor().fetchall()
+    except pymysql.err.Error as e:
+        resetConnection()
+        logger.debug("=========>> fetchAll e : %s" % e)
     _threadLock.release()
     return rows
 
@@ -71,6 +88,12 @@ def rollback():
     _threadLock.acquire()
     _getConnection().rollback()
     _threadLock.release()
+
+def resetConnection():
+    global dbCursor
+    global dbConnection
+    dbCursor = None
+    dbConnection = None
 
 def closeConnection():
     _threadLock.acquire()
