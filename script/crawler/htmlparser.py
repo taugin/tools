@@ -78,7 +78,7 @@ class HtmlParse(object):
             for link in links:
                 new_url = link['href']
                 new_full_url = urljoin(page_url, new_url)
-                if new_full_url.find(self.domain) > -1:
+                if self.domain == None or self.domain.strip() == "" or new_full_url.find(self.domain) > -1:
                     new_urls.add(new_full_url)
         return new_urls
 
