@@ -20,3 +20,4 @@ def apktool_cmd():
     subprocess.call(cmdlist)
 
 apktool_cmd()
+Common.pause()
