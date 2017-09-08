@@ -21,7 +21,7 @@ SCRIPT_DIR = os.path.join(HOME_DIR, "script")
 LIB_DIR = os.path.join(HOME_DIR, "libs")
 
 #签名文件存放目录
-KEYSTORES_DIR = os.path.join(HOME_DIR, "packhome/sdks/keystore")
+KEYSTORES_DIR = os.path.join(HOME_DIR, "extra/keystore")
 
 #可执行文件后缀
 BIN_SUFFIX = ""
