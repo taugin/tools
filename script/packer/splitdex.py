@@ -93,7 +93,10 @@ def split_dex(decompiledfolder):
     currDexIndex = 1
     allRefs = []
 
-    allFiles = Utils.list_files(os.path.join(decompiledfolder))
+    allFiles = Utils.list_files(os.path.join(decompiledfolder, "smali"))
+    Log.out("allFile1 len : %s" % len(allFiles))
+    allFiles = sortFiles(allFiles)
+    Log.out("allFile2 len : %s" % len(allFiles))
     #保证U9Application等类在第一个classex.dex文件中
     for f in allFiles:
         f = f.replace("\\", "/")
@@ -104,7 +107,10 @@ def split_dex(decompiledfolder):
 
     handled = 0
 
+    handledFile = None
+    srcFile = None
     for f in allFiles:
+        srcFile = f
         f = f.replace("\\", "/")
         if not f.endswith(".smali"):
             continue
@@ -125,12 +131,22 @@ def split_dex(decompiledfolder):
             currFucNum = currFucNum + thisFucNum
 
         if currDexIndex > 1:
+            handledFile = srcFile
             smaliClass = "smali_classes"+str(currDexIndex)
             pkgFilePath = f[len(smaliPath):]
-            targetPath = os.path.join(decompiledfolder, smaliClass, pkgFilePath)
-            Utils.copyfile(f, targetPath)
-            if (os.path.exists(f)):
-                os.remove(f)
+            targetPath = os.path.normpath(os.path.join(decompiledfolder, smaliClass, pkgFilePath))
+            Utils.copyfile(srcFile, targetPath)
+            Utils.deleteFile(srcFile)
 
         handled = handled + 1
-        Log.showNoReturn("[Logging...] 已处理文件数 : %s" % handled)
+        Log.showNoReturn("[Logging...] 已处理文件数 : %s, %s, %s, %s" % (handled, totalFucNum, currFucNum + thisFucNum, handledFile))
+    Log.out("[Logging...] 分包处理完成\n")
+
+def sortFiles(allFiles):
+    comFiles = []
+    for file in allFiles:
+        if "smali\com" in file and "com\ninemgames" not in file:
+            comFiles.append(file)
+            allFiles.remove(file)
+    allFiles += comFiles
+    return allFiles

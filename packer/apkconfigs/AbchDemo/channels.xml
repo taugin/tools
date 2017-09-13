@@ -9,6 +9,25 @@
     <channels>
         <channel>
             <param name="id" value="10"/>
+            <param name="name" value="baidu"/>
+            <param name="sdk" value="baidusdk"/>
+            <param name="desc" value="BAIDU SDK"/>
+            <param name="suffix" value=""/>
+            <param name="splash" value="0"/>
+            <param name="unity_splash" value="0"/>
+            <param name="icon" value="rb"/>
+            <param name="gamename" value="AbchDemo"/>
+            <manifest>
+                <param name="APPID" value="1212u3i2uu12oui"/>
+                <param name="APPSECRIT" value="ksdfjakjfajfkajfkajfk23rj2rkwfk3jfkjfkwjfkjrkjkjdkwjkjfk"/>
+            </manifest>
+            <sdk-version>
+                <versionCode>1</versionCode>
+                <versionName>1.0.0</versionName>
+            </sdk-version>
+        </channel>
+        <channel>
+            <param name="id" value="10"/>
             <param name="name" value="uc"/>
             <param name="sdk" value="ucsdk"/>
             <param name="desc" value="UC SDK"/>

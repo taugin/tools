@@ -26,6 +26,9 @@ def copydir(fromdir, todir):
 
 def copyfile(fromfile, tofile):
     try:
+        dirname = os.path.dirname(tofile)
+        if (not os.path.exists(dirname)):
+            os.makedirs(dirname)
         shutil.copy2(fromfile, tofile)
     except:
         pass
@@ -78,3 +81,7 @@ def list_files(dir):
         for file in files:
             allFiles.append(os.path.join(root, file))
     return allFiles
+
+def deleteFile(file):
+    if (os.path.exists(file)):
+        os.remove(file)
