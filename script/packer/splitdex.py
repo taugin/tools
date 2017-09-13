@@ -94,6 +94,7 @@ def split_dex(decompiledfolder):
     allRefs = []
 
     allFiles = Utils.list_files(os.path.join(decompiledfolder, "smali"))
+    allFiles.sort()
     Log.out("allFile1 len : %s" % len(allFiles))
     allFiles = sortFiles(allFiles)
     Log.out("allFile2 len : %s" % len(allFiles))
@@ -139,6 +140,8 @@ def split_dex(decompiledfolder):
             Utils.deleteFile(srcFile)
 
         handled = handled + 1
+        if (handledFile != None):
+            handledFile = handledFile.replace(decompiledfolder, "");
         Log.showNoReturn("[Logging...] 已处理文件数 : %s, %s, %s, %s" % (handled, totalFucNum, currFucNum + thisFucNum, handledFile))
     Log.out("[Logging...] 分包处理完成\n")
 

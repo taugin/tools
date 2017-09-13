@@ -105,7 +105,7 @@ def packapk(packconfig, channel):
     writeManifest(decompiledfolder, manifest)
     #################################################
     #分割DEX
-    splitDex(decompiledfolder)
+    #splitDex(decompiledfolder)
 
     recompilegameapk(decompiledfolder, unsigned_apk)
     signapk(unsigned_apk, signed_apk, keystore)

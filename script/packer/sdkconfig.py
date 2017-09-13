@@ -84,6 +84,8 @@ class SdkConfig:
         smali = os.path.join(self.decompiledfolder, "smali");
         smali2 = os.path.join(self.decompiledfolder, "smali_classes2");
         outdir = smali
+        if (os.path.exists(smali2)):
+            outdir = smali2
         apkbuilder.baksmali(dexfile, outdir)
 
     def process_copylist(self):

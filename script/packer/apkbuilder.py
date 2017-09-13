@@ -14,7 +14,7 @@ import zipfile
 def apk_compile(folder, compileapk):
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "b", folder, "-o", compileapk]
     Log.out("[Logging...] 回编文件名称 : [%s]" % compileapk)
-    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
         Log.out("[Logging...] 回编文件失败")
