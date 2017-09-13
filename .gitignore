@@ -5,8 +5,8 @@ extra/winreg/mytool.reg
 .pydevproject
 **/.settings/*
 workspace
-packages
-games
-packhome/sdks/channels/
-packhome/sdks/plugins/
+dstapks
+srcapks
+packer/sdks/channels/
+packer/sdks/plugins/
 **.pyc

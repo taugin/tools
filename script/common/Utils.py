@@ -70,3 +70,11 @@ def isEmpty(string):
     if (string == None or string.strip() == ""):
         return True
     return False
+
+def list_files(dir):
+    allFiles = []
+    mylist = os.walk(dir, True)
+    for root, filedir, files in mylist:
+        for file in files:
+            allFiles.append(os.path.join(root, file))
+    return allFiles

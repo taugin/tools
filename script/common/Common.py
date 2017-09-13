@@ -35,7 +35,7 @@ SEPERATER = os.path.sep
 
 #########################jar包文件路径定义#################################
 #APKTOOL的jar包，版本是2.1.1
-APKTOOL_JAR = os.path.join(LIB_DIR, "apktool_2.1.1.jar")
+APKTOOL_JAR = os.path.join(LIB_DIR, "apktool_2.2.1.jar")
 
 #签名jar
 SIGNAPK_JAR = os.path.join(LIB_DIR, "signapk.jar")
@@ -44,15 +44,15 @@ SIGNAPK_JAR = os.path.join(LIB_DIR, "signapk.jar")
 AXMLPRINTER_JAR = os.path.join(LIB_DIR, "AXMLPrinter2.jar")
 
 #壳DEX文件
-SHELL_DEX = os.path.join(LIB_DIR, "classes.dex");
+SHELL_DEX = os.path.join(LIB_DIR, "classes.dex")
 
 #smali-2.1.3
-SMALI_JAR = os.path.join(LIB_DIR, "smali-2.1.3.jar");
+SMALI_JAR = os.path.join(LIB_DIR, "smali-2.1.3.jar")
 
 #baksmali-2.1.3
-BAKSMALI_JAR = os.path.join(LIB_DIR, "baksmali-2.1.3.jar");
+BAKSMALI_JAR = os.path.join(LIB_DIR, "baksmali-2.1.3.jar")
 
-
+DX_JAR = os.path.join(LIB_DIR, "dx.jar")
 #########################可执行文件文件路径定义#################################
 
 #AAPT可执行文件
@@ -117,13 +117,13 @@ COMPANYFILE = "assets/ccp_strings.xml"
 ################################################################################
 #pack
 #游戏打包主目录
-PACK_HOME = os.path.join(HOME_DIR, "packhome");
+PACK_HOME = os.path.join(HOME_DIR, "packer")
 
 WORKSPACE = os.path.join(PACK_HOME, "workspace")
 
-PACKAGES = os.path.join(PACK_HOME, "packages")
+DSTAPKS = os.path.join(PACK_HOME, "dstapks")
 
-GAMES = os.path.join(PACK_HOME, "games")
+SRCAPKS = os.path.join(PACK_HOME, "srcapks")
 
 SDK_DIR = os.path.join(PACK_HOME, "sdks")
 
