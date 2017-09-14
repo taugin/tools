@@ -164,8 +164,8 @@ class Channel:
     def getsdkicon(self):
         return Utils.getvalue(self.map, "icon")
 
-    def getgamename(self):
-        return Utils.getvalue(self.map, "gamename")
+    def getfinalname(self):
+        return Utils.getvalue(self.map, "finalname")
 
     def getvercode(self):
         return Utils.getvalue(self.map, "vercode")

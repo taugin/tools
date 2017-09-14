@@ -64,7 +64,7 @@ def splitDex(decompiledfolder):
 
 def packapk(packconfig, channel):
     #获取当前渠道配置的游戏名称
-    gamename = channel.getgamename()
+    finalname = channel.getfinalname()
     #获取SDK目录
     sdkdirname = channel.getsdkdir();
     #获取所有sdk插件
@@ -85,10 +85,10 @@ def packapk(packconfig, channel):
     #游戏文件路径
     gameapk = os.path.join(Common.PACK_HOME, gameapkpath)
 
-    decompiledfolder = os.path.join(Common.WORKSPACE, gamename + "-" + sdkdirname)
-    unsigned_apk = os.path.join(Common.DSTAPKS, gamename + "-" + sdkname + "-unsigned.apk")
-    signed_apk = os.path.join(Common.DSTAPKS, gamename + "-" + sdkname + "-signed.apk")
-    final_apk = os.path.join(Common.DSTAPKS, gamename + "-" + sdkname + "-final.apk")
+    decompiledfolder = os.path.join(Common.WORKSPACE, finalname + "-" + sdkdirname)
+    unsigned_apk = os.path.join(Common.DSTAPKS, finalname + "-" + sdkname + "-unsigned.apk")
+    signed_apk = os.path.join(Common.DSTAPKS, finalname + "-" + sdkname + "-signed.apk")
+    final_apk = os.path.join(Common.DSTAPKS, finalname + "-" + sdkname + "-final.apk")
     sdk_channel = os.path.join(Common.CHANNEL_SDK_DIR, sdkdirname)
 
     #反编译APK

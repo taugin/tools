@@ -33,6 +33,22 @@ def copyfile(fromfile, tofile):
     except:
         pass
 
+def movefile(fromfile, tofile):
+    try:
+        dirname = os.path.dirname(tofile)
+        if (not os.path.exists(dirname)):
+            os.makedirs(dirname)
+        shutil.move(fromfile, tofile)
+        deleteEmptyDir(fromfile)
+    except:
+        pass
+
+def deleteEmptyDir(path):
+    while True:
+        dirname = os.path.dirname(path)
+        os.rmdir(dirname)
+        path = dirname
+
 ## Get pretty look
 def indent(elem, level=0):
     i = "\n" + level*"    "
@@ -74,9 +90,9 @@ def isEmpty(string):
         return True
     return False
 
-def list_files(dir):
+def list_files(dirname):
     allFiles = []
-    mylist = os.walk(dir, True)
+    mylist = os.walk(dirname, True)
     for root, filedir, files in mylist:
         for file in files:
             allFiles.append(os.path.join(root, file))

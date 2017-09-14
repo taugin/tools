@@ -95,9 +95,7 @@ def split_dex(decompiledfolder):
 
     allFiles = Utils.list_files(os.path.join(decompiledfolder, "smali"))
     allFiles.sort()
-    Log.out("allFile1 len : %s" % len(allFiles))
     allFiles = sortFiles(allFiles)
-    Log.out("allFile2 len : %s" % len(allFiles))
     #保证U9Application等类在第一个classex.dex文件中
     for f in allFiles:
         f = f.replace("\\", "/")
@@ -115,8 +113,8 @@ def split_dex(decompiledfolder):
         f = f.replace("\\", "/")
         if not f.endswith(".smali"):
             continue
-        if "/com/abch/sdk" in f or "/android/support/multidex" in f \
-             or "smali_classes" in f:
+
+        if "/com/abch/sdk" in f or "/android/support/multidex" in f:
             continue
 
         thisFucNum = get_smali_method_count(f, allRefs)
@@ -136,20 +134,20 @@ def split_dex(decompiledfolder):
             smaliClass = "smali_classes"+str(currDexIndex)
             pkgFilePath = f[len(smaliPath):]
             targetPath = os.path.normpath(os.path.join(decompiledfolder, smaliClass, pkgFilePath))
-            Utils.copyfile(srcFile, targetPath)
-            Utils.deleteFile(srcFile)
+            Utils.movefile(srcFile, targetPath)
 
         handled = handled + 1
         if (handledFile != None):
             handledFile = handledFile.replace(decompiledfolder, "");
-        Log.showNoReturn("[Logging...] 已处理文件数 : %s, %s, %s, %s" % (handled, totalFucNum, currFucNum + thisFucNum, handledFile))
+        #Log.showNoReturn("[Logging...] 已处理文件数 : %s, %s, %s, %s" % (handled, totalFucNum, currFucNum + thisFucNum, handledFile))
+        Log.showNoReturn("[Logging...] 已处理文件数 : %s, %s, %s" % (handled, totalFucNum, handledFile))
     Log.out("[Logging...] 分包处理完成\n")
 
 def sortFiles(allFiles):
-    comFiles = []
+    tailFiles = []
     for file in allFiles:
-        if "smali\com" in file and "com\ninemgames" not in file:
-            comFiles.append(file)
+        if ("smali\com" in file and "com\ninemgames" not in file and "com\baidu" not in file and "com\duoku" not in file) or ("smali\com" in file or "smali\okio" in file):
+            tailFiles.append(file)
             allFiles.remove(file)
-    allFiles += comFiles
+    allFiles += tailFiles
     return allFiles

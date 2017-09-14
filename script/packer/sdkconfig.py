@@ -82,10 +82,11 @@ class SdkConfig:
 
         dexfile = os.path.join(self.sdkfolder, "classes.dex")
         smali = os.path.join(self.decompiledfolder, "smali");
-        smali2 = os.path.join(self.decompiledfolder, "smali_classes2");
         outdir = smali
-        if (os.path.exists(smali2)):
-            outdir = smali2
+        #'''
+        if (os.path.exists(os.path.join(self.decompiledfolder, "smali_classes2"))):
+            outdir = os.path.join(self.decompiledfolder, "smali_classes2")
+        #'''
         apkbuilder.baksmali(dexfile, outdir)
 
     def process_copylist(self):

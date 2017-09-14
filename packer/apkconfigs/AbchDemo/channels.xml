@@ -16,7 +16,7 @@
             <param name="splash" value="0"/>
             <param name="unity_splash" value="0"/>
             <param name="icon" value="rb"/>
-            <param name="gamename" value="AbchDemo"/>
+            <param name="finalname" value="com.ninemgames.tennis.china"/>
             <manifest>
                 <param name="APPID" value="1212u3i2uu12oui"/>
                 <param name="APPSECRIT" value="ksdfjakjfajfkajfkajfk23rj2rkwfk3jfkjfkwjfkjrkjkjdkwjkjfk"/>
@@ -35,7 +35,7 @@
             <param name="splash" value="0"/>
             <param name="unity_splash" value="0"/>
             <param name="icon" value="rb"/>
-            <param name="gamename" value="AbchDemo"/>
+            <param name="finalname" value="com.ninemgames.tennis.china"/>
             <!-- sdk-params 参数是写入到developer_config.properties中 -->
             <properties>
                 <param name="UCGameId" value="544156" desc="GameId"/>
