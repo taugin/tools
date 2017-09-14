@@ -111,7 +111,7 @@ class Channel:
             return
         tree = ET.parse(keystore)
         root = tree.getroot()
-        channel = root.find(".//param[@name='channelName'][@value='%s']/.." % self.getsdkname())
+        channel = root.find(".//keystores/keystore[@channel='%s']" % self.getsdkname())
         if (channel == None):
             return
         params = channel.findall("param")

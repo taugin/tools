@@ -32,7 +32,10 @@ def recompilegameapk(decompiledfolder, recompiledfile):
 
 #APK签名
 def signapk(unsignapk, signedapk, keystore):
-    apkbuilder.signapk(unsignapk, signedapk, keystore)
+    if (len(keystore) > 0):
+        apkbuilder.signapk(unsignapk, signedapk, keystore)
+    else:
+        Log.out("[Logging...] 无法获取签名");
 
 #apk对齐
 def alignapk(unalignapk, finalapk):
