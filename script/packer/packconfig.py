@@ -113,6 +113,8 @@ class Channel:
         root = tree.getroot()
         channel = root.find(".//keystores/keystore[@channel='%s']" % self.getsdkname())
         if (channel == None):
+            channel = root.find(".//keystores/keystore[@channel='default']")
+        if (channel == None):
             return
         params = channel.findall("param")
         if (params == None):
