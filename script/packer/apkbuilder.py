@@ -139,3 +139,20 @@ def jar2dex(jarfile, dexfile):
     cmdlist = [Common.JAVA, "-jar", Common.DX_JAR, "--dex", "--output=%s" % dexfile, jarfile]
     subprocess.call(cmdlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     Log.out("[Logging...] Jar转换完成", True)
+
+def clearDupSmali(decompiledfolder):
+    Log.out("[Logging...] 清除重复文件 ", True)
+    smali = os.path.join(decompiledfolder, "smali")
+    smali2 = os.path.join(decompiledfolder, "smali_classes2")
+    if (not os.path.exists(smali2)):
+        return
+    srclist = os.walk(smali, True)
+    for root, filedir, files in srclist:
+        for file in files:
+            file = os.path.join(root, file)
+            if True or r"com\abch\sdk" in file:
+                toDeleteFile = file.replace(smali, smali2)
+                if os.path.exists(toDeleteFile):
+                    os.remove(toDeleteFile)
+                    Utils.deleteEmptyDir(toDeleteFile)
+    Log.out("[Logging...] 清除文件完成\n ", True)

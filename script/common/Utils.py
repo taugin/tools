@@ -44,10 +44,13 @@ def movefile(fromfile, tofile):
         pass
 
 def deleteEmptyDir(path):
-    while True:
-        dirname = os.path.dirname(path)
-        os.rmdir(dirname)
-        path = dirname
+    try:
+        while True:
+            dirname = os.path.dirname(path)
+            os.rmdir(dirname)
+            path = dirname
+    except:
+        pass
 
 ## Get pretty look
 def indent(elem, level=0):

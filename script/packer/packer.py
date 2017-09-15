@@ -62,6 +62,9 @@ def writeManifest(decompiledfolder, manifest):
 def splitDex(decompiledfolder):
     splitdex.split_dex(decompiledfolder)
 
+def deleteDupSmali(decompiledfolder):
+    apkbuilder.clearDupSmali(decompiledfolder)
+
 def packapk(packconfig, channel):
     #获取当前渠道配置的游戏名称
     finalname = channel.getfinalname()
@@ -110,6 +113,9 @@ def packapk(packconfig, channel):
     #分割DEX
     #splitDex(decompiledfolder)
 
+    #删除重复的smali文件
+    deleteDupSmali(decompiledfolder)
+
     recompilegameapk(decompiledfolder, unsigned_apk)
     signapk(unsigned_apk, signed_apk, keystore)
     alignapk(signed_apk, final_apk)
@@ -139,6 +145,7 @@ def packplugins(decompiledfolder, pluginlist):
 
 def pack():
     channelFile = os.path.join(Common.PACK_HOME, "apkconfigs/AbchDemo/channels.xml")
+    channelFile = os.path.join(Common.PACK_HOME, "apkconfigs/UTStage/channels.xml")
     channelFile = os.path.normpath(channelFile)
     packConfig = packconfig.PackConfig(channelFile);
     packConfig.parse()
