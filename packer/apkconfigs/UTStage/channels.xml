@@ -4,9 +4,28 @@
         <plugin name="pushsdk" desc="推送插件"/>
     </global-plugins>
 
-    <gameapk>srcapks/com.ninemgames.tennis.china.apk</gameapk>
+    <gameapk>srcapks/ten_stage_china_2.13.2482.apk</gameapk>
 
     <channels>
+        <channel>
+            <param name="id" value="10"/>
+            <param name="name" value="shly"/>
+            <param name="sdk" value="shlysdk"/>
+            <param name="desc" value="SHLY SDK"/>
+            <param name="suffix" value=""/>
+            <param name="splash" value="0"/>
+            <param name="unity_splash" value="0"/>
+            <param name="icon" value="rb"/>
+            <param name="finalname" value="com.ninemgames.tennis.china-shly"/>
+            <manifest>
+                <param name="APPID" value="1212u3i2uu12oui"/>
+                <param name="APPSECRIT" value="ksdfjakjfajfkajfkajfk23rj2rkwfk3jfkjfkwjfkjrkjkjdkwjkjfk"/>
+            </manifest>
+            <sdk-version>
+                <versionCode>1</versionCode>
+                <versionName>1.0.0</versionName>
+            </sdk-version>
+        </channel>
         <channel>
             <param name="id" value="10"/>
             <param name="name" value="baidu"/>
