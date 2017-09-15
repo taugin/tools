@@ -141,11 +141,11 @@ def jar2dex(jarfile, dexfile):
     Log.out("[Logging...] Jar转换完成", True)
 
 def clearDupSmali(decompiledfolder):
-    Log.out("[Logging...] 清除重复文件 ", True)
     smali = os.path.join(decompiledfolder, "smali")
     smali2 = os.path.join(decompiledfolder, "smali_classes2")
     if (not os.path.exists(smali2)):
         return
+    Log.out("[Logging...] 清除重复文件 ", True)
     srclist = os.walk(smali, True)
     for root, filedir, files in srclist:
         for file in files:
