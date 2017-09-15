@@ -4,33 +4,23 @@
         <plugin name="pushsdk" desc="推送插件"/>
     </global-plugins>
 
-    <gameapk>srcapks/AbchDemo.apk</gameapk>
+    <gameapk>srcapks/com.ninemgames.tennis.china.apk</gameapk>
 
     <channels>
         <channel>
             <param name="id" value="10"/>
-            <param name="name" value="uc"/>
-            <param name="sdk" value="ucsdk"/>
-            <param name="desc" value="UC SDK"/>
+            <param name="name" value="baidu"/>
+            <param name="sdk" value="baidusdk"/>
+            <param name="desc" value="BAIDU SDK"/>
             <param name="suffix" value=""/>
             <param name="splash" value="0"/>
             <param name="unity_splash" value="0"/>
             <param name="icon" value="rb"/>
-            <param name="finalname" value="AbchDemo"/>
-            <!-- sdk-params 参数是写入到developer_config.properties中 -->
-            <properties>
-                <param name="UCGameId" value="544156" desc="GameId"/>
-                <param name="UCCpId" value="22398" desc="CPId"/>
-                <param name="UCDebugMode" value="false" desc="是否开启调试模式"/>
-            </properties>
+            <param name="finalname" value="com.ninemgames.tennis.china"/>
             <manifest>
                 <param name="APPID" value="1212u3i2uu12oui"/>
                 <param name="APPSECRIT" value="ksdfjakjfajfkajfkajfk23rj2rkwfk3jfkjfkwjfkjrkjkjdkwjkjfk"/>
             </manifest>
-            <!-- 渠道插件 -->
-            <plugins>
-                <plugin name="sharesdk" desc="分享插件"/>
-            </plugins>
             <sdk-version>
                 <versionCode>1</versionCode>
                 <versionName>1.0.0</versionName>
