@@ -100,7 +100,8 @@ class SdkConfig:
             Log.out("[Logging...] 无法定位文件夹 %s" % self.sdkfolder, True)
             return False
 
-        before_armeabi_dir = self.get_armeabi_folders()
+        #拷贝资源之前，获取libs内的文件夹
+        before_armeabi_dir = self.get_libs_folders()
         time.sleep(1)
 
         copylist = self.getcopylist()
@@ -114,27 +115,34 @@ class SdkConfig:
                 else:
                     Utils.copydir(file, dest)
 
-        #删除游戏中不存在的armeabi
-        after_armeabi_dir = self.get_armeabi_folders()
+        #拷贝资源之后，获取libs内的文件夹
+        after_armeabi_dir = self.get_libs_folders()
+
+        #合并armeabi中的so
         after_new_dir = []
         if len(before_armeabi_dir) < len(after_armeabi_dir):
             for dafter in after_armeabi_dir:
                 if dafter not in before_armeabi_dir:
                     after_new_dir.append(dafter)
-                    for dbefore in before_armeabi_dir:
-                        Utils.copydir(dafter, dbefore)
+                    #拷贝armeabi中的内容
+                    if ("armeabi" in dafter) :
+                        for dbefore in before_armeabi_dir:
+                            Utils.copydir(dafter, dbefore)
 
+        #删除应用中不存在的so库类型
         for d in after_new_dir:
             Utils.deletedir(os.path.join(self.decompiledfolder, "lib", d))
         Log.out("[Logging...] 拷贝资源完成\n", True)
         return True
 
-    def get_armeabi_folders(self):
+    def get_libs_folders(self):
         armeabi_dir = []
-        listdir = os.listdir(os.path.join(self.decompiledfolder, "lib"))
+        libsdir = os.path.join(self.decompiledfolder, "lib")
+        if (not os.path.exists(libsdir)):
+            return armeabi_dir
+        listdir = os.listdir(libsdir)
         for d in listdir:
-            if ("armeabi" in d):
-                armeabi_dir.append(d)
+            armeabi_dir.append(d)
         return armeabi_dir
 
     def process_plugin(self):

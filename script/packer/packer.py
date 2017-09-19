@@ -14,7 +14,6 @@ import mergeaxml
 import sdkconfig
 import packconfig
 import splitdex
-import icondo
 
 #检查PIL模块
 def check_pil():
@@ -37,9 +36,11 @@ def process_sdk(decompiledfolder, sdk_channel):
     config.process()
 
 #处理渠道角标
-def process_corner_icon(decompiledfolder, sdk_channel, cornerPos):
+def process_corner_icon(decompiledfolder, sdk_channel, cornerpos):
     if (check_pil()):
-        icondo.process_corner_icon(decompiledfolder, sdk_channel, cornerPos)
+        import icondo
+        icondo.process_corner_icon(decompiledfolder, sdk_channel, cornerpos)
+
 #回编译游戏
 def recompilegameapk(decompiledfolder, recompiledfile):
     ret = apkbuilder.apk_compile(decompiledfolder, recompiledfile)
@@ -166,7 +167,7 @@ def packplugins(decompiledfolder, pluginlist):
 
 def pack():
     channelFile = os.path.join(Common.PACK_HOME, "apkconfigs/AbchDemo/channels.xml")
-    channelFile = os.path.join(Common.PACK_HOME, "apkconfigs/UTStage/channels.xml")
+    #channelFile = os.path.join(Common.PACK_HOME, "apkconfigs/UTStage/channels.xml")
     channelFile = os.path.normpath(channelFile)
     packConfig = packconfig.PackConfig(channelFile);
     packConfig.parse()
