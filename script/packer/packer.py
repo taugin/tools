@@ -14,6 +14,17 @@ import mergeaxml
 import sdkconfig
 import packconfig
 import splitdex
+import icondo
+
+#检查PIL模块
+def check_pil():
+    try:
+        from PIL import Image
+        return True
+    except ImportError:
+        return False
+    else:
+        return True
 
 #反编译游戏文件
 def decompilegameapk(srcapk, decompiledfolder):
@@ -21,10 +32,14 @@ def decompilegameapk(srcapk, decompiledfolder):
     Utils.exitOnFalse(ret)
 
 #拷贝sdk某些文件到反编译文件夹中
-def process_sdk(decompiledfolder, sdkfolder):
-    config = sdkconfig.SdkConfig(decompiledfolder, sdkfolder)
+def process_sdk(decompiledfolder, sdk_channel):
+    config = sdkconfig.SdkConfig(decompiledfolder, sdk_channel)
     config.process()
 
+#处理渠道角标
+def process_corner_icon(decompiledfolder, sdk_channel, cornerPos):
+    if (check_pil()):
+        icondo.process_corner_icon(decompiledfolder, sdk_channel, cornerPos)
 #回编译游戏
 def recompilegameapk(decompiledfolder, recompiledfile):
     ret = apkbuilder.apk_compile(decompiledfolder, recompiledfile)
@@ -85,6 +100,9 @@ def packapk(packconfig, channel):
     #获取manifest
     manifest = channel.getManifest()
 
+    #获取角标位置
+    cornerpos = channel.getcornerpos()
+
     #游戏文件路径
     srcapk = os.path.join(Common.PACK_HOME, srcapkpath)
 
@@ -116,31 +134,34 @@ def packapk(packconfig, channel):
     #删除重复的smali文件
     deleteDupSmali(decompiledfolder)
 
+    #处理渠道角标
+    process_corner_icon(decompiledfolder, sdk_channel, cornerpos)
+
     recompilegameapk(decompiledfolder, unsigned_apk)
     signapk(unsigned_apk, signed_apk, keystore)
     alignapk(signed_apk, final_apk)
     cleartmp(unsigned_apk, signed_apk)
 
 #打包渠道sdk
-def packchannel(decompiledfolder, sdkfolder, sdkname):
+def packchannel(decompiledfolder, sdk_channel, sdkname):
     Log.out("[Logging...] +++++++++++++++++++++++++++++++++++++++");
     Log.out("[Logging...] 打包配置渠道 : [%s]" % sdkname);
-    process_sdk(decompiledfolder, sdkfolder)
+    process_sdk(decompiledfolder, sdk_channel)
     Log.out("[Logging...] =======================================\n");
 
 #打包插件sdk
 def packplugins(decompiledfolder, pluginlist):
     Log.out("[Logging...] +++++++++++++++++++++++++++++++++++++++");
-    sdkfolder = None
+    sdk_channel = None
     if (pluginlist != None):
         for plugin in pluginlist:
             pname = Utils.getvalue(plugin, "name")
             if (Utils.isEmpty(pname)) :
                 continue
-            sdkfolder = os.path.join(Common.PLUGINS_SDK_DIR, pname)
-            if (os.path.exists(sdkfolder)):
+            sdk_channel = os.path.join(Common.PLUGINS_SDK_DIR, pname)
+            if (os.path.exists(sdk_channel)):
                 Log.out("[Logging...] 打包配置插件 : [%s]" % pname);
-                process_sdk(decompiledfolder, sdkfolder)
+                process_sdk(decompiledfolder, sdk_channel)
     Log.out("[Logging...] =======================================\n");
 
 def pack():

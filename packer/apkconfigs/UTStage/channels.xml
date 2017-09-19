@@ -9,14 +9,14 @@
     <channels>
         <channel>
             <param name="id" value="10"/>
-            <param name="name" value="shly"/>
-            <param name="sdk" value="shlysdk"/>
-            <param name="desc" value="SHLY SDK"/>
+            <param name="name" value="baidu"/>
+            <param name="sdk" value="baidusdk"/>
+            <param name="desc" value="BAIDU SDK"/>
             <param name="suffix" value=""/>
             <param name="splash" value="0"/>
             <param name="unity_splash" value="0"/>
-            <param name="icon" value="rb"/>
-            <param name="finalname" value="com.ninemgames.tennis.china-shly"/>
+            <param name="corner" value="rb"/>
+            <param name="finalname" value="com.ninemgames.tennis.china"/>
             <manifest>
                 <param name="APPID" value="1212u3i2uu12oui"/>
                 <param name="APPSECRIT" value="ksdfjakjfajfkajfkajfk23rj2rkwfk3jfkjfkwjfkjrkjkjdkwjkjfk"/>
@@ -28,14 +28,14 @@
         </channel>
         <channel>
             <param name="id" value="10"/>
-            <param name="name" value="baidu"/>
-            <param name="sdk" value="baidusdk"/>
-            <param name="desc" value="BAIDU SDK"/>
+            <param name="name" value="shly"/>
+            <param name="sdk" value="shlysdk"/>
+            <param name="desc" value="SHLY SDK"/>
             <param name="suffix" value=""/>
             <param name="splash" value="0"/>
             <param name="unity_splash" value="0"/>
-            <param name="icon" value="rb"/>
-            <param name="finalname" value="com.ninemgames.tennis.china"/>
+            <param name="corner" value="rb"/>
+            <param name="finalname" value="com.ninemgames.tennis.china-shly"/>
             <manifest>
                 <param name="APPID" value="1212u3i2uu12oui"/>
                 <param name="APPSECRIT" value="ksdfjakjfajfkajfkajfk23rj2rkwfk3jfkjfkwjfkjrkjkjdkwjkjfk"/>

@@ -177,3 +177,6 @@ class Channel:
 
     def getkeystore(self):
         return self.keystoreinfo
+
+    def getcornerpos(self):
+        return Utils.getvalue(self.map, "corner")

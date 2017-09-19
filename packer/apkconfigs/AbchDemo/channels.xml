@@ -15,7 +15,7 @@
             <param name="suffix" value=""/>
             <param name="splash" value="0"/>
             <param name="unity_splash" value="0"/>
-            <param name="icon" value="rb"/>
+            <param name="corner" value="rb"/>
             <param name="finalname" value="AbchDemo"/>
             <!-- sdk-params 参数是写入到developer_config.properties中 -->
             <properties>
