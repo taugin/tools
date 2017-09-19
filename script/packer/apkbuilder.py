@@ -33,7 +33,7 @@ def apk_decompile(apkfile, decompiled_folder=None):
 
     #cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "d", "-s", "-f" , apkfile, "-o", decompiled_folder]
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "d", "-f" , apkfile, "-o", decompiled_folder]
-    Log.out("[Logging...] 反编文件名称 : [%s]" % Utils.normalPath(apkfile))
+    Log.out("[Logging...] 反编文件名称 : [%s] --> [%s]" % (Utils.normalPath(apkfile), os.path.basename(decompiled_folder)))
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):

@@ -4,7 +4,7 @@
         <plugin name="pushsdk" desc="推送插件"/>
     </global-plugins>
 
-    <gameapk>srcapks/AbchDemo.apk</gameapk>
+    <srcapk>srcapks/AbchDemo.apk</srcapk>
 
     <channels>
         <channel>

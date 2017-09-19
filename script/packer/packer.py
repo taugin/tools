@@ -16,8 +16,8 @@ import packconfig
 import splitdex
 
 #反编译游戏文件
-def decompilegameapk(gameapk, decompiledfolder):
-    ret = apkbuilder.apk_decompile(gameapk, decompiledfolder)
+def decompilegameapk(srcapk, decompiledfolder):
+    ret = apkbuilder.apk_decompile(srcapk, decompiledfolder)
     Utils.exitOnFalse(ret)
 
 #拷贝sdk某些文件到反编译文件夹中
@@ -77,7 +77,7 @@ def packapk(packconfig, channel):
     #获取签名信息
     keystore = channel.getkeystore()
     #获取母包路径
-    gameapkpath = packconfig.getgameapk()
+    srcapkpath = packconfig.getsrcapk()
     #获取SDK名字
     sdkname = channel.getsdkname()
     #获取Properties
@@ -86,7 +86,7 @@ def packapk(packconfig, channel):
     manifest = channel.getManifest()
 
     #游戏文件路径
-    gameapk = os.path.join(Common.PACK_HOME, gameapkpath)
+    srcapk = os.path.join(Common.PACK_HOME, srcapkpath)
 
     decompiledfolder = os.path.join(Common.WORKSPACE, finalname + "-" + sdkdirname)
     unsigned_apk = os.path.join(Common.DSTAPKS, finalname + "-" + sdkname + "-unsigned.apk")
@@ -95,7 +95,7 @@ def packapk(packconfig, channel):
     sdk_channel = os.path.join(Common.CHANNEL_SDK_DIR, sdkdirname)
 
     #反编译APK
-    decompilegameapk(gameapk, decompiledfolder)
+    decompilegameapk(srcapk, decompiledfolder)
 
     #################################################
     #打渠道包

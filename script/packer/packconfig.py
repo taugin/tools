@@ -15,12 +15,12 @@ class PackConfig:
         self.channelList = []
         self.globalPlugin = []
         self.signapkinfo = {}
-        self.gameapk = None
+        self.srcapk = None
 
     def parse(self):
-        gameapkele = self.root.find("gameapk")
-        if (gameapkele != None):
-            self.gameapk = gameapkele.text
+        srcapknode = self.root.find("srcapk")
+        if (srcapknode != None):
+            self.srcapk = srcapknode.text
 
         globalPlugin = self.root.findall("global-plugins/plugin")
         mydict = {}
@@ -43,8 +43,8 @@ class PackConfig:
     def getsignapkinfo(self):
         return self.signapkinfo
 
-    def getgameapk(self):
-        return self.gameapk
+    def getsrcapk(self):
+        return self.srcapk
 
 class Channel:
     def __init__(self, root, globalPlugin):

@@ -4,7 +4,7 @@
         <plugin name="pushsdk" desc="推送插件"/>
     </global-plugins>
 
-    <gameapk>srcapks/ten_stage_china_2.13.2482.apk</gameapk>
+    <srcapk>srcapks/ten_stage_china_2.13.2482.apk</srcapk>
 
     <channels>
         <channel>
