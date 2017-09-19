@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 from xml.dom.minidom import Document
 import mergeaxml
 import apkbuilder
+import time
 
 
 class SdkConfig:
@@ -99,6 +100,9 @@ class SdkConfig:
             Log.out("[Logging...] 无法定位文件夹 %s" % self.sdkfolder, True)
             return False
 
+        before_armeabi_dir = self.get_armeabi_folders()
+        time.sleep(1)
+
         copylist = self.getcopylist()
         if (copylist != None):
             for d in copylist:
@@ -109,8 +113,29 @@ class SdkConfig:
                     Utils.copyfile(file, dest)
                 else:
                     Utils.copydir(file, dest)
+
+        #删除游戏中不存在的armeabi
+        after_armeabi_dir = self.get_armeabi_folders()
+        after_new_dir = []
+        if len(before_armeabi_dir) < len(after_armeabi_dir):
+            for dafter in after_armeabi_dir:
+                if dafter not in before_armeabi_dir:
+                    after_new_dir.append(dafter)
+                    for dbefore in before_armeabi_dir:
+                        Utils.copydir(dafter, dbefore)
+
+        for d in after_new_dir:
+            Utils.deletedir(os.path.join(self.decompiledfolder, "lib", d))
         Log.out("[Logging...] 拷贝资源完成\n", True)
         return True
+
+    def get_armeabi_folders(self):
+        armeabi_dir = []
+        listdir = os.listdir(os.path.join(self.decompiledfolder, "lib"))
+        for d in listdir:
+            if ("armeabi" in d):
+                armeabi_dir.append(d)
+        return armeabi_dir
 
     def process_plugin(self):
         pluginfile = os.path.join(self.decompiledfolder, "assets", "plugin_config.xml")

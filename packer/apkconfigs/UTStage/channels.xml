@@ -4,7 +4,7 @@
         <plugin name="pushsdk" desc="推送插件"/>
     </global-plugins>
 
-    <srcapk>srcapks/ten_stage_china_2.13.2482.apk</srcapk>
+    <srcapk>srcapks/UTStage_1.0.0.apk</srcapk>
 
     <channels>
         <channel>
@@ -16,7 +16,7 @@
             <param name="splash" value="0"/>
             <param name="unity_splash" value="0"/>
             <param name="corner" value="rb"/>
-            <param name="finalname" value="com.ninemgames.tennis.china"/>
+            <param name="finalname" value="UTStage_1.0.0"/>
             <manifest>
                 <param name="APPID" value="1212u3i2uu12oui"/>
                 <param name="APPSECRIT" value="ksdfjakjfajfkajfkajfk23rj2rkwfk3jfkjfkwjfkjrkjkjdkwjkjfk"/>

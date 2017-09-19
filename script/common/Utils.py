@@ -33,6 +33,12 @@ def copyfile(fromfile, tofile):
     except:
         pass
 
+def deletedir(path):
+    try:
+        shutil.rmtree(path)
+    except Exception as e:
+        print("e : %s" % e)
+
 def movefile(fromfile, tofile):
     try:
         dirname = os.path.dirname(tofile)
