@@ -166,8 +166,8 @@ def packplugins(decompiledfolder, pluginlist):
     Log.out("[Logging...] =======================================\n");
 
 def pack():
-    channelFile = os.path.join(Common.PACK_HOME, "apkconfigs/AbchDemo/channels.xml")
-    #channelFile = os.path.join(Common.PACK_HOME, "apkconfigs/UTStage/channels.xml")
+    #channelFile = os.path.join(Common.PACK_HOME, "apkconfigs/AbchDemo/channels.xml")
+    channelFile = os.path.join(Common.PACK_HOME, "apkconfigs/UTStage/channels.xml")
     channelFile = os.path.normpath(channelFile)
     packConfig = packconfig.PackConfig(channelFile);
     packConfig.parse()

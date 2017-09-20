@@ -119,18 +119,18 @@ class SdkConfig:
         after_armeabi_dir = self.get_libs_folders()
 
         #合并armeabi中的so
-        after_new_dir = []
+        waitfor_delete_dir = []
         if len(before_armeabi_dir) < len(after_armeabi_dir):
             for dafter in after_armeabi_dir:
                 if dafter not in before_armeabi_dir:
-                    after_new_dir.append(dafter)
+                    waitfor_delete_dir.append(dafter)
                     #拷贝armeabi中的内容
                     if ("armeabi" in dafter) :
                         for dbefore in before_armeabi_dir:
                             Utils.copydir(dafter, dbefore)
 
         #删除应用中不存在的so库类型
-        for d in after_new_dir:
+        for d in waitfor_delete_dir:
             Utils.deletedir(os.path.join(self.decompiledfolder, "lib", d))
         Log.out("[Logging...] 拷贝资源完成\n", True)
         return True

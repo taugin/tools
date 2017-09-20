@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # coding: UTF-8
 
-
+'''
+合成渠道角标
+'''
 import moduleconfig
 import Common
 import Log
@@ -69,7 +71,7 @@ def add_corner_icon(iconfile, cornerfile):
 
     offset_w = icon_w - corner_w
     offset_h = icon_h - corner_h
-    if offset_w < 0 or offset_h < 0:
+    if False and (offset_w < 0 or offset_h < 0):
         Log.out("[Logging...] 无法合成角标 : offsetx : %d, offsety : %d" % (offset_w, offset_h))
         return
     icon_image.paste(corner_image, (offset_w, offset_h), corner_image)
@@ -90,11 +92,12 @@ def find_proper_corner(icon_file, corner_files):
         (corner_w, corner_h) = corner_image.size
         corner_image.close()
         #print("icon_w : %d, icon_h : %d, corner_w : %d, corner_h : %d" % (icon_w, icon_h, corner_w, corner_h))
-        if (corner_w <= icon_w and corner_h <= icon_h):
+        #从所有角标中寻找合适的角标
+        if (True or corner_w <= icon_w and corner_h <= icon_h):
             offsetw = icon_w - corner_w
             offseth = icon_h - corner_h
             proper_corner = corner_file
-            if min_offsetw > offsetw and min_offseth > offseth:
+            if abs(min_offsetw) > abs(offsetw) and abs(min_offseth) > abs(offseth):
                 min_offsetw = offsetw
                 min_offseth = offseth
                 proper_corner = corner_file
