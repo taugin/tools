@@ -8,6 +8,8 @@ import Log
 import Utils
 
 import os
+import sys
+import getopt
 
 import apkbuilder
 import mergeaxml
@@ -172,13 +174,42 @@ def packplugins(decompiledfolder, pluginlist):
                 process_sdk(decompiledfolder, sdk_channel)
     Log.out("[Logging...] =======================================\n");
 
-def pack():
-    #channelFile = os.path.join(Common.PACK_HOME, "apkconfigs/AbchDemo/channels.xml")
-    channelFile = os.path.join(Common.PACK_HOME, "apkconfigs/UTStage/channels.xml")
+def pack(appName, channelNo):
+    channelFile = os.path.join(Common.PACK_HOME, "apkconfigs/%s/channels.xml" % appName)
     channelFile = os.path.normpath(channelFile)
+    if (not os.path.exists(channelFile)):
+        Log.out("[Logging...] 缺少配置文件 : [%s]" % channelFile)
+        return
     packConfig = packconfig.PackConfig(channelFile);
     packConfig.parse()
-    channel = packConfig.getChannelList()[0]
+    channelList = packConfig.getChannelList();
+    if (channelList == None or len(channelList) < channelNo):
+        Log.out("[Logging...] 渠道序号错误 : [%d]" % channelNo)
+        return
+    channel = channelList[channelNo]
     packapk(packConfig, channel)
 
-pack()
+if __name__ == "__main__":
+    if (len(sys.argv) < 2):
+        Log.out("[Logging...] 缺少参数 : %s -a 应用名称 -c 渠道序号" % os.path.basename(sys.argv[0]), True);
+        sys.exit()
+
+    appName = None
+    channelNo = None
+
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "a:c:h")
+        for op, value in opts:
+            if (op == "-a"):
+                appName = value
+            elif (op == "-c") :
+                channelNo = value
+            elif (op == "-h") :
+                Log.out("[Logging...] 缺少参数 : %s -a appName -c channelNo" % os.path.basename(sys.argv[0]), True);
+                sys.exit()
+    except getopt.GetoptError as err:
+        Log.out(err)
+        sys.exit()
+
+    if appName != None and channelNo != None and channelNo.isdigit():
+        pack(appName, int(channelNo))

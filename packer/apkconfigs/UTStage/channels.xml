@@ -22,6 +22,10 @@
             <properties>
                 <param name="appId" value="9214003" desc="appid"/>
                 <param name="appKey" value="YKaLwFvAESL3Y7AHj6MDypie" desc="appkey"/>
+                <param name="dispatch" value="000001" desc="dispatch"/>
+                <param name="statistics" value="000001" desc="statistics"/>
+                <param name="abch_app_id" value="1" desc="abch_app_id"/>
+                <param name="abch_app_key" value="e569f0e23dfe6870853ddf7b53be39d6" desc="abch_app_key"/>
             </properties>
             <sdk-version>
                 <versionCode>1</versionCode>
@@ -37,12 +41,14 @@
             <param name="splash" value="0"/>
             <param name="unity_splash" value="0"/>
             <param name="corner" value="rb"/>
-            <param name="finalname" value="com.ninemgames.tennis.china-shly"/>
+            <param name="finalname" value="UTStage_1.0.0"/>
             <manifest>
-                <param name="APPID" value="1212u3i2uu12oui"/>
-                <param name="APPSECRIT" value="ksdfjakjfajfkajfkajfk23rj2rkwfk3jfkjfkwjfkjrkjkjdkwjkjfk"/>
             </manifest>
             <properties>
+                <param name="dispatch" value="000001" desc="dispatch"/>
+                <param name="statistics" value="000001" desc="statistics"/>
+                <param name="abch_app_id" value="1" desc="abch_app_id"/>
+                <param name="abch_app_key" value="e569f0e23dfe6870853ddf7b53be39d6" desc="abch_app_key"/>
             </properties>
             <sdk-version>
                 <versionCode>1</versionCode>
