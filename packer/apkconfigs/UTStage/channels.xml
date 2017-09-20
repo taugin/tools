@@ -18,9 +18,11 @@
             <param name="corner" value="rb"/>
             <param name="finalname" value="UTStage_1.0.0"/>
             <manifest>
-                <param name="APPID" value="1212u3i2uu12oui"/>
-                <param name="APPSECRIT" value="ksdfjakjfajfkajfkajfk23rj2rkwfk3jfkjfkwjfkjrkjkjdkwjkjfk"/>
             </manifest>
+            <properties>
+                <param name="appId" value="9214003" desc="appid"/>
+                <param name="appKey" value="YKaLwFvAESL3Y7AHj6MDypie" desc="appkey"/>
+            </properties>
             <sdk-version>
                 <versionCode>1</versionCode>
                 <versionName>1.0.0</versionName>
@@ -40,6 +42,8 @@
                 <param name="APPID" value="1212u3i2uu12oui"/>
                 <param name="APPSECRIT" value="ksdfjakjfajfkajfkajfk23rj2rkwfk3jfkjfkwjfkjrkjkjdkwjkjfk"/>
             </manifest>
+            <properties>
+            </properties>
             <sdk-version>
                 <versionCode>1</versionCode>
                 <versionName>1.0.0</versionName>

@@ -50,10 +50,10 @@ def baksmali(dexfile, outdir):
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
-        Log.out("[Logging...] 文件转换失败")
+        Log.out("[Logging...] 文件转换失败\n")
         return False
     else:
-        Log.out("[Logging...] 文件转换成功")
+        Log.out("[Logging...] 文件转换成功\n")
         return True
 
 def deletemetainf(src_apk):
@@ -169,3 +169,12 @@ def encryptKeyFile(decompiledfolder):
             cmdlist = common + ["-i", file, "-o", file]
             subprocess.call(cmdlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     Log.out("[Logging...] 加密文件完成\n", True)
+
+#调用渠道自定义脚本
+def callChannelSpec(pyPath, args):
+    if (not os.path.exists(pyPath)):
+        return
+    Log.out("[Logging...] 执行渠道脚本", True)
+    cmdlist = ["python", pyPath] + args
+    subprocess.call(cmdlist)
+    Log.out("[Logging...] 执行脚本完成\n", True)
