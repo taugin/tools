@@ -41,6 +41,10 @@ def process_corner_icon(decompiledfolder, sdk_channel, cornerpos):
         import icondo
         icondo.process_corner_icon(decompiledfolder, sdk_channel, cornerpos)
 
+#加密关键文件
+def encryptKeyFile(decompiledfolder):
+    apkbuilder.encryptKeyFile(decompiledfolder)
+
 #回编译游戏
 def recompilegameapk(decompiledfolder, recompiledfile):
     ret = apkbuilder.apk_compile(decompiledfolder, recompiledfile)
@@ -137,6 +141,9 @@ def packapk(packconfig, channel):
 
     #处理渠道角标
     process_corner_icon(decompiledfolder, sdk_channel, cornerpos)
+
+    #加密关键文件
+    encryptKeyFile(decompiledfolder)
 
     recompilegameapk(decompiledfolder, unsigned_apk)
     signapk(unsigned_apk, signed_apk, keystore)

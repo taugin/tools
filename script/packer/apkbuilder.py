@@ -156,3 +156,16 @@ def clearDupSmali(decompiledfolder):
                     os.remove(toDeleteFile)
                     Utils.deleteEmptyDir(toDeleteFile)
     Log.out("[Logging...] 清除文件完成\n ", True)
+
+def encryptKeyFile(decompiledfolder):
+    Log.out("[Logging...] 加密关键文件", True)
+    common = [Common.JAVA, "-jar", Common.AES_JAR, "-k", "111222", "-e"]
+    encryptFileList = ["assets/plugin_config.xml", "assets/developer_config.properties"]
+    for f in encryptFileList:
+        file = os.path.join(decompiledfolder, f)
+        file = os.path.normpath(file)
+        if os.path.exists(file):
+            Log.out("[Logging...] 正在加密文件 : [%s]" % f, True)
+            cmdlist = common + ["-i", file, "-o", file]
+            subprocess.call(cmdlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    Log.out("[Logging...] 加密文件完成\n", True)
