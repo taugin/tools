@@ -9,6 +9,7 @@ import Utils
 import os
 import subprocess
 import zipfile
+import random
 
 #编译apk
 def apk_compile(folder, compileapk):
@@ -46,14 +47,17 @@ def apk_decompile(apkfile, decompiled_folder=None):
 def baksmali(dexfile, outdir):
     '''dex文件转smali文件，并且输出到outdir'''
     Log.out("[Logging...] 开始转换文件 : [%s] --> [%s]" % (dexfile, outdir))
-    cmdlist = [Common.JAVA, "-jar", Common.BAKSMALI_JAR, "-o", outdir, dexfile]
+    tmpdir = os.path.join(Common.WORKSPACE, "tmp%s" % random.randint(0, 1000))
+    cmdlist = [Common.JAVA, "-jar", Common.BAKSMALI_JAR, "-o", tmpdir, dexfile]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
+    Utils.copydir(tmpdir, outdir, False)
+    Utils.deletedir(tmpdir)
     if (ret != 0):
-        Log.out("[Logging...] 文件转换失败\n")
+        Log.out("[Logging...] 文件转换失败")
         return False
     else:
-        Log.out("[Logging...] 文件转换成功\n")
+        Log.out("[Logging...] 文件转换成功")
         return True
 
 def deletemetainf(src_apk):

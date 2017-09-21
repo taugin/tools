@@ -12,7 +12,7 @@ def pause():
         print("操作完成，按任意键退出")
         msvcrt.getch()
 
-def copydir(fromdir, todir):
+def copydir(fromdir, todir, override = True):
     mylist = os.walk(fromdir, True)
     for root, filedir, files in mylist:
         for file in files:
@@ -22,13 +22,16 @@ def copydir(fromdir, todir):
             #sdk文件夹内的文件
             fromdirfile = os.path.join(root, file)
             todirfile = fromdirfile.replace(fromdir, todir)
-            copyfile(fromdirfile, todirfile)
+            copyfile(fromdirfile, todirfile, override)
 
-def copyfile(fromfile, tofile):
+def copyfile(fromfile, tofile, override = True):
     try:
         dirname = os.path.dirname(tofile)
         if (not os.path.exists(dirname)):
             os.makedirs(dirname)
+        if override == False:
+            if (os.path.exists(tofile)):
+                return
         shutil.copy2(fromfile, tofile)
     except:
         pass

@@ -74,6 +74,10 @@
                 <param name="UCGameId" value="544156" desc="GameId"/>
                 <param name="UCCpId" value="22398" desc="CPId"/>
                 <param name="UCDebugMode" value="false" desc="是否开启调试模式"/>
+                <param name="dispatch" value="000001" desc="dispatch"/>
+                <param name="statistics" value="000001" desc="statistics"/>
+                <param name="abch_app_id" value="1" desc="abch_app_id"/>
+                <param name="abch_app_key" value="e569f0e23dfe6870853ddf7b53be39d6" desc="abch_app_key"/>
             </properties>
             <!--manifest参数会被写入到application下面的meta-data节点-->
             <manifest>
