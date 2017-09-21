@@ -16,11 +16,16 @@ class PackConfig:
         self.globalPlugin = []
         self.signapkinfo = {}
         self.srcapk = None
+        self.finalname = None
 
     def parse(self):
         srcapknode = self.root.find("srcapk")
         if (srcapknode != None):
             self.srcapk = srcapknode.text
+
+        finalnamenode = self.root.find("finalname")
+        if (finalnamenode != None):
+            self.finalname = finalnamenode.text
 
         globalPlugin = self.root.findall("global-plugins/plugin")
         mydict = {}
@@ -46,6 +51,9 @@ class PackConfig:
     def getsrcapk(self):
         return self.srcapk
 
+    def getfinalname(self):
+        return self.finalname
+
 class Channel:
     def __init__(self, root, globalPlugin):
         #developer_config.properties文件配置
@@ -61,6 +69,9 @@ class Channel:
         self.root = root
         #签名信息
         self.keystoreinfo = {}
+
+        #渠道自定义参数
+        self.spec_params = []
 
         self.parseChannel()
         self.parseKeystore()
@@ -96,6 +107,14 @@ class Channel:
             mydict["value"] = Utils.getattrib(sdkp, "value")
             mydict["desc"] = Utils.getattrib(sdkp, "desc")
             self.manifest += [mydict]
+
+        #获取spec-params
+        specparams = self.root.findall("spec-params/param")
+        for sdkp in specparams:
+            mydict = {}
+            mydict["name"] = Utils.getattrib(sdkp, "name")
+            mydict["value"] = Utils.getattrib(sdkp, "value")
+            self.spec_params += [mydict]
 
         plugins = self.root.findall("plugins/plugin")
         for plugin in plugins:
@@ -156,6 +175,9 @@ class Channel:
         else:
             return False
 
+    def getSpecParams(self):
+        return self.spec_params
+
     def isUnitySplash(self):
         tmp = Utils.getvalue(self.map, "unity_splash")
         if (tmp != None and tmp != "0"):
@@ -165,9 +187,6 @@ class Channel:
 
     def getsdkicon(self):
         return Utils.getvalue(self.map, "icon")
-
-    def getfinalname(self):
-        return Utils.getvalue(self.map, "finalname")
 
     def getvercode(self):
         return Utils.getvalue(self.map, "vercode")

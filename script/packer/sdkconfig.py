@@ -89,9 +89,6 @@ class SdkConfig:
             outdir = os.path.join(self.decompiledfolder, "smali_classes2")
         #'''
         apkbuilder.baksmali(dexfile, outdir)
-        #调用渠道自定义脚本
-        pyPath = os.path.normpath(os.path.join(self.sdkfolder, "channel_spec.py"))
-        apkbuilder.callChannelSpec(pyPath, ["1", "2", "3", "4"])
 
     def process_copylist(self):
         Log.out("[Logging...] 拷贝资源文件 ", True)

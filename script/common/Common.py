@@ -75,6 +75,8 @@ JAVA = "java"
 #apk对齐工具
 ZIPALIGN = os.path.join(BIN_DIR, "zipalign%s" % BIN_SUFFIX)
 
+PYTHON = "python"
+
 #########################apk签名参数#################################
 #jarsigner 在JDK7上需要的参数
 JDK7ARG="-tsa https://timestamp.geotrust.com/tsa -digestalg SHA1 -sigalg MD5withRSA"

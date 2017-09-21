@@ -174,7 +174,12 @@ def encryptKeyFile(decompiledfolder):
 def callChannelSpec(pyPath, args):
     if (not os.path.exists(pyPath)):
         return
-    Log.out("[Logging...] 执行渠道脚本", True)
-    cmdlist = ["python", pyPath] + args
+    Log.out("[Logging...] 执行渠道脚本 : [%s]" % pyPath, True)
+    cmdargs = []
+    try:
+        cmdargs.append(str(args))
+    except:
+        pass
+    cmdlist = [Common.PYTHON, pyPath] + cmdargs
     subprocess.call(cmdlist)
     Log.out("[Logging...] 执行脚本完成\n", True)

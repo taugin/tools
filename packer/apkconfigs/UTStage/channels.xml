@@ -5,6 +5,7 @@
     </global-plugins>
 
     <srcapk>srcapks/UTStage_1.0.0.apk</srcapk>
+    <finalname>UTStage_1.0.0</finalname>
 
     <channels>
         <channel>
@@ -16,7 +17,6 @@
             <param name="splash" value="0"/>
             <param name="unity_splash" value="0"/>
             <param name="corner" value="rb"/>
-            <param name="finalname" value="UTStage_1.0.0"/>
             <manifest>
             </manifest>
             <properties>
@@ -27,6 +27,9 @@
                 <param name="abch_app_id" value="1" desc="abch_app_id"/>
                 <param name="abch_app_key" value="e569f0e23dfe6870853ddf7b53be39d6" desc="abch_app_key"/>
             </properties>
+            <!--需要渠道单独处理的参数-->
+            <spec-params>
+            </spec-params>
             <sdk-version>
                 <versionCode>1</versionCode>
                 <versionName>1.0.0</versionName>
@@ -41,7 +44,6 @@
             <param name="splash" value="0"/>
             <param name="unity_splash" value="0"/>
             <param name="corner" value="rb"/>
-            <param name="finalname" value="UTStage_1.0.0"/>
             <manifest>
             </manifest>
             <properties>
@@ -50,6 +52,41 @@
                 <param name="abch_app_id" value="1" desc="abch_app_id"/>
                 <param name="abch_app_key" value="e569f0e23dfe6870853ddf7b53be39d6" desc="abch_app_key"/>
             </properties>
+            <!--需要渠道单独处理的参数-->
+            <spec-params>
+            </spec-params>
+            <sdk-version>
+                <versionCode>1</versionCode>
+                <versionName>1.0.0</versionName>
+            </sdk-version>
+        </channel>
+        <channel>
+            <param name="id" value="10"/>
+            <param name="name" value="uc"/>
+            <param name="sdk" value="ucsdk"/>
+            <param name="desc" value="UC SDK"/>
+            <param name="suffix" value=""/>
+            <param name="splash" value="0"/>
+            <param name="unity_splash" value="0"/>
+            <param name="corner" value="rb"/>
+            <!-- sdk-params 参数是写入到developer_config.properties中 -->
+            <properties>
+                <param name="UCGameId" value="544156" desc="GameId"/>
+                <param name="UCCpId" value="22398" desc="CPId"/>
+                <param name="UCDebugMode" value="false" desc="是否开启调试模式"/>
+            </properties>
+            <!--manifest参数会被写入到application下面的meta-data节点-->
+            <manifest>
+                <param name="APPID" value="1234567890"/>
+                <param name="APPSECRIT" value="e569f0e23dfe6870853ddf7b53be39d6"/>
+            </manifest>
+            <!--需要渠道单独处理的参数-->
+            <spec-params>
+            </spec-params>
+            <!-- 渠道插件 -->
+            <plugins>
+                <plugin name="sharesdk" desc="分享插件"/>
+            </plugins>
             <sdk-version>
                 <versionCode>1</versionCode>
                 <versionName>1.0.0</versionName>

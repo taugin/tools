@@ -90,7 +90,7 @@ def deleteDupSmali(decompiledfolder):
 
 def packapk(packconfig, channel):
     #获取当前渠道配置的游戏名称
-    finalname = channel.getfinalname()
+    finalname = packconfig.getfinalname()
     #获取SDK目录
     sdkdirname = channel.getsdkdir();
     #获取所有sdk插件
@@ -148,6 +148,10 @@ def packapk(packconfig, channel):
     #加密关键文件
     encryptKeyFile(decompiledfolder)
 
+    #调用渠道自定义脚本
+    pyPath = os.path.normpath(os.path.join(sdk_channel, "channel_spec.py"))
+    apkbuilder.callChannelSpec(pyPath, channel.getSpecParams())
+
     recompilegameapk(decompiledfolder, unsigned_apk)
     signapk(unsigned_apk, signed_apk, keystore)
     alignapk(signed_apk, final_apk)
@@ -176,7 +180,7 @@ def packplugins(decompiledfolder, pluginlist):
     Log.out("[Logging...] =======================================\n");
 
 def pack(appName, channelNo):
-    channelFile = os.path.join(Common.PACK_HOME, "apkconfigs/%s/channels.xml" % appName)
+    channelFile = os.path.join(Common.APK_CONFIGS, appName, "channels.xml")
     channelFile = os.path.normpath(channelFile)
     if (not os.path.exists(channelFile)):
         Log.out("[Logging...] 缺少配置文件 : [%s]" % channelFile)

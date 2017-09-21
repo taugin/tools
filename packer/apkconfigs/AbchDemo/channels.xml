@@ -5,6 +5,7 @@
     </global-plugins>
 
     <srcapk>srcapks/AbchDemo.apk</srcapk>
+    <finalname>AbchDemo</finalname>
 
     <channels>
         <channel>
@@ -16,21 +17,26 @@
             <param name="splash" value="0"/>
             <param name="unity_splash" value="0"/>
             <param name="corner" value="rb"/>
-            <param name="finalname" value="AbchDemo"/>
             <!-- sdk-params 参数是写入到developer_config.properties中 -->
             <properties>
                 <param name="UCGameId" value="544156" desc="GameId"/>
                 <param name="UCCpId" value="22398" desc="CPId"/>
                 <param name="UCDebugMode" value="false" desc="是否开启调试模式"/>
             </properties>
+            <!--manifest参数会被写入到application下面的meta-data节点-->
             <manifest>
-                <param name="APPID" value="1212u3i2uu12oui"/>
-                <param name="APPSECRIT" value="ksdfjakjfajfkajfkajfk23rj2rkwfk3jfkjfkwjfkjrkjkjdkwjkjfk"/>
+                <param name="APPID" value="1234567890"/>
+                <param name="APPSECRIT" value="e569f0e23dfe6870853ddf7b53be39d6"/>
             </manifest>
             <!-- 渠道插件 -->
             <plugins>
                 <plugin name="sharesdk" desc="分享插件"/>
             </plugins>
+            <!--需要渠道单独处理的参数-->
+            <spec-params>
+                <param name="host" value="uc.com"/>
+                <param name="schame" value="http"/>
+            </spec-params>
             <sdk-version>
                 <versionCode>1</versionCode>
                 <versionName>1.0.0</versionName>
