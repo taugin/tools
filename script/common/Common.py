@@ -133,6 +133,8 @@ CHANNEL_SDK_DIR = os.path.join(PACK_HOME, "sdks", "channels")
 
 PLUGINS_SDK_DIR = os.path.join(PACK_HOME, "sdks", "plugins")
 
+APK_CONFIGS = os.path.join(PACK_HOME, "apkconfigs")
+
 ###########################################################################
 def pause():
     input("按回车键退出...")
