@@ -147,6 +147,7 @@ class SdkConfig:
 
     def process_plugin(self):
         pluginfile = os.path.join(self.decompiledfolder, "assets", "plugin_config.xml")
+        pluginfile = os.path.normpath(pluginfile)
         if (os.path.exists(pluginfile) == False):
             self.create_plugin(pluginfile)
         self.append_plugin(pluginfile)

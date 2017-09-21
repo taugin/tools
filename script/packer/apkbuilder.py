@@ -13,6 +13,7 @@ import random
 
 #编译apk
 def apk_compile(folder, compileapk):
+    compileapk = os.path.normpath(compileapk)
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "b", folder, "-o", compileapk]
     Log.out("[Logging...] 回编文件名称 : [%s]" % compileapk)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
@@ -46,6 +47,8 @@ def apk_decompile(apkfile, decompiled_folder=None):
 
 def baksmali(dexfile, outdir):
     '''dex文件转smali文件，并且输出到outdir'''
+    dexfile = os.path.normpath(dexfile)
+    outdir = os.path.normpath(outdir)
     Log.out("[Logging...] 开始转换文件 : [%s] --> [%s]" % (dexfile, outdir))
     tmpdir = os.path.join(Common.WORKSPACE, "tmp%s" % random.randint(0, 1000))
     cmdlist = [Common.JAVA, "-jar", Common.BAKSMALI_JAR, "-o", tmpdir, dexfile]
@@ -80,6 +83,7 @@ def deletemetainf(src_apk):
 
 #为APK签名
 def signapk(src_apk, dst_apk, keystoreinfo = None):
+    dst_apk = os.path.normpath(dst_apk)
     deletemetainf(src_apk)
     Log.out("[Signing...] 安卓文件签名 : [%s -> %s]" % (os.path.basename(src_apk), os.path.basename(dst_apk)), True)
     if (keystoreinfo == None):
@@ -118,6 +122,7 @@ def signapk(src_apk, dst_apk, keystoreinfo = None):
 
 #apk对齐
 def alignapk(unalignapk, finalapk):
+    finalapk = os.path.normpath(finalapk)
     Log.out("[Logging...] 正在对齐文件 : [%s]" % finalapk, True)
     cmdlist = [Common.ZIPALIGN, "-f", "4", unalignapk, finalapk]
     subprocess.call(cmdlist, stdout=subprocess.PIPE)
@@ -129,6 +134,7 @@ def writeProperties(decompiledfolder, properties):
     if (len(properties) <= 0):
         return
     propertiesFile = os.path.join(decompiledfolder, "assets", "developer_config.properties")
+    propertiesFile = os.path.normpath(propertiesFile)
     Log.out("[Logging...] 写入配置文件 : [%s]\n" % propertiesFile)
     plist = []
     for p in properties:
