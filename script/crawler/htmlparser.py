@@ -109,13 +109,12 @@ class JokejiHtmlParser(HtmlParse):
 
         if datacontent != None:
             datacontent = datacontent.replace("'", "\\'")
-            res_data['title'] = title
-            res_data['pubtime'] = pubTimestamp
-            res_data['content'] = datacontent
-            res_data['pageurl'] = page_url
-            res_data['urlmd5'] = hashlib.md5(page_url.encode('utf-8')).hexdigest()
-            return res_data
-        return None
+        res_data['title'] = title
+        res_data['pubtime'] = pubTimestamp
+        res_data['content'] = datacontent
+        res_data['pageurl'] = page_url
+        res_data['urlmd5'] = hashlib.md5(page_url.encode('utf-8')).hexdigest()
+        return res_data
 
     def getData1(self, soup):
         datacontent = None
@@ -216,10 +215,9 @@ class Xiao688HtmlParser(HtmlParse):
 
         if datacontent != None:
             datacontent = datacontent.replace("'", "\\'")
-            res_data['title'] = title
-            res_data['pubtime'] = pubTimestamp
-            res_data['content'] = datacontent
-            res_data['pageurl'] = pageurl
-            res_data['urlmd5'] = hashlib.md5(pageurl.encode('utf-8')).hexdigest()
-            return res_data
-        return None
+        res_data['title'] = title
+        res_data['pubtime'] = pubTimestamp
+        res_data['content'] = datacontent
+        res_data['pageurl'] = pageurl
+        res_data['urlmd5'] = hashlib.md5(pageurl.encode('utf-8')).hexdigest()
+        return res_data
