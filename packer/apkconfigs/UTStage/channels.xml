@@ -47,10 +47,10 @@
             <manifest>
             </manifest>
             <properties>
-                <param name="dispatch" value="000001" desc="dispatch"/>
-                <param name="statistics" value="000001" desc="statistics"/>
-                <param name="abch_app_id" value="1" desc="abch_app_id"/>
-                <param name="abch_app_key" value="e569f0e23dfe6870853ddf7b53be39d6" desc="abch_app_key"/>
+                <param name="dispatch" value="000009" desc="channel"/>
+                <param name="statistics" value="000009" desc="channel"/>
+                <param name="abch_app_id" value="3" desc="channel"/>
+                <param name="abch_app_key" value="de8474c8622c90e87f77456603a330ed" desc="channel"/>
             </properties>
             <!--需要渠道单独处理的参数-->
             <spec-params>
