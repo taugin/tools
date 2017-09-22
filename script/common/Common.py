@@ -18,7 +18,7 @@ BIN_DIR = os.path.join(HOME_DIR, "bin")
 SCRIPT_DIR = os.path.join(HOME_DIR, "script")
 
 #库文件存放目录
-LIB_DIR = os.path.join(HOME_DIR, "libs")
+LIB_DIR = os.path.join(HOME_DIR, "lib")
 
 #签名文件存放目录
 KEYSTORES_DIR = os.path.join(HOME_DIR, "extra/keystore")
@@ -64,7 +64,7 @@ AAPT_BIN = os.path.join(BIN_DIR, "aapt%s" % BIN_SUFFIX)
 KEYTOOL = "keytool"
 
 #jarsigner可执行文件
-JARSIGNER="jarsigner"
+JARSIGNER=os.path.join(BIN_DIR, "jarsigner%s" % BIN_SUFFIX)
 
 #adb
 ADB = os.path.join(BIN_DIR, "adb%s" % BIN_SUFFIX);
