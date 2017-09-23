@@ -156,12 +156,12 @@ def packapk(packconfig, channel):
     #处理渠道角标
     process_corner_icon(decompiledfolder, sdk_channel, cornerpos)
 
-    #加密关键文件
-    encryptKeyFile(decompiledfolder)
-
     #调用渠道自定义脚本
     pyPath = os.path.normpath(os.path.join(sdk_channel, "channel_spec.py"))
     apkbuilder.callChannelSpec(pyPath, channel.getSpecParams())
+
+    #加密关键文件
+    encryptKeyFile(decompiledfolder)
 
     recompilegameapk(decompiledfolder, unsigned_apk)
     signapk(unsigned_apk, signed_apk, keystore)

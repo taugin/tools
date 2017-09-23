@@ -77,9 +77,9 @@ class SdkConfig:
         return mylist
 
     def process(self):
-        mergeaxml.merge_manifest(self.decompiledfolder, self.sdkfolder)
         self.process_copylist()
         self.process_plugin()
+        mergeaxml.merge_manifest(self.decompiledfolder, self.sdkfolder)
 
         dexfile = os.path.join(self.sdkfolder, "classes.dex")
         smali = os.path.join(self.decompiledfolder, "smali");

@@ -39,7 +39,7 @@ def processEntryActivity(decompiledfolder, approot, sdkroot):
         if intentFilterNode != None and categoryNode != None:
             intentFilterNode.remove(categoryNode)
             entryDict = {"name" : "app_entry_name", "value" : appEntryActivity}
-            apkbuilder.writeProperties(decompiledfolder, [entryDict])
+            apkbuilder.writeProperties(decompiledfolder, [entryDict], False)
 
 #合并AndroidManifest.xml文件
 def merge_manifest(decompiledfolder, sdkfolder):

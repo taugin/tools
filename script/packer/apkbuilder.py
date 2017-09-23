@@ -130,7 +130,7 @@ def alignapk(unalignapk, finalapk):
     return True
 
 #写developer_config.properties文件
-def writeProperties(decompiledfolder, properties):
+def writeProperties(decompiledfolder, properties, append = True):
     if (len(properties) <= 0):
         return
     propertiesFile = os.path.join(decompiledfolder, "assets", "developer_config.properties")
@@ -142,9 +142,9 @@ def writeProperties(decompiledfolder, properties):
     plist = []
     for p in properties:
         plist += p["name"] + "=" + p["value"] + "\n"
-    pstring = "\n" + "".join(plist)
+    pstring = "".join(plist)
     mode = "w";
-    if (os.path.exists(propertiesFile)):
+    if (append):
         mode = "a"
     f = open(propertiesFile, mode)
     f.write(pstring)
