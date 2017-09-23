@@ -169,6 +169,9 @@ class SdkConfig:
         doc = Document()  #创建DOM文档对象
         root = doc.createElement('plugins') #创建根元素
         doc.appendChild(root)
+        plugindir = os.path.dirname(pluginfile)
+        if (not os.path.exists(plugindir)) :
+            os.makedirs(plugindir)
         f = open(pluginfile,'wb')
         f.write(doc.toxml(encoding = "utf-8"))
         f.close()
