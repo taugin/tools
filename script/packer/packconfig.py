@@ -56,6 +56,7 @@ class PackConfig:
 
 class Channel:
     def __init__(self, root, globalPlugin):
+        self.root = root
         #developer_config.properties文件配置
         self.properties = []
         #manifest meta信息
@@ -65,11 +66,13 @@ class Channel:
         #全局插件
         self.globalPugins = globalPlugin
         #基本参数
-        self.map = {}
-        self.root = root
+        self.baseParams = {}
+        #渠道参数
+        self.channelParams = {}
+        #版本参数
+        self.versionParams = {}
         #签名信息
         self.keystoreinfo = {}
-
         #渠道自定义参数
         self.spec_params = []
 
@@ -82,14 +85,22 @@ class Channel:
         params = self.root.findall("param")
         if (params != None):
             for param in params:
-                self.set(Utils.getattrib(param, "name"), Utils.getattrib(param, "value"))
+                self.baseParams[Utils.getattrib(param, "name")] = Utils.getattrib(param, "value")
 
+        #获取渠道配置参数
+        sdkparams = self.root.findall("sdk/param")
+        if (params != None):
+            for param in sdkparams:
+                self.channelParams[Utils.getattrib(param, "name")] = Utils.getattrib(param, "value")
+
+        #获取版本参数
         verCode = self.root.find("sdk-version/versionCode")
         verName = self.root.find("sdk-version/versionName")
         if (verCode != None):
-            self.set("vercode", verCode.text);
+            self.channelParams["vercode"] = verCode.text
         if (verName != None):
-            self.set("vername", verName.text);
+            self.channelParams["vername"] = verName.text
+
         #获取properties
         properties = self.root.findall("properties/param")
         for sdkp in properties:
@@ -141,61 +152,63 @@ class Channel:
         for p in params:
             self.keystoreinfo[p.attrib["name"]] = p.attrib["value"]
 
-    def set(self, key, value):
-        self.map[key] = value
+    #获取渠道参数开始
+    def getsdkid(self):
+        return Utils.getvalue(self.channelParams, "id")
 
+    def getsdkname(self):
+        return Utils.getvalue(self.channelParams, "name")
+
+    def getsdkdir(self):
+        return Utils.getvalue(self.channelParams, "sdk")
+
+    def getsdkdesc(self):
+        return Utils.getvalue(self.channelParams, "desc")
+
+    #基本参数
+    def getsuffix(self):
+        return Utils.getvalue(self.baseParams, "suffix")
+
+    def getcornerpos(self):
+        return Utils.getvalue(self.baseParams, "corner")
+
+    def isSplash(self):
+        tmp = Utils.getvalue(self.baseParams, "splash")
+        if (tmp != None and tmp != "0"):
+            return True
+        else:
+            return False
+
+    def isUnitySplash(self):
+        tmp = Utils.getvalue(self.baseParams, "unity_splash")
+        if (tmp != None and tmp != "0"):
+            return True
+        else:
+            return False
+
+    #填充的developer.properties中的参数
     def getProperties(self):
         return self.properties
 
+    #填充的AndroidManifest.xml中的参数
     def getManifest(self):
         return self.manifest
 
+    #填充的插件的参数
     def getPlugin(self):
         return self.plugins + self.globalPugins
 
-    def getsdkid(self):
-        return Utils.getvalue(self.map, "id")
-
-    def getsdkname(self):
-        return Utils.getvalue(self.map, "name")
-
-    def getsdkdir(self):
-        return Utils.getvalue(self.map, "sdk")
-
-    def getsdkdesc(self):
-        return Utils.getvalue(self.map, "desc")
-
-    def getsdksuffix(self):
-        return Utils.getvalue(self.map, "suffix")
-
-    def isSplash(self):
-        tmp = Utils.getvalue(self.map, "splash")
-        if (tmp != None and tmp != "0"):
-            return True
-        else:
-            return False
-
+    #渠道定制参数
     def getSpecParams(self):
         return self.spec_params
 
-    def isUnitySplash(self):
-        tmp = Utils.getvalue(self.map, "unity_splash")
-        if (tmp != None and tmp != "0"):
-            return True
-        else:
-            return False
-
-    def getsdkicon(self):
-        return Utils.getvalue(self.map, "icon")
-
+    #版本参数
     def getvercode(self):
-        return Utils.getvalue(self.map, "vercode")
+        return Utils.getvalue(self.channelParams, "vercode")
 
     def getvername(self):
-        return Utils.getvalue(self.map, "vername")
+        return Utils.getvalue(self.channelParams, "vername")
 
+    #签名参数
     def getkeystore(self):
         return self.keystoreinfo
-
-    def getcornerpos(self):
-        return Utils.getvalue(self.map, "corner")

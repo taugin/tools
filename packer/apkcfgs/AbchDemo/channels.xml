@@ -9,14 +9,17 @@
 
     <channels>
         <channel>
-            <param name="id" value="10"/>
-            <param name="name" value="uc"/>
-            <param name="sdk" value="ucsdk"/>
-            <param name="desc" value="UC SDK"/>
-            <param name="suffix" value=""/>
+            <!--基本参数-->
+            <param name="suffix" value=".uc"/>
             <param name="splash" value="0"/>
             <param name="unity_splash" value="0"/>
             <param name="corner" value="rb"/>
+            <!--渠道SDK参数-->
+            <sdk>
+                <param name="id" value="10"/>
+                <param name="name" value="uc"/>
+                <param name="sdk" value="ucsdk"/>
+            </sdk>
             <!-- sdk-params 参数是写入到developer_config.properties中 -->
             <properties>
                 <param name="UCGameId" value="544156" desc="GameId"/>
@@ -37,6 +40,7 @@
                 <param name="host" value="uc.com"/>
                 <param name="schame" value="http"/>
             </spec-params>
+            <!--中间件版本参数-->
             <sdk-version>
                 <versionCode>1</versionCode>
                 <versionName>1.0.0</versionName>

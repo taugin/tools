@@ -15,7 +15,7 @@ import glob
 
 def find_corner_files(sdk_channel, cornerpos):
     '''搜索角标文件'''
-    searchPath = os.path.join(sdk_channel, "cornericons", "%s*" % cornerpos)
+    searchPath = os.path.join(sdk_channel, "corners", "%s*" % cornerpos)
     return glob.glob(searchPath)
 
 def find_icon_files(decompiledfolder, icon_name):
@@ -128,6 +128,6 @@ def process_corner_icon(decompiledfolder, sdk_channel, cornerpos):
     Log.out("[Logging...] 合成角标结束\n")
 
 if __name__ == "__main__":
-    #add_corner_icon(r"E:\temp\icon.png", r"E:\Github\tools\packer\sdks\channels\ucsdk\cornericons\rb_72x72.png")
+    #add_corner_icon(r"E:\temp\icon.png", r"E:\Github\tools\packer\sdks\channels\ucsdk\corners\rb_72x72.png")
     process_corner_icon(r"E:\Github\tools\packer\workspace\com.ninemgames.tennis.china-shly-shlysdk",
                          r"E:\Github\tools\packer\sdks\channels\ucsdk", "rb")

@@ -15,8 +15,8 @@ import subprocess;
 import threading
 import platform
 
-INTERFACE_WIDTH = 1000
-INTERFACE_HEIGHT = 800
+INTERFACE_WIDTH = 800
+INTERFACE_HEIGHT = 600
 
 def get_tk():
     '''获取一个Tk对象'''

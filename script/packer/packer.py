@@ -18,6 +18,17 @@ import sdkconfig
 import packconfig
 import splitdex
 
+######################################################
+PACK_HOME = Common.PACK_HOME
+WORKSPACE = os.path.join(PACK_HOME, "workspace")
+DSTAPKS = os.path.join(PACK_HOME, "dstapks")
+SRCAPKS = os.path.join(PACK_HOME, "srcapks")
+SDK_DIR = os.path.join(PACK_HOME, "sdks")
+CHANNEL_SDK_DIR = os.path.join(PACK_HOME, "sdks", "channels")
+PLUGINS_SDK_DIR = os.path.join(PACK_HOME, "sdks", "plugins")
+APK_CFGS = os.path.join(PACK_HOME, "apkcfgs")
+######################################################
+
 #检查PIL模块
 def check_pil():
     try:
@@ -96,7 +107,7 @@ def packapk(packconfig, channel):
     #获取所有sdk插件
     pluginlist = channel.getPlugin()
     #获取包名后缀
-    suffix = channel.getsdksuffix()
+    suffix = channel.getsuffix()
     #获取签名信息
     keystore = channel.getkeystore()
     #获取母包路径
@@ -112,13 +123,13 @@ def packapk(packconfig, channel):
     cornerpos = channel.getcornerpos()
 
     #游戏文件路径
-    srcapk = os.path.join(Common.PACK_HOME, srcapkpath)
+    srcapk = os.path.join(PACK_HOME, srcapkpath)
 
-    decompiledfolder = os.path.join(Common.WORKSPACE, finalname + "-" + sdkdirname)
-    unsigned_apk = os.path.join(Common.DSTAPKS, finalname + "-" + sdkname + "-unsigned.apk")
-    signed_apk = os.path.join(Common.DSTAPKS, finalname + "-" + sdkname + "-signed.apk")
-    final_apk = os.path.join(Common.DSTAPKS, finalname + "-" + sdkname + "-final.apk")
-    sdk_channel = os.path.join(Common.CHANNEL_SDK_DIR, sdkdirname)
+    decompiledfolder = os.path.join(WORKSPACE, finalname + "-" + sdkdirname)
+    unsigned_apk = os.path.join(DSTAPKS, finalname + "-" + sdkname + "-unsigned.apk")
+    signed_apk = os.path.join(DSTAPKS, finalname + "-" + sdkname + "-signed.apk")
+    final_apk = os.path.join(DSTAPKS, finalname + "-" + sdkname + "-final.apk")
+    sdk_channel = os.path.join(CHANNEL_SDK_DIR, sdkdirname)
 
     #反编译APK
     decompilegameapk(srcapk, decompiledfolder)
@@ -173,14 +184,14 @@ def packplugins(decompiledfolder, pluginlist):
             pname = Utils.getvalue(plugin, "name")
             if (Utils.isEmpty(pname)) :
                 continue
-            sdk_channel = os.path.join(Common.PLUGINS_SDK_DIR, pname)
+            sdk_channel = os.path.join(PLUGINS_SDK_DIR, pname)
             if (os.path.exists(sdk_channel)):
                 Log.out("[Logging...] 打包配置插件 : [%s]" % pname);
                 process_sdk(decompiledfolder, sdk_channel)
     Log.out("[Logging...] =======================================\n");
 
 def pack(appName, channelNo):
-    channelFile = os.path.join(Common.APK_CONFIGS, appName, "channels.xml")
+    channelFile = os.path.join(APK_CFGS, appName, "channels.xml")
     channelFile = os.path.normpath(channelFile)
     if (not os.path.exists(channelFile)):
         Log.out("[Logging...] 缺少配置文件 : [%s]" % channelFile)
@@ -234,7 +245,7 @@ def printChannelList(chlist):
         print("[%s] : %s" % (index, chlist[index].getsdkname()))
 
 def pack_apk_from_select():
-    apkcfg = os.listdir(Common.APK_CONFIGS)
+    apkcfg = os.listdir(APK_CFGS)
     if apkcfg == None or len(apkcfg) <= 0:
         Log.out("[Logging...] 缺少打包应用")
         sys.exit(0)
@@ -244,7 +255,7 @@ def pack_apk_from_select():
         Log.out("[Logging...] 选择参数错误 : [%s]" % index)
         sys.exit(0)
     appName = apkcfg[index]
-    channelFile = os.path.join(Common.APK_CONFIGS, appName, "channels.xml")
+    channelFile = os.path.join(APK_CFGS, appName, "channels.xml")
     channelFile = os.path.normpath(channelFile)
     if not os.path.exists(channelFile):
         Log.out("[Logging...] 确实配置文件 : [%s]" % channelFile)
