@@ -38,6 +38,9 @@ def processEntryActivity(decompiledfolder, approot, sdkroot):
         categoryNode = intentFilterNode.find('category')
         if intentFilterNode != None and categoryNode != None:
             intentFilterNode.remove(categoryNode)
+            package = approot.get("package")
+            if appEntryActivity.startswith("."):
+                appEntryActivity = package + appEntryActivity
             entryDict = {"name" : "app_entry_name", "value" : appEntryActivity}
             apkbuilder.writeProperties(decompiledfolder, [entryDict], False)
 
