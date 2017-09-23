@@ -135,12 +135,18 @@ def writeProperties(decompiledfolder, properties):
         return
     propertiesFile = os.path.join(decompiledfolder, "assets", "developer_config.properties")
     propertiesFile = os.path.normpath(propertiesFile)
+    propertiesDir = os.path.dirname(propertiesFile)
+    if (not os.path.exists(propertiesDir)):
+        os.makedirs(propertiesDir)
     Log.out("[Logging...] 写入配置文件 : [%s]\n" % propertiesFile)
     plist = []
     for p in properties:
         plist += p["name"] + "=" + p["value"] + "\n"
-    pstring = "".join(plist)
-    f = open(propertiesFile, "w")
+    pstring = "\n" + "".join(plist)
+    mode = "w";
+    if (os.path.exists(propertiesFile)):
+        mode = "a"
+    f = open(propertiesFile, mode)
     f.write(pstring)
     f.close()
 

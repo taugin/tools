@@ -10,10 +10,37 @@ import Utils
 
 import os
 import xml.etree.ElementTree as ET
+import apkbuilder
 #from xml.etree import cElementTree as ET
 #from xml.dom import minidom
 
 ###############################################################################
+#查找原插件app中的启动Activity
+def findEntryActivity(root):
+    entryNode = root.find(Common.MAIN_ACTIVITY_XPATH)
+    if (entryNode != None):
+        return entryNode
+
+def processEntryActivity(decompiledfolder, approot, sdkroot):
+    appEntryNode = findEntryActivity(approot)
+    sdkEntryNode = findEntryActivity(sdkroot)
+
+    appEntryActivity = None
+    sdkEntryActivity = None
+
+    if appEntryNode != None:
+        appEntryActivity = appEntryNode.attrib['{%s}name' % Common.XML_NAMESPACE]
+    if sdkEntryNode != None:
+        sdkEntryActivity = sdkEntryNode.attrib['{%s}name' % Common.XML_NAMESPACE]
+
+    if appEntryActivity != None and appEntryActivity != '' and sdkEntryActivity != None and sdkEntryActivity != '':
+        intentFilterNode = appEntryNode.find("intent-filter/category/[@{%s}name='android.intent.category.LAUNCHER']/.." % Common.XML_NAMESPACE)
+        categoryNode = intentFilterNode.find('category')
+        if intentFilterNode != None and categoryNode != None:
+            intentFilterNode.remove(categoryNode)
+            entryDict = {"name" : "app_entry_name", "value" : appEntryActivity}
+            apkbuilder.writeProperties(decompiledfolder, [entryDict])
+
 #合并AndroidManifest.xml文件
 def merge_manifest(decompiledfolder, sdkfolder):
     Log.out("[Logging...] 正在合并文件 : [AndroidManifest.xml]", True)
@@ -34,6 +61,9 @@ def merge_manifest(decompiledfolder, sdkfolder):
     sdktree = ET.parse(sdkmanifest)
     sdkroot = sdktree.getroot()
     sdkapplication = sdkroot.find("application")
+
+    #处理入口Activity
+    processEntryActivity(decompiledfolder, gameroot, sdkroot)
 
     for item in sdkroot.getchildren():
         if (item.tag == "uses-permission"):
@@ -86,3 +116,5 @@ def add_meta(decompiledfolder, meta_data):
     tree.write(manifestfile, encoding='utf-8', xml_declaration=True)
     Log.out("[Logging...] 添加据据完成\n")
 ###############################################################################
+if __name__ == "__main__":
+    merge_manifest(r"D:\github\tools\packer\workspace\AbchDemo-ucsdk", r"D:\github\tools\packer\sdks\channels\ucsdk")
