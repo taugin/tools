@@ -66,10 +66,7 @@ def recompilegameapk(decompiledfolder, recompiledfile):
 
 #APK签名
 def signapk(unsignapk, signedapk, keystore):
-    if (len(keystore) > 0):
-        apkbuilder.signapk(unsignapk, signedapk, keystore)
-    else:
-        Log.out("[Logging...] 无法获取签名");
+    apkbuilder.signapk(unsignapk, signedapk, keystore)
 
 #apk对齐
 def alignapk(unalignapk, finalapk):
@@ -190,22 +187,34 @@ def packplugins(decompiledfolder, pluginlist):
                 process_sdk(decompiledfolder, sdk_channel)
     Log.out("[Logging...] =======================================\n");
 
-def pack(appCfg, sdk):
+def packWithApkCfg(appCfg, sdk):
     channelFile = os.path.join(APK_CFGS, appCfg, "channels.xml")
     channelFile = os.path.normpath(channelFile)
     if (not os.path.exists(channelFile)):
         Log.out("[Logging...] 缺少配置文件 : [%s]" % channelFile)
         return
 
-    apkConfig = apkconfig.ApkConfig();
+    apkConfig = apkconfig.ApkConfig()
     apkConfig.parse(channelFile)
-    channelList = apkConfig.getAllChannels();
+    channelList = apkConfig.getAllChannels()
     if (channelList == None or sdk not in channelList):
         Log.out("[Logging...] 渠道名字错误 : [%s]" % sdk)
         return
     channel = channelList[sdk]
 
     Log.out("[Logging...] 应用打包信息 : [%s, %s]\n" % (appCfg, channel.getsdkname()))
+    packapk(apkConfig, channel)
+
+def packWithApkFile(apkFile, sdk):
+    name, ext = os.path.splitext(os.path.basename(apkFile))
+    apkConfig = apkconfig.ApkConfig(srcapk=apkFile, finalname=name)
+    sdkpath = os.path.join(CHANNEL_SDK_DIR, sdk)
+    if (not os.path.exists(sdkpath)):
+        Log.out("[Logging...] 渠道名字错误 : [%s]" % sdk)
+        sys.exit()
+    channelParams = {"sdk" : sdk, "name" : sdk}
+    channel = apkconfig.Channel(channelParams = channelParams)
+    Log.out("[Logging...] 应用打包信息 : [%s, %s]\n" % (name, channel.getsdkname()))
     packapk(apkConfig, channel)
 
 def pack_apk_from_args(argv):
@@ -226,7 +235,11 @@ def pack_apk_from_args(argv):
         sys.exit()
 
     if appName != None and sdk != None:
-        pack(appName, sdk)
+        if os.path.exists(appName) and appName.endswith(".apk"):
+            appName =os.path.normpath(appName)
+            packWithApkFile(appName, sdk)
+        else:
+            packWithApkCfg(appName, sdk)
 
 def inputInRange(prompt, maxValue):
     try:
