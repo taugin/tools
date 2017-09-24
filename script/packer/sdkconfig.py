@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/python
 # coding: UTF-8
 
-import moduleconfig
+import _config
 import Log
 import Utils
 

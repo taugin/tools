@@ -2,7 +2,7 @@
 # coding: UTF-8
 #引入别的文件夹的模块
 
-import moduleconfig
+import _config
 import Common
 import Log
 import Utils

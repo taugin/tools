@@ -2,7 +2,7 @@
 # coding: UTF-8
 
 
-import moduleconfig
+import _config
 import Common
 import Log
 import Utils

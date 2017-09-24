@@ -2,7 +2,7 @@
 # coding: UTF-8
 
 
-import moduleconfig
+import _config
 import Common
 import Log
 import Utils
@@ -15,7 +15,7 @@ import signal
 import apkbuilder
 import mergeaxml
 import sdkconfig
-import packconfig
+import apkconfig
 import splitdex
 
 ######################################################
@@ -99,9 +99,9 @@ def splitDex(decompiledfolder):
 def deleteDupSmali(decompiledfolder):
     apkbuilder.clearDupSmali(decompiledfolder)
 
-def packapk(packconfig, channel):
+def packapk(apkconfig, channel):
     #获取当前渠道配置的游戏名称
-    finalname = packconfig.getfinalname()
+    finalname = apkconfig.getfinalname()
     #获取SDK目录
     sdkdirname = channel.getsdkdir();
     #获取所有sdk插件
@@ -111,7 +111,7 @@ def packapk(packconfig, channel):
     #获取签名信息
     keystore = channel.getkeystore()
     #获取母包路径
-    srcapkpath = packconfig.getsrcapk()
+    srcapkpath = apkconfig.getsrcapk()
     #获取SDK名字
     sdkname = channel.getsdkname()
     #获取Properties
@@ -190,22 +190,22 @@ def packplugins(decompiledfolder, pluginlist):
                 process_sdk(decompiledfolder, sdk_channel)
     Log.out("[Logging...] =======================================\n");
 
-def pack(appName, channelNo):
-    channelFile = os.path.join(APK_CFGS, appName, "channels.xml")
+def pack(appCfg, channelNo):
+    channelFile = os.path.join(APK_CFGS, appCfg, "channels.xml")
     channelFile = os.path.normpath(channelFile)
     if (not os.path.exists(channelFile)):
         Log.out("[Logging...] 缺少配置文件 : [%s]" % channelFile)
         return
-    packConfig = packconfig.PackConfig(channelFile);
-    packConfig.parse()
-    channelList = packConfig.getChannelList();
+    apkConfig = apkconfig.ApkConfig(channelFile);
+    apkConfig.parse()
+    channelList = apkConfig.getChannelList();
     if (channelList == None or len(channelList) <= channelNo):
         Log.out("[Logging...] 渠道序号错误 : [%d]" % channelNo)
         return
     channel = channelList[channelNo]
 
-    Log.out("[Logging...] 应用打包信息 : [%s, %s]\n" % (appName, channel.getsdkname()))
-    packapk(packConfig, channel)
+    Log.out("[Logging...] 应用打包信息 : [%s, %s]\n" % (appCfg, channel.getsdkname()))
+    packapk(apkConfig, channel)
 
 def pack_apk_from_args(argv):
     try:
@@ -216,7 +216,7 @@ def pack_apk_from_args(argv):
             elif (op == "-c") :
                 channelNo = value
             elif (op == "-h") :
-                Log.out("[Logging...] 缺少参数 : %s -a appName -c channelNo" % os.path.basename(sys.argv[0]), True);
+                Log.out("[Logging...] 缺少参数 : %s -a appCfg -c channelNo" % os.path.basename(sys.argv[0]), True);
                 sys.exit()
     except getopt.GetoptError as err:
         Log.out(err)
@@ -234,10 +234,10 @@ def inputInRange(prompt, maxValue):
     except KeyboardInterrupt:
         sys.exit(0)
 
-def printAppList(apkcfg):
+def printAppList(apkconfig):
     print("打包应用列表:")
-    for index in range(len(apkcfg)):
-        print("[%s] : %s" % (index, apkcfg[index]))
+    for index in range(len(apkconfig)):
+        print("[%s] : %s" % (index, apkconfig[index]))
 
 def printChannelList(chlist):
     print("打包渠道列表:")
@@ -245,25 +245,25 @@ def printChannelList(chlist):
         print("[%s] : %s" % (index, chlist[index].getsdkname()))
 
 def pack_apk_from_select():
-    apkcfg = os.listdir(APK_CFGS)
-    if apkcfg == None or len(apkcfg) <= 0:
+    apkcfg_list = os.listdir(APK_CFGS)
+    if apkcfg_list == None or len(apkcfg_list) <= 0:
         Log.out("[Logging...] 缺少打包应用")
         sys.exit(0)
-    printAppList(apkcfg)
-    index = inputInRange("选择应用编号 : ", len(apkcfg))
-    if index >= len(apkcfg):
+    printAppList(apkcfg_list)
+    index = inputInRange("选择应用编号 : ", len(apkcfg_list))
+    if index >= len(apkcfg_list):
         Log.out("[Logging...] 选择参数错误 : [%s]" % index)
         sys.exit(0)
-    appName = apkcfg[index]
+    appName = apkcfg_list[index]
     channelFile = os.path.join(APK_CFGS, appName, "channels.xml")
     channelFile = os.path.normpath(channelFile)
     if not os.path.exists(channelFile):
         Log.out("[Logging...] 确实配置文件 : [%s]" % channelFile)
         sys.exit(0)
 
-    packConfig = packconfig.PackConfig(channelFile)
-    packConfig.parse()
-    channelList = packConfig.getChannelList()
+    apkConfig = apkconfig.ApkConfig()
+    apkConfig.parse(channelFile)
+    channelList = apkConfig.getChannelList()
     if channelList == None or len(channelList) <= 0:
         Log.out("[Logging...] 缺少打包渠道")
         sys.exit(0)
@@ -277,7 +277,7 @@ def pack_apk_from_select():
 
     print("\n")
     Log.out("[Logging...] 应用打包信息 : [%s, %s]\n" % (appName, channel.getsdkname()))
-    packapk(packConfig, channel)
+    packapk(apkConfig, channel)
 
 def signalHandler(signum, frame):
     Log.out("\n[Logging...] 用户主动退出")
