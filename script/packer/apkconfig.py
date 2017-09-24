@@ -9,14 +9,14 @@ import os
 import xml.etree.ElementTree as ET
 
 class ApkConfig:
-    def __init__(self, channelList = [], globalPlugins = [], srcapk = None, finalname = None):
-        self.channelList = []
+    def __init__(self, allChannels = {}, globalPlugins = [], srcapk = None, finalname = None):
+        self.allChannels = {}
         self.globalPlugin = []
         self.srcapk = srcapk
         self.finalname = finalname
 
-        if (channelList != None):
-            self.channelList = channelList
+        if (allChannels != None):
+            self.allChannels = allChannels
 
         if (globalPlugins != None):
             self.globalPlugins = globalPlugins
@@ -44,11 +44,11 @@ class ApkConfig:
         allchannels = root.findall("channels/channel")
         for channel in allchannels:
             sdkChannel = Channel(globalPlugins = self.globalPlugins)
-            self.channelList.append(sdkChannel)
             sdkChannel.parse(channel)
+            self.allChannels[sdkChannel.getsdkname()] = sdkChannel
 
-    def getChannelList(self):
-        return self.channelList
+    def getAllChannels(self):
+        return self.allChannels
 
     def getGlobalPlugin(self):
         return self.globalPlugin
