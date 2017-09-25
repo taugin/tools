@@ -61,7 +61,7 @@
             <!-- sdk-params 参数是写入到developer_config.properties中 -->
             <properties>
                 <param name="countdown" value="5" desc="倒计时秒"/>
-                <param name="splashimg" value="splash_img.png" desc="广告图片"/>
+                <param name="splashimg" value="ad_splash_image.png" desc="广告图片"/>
             </properties>
             <!--manifest参数会被写入到application下面的meta-data节点-->
             <manifest>

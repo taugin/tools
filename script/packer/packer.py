@@ -168,7 +168,7 @@ def packapk(apkconfig, channel):
 
     #调用渠道自定义脚本
     pyPath = os.path.normpath(os.path.join(sdk_channel, "channel_spec.py"))
-    apkbuilder.callChannelSpec(pyPath, channel.getSpecParams())
+    apkbuilder.callChannelSpec(pyPath, decompiledfolder, channel.getSpecParams())
 
     #加密关键文件
     encryptKeyFile(decompiledfolder)

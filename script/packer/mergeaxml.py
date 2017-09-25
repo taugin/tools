@@ -41,8 +41,18 @@ def processEntryActivity(decompiledfolder, approot, sdkroot):
             package = approot.get("package")
             if appEntryActivity.startswith("."):
                 appEntryActivity = package + appEntryActivity
-            entryDict = {"name" : "app_entry_name", "value" : appEntryActivity}
-            apkbuilder.writeProperties(decompiledfolder, [entryDict], False)
+    return appEntryActivity, sdkEntryActivity
+
+#添加入口activity到主activity
+def check_ad_entry_activity(item, appEntryActivity, sdkEntryActivity):
+    if sdkEntryActivity == None:
+        return
+    activityName = item.attrib["{%s}name" % Common.XML_NAMESPACE]
+    if (activityName == sdkEntryActivity):
+        element = ET.Element("meta-data")
+        element.set("{%s}name" % Common.XML_NAMESPACE, "app_entry_name")
+        element.set("{%s}value" % Common.XML_NAMESPACE, appEntryActivity)
+        item.append(element)
 
 #合并AndroidManifest.xml文件
 def merge_manifest(decompiledfolder, sdkfolder):
@@ -66,13 +76,14 @@ def merge_manifest(decompiledfolder, sdkfolder):
     sdkapplication = sdkroot.find("application")
 
     #处理入口Activity
-    processEntryActivity(decompiledfolder, gameroot, sdkroot)
+    appEntryActivity, sdkEntryActivity = processEntryActivity(decompiledfolder, gameroot, sdkroot)
 
     for item in sdkroot.getchildren():
         if (item.tag == "uses-permission"):
             gameroot.append(item)
 
     for item in sdkapplication.getchildren():
+        check_ad_entry_activity(item, appEntryActivity, sdkEntryActivity)
         gameapplication.append(item)
 
     Utils.indent(gameroot)

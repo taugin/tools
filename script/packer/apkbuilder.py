@@ -187,11 +187,17 @@ def encryptKeyFile(decompiledfolder):
     Log.out("[Logging...] 加密文件完成\n", True)
 
 #调用渠道自定义脚本
-def callChannelSpec(pyPath, args):
+def callChannelSpec(pyPath, decompiledfolder, args):
     if (not os.path.exists(pyPath)):
         return
     Log.out("[Logging...] 执行渠道脚本 : [%s]" % pyPath, True)
     cmdargs = []
+    if (args == None):
+        args = []
+    dec = {}
+    dec["name"] = "decompiledfolder"
+    dec["value"] = decompiledfolder
+    args.insert(0, dec);
     try:
         cmdargs.append(str(args))
     except:
