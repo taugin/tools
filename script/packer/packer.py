@@ -96,6 +96,14 @@ def splitDex(decompiledfolder):
 def deleteDupSmali(decompiledfolder):
     apkbuilder.clearDupSmali(decompiledfolder)
 
+def check(srcapk, sdk_channel):
+    if (not os.path.exists(srcapk)):
+        Log.out("[Logging...] 没有找到渠道 : [%s]" % srcapk);
+        sys.exit(0)
+    if (not os.path.exists(sdk_channel)):
+        Log.out("[Logging...] 没有找到渠道 : [%s]" % sdk_channel);
+        sys.exit(0)
+
 def packapk(apkconfig, channel):
     #获取当前渠道配置的游戏名称
     finalname = apkconfig.getfinalname()
@@ -115,18 +123,23 @@ def packapk(apkconfig, channel):
     properties = channel.getProperties()
     #获取manifest
     manifest = channel.getManifest()
-
     #获取角标位置
     cornerpos = channel.getcornerpos()
-
     #游戏文件路径
     srcapk = os.path.join(PACK_HOME, srcapkpath)
-
+    #反编译目录
     decompiledfolder = os.path.join(WORKSPACE, finalname + "-" + sdkdirname)
-    unsigned_apk = os.path.join(DSTAPKS, finalname + "-" + sdkname + "-unsigned.apk")
-    signed_apk = os.path.join(DSTAPKS, finalname + "-" + sdkname + "-signed.apk")
-    final_apk = os.path.join(DSTAPKS, finalname + "-" + sdkname + "-final.apk")
+    #sdk目录
     sdk_channel = os.path.join(CHANNEL_SDK_DIR, sdkdirname)
+    #未签名apk
+    unsigned_apk = os.path.join(DSTAPKS, finalname + "-" + sdkname + "-unsigned.apk")
+    #已签名apk
+    signed_apk = os.path.join(DSTAPKS, finalname + "-" + sdkname + "-signed.apk")
+    #已对齐apk
+    final_apk = os.path.join(DSTAPKS, finalname + "-" + sdkname + "-final.apk")
+
+    #检查参数
+    check(srcapk, sdk_channel)
 
     #反编译APK
     decompilegameapk(srcapk, decompiledfolder)
@@ -206,7 +219,7 @@ def packWithApkCfg(appCfg, sdk):
     packapk(apkConfig, channel)
 
 def packWithApkFile(apkFile, sdk):
-    name, ext = os.path.splitext(os.path.basename(apkFile))
+    name, ext = os.path.splitext(apkFile)
     apkConfig = apkconfig.ApkConfig(srcapk=apkFile, finalname=name)
     sdkpath = os.path.join(CHANNEL_SDK_DIR, sdk)
     if (not os.path.exists(sdkpath)):
