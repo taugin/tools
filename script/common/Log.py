@@ -10,7 +10,10 @@ def d(tag, msg):
 
 def out(msg, show=True):
     if (show):
-        print(msg)
+        try:
+            print(msg)
+        except:
+            pass
 
 def showNoReturn(msg):
     try:

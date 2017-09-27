@@ -98,7 +98,7 @@ def deleteDupSmali(decompiledfolder):
 
 def check(srcapk, sdk_channel):
     if (not os.path.exists(srcapk)):
-        Log.out("[Logging...] 没有找到渠道 : [%s]" % srcapk);
+        Log.out("[Logging...] 没有找到应用 : [%s]" % srcapk);
         sys.exit(0)
     if (not os.path.exists(sdk_channel)):
         Log.out("[Logging...] 没有找到渠道 : [%s]" % sdk_channel);
@@ -249,6 +249,7 @@ def pack_apk_from_args(argv):
 
     if appName != None and sdk != None:
         if os.path.exists(appName) and appName.endswith(".apk"):
+            appName = os.path.realpath(appName)
             appName =os.path.normpath(appName)
             packWithApkFile(appName, sdk)
         else:
