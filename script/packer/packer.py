@@ -13,7 +13,7 @@ import getopt
 import signal
 
 import apkbuilder
-import mergeaxml
+import axmldo
 import sdkconfig
 import apkconfig
 import splitdex
@@ -82,13 +82,13 @@ def cleartmp(unsigned_apk, signed_apk):
         pass
 
 def modifypkgname(decompiledfolder, pkg_suffix):
-    mergeaxml.modify_package(decompiledfolder, pkg_suffix)
+    axmldo.modify_package(decompiledfolder, pkg_suffix)
 
 def writeProperties(decompiledfolder, properties):
     apkbuilder.writeProperties(decompiledfolder, properties)
 
 def writeManifest(decompiledfolder, manifest):
-    mergeaxml.add_meta(decompiledfolder, manifest)
+    axmldo.add_meta(decompiledfolder, manifest)
 
 def splitDex(decompiledfolder):
     splitdex.split_dex(decompiledfolder)

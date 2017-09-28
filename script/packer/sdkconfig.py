@@ -7,10 +7,8 @@ import Utils
 
 import os
 import xml.etree.ElementTree as ET
-#from xml.etree import cElementTree as ET
-#from xml.dom import minidom
 from xml.dom.minidom import Document
-import mergeaxml
+import axmldo
 import apkbuilder
 import time
 
@@ -79,7 +77,7 @@ class SdkConfig:
     def process(self):
         self.process_copylist()
         self.process_plugin()
-        mergeaxml.merge_manifest(self.decompiledfolder, self.sdkfolder)
+        axmldo.merge_manifest(self.decompiledfolder, self.sdkfolder)
 
         dexfile = os.path.join(self.sdkfolder, "classes.dex")
         smali = os.path.join(self.decompiledfolder, "smali");

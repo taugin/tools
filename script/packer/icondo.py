@@ -5,13 +5,11 @@
 合成渠道角标
 '''
 import _config
-import Common
 import Log
-import Utils
-import xml.etree.ElementTree as ET
 import os
 from PIL import Image
 import glob
+import axmldo
 
 def find_corner_files(sdk_channel, cornerpos):
     '''搜索角标文件'''
@@ -22,44 +20,6 @@ def find_icon_files(decompiledfolder, icon_name):
     '''搜索应用图标文件'''
     searchPath = os.path.join(decompiledfolder, "res", "**", "%s.*" % icon_name)
     return glob.glob(searchPath)
-
-def parse_icon_name(iconNode):
-    '''解析图标文件'''
-    if (iconNode != None):
-        return iconNode.split("/")[1]
-    return None
-
-def find_apk_icon(decompiledfolder):
-    '''从AndroidManifest.xml中查找应用图标名称'''
-    if (os.path.exists(decompiledfolder) == False):
-        Log.out("[Logging...] 无法定位文件夹 %s" % decompiledfolder, True)
-        return False
-    manifestfile = "%s/AndroidManifest.xml" % decompiledfolder;
-    ET.register_namespace('android', Common.XML_NAMESPACE)
-    manifesttree = ET.parse(manifestfile)
-    manifestroot = manifesttree.getroot()
-    applicationNode = manifestroot.find("application")
-    iconNode = applicationNode.get("{%s}icon" % Common.XML_NAMESPACE)
-    if iconNode != None:
-        return parse_icon_name(iconNode)
-
-    iconNode = applicationNode.get("{%s}logo" % Common.XML_NAMESPACE)
-    if iconNode != None:
-        return parse_icon_name(iconNode)
-
-    mainactivity = manifestroot.findall(Common.MAIN_ACTIVITY_XPATH)
-    if (mainactivity == None or len(mainactivity) <= 0):
-        return None
-
-    iconNode = mainactivity[0].get("{%s}icon" % Common.XML_NAMESPACE)
-    if iconNode != None:
-        return parse_icon_name(iconNode)
-
-    iconNode = mainactivity[0].get("{%s}logo" % Common.XML_NAMESPACE)
-    if iconNode != None:
-        return parse_icon_name(iconNode)
-
-    return None
 
 def add_corner_icon(iconfile, cornerfile):
     '''添加渠道角标'''
@@ -105,7 +65,7 @@ def find_proper_corner(icon_file, corner_files):
 
 def process_corner_icon(decompiledfolder, sdk_channel, cornerpos):
     '''进行角标处理'''
-    icon_name = find_apk_icon(decompiledfolder)
+    icon_name = axmldo.findApkIcon(decompiledfolder)
     if (icon_name == None):
         Log.out("[Logging...] 没有找到图标\n")
         return

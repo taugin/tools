@@ -10,11 +10,66 @@ import Utils
 
 import os
 import xml.etree.ElementTree as ET
-import apkbuilder
-#from xml.etree import cElementTree as ET
-#from xml.dom import minidom
 
 ###############################################################################
+
+#查找应用图标
+def parseIconName(iconNode):
+    '''解析图标文件'''
+    if (iconNode != None):
+        return iconNode.split("/")[1]
+    return None
+#查找应用图标
+def findApkIcon(decompiledfolder):
+    '''从AndroidManifest.xml中查找应用图标名称'''
+    if (os.path.exists(decompiledfolder) == False):
+        Log.out("[Logging...] 无法定位文件夹 %s" % decompiledfolder, True)
+        return False
+    manifestfile = "%s/AndroidManifest.xml" % decompiledfolder;
+    ET.register_namespace('android', Common.XML_NAMESPACE)
+    manifesttree = ET.parse(manifestfile)
+    manifestroot = manifesttree.getroot()
+    applicationNode = manifestroot.find("application")
+    iconNode = applicationNode.get("{%s}icon" % Common.XML_NAMESPACE)
+    if iconNode != None:
+        return parseIconName(iconNode)
+
+    iconNode = applicationNode.get("{%s}logo" % Common.XML_NAMESPACE)
+    if iconNode != None:
+        return parseIconName(iconNode)
+
+    mainactivity = manifestroot.findall(Common.MAIN_ACTIVITY_XPATH)
+    if (mainactivity == None or len(mainactivity) <= 0):
+        return None
+
+    iconNode = mainactivity[0].get("{%s}icon" % Common.XML_NAMESPACE)
+    if iconNode != None:
+        return parseIconName(iconNode)
+
+    iconNode = mainactivity[0].get("{%s}logo" % Common.XML_NAMESPACE)
+    if iconNode != None:
+        return parseIconName(iconNode)
+    return None
+
+#查找入口Application
+def findEntryApplication(decompiledfolder):
+    '''从AndroidManifest.xml中查找应用图标名称'''
+    if (os.path.exists(decompiledfolder) == False):
+        Log.out("[Logging...] 无法定位文件夹 %s" % decompiledfolder, True)
+        return False
+    manifestfile = "%s/AndroidManifest.xml" % decompiledfolder;
+    ET.register_namespace('android', Common.XML_NAMESPACE)
+    manifesttree = ET.parse(manifestfile)
+    manifestroot = manifesttree.getroot()
+    packageName = manifestroot.get("package")
+    applicationNode = manifestroot.find("application")
+    appName = applicationNode.get("{%s}name" % Common.XML_NAMESPACE)
+    if (appName == None or appName.strip() == ""):
+        return None
+    if (appName.startswith(".")) :
+        return packageName + appName
+    return appName
+
 #查找原插件app中的启动Activity
 def findEntryActivity(root):
     entryNode = root.find(Common.MAIN_ACTIVITY_XPATH)

@@ -9,6 +9,7 @@ import Utils
 
 import os
 import apkbuilder
+import axmldo
 
 def parse_class(line):
     if not line.startswith(".class"):
@@ -96,10 +97,15 @@ def split_dex(decompiledfolder):
     allFiles = Utils.list_files(os.path.join(decompiledfolder, "smali"))
     allFiles.sort()
     allFiles = sortFiles(allFiles)
+    applicationName = axmldo.findEntryApplication(decompiledfolder)
+    if applicationName != None:
+        applicationName = applicationName.replace(".", "/")
     #保证U9Application等类在第一个classex.dex文件中
     for f in allFiles:
         f = f.replace("\\", "/")
-        if "/com/abch/sdk" in f or "/android/support/multidex" in f:
+        if "/com/abch/sdk" in f or "/android/support/multidex" in f :
+            currFucNum = currFucNum + get_smali_method_count(f, allRefs)
+        elif applicationName != None and applicationName in f:
             currFucNum = currFucNum + get_smali_method_count(f, allRefs)
 
     totalFucNum = currFucNum
