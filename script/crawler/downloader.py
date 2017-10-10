@@ -83,6 +83,11 @@ class Downloader:
         if cookieHandler != None:
             handlers.append(cookieHandler)
 
+        #增加重定向处理器，此处禁止重定向
+        redirectHandler = self.buildRedirectHandler()
+        if redirectHandler != None:
+            handlers.append(redirectHandler)
+
         opener = urllib.request.build_opener(*handlers)
         return opener
 
@@ -133,6 +138,13 @@ class Downloader:
             logger.debug("error : %s" % e)
         return None
 
+    def buildRedirectHandler(self):
+        try:
+            return RedirectHandler()
+        except Exception as e:
+            logger.debug("error : %s" % e)
+        return None
+
     def parseCharset(self, res):
         contentType = res.getheader("Content-Type")
         charset = None
@@ -152,3 +164,9 @@ class Downloader:
         except:
             content = resbytes.decode("GBK");
         return content
+
+class RedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        pass
+    def http_error_302(self, req, fp, code, msg, headers):
+        pass
