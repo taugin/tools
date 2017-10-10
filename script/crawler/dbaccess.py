@@ -42,17 +42,19 @@ def execSql(sql):
     logger.debug("=========>> execSql Start")
     result = 0
     timeToRetry = 1
-    while timeToRetry < 3:
+    while timeToRetry <= 3:
         try:
             _getCursor().execute(sql)
             result = _getCursor().lastrowid
             _getConnection().commit()
         except Exception as e:
             result = -1
+            logger.debug("=========>> execSql e : %s" % repr(e))
+            if isinstance(e, pymysql.err.IntegrityError):
+                break
             resetConnection();
-            logger.debug("=========>> execSql e : %s" % e)
         if result >= 0:
-            break;
+            break
         timeToRetry = timeToRetry + 1
     logger.debug("=========>> execSql KeyId : %s" % result)
     _threadLock.release()
@@ -90,6 +92,7 @@ def rollback():
     _threadLock.release()
 
 def resetConnection():
+    logger.debug("resetConnection")
     global dbCursor
     global dbConnection
     dbCursor = None
