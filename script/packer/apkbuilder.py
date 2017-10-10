@@ -86,7 +86,7 @@ def signapk(src_apk, dst_apk, keystoreinfo = None):
     dst_apk = os.path.normpath(dst_apk)
     deletemetainf(src_apk)
     Log.out("[Signing...] 安卓文件签名 : [%s -> %s]" % (os.path.basename(src_apk), os.path.basename(dst_apk)), True)
-    if (keystoreinfo == None or len(keystoreinfo) <= 0):
+    if (keystoreinfo == None or len(keystoreinfo) <= 0 or not os.path.exists(Common.JARSIGNER)):
         Log.out ("[Logging...] 签名文件信息 : [testkey.x509.pem], [testkey.pk8]", True)
         retcode = subprocess.call([Common.JAVA, "-jar", Common.SIGNAPK_JAR, Common.X509, Common.PK8, src_apk, dst_apk], stdout=subprocess.PIPE)
         if (retcode == 0):
