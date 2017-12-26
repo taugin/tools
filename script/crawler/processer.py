@@ -40,8 +40,10 @@ class JokeProcesser(Processer):
             return
         if "content" in data and data["content"] != None and len(data["content"]) > 0:
             self.addGrabContent(data)
+        '''不在存储错误url
         else:
             self.addErrorInfo(data)
+        '''
 
     def hasGrabbed(self, url):
         '''判断当前url是否被抓取过'''
