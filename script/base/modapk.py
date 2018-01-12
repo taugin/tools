@@ -3,6 +3,10 @@
 '''
 给apk加壳，是apk的classes.dex文件保持不变
 '''
+'''
+二进制修改AndroidManifest.xml
+https://github.com/taugin/AXMLEditor/blob/master/README.md
+'''
 import sys
 import os
 #引入别的文件夹的模块
@@ -14,7 +18,6 @@ sys.path.append(COM_DIR)
 import Common
 import Log
 
-import os
 import subprocess
 import zipfile
 import xml.etree.ElementTree as ET
@@ -41,6 +44,7 @@ APK_NEWLABEL = ""
 APK_ENCRYPT = False
 APK_ONLYDECOMPILE = False;
 IS_GRAPHIC = False;
+APK_ENABLEDEBUG = False
 
 #输入参数封装
 def inputArguement(prompt):
@@ -231,6 +235,34 @@ def modifyapk(srcapk, dstapk):
                 pause()
                 return;
 
+#增加调试标记android:debuggable="true"
+def addDebuggable(srcapk, dstapk):
+    #生成新的apk
+    generate_dstapk(dstapk)
+    szf = zipfile.ZipFile(srcapk, "r")
+    srcXml = "src_manifest.xml"
+    dstXml = "AndroidManifest.xml"
+    f = open(srcXml, "wb")
+    f.write(szf.read("AndroidManifest.xml"));
+    szf.close()
+    f.close()
+    #添加debuggable属性
+    cmdlist = [Common.JAVA, "-jar", Common.AXML_EDITOR, "-attr", "-i", "application", "package", "debuggable", "true", srcXml, dstXml]
+    subprocess.call(cmdlist, stdout=subprocess.PIPE)
+    subprocess.call([Common.AAPT_BIN, "r", dstapk, dstXml], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    zf = zipfile.ZipFile(dstapk, "a")
+    zf.write(dstXml);
+    zf.close()
+    #签名
+    signapk_use_testkey(dstapk)
+    if (os.path.exists(srcXml)):
+        os.remove(srcXml)
+    if (os.path.exists(dstXml)):
+        os.remove(dstXml)
+    if (os.path.exists(dstapk)):
+        os.remove(dstapk)
+    Common.pause()
+
 def readEncryptArguement():
     s = inputArguement("确认apk是否加壳 : (Y/N) ")
     if (s == None or len(s) <= 0):
@@ -249,8 +281,9 @@ def parseArguement(argv):
     global APK_ENCRYPT
     global APK_ONLYDECOMPILE
     global IS_GRAPHIC
+    global APK_ENABLEDEBUG
     try:
-        opts, args = getopt.getopt(argv[1:], "p:l:edg")
+        opts, args = getopt.getopt(argv[1:], "p:l:edgj")
         if (len(args) == 0):
             return
         for op, value in opts:
@@ -264,6 +297,8 @@ def parseArguement(argv):
                 APK_ONLYDECOMPILE = True
             elif (op == "-g"):
                 IS_GRAPHIC = True
+            elif (op == "-j"): # 为apk增加调试参数
+                APK_ENABLEDEBUG = True
 
     except getopt.GetoptError as err:
         Log.out(err)
@@ -293,6 +328,9 @@ def checkArguement():
         Log.out("[Logging...] 无法定位文件 %s" % APK_SRCFILE)
         sys.exit(0)
 
+    if (APK_ENABLEDEBUG == True):
+        '''使apk可调试'''
+        return True
     mod_pkgname = APK_NEWPKG != None and len(APK_NEWPKG) > 0
     mod_applabel = APK_NEWLABEL != None and len(APK_NEWLABEL) > 0
     if ((mod_pkgname or mod_applabel or APK_ENCRYPT or APK_ONLYDECOMPILE) == False):
@@ -311,11 +349,15 @@ checkArguement()
 
 srcapkname = os.path.basename(APK_SRCFILE)
 (name, ext) = os.path.splitext(srcapkname)
-if (APK_NEWPKG != None and APK_NEWPKG != ""):
-    dstapk = name + "-" + APK_NEWPKG + "-mod.apk"
-else:
-    dstapk = name + "-mod.apk"
 
 #更改当前目录为源文件所在目录
 os.chdir(os.path.dirname(os.path.abspath(APK_SRCFILE)))
-modifyapk(APK_SRCFILE, dstapk)
+if (APK_ENABLEDEBUG == True):
+    dstapk = name + "-debuggable.apk"
+    addDebuggable(APK_SRCFILE, dstapk)
+else:
+    if (APK_NEWPKG != None and APK_NEWPKG != ""):
+        dstapk = name + "-" + APK_NEWPKG + "-mod.apk"
+    else:
+        dstapk = name + "-mod.apk"
+    modifyapk(APK_SRCFILE, dstapk)

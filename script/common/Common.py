@@ -55,6 +55,8 @@ BAKSMALI_JAR = os.path.join(LIB_DIR, "baksmali-2.1.3.jar")
 DX_JAR = os.path.join(LIB_DIR, "dx.jar")
 
 AES_JAR = os.path.join(LIB_DIR, "aes.jar")
+
+AXML_EDITOR = os.path.join(LIB_DIR, "AXMLEditor.jar");
 #########################可执行文件文件路径定义#################################
 
 #AAPT可执行文件
