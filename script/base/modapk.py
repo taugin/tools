@@ -237,8 +237,6 @@ def modifyapk(srcapk, dstapk):
 
 #增加调试标记android:debuggable="true"
 def addDebuggable(srcapk, dstapk):
-    #生成新的apk
-    generate_dstapk(dstapk)
     szf = zipfile.ZipFile(srcapk, "r")
     srcXml = "src_manifest.xml"
     dstXml = "AndroidManifest.xml"
@@ -248,13 +246,19 @@ def addDebuggable(srcapk, dstapk):
     f.close()
     #添加debuggable属性
     cmdlist = [Common.JAVA, "-jar", Common.AXML_EDITOR, "-attr", "-i", "application", "package", "debuggable", "true", srcXml, dstXml]
-    subprocess.call(cmdlist, stdout=subprocess.PIPE)
-    subprocess.call([Common.AAPT_BIN, "r", dstapk, dstXml], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    zf = zipfile.ZipFile(dstapk, "a")
-    zf.write(dstXml);
-    zf.close()
-    #签名
-    signapk_use_testkey(dstapk)
+    subprocess.call(cmdlist)
+    if (dstXml != None and os.path.exists(dstXml)):
+        #生成新的apk
+        generate_dstapk(dstapk)
+        subprocess.call([Common.AAPT_BIN, "r", dstapk, dstXml], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        zf = zipfile.ZipFile(dstapk, "a")
+        zf.write(dstXml);
+        zf.close()
+        #签名
+        signapk_use_testkey(dstapk)
+    else:
+        Log.out("[Error...] 添加debuggable属性失败")
+
     if (os.path.exists(srcXml)):
         os.remove(srcXml)
     if (os.path.exists(dstXml)):
