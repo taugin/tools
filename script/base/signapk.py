@@ -73,7 +73,7 @@ def signapk(src_apk, dst_apk, keystoreinfo):
         cmdlist.append("MD5withRSA")
         
         cmdlist.append("-keystore")
-        cmdlist.append(dir + Common.SEPERATER + keystoreinfo[0])
+        cmdlist.append(keystoreinfo[0])
         cmdlist.append("-storepass")
         cmdlist.append(keystoreinfo[1])
         cmdlist.append("-keypass")
@@ -125,12 +125,14 @@ def readkeystore(dir):
     else:
         p = 0
     if (storeindex <= 0):
-        Log.out("[Logging...] 找不到签名文件", True)
-        sys.exit()
-    keystorefile = storefiles[int(p) - 1]
+        Log.out("[Logging...] 找不到签名文件, 使用默认签名文件", True)
+        keystorefile = os.path.normpath(Common.KEYSTORES_DEFAULT_FILE)
+    else:
+        keystorefile = storefiles[int(p) - 1]
     Log.out("[Logging...] 签名文件 : %s" % keystorefile, True)
-    index = keystorefile.rfind(".keystore")
-    filename = keystorefile[0:index]
+    keystorename = os.path.basename(keystorefile)
+    index = keystorename.rfind(".keystore")
+    filename = keystorename[0:index]
     splits = filename.split("_")
     if (len(splits) < 3):
         Log.out("[Logging...] 无法获取签名文件信息,请重命名签名文件格式 <[alias]_[storepass]_[aliaspass].keystore>", True)
@@ -146,12 +148,13 @@ def readkeystore(dir):
         Log.out("[Logging...] keystorealias or keystorepass is empty")
         sys.exit()
 
-    retcode = subprocess.call([Common.KEYTOOL, "-list", "-keystore", dir + Common.SEPERATER + keystorefile, "-storepass", keystorepass], stdout=subprocess.PIPE)
+    keystorepath = os.path.join(dir, keystorefile)
+    retcode = subprocess.call([Common.KEYTOOL, "-list", "-keystore", keystorepath, "-storepass", keystorepass], stdout=subprocess.PIPE)
     if (retcode != 0):
         Log.out("[Logging...] 签名文件不正确", True)
         sys.exit()
     keystoreinfo = []
-    keystoreinfo.append(keystorefile)
+    keystoreinfo.append(keystorepath)
     keystoreinfo.append(keystorepass)
     keystoreinfo.append(keystorealias)
     keystoreinfo.append(keyaliaspass)

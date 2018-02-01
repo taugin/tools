@@ -23,6 +23,9 @@ LIB_DIR = os.path.join(HOME_DIR, "lib")
 #签名文件存放目录
 KEYSTORES_DIR = os.path.join(HOME_DIR, "extra/keystore")
 
+#默认的签名文件
+KEYSTORES_DEFAULT_FILE = os.path.join(KEYSTORES_DIR, "taugin_pwd_taugin0426.keystore")
+
 #可执行文件后缀
 BIN_SUFFIX = ""
 if (platform.system().lower() == "windows"):
