@@ -10,6 +10,7 @@ sys.path.append(COM_DIR)
 
 import Common
 import Log
+import Utils
 
 import getopt
 import platform
@@ -103,7 +104,12 @@ def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     keystoreinfo = []
     if(USE_TESTSIGN_FILE == False):
         keystoreinfo = readkeystore(os.path.dirname(src_apk))
-    signapk(src_apk, dst_apk, keystoreinfo)
+    dirname = os.path.dirname(src_apk);
+    basename = os.path.basename(src_apk) + "-tmp.apk"
+    tmp_apk = os.path.join(dirname, basename)
+    Utils.copyfile(src_apk, tmp_apk, True);
+    signapk(tmp_apk, dst_apk, keystoreinfo)
+    Utils.deleteFile(tmp_apk)
 
 def readkeystore(dir):
     listfile=os.listdir(dir)
