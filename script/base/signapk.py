@@ -18,6 +18,7 @@ import zipfile
 import subprocess;
 
 USE_TESTSIGN_FILE = False
+OUTPUT_SIGNED_APK = None
 
 def pause():
     if (platform.system().lower() == "windows"):
@@ -92,6 +93,7 @@ def signapk(src_apk, dst_apk, keystoreinfo):
     Log.out("---------------------------------------", True);
 
 def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
+    global OUTPUT_SIGNED_APK
     Log.out("[Logging...] APK 文件 : " + src_apk, True)
     index = src_apk.rfind(".apk")
     if (index == -1):
@@ -100,6 +102,8 @@ def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     #Log.out("index : %d " % index)
     #Log.out("substring : %s " % src_apk[0:index])
     dst_apk = src_apk[0:index] + "-signed.apk"
+    if (OUTPUT_SIGNED_APK != None and len(OUTPUT_SIGNED_APK) > 0):
+        dst_apk = OUTPUT_SIGNED_APK
     #Log.out("dst_apk : %s " % dst_apk)
     keystoreinfo = []
     if(USE_TESTSIGN_FILE == False):
@@ -169,10 +173,12 @@ def readkeystore(dir):
 if (len(sys.argv) < 2):
     Log.out("[Logging...] 缺少参数, %s [-t] <src_apk>" % os.path.basename(sys.argv[0]), True);
     sys.exit()
-opts, args = getopt.getopt(sys.argv[1:], "t")
+opts, args = getopt.getopt(sys.argv[1:], "to:")
 for op, value in opts:
     if (op == "-t"):
         USE_TESTSIGN_FILE = True
+    elif (op == "-o"):
+        OUTPUT_SIGNED_APK = value
 
 for file in args :
     if (os.path.isdir(file)):
