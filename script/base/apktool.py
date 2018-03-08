@@ -18,7 +18,11 @@ SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "signapk.py")
 def apktool_cmd():
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR]
     cmdlist += sys.argv[1:]
-    subprocess.call(cmdlist)
+    ret = subprocess.call(cmdlist)
+    if (ret == 0) :
+        return True
+    else:
+        return False
 
 def signapk(srcapk, dstapk):
     Log.out("")
@@ -38,10 +42,10 @@ def alignapk(unalignapk, finalapk):
     Log.out("[Logging...] 文件对齐成功\n")
     return True
 
-apktool_cmd()
+ret = apktool_cmd()
 
 #回编译签名
-if (len(sys.argv) > 1 and sys.argv[1] == "b"):
+if (ret and len(sys.argv) > 1 and sys.argv[1] == "b"):
     srcapk = None
     signedapk = None
     alignedapk = None;
