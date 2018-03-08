@@ -20,27 +20,44 @@ def apktool_cmd():
     cmdlist += sys.argv[1:]
     subprocess.call(cmdlist)
 
-def signapk(dstapk):
+def signapk(srcapk, dstapk):
     Log.out("")
-    cmdlist = ["python", SIGNAPK_FILE, dstapk]
+    cmdlist = ["python", SIGNAPK_FILE, "-o", dstapk, srcapk]
     ret = subprocess.call(cmdlist)
     if (ret == 0):
         return True
     else:
         return False
 
+#apk对齐
+def alignapk(unalignapk, finalapk):
+    finalapk = os.path.normpath(finalapk)
+    Log.out("[Logging...] 正在对齐文件 : [%s]" % finalapk, True)
+    cmdlist = [Common.ZIPALIGN, "-f", "4", unalignapk, finalapk]
+    subprocess.call(cmdlist, stdout=subprocess.PIPE)
+    Log.out("[Logging...] 文件对齐成功\n")
+    return True
+
 apktool_cmd()
 
 #回编译签名
 if (len(sys.argv) > 1 and sys.argv[1] == "b"):
-    apkfile = None
+    srcapk = None
+    signedapk = None
+    alignedapk = None;
     opts, args = getopt.getopt(sys.argv[3:], "o:")
     for op, value in opts:
         if (op == "-o"):
-            apkfile = value
-    if (apkfile != None and len(apkfile) > 0) :
-        if (signapk(apkfile) == True):
-            if (os.path.exists(apkfile)):
-                os.remove(apkfile)
+            srcapk = value
+    if (srcapk != None and len(srcapk) > 0) :
+        (tmpname, ext) = os.path.splitext(srcapk)
+        signedapk = tmpname + "-signed.apk"
+        alignedapk = tmpname + "-aligned.apk"
+        if (signapk(srcapk, signedapk) == True):
+            if (os.path.exists(srcapk)):
+                os.remove(srcapk)
+            if (alignapk(signedapk, alignedapk) == True):
+                if (os.path.exists(signedapk)):
+                    os.remove(signedapk)
 
 Common.pause()
