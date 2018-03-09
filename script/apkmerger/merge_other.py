@@ -10,7 +10,7 @@ import os
 #引入别的文件夹的模块
 DIR = os.path.dirname(sys.argv[0])
 COM_DIR = os.path.join(DIR, "..", "common")
-COM_DIR = os.path.normpath(COM_DIR) 
+COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
 
 import Common
@@ -117,7 +117,7 @@ def generate_slave(mergedapk, slaveapk):
     tmpzip.writestr("classes.dex", slavezip.read("classes.dex"), zipfile.ZIP_DEFLATED)
     slavezip.close()
     tmpzip.close()
-    
+
     mergedzip = zipfile.ZipFile(mergedapk, "a")
     mergedzip.write(tmpzipfile, Common.PAY_STUBDATA, zipfile.ZIP_DEFLATED)
     mergedzip.close()
@@ -139,7 +139,7 @@ def indent(elem, level=0):
         elem.tail = i
     return elem
 
-def copy_fromapk(mergedapk, masterapk, slaveapk, company_name):
+def merge_other(mergedapk, masterapk, slaveapk, company_name):
     if (os.path.exists(mergedapk) == False):
         Log.out("[Logging...] 无法定位文件 %s" % mergedapk, True)
         sys.exit(0)

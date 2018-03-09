@@ -13,13 +13,15 @@ import Log
 import subprocess
 import shutil
 import getopt
+import Utils
 
 import apkbuilder
-import check_resdup
+import merge_rfile
 import merge_public
 import merge_res
-import merge_xml
-import copy_fromapk
+import merge_axml
+import merge_other
+import merge_extra
 
 TRY_CONFIG = "error.json"
 SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "base", "signapk.py")
@@ -40,8 +42,8 @@ def clean_tmp_folders(masterfolder, slavefolder, file1, file2):
     try:
         shutil.rmtree(masterfolder, ignore_errors = True)
         shutil.rmtree(slavefolder, ignore_errors = True)
-        shutil.rmtree(file1, ignore_errors = True)
-        shutil.rmtree(file2, ignore_errors = True)
+        Utils.deleteFile(file1)
+        Utils.deleteFile(file2)
     except:
         pass
     Log.out("[Logging...] 文件清除完成\n")
@@ -71,15 +73,17 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
     functions = []
     functions += [{"function":"apkbuilder.apk_decompile(masterapk, masterfolder)"}]
     functions += [{"function":"apkbuilder.apk_decompile(slaveapk, slavefolder)"}]
-    functions += [{"function":"check_resdup.check_resdup(masterfolder, slavefolder)"}]
+    functions += [{"function":"merge_rfile.check_resdup(masterfolder, slavefolder)"}]
 
     if (ONLY_CHECK_DUP == False):
-        functions += [{"function":"merge_xml.merge_xml_change_pkg(masterfolder, slavefolder, newpkgname)"}]
+        functions += [{"function":"merge_axml.merge_xml_change_pkg(masterfolder, slavefolder, newpkgname)"}]
         functions += [{"function":"merge_public.rebuild_ids(masterfolder, slavefolder)"}]
-        functions += [{"function":"merge_res.merge_res(masterfolder, slavefolder)"}]
+        functions += [{"function":"merge_res.merge_res(masterfolder, slavefolder, True)"}]
         functions += [{"function":"apkbuilder.copy_smali(masterfolder, slavefolder)"}]
+        functions += [{"function":"merge_rfile.update_all_rfile(masterfolder)"}]
+        functions += [{"function":"merge_extra.add_application(masterfolder, slavefolder)"}]
         functions += [{"function":"apkbuilder.apk_compile(masterfolder, mastermergedapk)", "saveonfalse":"True"}]
-        functions += [{"function":"copy_fromapk.copy_fromapk(mastermergedapk, masterapk, slaveapk, company)"}]
+        functions += [{"function":"merge_other.merge_other(mastermergedapk, masterapk, slaveapk, company)"}]
         functions += [{"function":"signapk(mastermergedapk, mastersignedapk)"}]
         functions += [{"function":"apkbuilder.alignapk(mastersignedapk, masterfinalapk)"}]
 

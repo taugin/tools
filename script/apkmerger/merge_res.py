@@ -31,7 +31,7 @@ def indent(elem, level=0):
         elem.tail = i
     return elem
 
-def merge_exist(masterfile, slavefile):
+def merge_exist(masterfile, slavefile, override):
     #Log.out("[Logging...] 合并 %s -> %s" % (slavefile, masterfile))
     try:
         mastertree = ET.parse(masterfile)
@@ -44,19 +44,30 @@ def merge_exist(masterfile, slavefile):
         if (len(slavechildren) <= 0):
             #如果资源内容为空，则不需要合并
             return True
-        namelist = []
+        namelist = {}
         for item in masterchildren:
-            namelist += [item.get("name")]
+            namelist[item.get("name")] = item
 
         for item in slavechildren:
-            if (item != None and item.get("name") not in namelist):
-                masterroot.append(item)
+            if (item != None):
+                name = item.get("name")
+                value = None
+                if (name != None and name in namelist.keys()):
+                    value = namelist[name]
+                #资源不存在时
+                if value == None:
+                    masterroot.append(item)
+                else:
+                    #资源存在时
+                    if (override == True):
+                        masterroot.remove(value)
+                        masterroot.append(item)
         indent(masterroot)
         mastertree.write(masterfile, encoding='utf-8', xml_declaration=True)
     except Exception as e:
         Log.out("Exception : %s" % e)
 
-def merge_res(masterfolder, slavefolder):
+def merge_res(masterfolder, slavefolder, override = False):
     Log.out("[Logging...] 拷贝资源文件 : [res]", True)
     if (os.path.exists(masterfolder) == False):
         Log.out("[Logging...] 无法定位文件夹 %s" % masterfolder, True)
@@ -86,7 +97,7 @@ def merge_res(masterfolder, slavefolder):
                 tmp = os.path.join(root, file)
                 masterfile = tmp.replace(slavefolder, masterfolder)
                 if (os.path.exists(masterfile)) :
-                    merge_exist(masterfile, slavefile)
+                    merge_exist(masterfile, slavefile, override)
                 else:
                     #Log.out("slavefile : %s , masterfile : %s " % (slavefile, masterfile))
                     shutil.copy2(slavefile, masterfile)

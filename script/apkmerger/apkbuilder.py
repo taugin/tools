@@ -52,7 +52,24 @@ def copy_smali(masterfolder, slavefolder):
         Utils.copydir(fromdir, dstdir, False)
 
     support_multidex(masterfolder)
+    update_google_ad(masterfolder)
     clear_dup_smali(masterfolder)
+
+def update_google_ad(decompiledfolder):
+    Log.out("[Logging...] 更新谷歌广告")
+    smali = os.path.join(decompiledfolder, "smali")
+    smali2 = os.path.join(decompiledfolder, "smali_classes2")
+    if (not os.path.exists(smali2)):
+        return
+    srclist = os.walk(smali2, True)
+    for root, filedir, files in srclist:
+        for file in files:
+            fromfile = os.path.join(root, file)
+            tofile = fromfile.replace(smali2, smali);
+            if (os.path.exists(tofile)):
+                Utils.copyfile(fromfile, tofile, True)
+                Utils.deleteFile(fromfile)
+
 #apk对齐
 def alignapk(unalignapk, finalapk):
     finalapk = os.path.normpath(finalapk)
