@@ -66,7 +66,7 @@ def update_google_ad(decompiledfolder):
         for file in files:
             fromfile = os.path.join(root, file)
             tofile = fromfile.replace(smali2, smali);
-            if (os.path.exists(tofile)):
+            if (os.path.exists(tofile) and "com\google" in fromfile):
                 Utils.copyfile(fromfile, tofile, True)
                 Utils.deleteFile(fromfile)
 

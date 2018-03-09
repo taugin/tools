@@ -78,7 +78,7 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
     if (ONLY_CHECK_DUP == False):
         functions += [{"function":"merge_axml.merge_xml_change_pkg(masterfolder, slavefolder, newpkgname)"}]
         functions += [{"function":"merge_public.rebuild_ids(masterfolder, slavefolder)"}]
-        functions += [{"function":"merge_res.merge_res(masterfolder, slavefolder, True)"}]
+        functions += [{"function":"merge_res.merge_res(masterfolder, slavefolder)"}]
         functions += [{"function":"apkbuilder.copy_smali(masterfolder, slavefolder)"}]
         functions += [{"function":"merge_rfile.update_all_rfile(masterfolder)"}]
         functions += [{"function":"merge_extra.add_application(masterfolder, slavefolder)"}]
