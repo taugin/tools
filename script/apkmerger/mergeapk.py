@@ -22,6 +22,7 @@ import merge_res
 import merge_axml
 import merge_other
 import merge_extra
+import merge_smali
 
 TRY_CONFIG = "error.json"
 SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "base", "signapk.py")
@@ -40,7 +41,7 @@ def signapk(unsignapk, signedapk):
 def clean_tmp_folders(masterfolder, slavefolder, file1, file2):
     Log.out("[Logging...] 清除临时文件")
     try:
-        shutil.rmtree(masterfolder, ignore_errors = True)
+        #shutil.rmtree(masterfolder, ignore_errors = True)
         shutil.rmtree(slavefolder, ignore_errors = True)
         Utils.deleteFile(file1)
         Utils.deleteFile(file2)
@@ -79,9 +80,9 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
         functions += [{"function":"merge_axml.merge_xml_change_pkg(masterfolder, slavefolder, newpkgname)"}]
         functions += [{"function":"merge_public.rebuild_ids(masterfolder, slavefolder)"}]
         functions += [{"function":"merge_res.merge_res(masterfolder, slavefolder)"}]
-        functions += [{"function":"apkbuilder.copy_smali(masterfolder, slavefolder)"}]
+        functions += [{"function":"merge_smali.merge_smali(masterfolder, slavefolder)"}]
         functions += [{"function":"merge_rfile.update_all_rfile(masterfolder)"}]
-        functions += [{"function":"merge_extra.add_application(masterfolder, slavefolder)"}]
+        functions += [{"function":"merge_extra.merge_extra(masterfolder, slavefolder)"}]
         functions += [{"function":"apkbuilder.apk_compile(masterfolder, mastermergedapk)", "saveonfalse":"True"}]
         functions += [{"function":"merge_other.merge_other(mastermergedapk, masterapk, slaveapk, company)"}]
         functions += [{"function":"signapk(mastermergedapk, mastersignedapk)"}]

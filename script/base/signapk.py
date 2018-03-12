@@ -135,7 +135,7 @@ def readkeystore(dir):
     else:
         p = 0
     if (storeindex <= 0):
-        Log.out("[Logging...] 找不到签名文件, 使用默认签名文件", True)
+        Log.out("[Logging...] 读取签名 : 找不到签名文件, 使用默认签名文件", True)
         keystorefile = os.path.normpath(Common.KEYSTORES_DEFAULT_FILE)
     else:
         keystorefile = storefiles[int(p) - 1]

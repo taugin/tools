@@ -35,45 +35,6 @@ def indent(elem, level=0):
 def merge_xml(masterfolder, slavefolder):
     merge_xml_change_pkg(masterfolder, slavefolder, None)
 
-#查找原插件app中的启动Activity
-def findEntryActivity(root):
-    entryNode = root.find(Common.MAIN_ACTIVITY_XPATH)
-    if (entryNode != None):
-        return entryNode
-
-def processEntryActivity(decompiledfolder, masterroot, slaveroot):
-    appEntryNode = findEntryActivity(masterroot)
-    sdkEntryNode = findEntryActivity(slaveroot)
-
-    master_entry = None
-    slave_entry = None
-
-    if appEntryNode != None:
-        master_entry = appEntryNode.attrib['{%s}name' % Common.XML_NAMESPACE]
-    if sdkEntryNode != None:
-        slave_entry = sdkEntryNode.attrib['{%s}name' % Common.XML_NAMESPACE]
-
-    if master_entry != None and master_entry != '' and slave_entry != None and slave_entry != '':
-        intentFilterNode = appEntryNode.find("intent-filter/category/[@{%s}name='android.intent.category.LAUNCHER']/.." % Common.XML_NAMESPACE)
-        categoryNode = intentFilterNode.find('category')
-        if intentFilterNode != None and categoryNode != None:
-            intentFilterNode.remove(categoryNode)
-            package = masterroot.get("package")
-            if master_entry.startswith("."):
-                master_entry = package + master_entry
-    return master_entry, slave_entry
-
-#添加入口activity到主activity
-def check_ad_entry_activity(item, master_entry, slave_entry):
-    if slave_entry == None:
-        return
-    activityName = item.attrib["{%s}name" % Common.XML_NAMESPACE]
-    if (activityName == slave_entry):
-        element = ET.Element("meta-data")
-        element.set("{%s}name" % Common.XML_NAMESPACE, "app_entry_name")
-        element.set("{%s}value" % Common.XML_NAMESPACE, master_entry)
-        item.append(element)
-
 #去除重复权限
 def remove_dup_permission(masterroot):
     Log.out("[Logging...] 去除重复权限", True)
@@ -107,9 +68,6 @@ def merge_xml_change_pkg(masterfolder, slavefolder, newpkgname = None):
     slaveroot = slavetree.getroot()
     slaveapplication = slaveroot.find("application")
 
-    #处理入口Activity
-    #master_entry, slave_entry = processEntryActivity(masterfolder, masterroot, slaveroot)
-
     for item in slaveroot.getchildren():
         if (item.tag == "uses-permission"):
             masterroot.append(item)
@@ -117,7 +75,6 @@ def merge_xml_change_pkg(masterfolder, slavefolder, newpkgname = None):
     for item in slaveapplication.getchildren():
         exclude = item.find("meta-data/[@{%s}name='exclude']" % Common.XML_NAMESPACE)
         if (exclude == None):
-            #check_ad_entry_activity(item, master_entry, slave_entry)
             masterapplication.append(item)
 
     #去除重复的权限
