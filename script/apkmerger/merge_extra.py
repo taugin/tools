@@ -88,14 +88,15 @@ def add_application(masterfolder, slavefolder):
     set_application(masterfolder, app_name)
 ###########################################################################
 #查找原插件app中的启动Activity
-ENTRY_ACTIVITY_XPATH = ".//meta-data/[@{%s}name='new_entry']/.." % (Common.XML_NAMESPACE)
+ENTRY_ACTIVITY_XPATH = ".//meta-data/[@{%s}name='app_entry_name']/.." % (Common.XML_NAMESPACE)
+META_ACTIVITY_XPATH = ".//meta-data/[@{%s}name='app_entry_name']" % (Common.XML_NAMESPACE)
 LAUNCHER_ACTIVITY_XPATH = "intent-filter/category/[@{%s}name='android.intent.category.LAUNCHER']/.." % Common.XML_NAMESPACE
 def find_launcher_activity(root):
     entryNode = root.find(Common.MAIN_ACTIVITY_XPATH)
     if (entryNode != None):
         return entryNode
 
-''' 找出有<meta-data android:name="entry_activity" android:value="true"/>的activity'''
+''' 找出有<meta-data android:name="app_entry_name" android:value="true"/>的activity'''
 def find_entry_activity(masterroot, slaveroot):
     entryNode = slaveroot.find(ENTRY_ACTIVITY_XPATH)
     if (entryNode != None):
@@ -126,10 +127,9 @@ def modify_entry_activity(package_name, app_launcher_activity, new_entry_activit
         app_launcher_activity.remove(intentFilterNode)
         if (new_entry_activity.find(LAUNCHER_ACTIVITY_XPATH) == None):
             new_entry_activity.append(intentFilterNode)
-        element = ET.Element("meta-data")
-        element.set("{%s}name" % Common.XML_NAMESPACE, "app_entry_name")
-        element.set("{%s}value" % Common.XML_NAMESPACE, launcher_full_name)
-        new_entry_activity.append(element)
+        meta_data = new_entry_activity.find(META_ACTIVITY_XPATH)
+        if (meta_data != None):
+            meta_data.set("{%s}value" % Common.XML_NAMESPACE, launcher_full_name)
 
 def modify_activity_entry(masterfolder, slavefolder):
     if (os.path.exists(masterfolder) == False):
@@ -162,4 +162,5 @@ def merge_extra(masterfolder, slavefolder):
     move_special_files(masterfolder, os.path.normpath("com/wb/rpadapter"))
 
 if __name__ == "__main__":
-    move_special_files("d:\\temp\\loseweight", os.path.normpath("com/wb/rpadapter"))
+    #move_special_files("d:\\temp\\loseweight", os.path.normpath("com/wb/rpadapter"))
+    add_application("D:\\temp\\loseweight", "D:\\temp\\app-release-unsigned")
