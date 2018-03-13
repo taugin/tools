@@ -56,7 +56,7 @@ if (ret and len(sys.argv) > 1 and sys.argv[1] == "b"):
     if (srcapk != None and len(srcapk) > 0) :
         (tmpname, ext) = os.path.splitext(srcapk)
         signedapk = tmpname + "-signed.apk"
-        alignedapk = tmpname + "-aligned.apk"
+        alignedapk = tmpname + "-final.apk"
         if (signapk(srcapk, signedapk) == True):
             if (os.path.exists(srcapk)):
                 os.remove(srcapk)

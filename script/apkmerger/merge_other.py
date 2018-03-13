@@ -2,7 +2,7 @@
 # coding: UTF-8
 
 '''
-从支付apk和游戏apk中拷贝必要的文件到
+从从源apk和主源apk中拷贝必要的文件到
 已经合并的apk
 '''
 import sys
@@ -56,9 +56,9 @@ def should_copyslaveapklibfile(name, liblist):
         return False
     return True
 
-#从支付apk中拷贝文件
+#从从源apk中拷贝文件
 def copy_slaveapk(mergedapk, slaveapk):
-    Log.out("[Logging...] 拷贝支付文件", True)
+    Log.out("[Logging...] 拷贝从源文件", True)
     mergedzip = zipfile.ZipFile(mergedapk, "a")
     liblist = get_lib_dirs(mergedapk)
     slavezip = zipfile.ZipFile(slaveapk, "r")
@@ -95,9 +95,9 @@ def exists_in_masterapk(zip, name):
     except:
         return False
 
-#从游戏apk中拷贝文件
+#从主源apk中拷贝文件
 def copy_masterapk(mergedapk, masterapk):
-    Log.out("[Logging...] 拷贝游戏文件", True)
+    Log.out("[Logging...] 拷贝主源文件", True)
     mergedzip = zipfile.ZipFile(mergedapk, "a")
     masterzip = zipfile.ZipFile(masterapk, "r")
     for name in masterzip.namelist():
@@ -108,7 +108,7 @@ def copy_masterapk(mergedapk, masterapk):
     mergedzip.close()
     masterzip.close()
 
-#将支付apk中的classes.dex文件，压缩成Common.PAY_STUBDATA，并且放置到合并的apk
+#将从源apk中的classes.dex文件，压缩成Common.PAY_STUBDATA，并且放置到合并的apk
 #的assets文件夹内
 def generate_slave(mergedapk, slaveapk):
     slavezip = zipfile.ZipFile(slaveapk, "r")
