@@ -97,14 +97,8 @@ def find_launcher_activity(root):
         return entryNode
 
 ''' 找出有<meta-data android:name="app_entry_name" android:value="true"/>的activity'''
-def find_entry_activity(masterroot, slaveroot):
-    entryNode = slaveroot.find(ENTRY_ACTIVITY_XPATH)
-    if (entryNode != None):
-        activity_name = entryNode.get("{%s}name" % Common.XML_NAMESPACE)
-        if activity_name != None and len(activity_name):
-            activity_node = masterroot.find(".//activity/[@{%s}name='%s']" % (Common.XML_NAMESPACE, activity_name))
-            return activity_node
-    return None
+def find_entry_activity(masterroot):
+    return masterroot.find(ENTRY_ACTIVITY_XPATH)
 
 def modify_entry_activity(package_name, app_launcher_activity, new_entry_activity):
     if (app_launcher_activity == None or new_entry_activity == None or package_name == None):
@@ -131,26 +125,19 @@ def modify_entry_activity(package_name, app_launcher_activity, new_entry_activit
         if (meta_data != None):
             meta_data.set("{%s}value" % Common.XML_NAMESPACE, launcher_full_name)
 
-def modify_activity_entry(masterfolder, slavefolder):
+def modify_activity_entry(masterfolder):
     if (os.path.exists(masterfolder) == False):
         Log.out("[Logging...] 无法定位文件夹 %s" % masterfolder, True)
         sys.exit(0)
-    if (os.path.exists(slavefolder) == False):
-        Log.out("[Logging...] 无法定位文件夹 %s" % slavefolder, True)
-        sys.exit(0)
     mastermanifest = "%s/AndroidManifest.xml" % masterfolder;
-    slavemanifest = "%s/AndroidManifest.xml" % slavefolder;
     ET.register_namespace('android', Common.XML_NAMESPACE)
 
     mastertree = ET.parse(mastermanifest)
     masterroot = mastertree.getroot()
 
-    slavetree = ET.parse(slavemanifest)
-    slaveroot = slavetree.getroot()
-
     package_name = masterroot.get("package")
     app_launcher_activity = find_launcher_activity(masterroot)
-    new_entry_activity = find_entry_activity(masterroot, slaveroot)
+    new_entry_activity = find_entry_activity(masterroot)
     modify_entry_activity(package_name, app_launcher_activity, new_entry_activity)
     Utils.indent(masterroot)
     mastertree.write(mastermanifest, encoding="utf-8", xml_declaration=True)
@@ -158,7 +145,7 @@ def modify_activity_entry(masterfolder, slavefolder):
 ###########################################################################
 def merge_extra(masterfolder, slavefolder):
     add_application(masterfolder, slavefolder)
-    modify_activity_entry(masterfolder, slavefolder)
+    modify_activity_entry(masterfolder)
     move_special_files(masterfolder, os.path.normpath("com/wb/rpadapter"))
 
 if __name__ == "__main__":

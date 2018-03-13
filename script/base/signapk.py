@@ -63,7 +63,7 @@ def signapk(src_apk, dst_apk, keystoreinfo):
             Log.out("[Signing...] 签名失败", True)
             pause()
     else:
-        Log.out("[Logging...] 签名信息 : keystore : [%s], storepass : [%s] , keyalias : [%s], keypass : [%s]" % (keystoreinfo[0],keystoreinfo[1], keystoreinfo[2], keystoreinfo[3]), True)
+        Log.out("[Logging...] 签名信息 : keystore : [%s], storepass : [%s] , keyalias : [%s], keypass : [%s]" % (os.path.basename(keystoreinfo[0]),keystoreinfo[1], keystoreinfo[2], keystoreinfo[3]), True)
 
         dir = os.path.dirname(src_apk)
         cmdlist = []
