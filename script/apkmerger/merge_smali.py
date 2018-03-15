@@ -22,9 +22,9 @@ def copy_smali(masterfolder, slavefolder):
     if (os.path.exists(fromdir)):
         Utils.copydir(fromdir, dstdir, False)
 
-def clear_dup_smali(decompiledfolder):
-    smali = os.path.join(decompiledfolder, "smali")
-    smali2 = os.path.join(decompiledfolder, "smali_classes2")
+def clear_dup_smali(masterfolder):
+    smali = os.path.join(masterfolder, "smali")
+    smali2 = os.path.join(masterfolder, "smali_classes2")
     if (not os.path.exists(smali2)):
         return
     Log.out("[Logging...] 清除重复文件 ", True)
@@ -64,11 +64,9 @@ def baksmali(dexfile, outdir):
         Log.out("[Logging...] 文件转换成功")
         return True
 
-'''
-多dex支持
-'''
-def support_multidex(decompiledfolder):
-    smaliPath = os.path.join(decompiledfolder, "smali/")
+def support_multidex(masterfolder):
+    '''增加多dex支持'''
+    smaliPath = os.path.join(masterfolder, "smali/")
     multidexFilePath = os.path.join(smaliPath, "android/support/multidex/MultiDex.smali")
     multidexFilePath = os.path.normpath(multidexFilePath)
     if not os.path.exists(multidexFilePath):
@@ -81,7 +79,7 @@ def support_multidex(decompiledfolder):
             os.makedirs(multiDexPath)
         multiDexFile = os.path.join(multiDexPath, "classes.dex")
         jar2dex(multiDexJar, multiDexFile)
-        smaliPath = os.path.join(decompiledfolder, "smali/");
+        smaliPath = os.path.join(masterfolder, "smali/");
         baksmali(multiDexFile, smaliPath)
         Utils.deletedir(multiDexPath)
 

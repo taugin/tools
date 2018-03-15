@@ -107,7 +107,7 @@ def list_files(dirname):
     mylist = os.walk(dirname, True)
     for root, filedir, files in mylist:
         for file in files:
-            allFiles.append(os.path.join(root, file))
+            allFiles.append(os.path.normpath(os.path.join(root, file)))
     return allFiles
 
 def deleteFile(file):
