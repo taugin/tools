@@ -23,6 +23,7 @@ from xml.dom.minidom import Document
 拷贝指定前缀的文件到smali文件夹对应的位置
 '''
 def move_special_files(masterfolder, prefix):
+    Log.out("[Logging...] 移动指定文件 : [%s]" % prefix)
     fromdir = os.path.normpath("%s/smali_classes2" % masterfolder)
     dstdir = os.path.normpath("%s/smali" % masterfolder)
     if (os.path.exists(fromdir) and os.path.exists(dstdir)):
@@ -85,6 +86,7 @@ def add_application(masterfolder, slavefolder):
     app_name = get_application_name(slavefolder)
     if (app_name == None or len(app_name) <= 0):
         return
+    Log.out("[Logging...] 设置应用入口 : [%s]" % app_name)
     set_application(masterfolder, app_name)
 ###########################################################################
 #查找原插件app中的启动Activity
@@ -138,15 +140,61 @@ def modify_activity_entry(masterfolder):
     package_name = masterroot.get("package")
     app_launcher_activity = find_launcher_activity(masterroot)
     new_entry_activity = find_entry_activity(masterroot)
+
+    '''输出log'''
+    entry_full_name = None
+    if (new_entry_activity != None):
+        entry_full_name = new_entry_activity.get("{%s}name" % Common.XML_NAMESPACE)
+        if (entry_full_name != None and entry_full_name.startswith(".")):
+            entry_full_name = package_name + entry_full_name
+    if (entry_full_name != None):
+        Log.out("[Logging...] 修改界面入口 : [%s]" % entry_full_name)
+    '''输出log'''
+
     modify_entry_activity(package_name, app_launcher_activity, new_entry_activity)
     Utils.indent(masterroot)
     mastertree.write(mastermanifest, encoding="utf-8", xml_declaration=True)
+
+def contain_special_path(spfolder, spfile):
+    if (spfolder == None or len(spfolder) <= 0 or spfile == None or len(spfile) <= 0):
+        return False
+    for sp in spfolder:
+        if (sp in spfile):
+            return True
+    return False
+
+def update_duplicate_files(masterfolder, spfolder):
+    Log.out("[Logging...] 更新指定文件 ")
+    fromdir = os.path.normpath("%s/smali_classes2" % masterfolder)
+    dstdir = os.path.normpath("%s/smali" % masterfolder)
+    if (os.path.exists(fromdir) and os.path.exists(dstdir)):
+        filelist = os.walk(fromdir, True)
+        for root, filedir, files in filelist:
+            for file in files:
+                fromfile = os.path.join(root, file)
+                tofile = fromfile.replace(fromdir, dstdir)
+                if (os.path.exists(fromfile) and os.path.exists(tofile) and contain_special_path(spfolder, fromfile)):
+                    Log.out("fromfile : %s" % fromfile)
+                    Utils.movefile(fromfile, tofile)
+
+    fromdir = os.path.normpath("%s/smali_classes3" % masterfolder)
+    dstdir = os.path.normpath("%s/smali" % masterfolder)
+    if (os.path.exists(fromdir) and os.path.exists(dstdir)):
+        filelist = os.walk(fromdir, True)
+        for root, filedir, files in filelist:
+            for file in files:
+                fromfile = os.path.join(root, file)
+                tofile = fromfile.replace(fromdir, dstdir)
+                if (os.path.exists(fromfile) and os.path.exists(tofile) and contain_special_path(spfolder, fromfile)):
+                    Log.out("fromfile : %s" % fromfile)
+                    Utils.movefile(fromfile, tofile)
 
 ###########################################################################
 def merge_extra(masterfolder, slavefolder):
     add_application(masterfolder, slavefolder)
     modify_activity_entry(masterfolder)
     move_special_files(masterfolder, os.path.normpath("com/wb/rpadapter"))
+    #update_duplicate_files(masterfolder, [os.path.normpath("android/support/v7/widget/LinearLayoutManager")])
 
 if __name__ == "__main__":
     #move_special_files("d:\\temp\\loseweight", os.path.normpath("com/wb/rpadapter"))

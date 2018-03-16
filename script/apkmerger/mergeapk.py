@@ -83,6 +83,7 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
         functions += [{"function":"merge_smali.merge_smali(masterfolder, slavefolder)"}]
         functions += [{"function":"merge_rfile.update_all_rfile(masterfolder)"}]
         functions += [{"function":"merge_extra.merge_extra(masterfolder, slavefolder)"}]
+        functions += [{"function":"merge_smali.clear_dup_smali(masterfolder)"}]
         functions += [{"function":"apkbuilder.apk_compile(masterfolder, mastermergedapk)", "saveonfalse":"True"}]
         functions += [{"function":"merge_other.merge_other(mastermergedapk, masterapk, slaveapk, company)"}]
         functions += [{"function":"signapk(mastermergedapk, mastersignedapk)"}]

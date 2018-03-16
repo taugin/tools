@@ -86,7 +86,6 @@ def support_multidex(masterfolder):
 def merge_smali(masterfolder, slavefolder):
     copy_smali(masterfolder, slavefolder)
     support_multidex(masterfolder)
-    clear_dup_smali(masterfolder)
 
 if __name__ == "__main__":
     pass
