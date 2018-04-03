@@ -12,11 +12,9 @@ import Common
 import Log
 
 import io
-import re
 import getopt
 import zipfile
 import hashlib
-import platform
 import subprocess
 
 SIGNINFO_MD5 = False
@@ -27,6 +25,7 @@ INSTALL_APK = False
 AXMLPRINTER = False
 
 def md5_classes(apkFile):
+    '''    输出classes.dex的MD5    '''
     signfile = ""
     z = zipfile.ZipFile(apkFile, "r")
     for f in z.namelist() :
@@ -37,8 +36,8 @@ def md5_classes(apkFile):
         Log.out("[CLASSDEX] " + retsult + " : " + apkFile)
     z.close()
 
-
 def printsign_md5(apkFile, signFile):
+    '''输出签名文件的MD5'''
     cmdlist = [Common.KEYTOOL, "-printcert", "-file", signFile]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     process.wait()
@@ -52,6 +51,7 @@ def printsign_md5(apkFile, signFile):
             Log.out("[SIGNFILE] " + tmp + " : " + apkFile)
 
 def md5_signfile(apkFile):
+    '''输出一般文件的MD5'''
     signfile = ""
     z = zipfile.ZipFile(apkFile, "r")
     for f in z.namelist() :
@@ -68,6 +68,7 @@ def md5_signfile(apkFile):
     z.close()
 
 def getpkg(apkFile):
+    '''输出apk的包信息'''
     cmdlist = [Common.AAPT_BIN, "d", "badging", apkFile]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
 
@@ -135,10 +136,10 @@ def processFileMd5(args):
 def file_md5(strFile):
     m = hashlib.md5()
     file = io.FileIO(strFile,'rb')
-    bytes = file.read(1024)
-    while(bytes != b''):
-        m.update(bytes)
-        bytes = file.read(1024)
+    bytesRead = file.read(1024)
+    while(bytesRead != b''):
+        m.update(bytesRead)
+        bytesRead = file.read(1024)
     file.close()
     md5value = m.hexdigest()
     Log.out("[MD5..] " + md5value + " : " + strFile)

@@ -99,31 +99,29 @@ def find_launcher_activity(root):
         return entryNode
 
 ''' 找出有<meta-data android:name="app_entry_name" android:value="true"/>的activity'''
-def find_entry_activity(masterroot):
+def find_activity_with_app_entry(masterroot):
     return masterroot.find(ENTRY_ACTIVITY_XPATH)
 
-def modify_entry_activity(package_name, app_launcher_activity, new_entry_activity):
-    if (app_launcher_activity == None or new_entry_activity == None or package_name == None):
+def modify_entry_activity(package_name, old_entry_activity, activity_with_app_entry):
+    if (old_entry_activity == None or activity_with_app_entry == None or package_name == None):
         return
-    launcher_full_name = app_launcher_activity.get("{%s}name" % Common.XML_NAMESPACE)
+    launcher_full_name = old_entry_activity.get("{%s}name" % Common.XML_NAMESPACE)
     if (launcher_full_name == None):
         return
     if (launcher_full_name.startswith(".")):
         launcher_full_name = package_name + launcher_full_name
 
-    entry_full_name = new_entry_activity.get("{%s}name" % Common.XML_NAMESPACE)
+    entry_full_name = activity_with_app_entry.get("{%s}name" % Common.XML_NAMESPACE)
     if (entry_full_name == None):
         return
     if (entry_full_name.startswith(".")):
         entry_full_name = package_name + entry_full_name
     if (launcher_full_name == entry_full_name):
         return
-    intentFilterNode = app_launcher_activity.find(LAUNCHER_ACTIVITY_XPATH)
+    intentFilterNode = old_entry_activity.find(LAUNCHER_ACTIVITY_XPATH)
     if intentFilterNode != None:
-        app_launcher_activity.remove(intentFilterNode)
-        if (new_entry_activity.find(LAUNCHER_ACTIVITY_XPATH) == None):
-            new_entry_activity.append(intentFilterNode)
-        meta_data = new_entry_activity.find(META_ACTIVITY_XPATH)
+        old_entry_activity.remove(intentFilterNode)
+        meta_data = activity_with_app_entry.find(META_ACTIVITY_XPATH)
         if (meta_data != None):
             meta_data.set("{%s}value" % Common.XML_NAMESPACE, launcher_full_name)
 
@@ -138,20 +136,21 @@ def modify_activity_entry(masterfolder):
     masterroot = mastertree.getroot()
 
     package_name = masterroot.get("package")
-    app_launcher_activity = find_launcher_activity(masterroot)
-    new_entry_activity = find_entry_activity(masterroot)
+    #此处会查找到第一个入口activity，刚好是原app的入口
+    old_entry_activity = find_launcher_activity(masterroot)
+    activity_with_app_entry = find_activity_with_app_entry(masterroot)
 
     '''输出log'''
     entry_full_name = None
-    if (new_entry_activity != None):
-        entry_full_name = new_entry_activity.get("{%s}name" % Common.XML_NAMESPACE)
+    if (activity_with_app_entry != None):
+        entry_full_name = activity_with_app_entry.get("{%s}name" % Common.XML_NAMESPACE)
         if (entry_full_name != None and entry_full_name.startswith(".")):
             entry_full_name = package_name + entry_full_name
     if (entry_full_name != None):
         Log.out("[Logging...] 修改界面入口 : [%s]" % entry_full_name)
     '''输出log'''
 
-    modify_entry_activity(package_name, app_launcher_activity, new_entry_activity)
+    modify_entry_activity(package_name, old_entry_activity, activity_with_app_entry)
     Utils.indent(masterroot)
     mastertree.write(mastermanifest, encoding="utf-8", xml_declaration=True)
 
