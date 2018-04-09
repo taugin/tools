@@ -5,7 +5,7 @@ import os
 #引入别的文件夹的模块
 DIR = os.path.dirname(sys.argv[0])
 COM_DIR = os.path.join(DIR, "..", "common")
-COM_DIR = os.path.normpath(COM_DIR) 
+COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
 
 import Common
@@ -23,32 +23,44 @@ STR_MD5 = False
 APK_INFO = False
 INSTALL_APK = False
 AXMLPRINTER = False
+apk_info = {}
+apk_info["apkfile"] = None
+apk_info["apklabel"] = None
+apk_info["pkgname"] = None
+apk_info["vercode"] = None
+apk_info["vername"] = None
+apk_info["classes_md5"] = None
+apk_info["apk_md5"] = None
+apk_info["sign_md5"] = None
 
 def md5_classes(apkFile):
     '''    输出classes.dex的MD5    '''
+    global apk_info
     signfile = ""
     z = zipfile.ZipFile(apkFile, "r")
     for f in z.namelist() :
         if (f == "classes.dex"):
             signfile = f
     if (signfile != ""):
-        retsult = hashlib.md5(z.read(signfile)).hexdigest()
-        Log.out("[CLASSDEX] " + retsult + " : " + apkFile)
+        result = hashlib.md5(z.read(signfile)).hexdigest()
+        apk_info["classes_md5"] = result
     z.close()
 
 def printsign_md5(apkFile, signFile):
     '''输出签名文件的MD5'''
+    global apk_info
     cmdlist = [Common.KEYTOOL, "-printcert", "-file", signFile]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     process.wait()
     alllines = process.stdout.readlines()
+    sign_md5 = None
     for line in alllines:
         tmp = str(line, "gbk")
         tmp = tmp.strip().lower()
         if (tmp.startswith("md5")):
             tmp = tmp[4:]
-            tmp = tmp.replace(":", "").strip()
-            Log.out("[SIGNFILE] " + tmp + " : " + apkFile)
+            sign_md5 = tmp.replace(":", "").strip()
+    apk_info["sign_md5"] = sign_md5
 
 def md5_signfile(apkFile):
     '''输出一般文件的MD5'''
@@ -69,6 +81,7 @@ def md5_signfile(apkFile):
 
 def getpkg(apkFile):
     '''输出apk的包信息'''
+    global apk_info
     cmdlist = [Common.AAPT_BIN, "d", "badging", apkFile]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
 
@@ -77,17 +90,27 @@ def getpkg(apkFile):
     alllines = process.stdout.readlines()
     for line in alllines :
         tmp = str(line, "utf-8")
-        if (tmp.startswith("package")):
-            tmppkg = tmp
+        if (tmp.startswith("package: ")):
+            tmppkg = tmp[len("package: "):]
             break;
     tmppkg = tmppkg.replace("\r", "")
     tmppkg = tmppkg.replace("\n", "")
     tmppkg = tmppkg.replace("'", "")
-    Log.out("apkfile: " + apkFile)
-    Log.out(tmppkg)
-    #Log.out("--------------------------------------------")
+    tmpsplit = tmppkg.split(" ")
+    pkgname = None
+    vercode = None
+    vername = None
+    if tmpsplit != None and len(tmpsplit) >= 3:
+        pkgname = tmpsplit[0].split("=")[1]
+        vercode = tmpsplit[1].split("=")[1]
+        vername = tmpsplit[2].split("=")[1]
+    apk_info["pkgname"] = pkgname
+    apk_info["vercode"] = vercode
+    apk_info["vername"] = vername
 
 def getlabel(apkFile):
+    global apk_info
+    apk_info["apkfile"] = apkFile
     cmdlist = [Common.AAPT_BIN, "d", "badging", apkFile]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
 
@@ -102,9 +125,8 @@ def getlabel(apkFile):
     tmppkg = tmppkg.replace("\r", "")
     tmppkg = tmppkg.replace("\n", "")
     tmppkg = tmppkg.replace("'", "")
-    Log.out("apkfile: " + apkFile)
-    Log.out(tmppkg)
-    #Log.out("--------------------------------------------")
+    label = tmppkg.split(":")[1]
+    apk_info["apklabel"] = label
 
 def readapkinfo(apkFile, function):
     function(apkFile)
@@ -134,6 +156,7 @@ def processFileMd5(args):
                 file_md5(os.path.abspath(file))
 
 def file_md5(strFile):
+    global apk_info
     m = hashlib.md5()
     file = io.FileIO(strFile,'rb')
     bytesRead = file.read(1024)
@@ -142,7 +165,7 @@ def file_md5(strFile):
         bytesRead = file.read(1024)
     file.close()
     md5value = m.hexdigest()
-    Log.out("[MD5..] " + md5value + " : " + strFile)
+    apk_info["apk_md5"] = md5value
 
 def string_md5(srcStr):
     if (len(srcStr) > 0):
@@ -200,6 +223,53 @@ def print_xml(args):
                 os.remove(tmpfile)
             zf.close()
 
+def calc_maxlen():
+    global apk_info
+    max_len = 0
+    for key in apk_info:
+        if apk_info[key] != None:
+            ilen = len(apk_info[key])
+            if ilen > max_len:
+                max_len = ilen
+    return max_len
+
+def print_apkinfo():
+    global apk_info
+    max_len = calc_maxlen()
+    dash_len = 13 + max_len
+    Log.out("-" * dash_len)
+    output = " 文件名称 | %s" % apk_info["apkfile"]
+    Log.out(output)
+
+    Log.out("-" * dash_len)
+    output = " 应用名称 | %s" % apk_info["apklabel"]
+    Log.out(output)
+
+    Log.out("-" * dash_len)
+    output = " 应用包名 | %s" % apk_info["pkgname"]
+    Log.out(output)
+
+    Log.out("-" * dash_len)
+    output = " 应用版本 | %s" % apk_info["vercode"]
+    Log.out(output)
+
+    Log.out("-" * dash_len)
+    output = " 应用版本 | %s " % apk_info["vername"]
+    Log.out(output)
+
+    Log.out("-" * dash_len)
+    output = " 内部摘要 | %s" % apk_info["classes_md5"]
+    Log.out(output)
+
+    Log.out("-" * dash_len)
+    output = " 签名摘要 | %s" % apk_info["sign_md5"]
+    Log.out(output)
+
+    Log.out("-" * dash_len)
+    output = " 文件摘要 | %s" % apk_info["apk_md5"]
+    Log.out(output)
+    Log.out("-" * dash_len)
+
 # start ============================================================================================
 if (len(sys.argv) < 2):
     Log.out("[Logging...] 缺少参数 : %s <src_apk> 输出APK文件信息" % os.path.basename(sys.argv[0]), True);
@@ -238,32 +308,18 @@ check_arg(args)
 
 if FILE_MD5 == True:
     processFileMd5(args)
-
-if APK_INFO == True:
-    Log.out("显示包文件是的应用名称 : ")
-    #Log.out("--------------------------------------------")
+    max_len = calc_maxlen()
+    dash_len = 13 + max_len
+    Log.out("-" * dash_len)
+    output = " 文件摘要 | %s" % apk_info["apk_md5"]
+    Log.out(output)
+    Log.out("-" * dash_len)
+elif APK_INFO == True:
     processapk(args, getlabel)
-    Log.out("\n")
-
-    Log.out("显示包文件是的包名信息 : ")
-    #Log.out("--------------------------------------------")
     processapk(args, getpkg)
-    Log.out("\n")
-
-    Log.out("显示classes.dex的MD5值 : ")
-    #Log.out("--------------------------------------------")
     processapk(args, md5_classes)
-    Log.out("\n")
-    #Log.out("--------------------------------------------")
-
-    Log.out("显示APK文件签名的MD5值 : ")
-    #Log.out("--------------------------------------------")
     processapk(args, md5_signfile)
-    Log.out("\n")
-    #Log.out("--------------------------------------------")
-
-    Log.out("显示APK文件的MD5值 : ")
-    #Log.out("--------------------------------------------")
     processapk(args, file_md5)
-    #Log.out("--------------------------------------------")
+    print_apkinfo()
+    Log.out("")
 Common.pause()
