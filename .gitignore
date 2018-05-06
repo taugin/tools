@@ -10,3 +10,4 @@ srcapks
 packer/sdks/channels/
 packer/sdks/plugins/
 **.pyc
+bin/jd-gui.cfg
