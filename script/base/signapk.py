@@ -90,7 +90,7 @@ def signapk(src_apk, dst_apk, keystoreinfo):
         else:
             Log.out("[Signing...] 签名失败", True)
             pause()
-    Log.out("---------------------------------------", True);
+    Log.out("", True);
 
 def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     global OUTPUT_SIGNED_APK

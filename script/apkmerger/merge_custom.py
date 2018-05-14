@@ -189,11 +189,12 @@ def update_duplicate_files(masterfolder, spfolder):
                     Utils.movefile(fromfile, tofile)
 
 ###########################################################################
-def merge_extra(masterfolder, slavefolder):
+def merge_custom(masterfolder, slavefolder):
     add_application(masterfolder, slavefolder)
     modify_activity_entry(masterfolder)
     move_special_files(masterfolder, os.path.normpath("com/wb/rpadapter"))
     #update_duplicate_files(masterfolder, [os.path.normpath("android/support/v7/widget/LinearLayoutManager")])
+    Log.out("");
 
 if __name__ == "__main__":
     #move_special_files("d:\\temp\\loseweight", os.path.normpath("com/wb/rpadapter"))

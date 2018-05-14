@@ -9,7 +9,6 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR) 
 sys.path.append(COM_DIR)
 
-import Common
 import Log
 
 import shutil
@@ -77,8 +76,8 @@ def merge_res(masterfolder, slavefolder, override = False):
         sys.exit(0)
     masterres = os.path.join(masterfolder, "res")
     slaveres = os.path.join(slavefolder, "res")
-    list = os.walk(slaveres, True)
-    for root, dirs, files in list:
+    reslist = os.walk(slaveres, True)
+    for root, dirs, files in reslist:
         for file in files:
             masterdir = root.replace(slavefolder, masterfolder)
             slavefile = os.path.join(root, file)

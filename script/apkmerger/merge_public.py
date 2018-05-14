@@ -121,27 +121,27 @@ def generate_xml(public_xml):
     indent(tree.getroot())
     tree.write(public_xml, encoding="utf-8", xml_declaration=True)
 
-def rebuild_ids(masterfolder, payfolder):
+def rebuild_ids(masterfolder, slavefolder):
     if (os.path.exists(masterfolder) == False):
         Log.out("[Warning...] 无法定位文件夹 %s" % masterfolder, True)
         sys.exit(0)
-    if (os.path.exists(payfolder) == False):
-        Log.out("[Warning...] 无法定位文件夹 %s" % payfolder, True)
+    if (os.path.exists(slavefolder) == False):
+        Log.out("[Warning...] 无法定位文件夹 %s" % slavefolder, True)
         sys.exit(0)
     Log.out("[Logging...] 合并资源编号", True)
     masterpublic = "%s/res/values/public.xml" % masterfolder;
-    paypublic = "%s/res/values/public.xml" % payfolder;
+    slavepublic = "%s/res/values/public.xml" % slavefolder;
     if (os.path.exists(masterpublic) == False):
         Log.out("[Warning...] 无法定位文件 %s\n" % masterpublic, True)
         generate_xml(masterpublic)
 
-    if (os.path.exists(paypublic) == False):
-        Log.out("[Warning...] 无法定位文件 %s\n" % paypublic, True)
-        generate_xml(paypublic)
+    if (os.path.exists(slavepublic) == False):
+        Log.out("[Warning...] 无法定位文件 %s\n" % slavepublic, True)
+        generate_xml(slavepublic)
 
     publicdict = get_all_ids(masterpublic)
 
-    tree = ET.parse(paypublic)
+    tree = ET.parse(slavepublic)
     root = tree.getroot();
     list = []
     maxids = {}

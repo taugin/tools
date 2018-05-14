@@ -9,6 +9,8 @@ import Utils
 import random
 import subprocess
 
+SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "base", "signapk.py")
+
 def apk_compile(folder, compileapk):
     thisdir = os.path.dirname(sys.argv[0])
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "b", folder, "-o", compileapk]
@@ -37,6 +39,16 @@ def apk_decompile(apkfile, decompiled_folder=None):
     else:
         Log.out("[Logging...] 反编文件成功\n")
         return True
+
+#签名apk
+def signapk(unsignapk, signedapk):
+    Log.out("")
+    cmdlist = ["python", SIGNAPK_FILE, "-o", signedapk, unsignapk]
+    ret = subprocess.call(cmdlist)
+    if (ret == 0):
+        return True
+    else:
+        return False
 
 #apk对齐
 def alignapk(unalignapk, finalapk):

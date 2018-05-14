@@ -10,34 +10,63 @@ COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
 
 import Log
-import subprocess
 import shutil
 import getopt
 import Utils
 
-import apkbuilder
+import merge_builder
 import merge_rfile
 import merge_public
 import merge_res
 import merge_axml
-import merge_other
-import merge_extra
+import merge_apkfile
+import merge_custom
 import merge_smali
 
 TRY_CONFIG = "error.json"
-SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "base", "signapk.py")
 ONLY_CHECK_DUP = False
 MERGE_BY_CONFIG = False
 
-def signapk(unsignapk, signedapk):
-    Log.out("")
-    cmdlist = ["python", SIGNAPK_FILE, "-o", signedapk, unsignapk]
-    ret = subprocess.call(cmdlist)
-    if (ret == 0):
-        return True
-    else:
-        return False
+def fun_apk_decompile(apkfile, apkfolder):
+    merge_builder.apk_decompile(apkfile, apkfolder)
 
+def fun_apk_compile(masterfolder, mastermergedapk):
+    merge_builder.apk_compile(masterfolder, mastermergedapk)
+
+def fun_check_resdup(masterfolder, slavefolder):
+    merge_rfile.check_resdup(masterfolder, slavefolder)
+
+def fun_merge_xml_change_pkg(masterfolder, slavefolder, newpkgname):
+    merge_axml.merge_xml_change_pkg(masterfolder, slavefolder, newpkgname)
+
+def fun_rebuild_ids(masterfolder, slavefolder):
+    merge_public.rebuild_ids(masterfolder, slavefolder)
+
+def fun_merge_res(masterfolder, slavefolder):
+    merge_res.merge_res(masterfolder, slavefolder)
+
+def fun_merge_smali(masterfolder, slavefolder):
+    merge_smali.merge_smali(masterfolder, slavefolder)
+
+def fun_update_all_rfile(masterfolder):
+    merge_rfile.update_all_rfile(masterfolder)
+
+def fun_merge_custom(masterfolder, slavefolder):
+    merge_custom.merge_custom(masterfolder, slavefolder)
+
+def fun_clear_dup_smali(masterfolder):
+    merge_smali.clear_dup_smali(masterfolder)
+
+def fun_merge_apkfile(mastermergedapk, masterapk, slaveapk, company):
+    merge_apkfile.merge_apkfile(mastermergedapk, masterapk, slaveapk, company)
+
+def fun_signapk(mastermergedapk, mastersignedapk):
+    merge_builder.signapk(mastermergedapk, mastersignedapk)
+
+def fun_alignapk(mastersignedapk, masterfinalapk):
+    merge_builder.alignapk(mastersignedapk, masterfinalapk)
+
+###############################################################
 def clean_tmp_folders(masterfolder, slavefolder, file1, file2):
     Log.out("[Logging...] 清除临时文件")
     try:
@@ -72,22 +101,22 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
         masterfinalapk = tmpname + "-" + newpkgname + "-merged-final.apk"
 
     functions = []
-    functions += [{"function":"apkbuilder.apk_decompile(masterapk, masterfolder)"}]
-    functions += [{"function":"apkbuilder.apk_decompile(slaveapk, slavefolder)"}]
-    functions += [{"function":"merge_rfile.check_resdup(masterfolder, slavefolder)"}]
+    functions += [{"function":"fun_apk_decompile(masterapk, masterfolder)"}]
+    functions += [{"function":"fun_apk_decompile(slaveapk, slavefolder)"}]
+    functions += [{"function":"fun_check_resdup(masterfolder, slavefolder)"}]
 
     if (ONLY_CHECK_DUP == False):
-        functions += [{"function":"merge_axml.merge_xml_change_pkg(masterfolder, slavefolder, newpkgname)"}]
-        functions += [{"function":"merge_public.rebuild_ids(masterfolder, slavefolder)"}]
-        functions += [{"function":"merge_res.merge_res(masterfolder, slavefolder)"}]
-        functions += [{"function":"merge_smali.merge_smali(masterfolder, slavefolder)"}]
-        functions += [{"function":"merge_rfile.update_all_rfile(masterfolder)"}]
-        functions += [{"function":"merge_extra.merge_extra(masterfolder, slavefolder)"}]
-        functions += [{"function":"merge_smali.clear_dup_smali(masterfolder)"}]
-        functions += [{"function":"apkbuilder.apk_compile(masterfolder, mastermergedapk)", "saveonfalse":"True"}]
-        functions += [{"function":"merge_other.merge_other(mastermergedapk, masterapk, slaveapk, company)"}]
-        functions += [{"function":"signapk(mastermergedapk, mastersignedapk)"}]
-        functions += [{"function":"apkbuilder.alignapk(mastersignedapk, masterfinalapk)"}]
+        functions += [{"function":"fun_merge_xml_change_pkg(masterfolder, slavefolder, newpkgname)"}]
+        functions += [{"function":"fun_rebuild_ids(masterfolder, slavefolder)"}]
+        functions += [{"function":"fun_merge_res(masterfolder, slavefolder)"}]
+        functions += [{"function":"fun_merge_smali(masterfolder, slavefolder)"}]
+        functions += [{"function":"fun_update_all_rfile(masterfolder)"}]
+        functions += [{"function":"fun_merge_custom(masterfolder, slavefolder)"}]
+        functions += [{"function":"fun_clear_dup_smali(masterfolder)"}]
+        functions += [{"function":"fun_apk_compile(masterfolder, mastermergedapk)", "saveonfalse":"True"}]
+        functions += [{"function":"fun_merge_apkfile(mastermergedapk, masterapk, slaveapk, company)"}]
+        functions += [{"function":"fun_signapk(mastermergedapk, mastersignedapk)"}]
+        functions += [{"function":"fun_alignapk(mastersignedapk, masterfinalapk)"}]
 
     result = False
     length = len(functions)
@@ -117,7 +146,7 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
             except:
                 pass
             SAVE_ON_FALSE = saveonfalse
-            Log.out("[Logging...] 当前函数编号 : [%d] [%s]" % (item, functions[item]["function"].split("(")[0]))
+            Log.out("[Logging...] 当前函数编号 : [%.2d] [%s]" % (item + 1, functions[item]["function"].split("(")[0]))
             result = eval(functions[item]["function"])
             if (result == False):
                 if (saveonfalse == True):
