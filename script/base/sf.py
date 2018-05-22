@@ -32,6 +32,7 @@ apk_info["vername"] = None
 apk_info["classes_md5"] = None
 apk_info["apk_md5"] = None
 apk_info["sign_md5"] = None
+apk_info["apk_size"] = None
 
 def md5_classes(apkFile):
     '''    输出classes.dex的MD5    '''
@@ -155,6 +156,24 @@ def processFileMd5(args):
             if (os.path.isfile(os.path.abspath(file))):
                 file_md5(os.path.abspath(file))
 
+def formatSize(bytesLen):
+    try:
+        bytesLen = float(bytesLen)
+        kb = bytesLen / 1024
+    except:
+        print("传入的字节格式不对")
+        return "Error"
+
+    if kb >= 1024:
+        M = kb / 1024
+        if M >= 1024:
+            G = M / 1024
+            return "%.2fG" % (G)
+        else:
+            return "%.2fM" % (M)
+    else:
+        return "%.2fkb" % (kb)
+
 def file_md5(strFile):
     global apk_info
     m = hashlib.md5()
@@ -167,6 +186,12 @@ def file_md5(strFile):
     md5value = m.hexdigest()
     apk_info["apk_md5"] = md5value
 
+def file_size(strFile):
+    try:
+        size = os.path.getsize(strFile)
+        apk_info["apk_size"] = formatSize(size)
+    except:
+        pass
 def string_md5(srcStr):
     if (len(srcStr) > 0):
         md5=hashlib.md5(srcStr[0].encode('utf-8')).hexdigest()
@@ -256,6 +281,10 @@ def print_apkinfo():
     Log.out("-" * dash_len)
     output = " 应用版本 | %s " % apk_info["vername"]
     Log.out(output)
+    
+    Log.out("-" * dash_len)
+    output = " 文件大小 | %s " % apk_info["apk_size"]
+    Log.out(output)
 
     Log.out("-" * dash_len)
     output = " 内部摘要 | %s" % apk_info["classes_md5"]
@@ -317,6 +346,7 @@ if FILE_MD5 == True:
 elif APK_INFO == True:
     processapk(args, getlabel)
     processapk(args, getpkg)
+    processapk(args, file_size)
     processapk(args, md5_classes)
     processapk(args, md5_signfile)
     processapk(args, file_md5)
