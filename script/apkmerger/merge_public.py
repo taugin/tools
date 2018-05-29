@@ -66,6 +66,8 @@ def process_maxid(maxid, dict, type):
 
     idlist = []
     for key in dict:
+        if key == "name":
+            continue
         list = dict[key]
         list.sort()
         idlist.append(list[0][0:6])
