@@ -161,9 +161,9 @@ def rebuild_ids(masterfolder, slavefolder):
         if (name not in publicdict["name"]):
             hexid = get_next_id(restype, publicdict, maxids)
             element = ET.Element("public")
-            element.attrib["id"] = hexid
-            element.attrib["name"] = name
             element.attrib["type"] = restype
+            element.attrib["name"] = name
+            element.attrib["id"] = hexid
             masterroot.append(element)
     indent(masterroot)
     mastertree.write(masterpublic, encoding="utf-8", xml_declaration=True)
