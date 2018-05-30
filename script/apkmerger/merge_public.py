@@ -22,23 +22,25 @@ from xml.etree import cElementTree as ET
 from xml.dom import minidom
 from xml.dom.minidom import Document
 
+ATTR_NAME = "attr_name"
+
 #获取所有的ID
 def get_all_ids(publicfile):
     tree = ET.parse(publicfile)
     root = tree.getroot()
     pubdict = {}
     for child in root:
-        pubtype = child.attrib["type"]
-        name = child.attrib["name"]
-        id = child.attrib["id"]
-        if (pubtype in pubdict):
-            pubdict[pubtype].append(id)
+        restype = child.attrib["type"]
+        resname = child.attrib["name"]
+        resid = child.attrib["id"]
+        if (restype in pubdict):
+            pubdict[restype].append(resid)
         else:
-            pubdict[pubtype] = [id]
-        if ("name" in pubdict):
-            pubdict["name"].append(name)
+            pubdict[restype] = [resid]
+        if (ATTR_NAME in pubdict):
+            pubdict[ATTR_NAME].append(resname)
         else:
-            pubdict["name"] = [name]
+            pubdict[ATTR_NAME] = [resname]
     return pubdict;
 
 ## Get pretty look
@@ -60,17 +62,17 @@ def indent(elem, level=0):
 #如：layout不存在public中，则找出所有类型的最大ID
 #即0x7f03，然后将此值+1为0x7f04，最后将此值与0000
 #合并成ID ：0x7f040000
-def process_maxid(maxid, dict, type):
+def process_maxid(maxid, iddict, restype):
     if (maxid != "unknown"):
         return maxid
 
     idlist = []
-    for key in dict:
-        if key == "name":
+    for key in iddict:
+        if key == ATTR_NAME:
             continue
-        list = dict[key]
-        list.sort()
-        idlist.append(list[0][0:6])
+        tmplist = iddict[key]
+        tmplist.sort()
+        idlist.append(tmplist[0][0:6])
     idlist.sort()
     intid = 0
     if (len(idlist) > 0):
@@ -79,34 +81,34 @@ def process_maxid(maxid, dict, type):
         intid = int(eval("0x7f01"))
     intid = intid + 1
     hexid = hex(intid) + "0000"
-    dict[type] = [hexid]
+    iddict[restype] = [hexid]
     return hexid
 
 #获取特定类型的最大ID，如果不存在返回unknown
-def getmaxids(dict, key):
-    if (key not in dict):
+def getmaxids(pubdict, key):
+    if (key not in pubdict):
         return "unknown"
-    list = dict[key]
-    list.sort()
-    return list[-1]
+    idlist = pubdict[key]
+    idlist.sort()
+    return idlist[-1]
 
 #获取当前最大的ID值，然后+1，作为下一个
 #ID值
-def get_next_id(type, dict, maxids):
-    if (type not in maxids):
-        maxid = getmaxids(dict, type)
-        maxids[type] = maxid
-    maxid = process_maxid(maxids[type], dict, type)
+def get_next_id(restype, iddict, maxids):
+    if (restype not in maxids):
+        maxid = getmaxids(iddict, restype)
+        maxids[restype] = maxid
+    maxid = process_maxid(maxids[restype], iddict, restype)
     intid = int(eval(maxid))
     intid = intid + 1
     hexid = hex(intid)
-    maxids[type] = hexid
+    maxids[restype] = hexid
     return hexid
 
 #生成空的public.xml文件
 def generate_xml(public_xml):
-    dir = os.path.dirname(public_xml)
-    os.makedirs(dir)
+    xmldir = os.path.dirname(public_xml)
+    os.makedirs(xmldir)
     doc = Document()  #创建DOM文档对象
     root = doc.createElement('resources') #创建根元素
     doc.appendChild(root)
@@ -145,24 +147,26 @@ def rebuild_ids(masterfolder, slavefolder):
 
     tree = ET.parse(slavepublic)
     root = tree.getroot();
-    list = []
     maxids = {}
     for restype in publicdict:
+        if restype == ATTR_NAME:
+            continue
         maxid = getmaxids(publicdict, restype)
-        maxids[restype] = maxid
+        if (maxid != "unknown"):
+            maxids[restype] = maxid
 
     mastertree = ET.parse(masterpublic)
     masterroot = mastertree.getroot()
 
     for child in root:
         restype = child.attrib["type"]
-        name = child.attrib["name"]
-        #id = child.attrib["id"]
-        if (name not in publicdict["name"]):
+        resname = child.attrib["name"]
+        if (resname not in publicdict[ATTR_NAME]):
+            Log.out("resname : %s" % resname)
             hexid = get_next_id(restype, publicdict, maxids)
             element = ET.Element("public")
             element.attrib["type"] = restype
-            element.attrib["name"] = name
+            element.attrib["name"] = resname
             element.attrib["id"] = hexid
             masterroot.append(element)
     indent(masterroot)
