@@ -162,7 +162,6 @@ def rebuild_ids(masterfolder, slavefolder):
         restype = child.attrib["type"]
         resname = child.attrib["name"]
         if (resname not in publicdict[ATTR_NAME]):
-            Log.out("resname : %s" % resname)
             hexid = get_next_id(restype, publicdict, maxids)
             element = ET.Element("public")
             element.attrib["type"] = restype
