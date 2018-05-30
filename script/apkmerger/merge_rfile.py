@@ -146,6 +146,16 @@ def find_rfiles(rfolder):
                 rfiles += [os.path.join(root, file)]
     return rfiles
 
+def find_type_byfile(rfile):
+    restype = None
+    try:
+        bname = os.path.basename(rfile)
+        bname = bname.replace("R$", "")
+        restype = bname.replace(".smali", "")
+    except:
+        pass
+    return restype
+
 def update_one_rfile(pubdict, rfile):
     #Log.out("update rfile : %s" % rfile)
     conlist = []
@@ -154,7 +164,8 @@ def update_one_rfile(pubdict, rfile):
     for c in allcontent:
         conlist.append(c.replace("\n", ""))
     f.close()
-    name = None
+    resname = None
+    restype = find_type_byfile(rfile)
     oid = None
     nid = None
     modify = False
@@ -163,9 +174,9 @@ def update_one_rfile(pubdict, rfile):
         if (c.startswith(".field public static")):
             s = c.split(r" ")
             try:
-                name = s[4].split(":")[0]
+                resname = s[4].split(":")[0]
                 oid = s[6]
-                nid = pubdict[name]
+                nid = pubdict["%s#%s" % (resname, restype)]
                 if (nid != oid):
                     s[6] = nid
                     news = " ".join(s)
@@ -208,8 +219,10 @@ def prepare_public(masterfolder):
             return None
         items = root.getchildren()
         for item in items:
-            pubdict[item.get("name")] = item.get("id")
+            resname = item.get("name")
+            restype = item.get("type")
+            pubdict["%s#%s" % (resname, restype)] = item.get("id")
     return pubdict
 
 if __name__ == "__main__":
-    update_all_rfile("D:\\temp\\loseweight-merged-final")
+    update_all_rfile(sys.argv[1])

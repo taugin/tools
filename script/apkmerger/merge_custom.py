@@ -193,7 +193,7 @@ def merge_custom(masterfolder, slavefolder):
     add_application(masterfolder, slavefolder)
     modify_activity_entry(masterfolder)
     move_special_files(masterfolder, os.path.normpath("com/wb/rpadapter"))
-    #update_duplicate_files(masterfolder, [os.path.normpath("android/support/v7/widget/LinearLayoutManager")])
+    move_special_files(masterfolder, os.path.normpath("com/fitness/dwadapter"))
     Log.out("");
 
 if __name__ == "__main__":
