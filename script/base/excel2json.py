@@ -11,6 +11,7 @@ sys.path.append(COM_DIR)
 
 import xlrd
 import Log
+import Common;
 
 ADPLACES = "adplaces"
 ADNAME = "name"
@@ -120,19 +121,23 @@ def read_excel(excel_file):
     pids_map = {}
     if not os.path.exists(excel_file):
         Log.out("[Logging...] 无法定位文件 : [%s]" % excel_file)
+        Common.pause()
         sys.exit(0)
     excel_obj = open_excel(excel_file)
     if not excel_obj:
         Log.out("[Logging...] 无法解析文件 : [%s]" % excel_file)
+        Common.pause()
         sys.exit(0)
     sheet_names = read_sheet_names(excel_obj)
     if not sheet_names:
         Log.out("[Logging...] 无法解析表单 : [%s]" % excel_file)
+        Common.pause()
         sys.exit(0)
     #获取adplaces工作表
     adplace_sheet = read_sheet_by_name(excel_obj, ADPLACES)
     if not adplace_sheet:
         Log.out("[Logging...] 无法获取表单 : [%s]" % "adplaces")
+        Common.pause()
         sys.exit(0)
 
     #获取广告位数据
@@ -159,7 +164,8 @@ def read_excel(excel_file):
     f = open(newfile, "w")
     f.write(str(adstring))
     f.close()
-    
+    Log.out("[Logging...] 文件转换成功 : [%s]" % newfile)
+    Common.pause()
 
 if __name__ == "__main__":
     read_excel(sys.argv[1])
