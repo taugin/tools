@@ -19,33 +19,31 @@ from xml.dom import minidom
 from xml.dom.minidom import Document
 ###########################################################################
 
+def move_files_recursion(fromdir, prefix, dstdir, recursion):
+    if (os.path.exists(fromdir) and os.path.exists(dstdir)):
+            filelist = os.walk(fromdir, True)
+            for root, filedir, files in filelist:
+                for file in files:
+                    fromfile = os.path.join(root, file)
+                    tofile = fromfile.replace(fromdir, dstdir)
+                    if (os.path.exists(fromfile) and prefix in fromfile):
+                        if not recursion:
+                            dirname = os.path.dirname(fromfile)
+                            if not dirname.endswith(prefix):
+                                continue
+                        Utils.movefile(fromfile, tofile)
+
 '''
 拷贝指定前缀的文件到smali文件夹对应的位置
 '''
-def move_special_files(masterfolder, prefix):
+def move_special_files(masterfolder, prefix, recursion = True):
     Log.out("[Logging...] 移动指定文件 : [%s]" % prefix)
-    fromdir = os.path.normpath("%s/smali_classes2" % masterfolder)
+    fromdir2 = os.path.normpath("%s/smali_classes2" % masterfolder)
+    fromdir3 = os.path.normpath("%s/smali_classes3" % masterfolder)
     dstdir = os.path.normpath("%s/smali" % masterfolder)
-    if (os.path.exists(fromdir) and os.path.exists(dstdir)):
-        filelist = os.walk(fromdir, True)
-        for root, filedir, files in filelist:
-            for file in files:
-                fromfile = os.path.join(root, file)
-                tofile = fromfile.replace(fromdir, dstdir)
-                if (os.path.exists(fromfile) and prefix in fromfile):
-                    Utils.movefile(fromfile, tofile)
-
-    fromdir = os.path.normpath("%s/smali_classes3" % masterfolder)
-    dstdir = os.path.normpath("%s/smali" % masterfolder)
-    if (os.path.exists(fromdir) and os.path.exists(dstdir)):
-        filelist = os.walk(fromdir, True)
-        for root, filedir, files in filelist:
-            for file in files:
-                fromfile = os.path.join(root, file)
-                tofile = fromfile.replace(fromdir, dstdir)
-                if (os.path.exists(fromfile) and prefix in fromfile):
-                    Utils.movefile(fromfile, tofile)
-
+    prefix = os.path.normpath(prefix)
+    move_files_recursion(fromdir2, prefix, dstdir, recursion)
+    move_files_recursion(fromdir3, prefix, dstdir, recursion)
 '''
 增加application文件
 '''
@@ -197,5 +195,4 @@ def merge_custom(masterfolder, slavefolder):
     Log.out("");
 
 if __name__ == "__main__":
-    #move_special_files("d:\\temp\\loseweight", os.path.normpath("com/wb/rpadapter"))
-    add_application("D:\\temp\\loseweight", "D:\\temp\\app-release-unsigned")
+    move_special_files(sys.argv[1], sys.argv[2])
