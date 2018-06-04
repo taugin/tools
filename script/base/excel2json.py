@@ -176,7 +176,12 @@ def read_excel(excel_file):
 
     for adplace in adplaces:
         name = adplace[AD_NAME]
-        adplace[AD_PIDS] = pids_map[name]
+        try:
+            adplace[AD_PIDS] = pids_map[name]
+        except:
+            Log.out("[Loggging...] 无法找到健值 : [%s]" % name)
+            Common.pause()
+            sys.exit(0)
 
     adstring = str(adconfig)
     adstring = adstring.replace("\'", "\"")
