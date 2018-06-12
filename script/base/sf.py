@@ -31,6 +31,7 @@ apk_info["vercode"] = None
 apk_info["vername"] = None
 apk_info["classes_md5"] = None
 apk_info["apk_md5"] = None
+apk_info["apk_sha1"] = None
 apk_info["sign_md5"] = None
 apk_info["sign_sha1"] = None
 apk_info["sign_sha256"] = None
@@ -164,9 +165,11 @@ def processFileMd5(args):
                 apkpath = os.path.join(file, apkfile)
                 if (os.path.isfile(os.path.abspath(apkpath))):
                     file_md5(os.path.abspath(apkpath))
+                    file_sh1(os.path.abspath(apkpath))
         else:
             if (os.path.isfile(os.path.abspath(file))):
                 file_md5(os.path.abspath(file))
+                file_sh1(os.path.abspath(file))
 
 def formatSize(bytesLen):
     try:
@@ -197,6 +200,18 @@ def file_md5(strFile):
     file.close()
     md5value = m.hexdigest()
     apk_info["apk_md5"] = md5value
+
+def file_sh1(strFile):
+    global apk_info
+    sha1 = hashlib.sha1()
+    file = io.FileIO(strFile,'rb')
+    bytesRead = file.read(1024)
+    while(bytesRead != b''):
+        sha1.update(bytesRead)
+        bytesRead = file.read(1024)
+    file.close()
+    sh1value = sha1.hexdigest()
+    apk_info["apk_sha1"] = sh1value
 
 def file_size(strFile):
     try:
@@ -317,6 +332,10 @@ def print_apkinfo():
     Log.out("-" * dash_len)
     output = " 文件摘要 | %s" % apk_info["apk_md5"]
     Log.out(output)
+
+    Log.out("-" * dash_len)
+    output = " 文件哈希 | %s" % apk_info["apk_sha1"]
+    Log.out(output)
     Log.out("-" * dash_len)
 
 # start ============================================================================================
@@ -361,6 +380,8 @@ if FILE_MD5 == True:
     dash_len = 13 + max_len
     Log.out("-" * dash_len)
     output = " 文件摘要 | %s" % apk_info["apk_md5"]
+    output +="\n"
+    output += " 文件哈希 | %s" % apk_info["apk_sha1"]
     Log.out(output)
     Log.out("-" * dash_len)
 elif APK_INFO == True:
@@ -370,6 +391,7 @@ elif APK_INFO == True:
     processapk(args, md5_classes)
     processapk(args, md5_signfile)
     processapk(args, file_md5)
+    processapk(args, file_sh1)
     print_apkinfo()
     Log.out("")
 Common.pause()
