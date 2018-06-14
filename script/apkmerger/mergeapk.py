@@ -24,8 +24,8 @@ import merge_custom
 import merge_smali
 
 TRY_CONFIG = "error.json"
-ONLY_CHECK_DUP = False
-MERGE_BY_CONFIG = False
+DUP_CHECK_ONLY = False
+CLEAR_TMP_FOLDER = False
 
 def fun_apk_decompile(apkfile, apkfolder):
     merge_builder.apk_decompile(apkfile, apkfolder)
@@ -70,8 +70,9 @@ def fun_alignapk(mastersignedapk, masterfinalapk):
 def clean_tmp_folders(masterfolder, slavefolder, file1, file2):
     Log.out("[Logging...] 清除临时文件")
     try:
-        #shutil.rmtree(masterfolder, ignore_errors = True)
-        #shutil.rmtree(slavefolder, ignore_errors = True)
+        if (CLEAR_TMP_FOLDER):
+            shutil.rmtree(masterfolder, ignore_errors = True)
+            shutil.rmtree(slavefolder, ignore_errors = True)
         Utils.deleteFile(file1)
         Utils.deleteFile(file2)
     except:
@@ -105,7 +106,7 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
     functions += [{"function":"fun_apk_decompile(slaveapk, slavefolder)"}]
     functions += [{"function":"fun_check_resdup(masterfolder, slavefolder)"}]
 
-    if (ONLY_CHECK_DUP == False):
+    if (DUP_CHECK_ONLY == False):
         functions += [{"function":"fun_merge_xml_change_pkg(masterfolder, slavefolder, newpkgname)"}]
         functions += [{"function":"fun_rebuild_ids(masterfolder, slavefolder)"}]
         functions += [{"function":"fun_merge_res(masterfolder, slavefolder)"}]
@@ -170,10 +171,12 @@ def merge_according_cmdline(args):
 #############################################################################
 if (__name__ == "__main__"):
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "c")
+        opts, args = getopt.getopt(sys.argv[1:], "cd")
         for op, value in opts:
-            if (op == "-c"):
-                ONLY_CHECK_DUP = True
+            if (op == "-d"):
+                DUP_CHECK_ONLY = True
+            elif (op == "-c"):
+                CLEAR_TMP_FOLDER = True
     except getopt.GetoptError as err:
         Log.out(err)
         sys.exit()
