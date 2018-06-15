@@ -170,7 +170,10 @@ def read_excel(excel_file):
         if name == AD_PLACES:
             continue
         #获取各个广告平台配置数据
-        parse_pidlist(read_sheet_by_name(excel_obj, name), pids_map)
+        sheet_sdk = read_sheet_by_name(excel_obj, name)
+        #只处理可见的表单
+        if (sheet_sdk.visibility == 0):
+            parse_pidlist(sheet_sdk, pids_map)
 
     adconfig[AD_PLACES] = adplaces;
 
