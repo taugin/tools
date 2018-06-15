@@ -181,11 +181,14 @@ def read_excel(excel_file):
         name = adplace[AD_NAME]
         try:
             adplace[AD_PIDS] = pids_map[name]
+            Log.out("[Logging...] 处理广告位中 : [%s - %s]" % (name, len(adplace[AD_PIDS])))
         except:
-            Log.out("[Loggging...] 无法找到健值 : [%s]" % name)
+            Log.out("[Logging...] 无法找到健值 : [%s]" % name)
             Common.pause()
             sys.exit(0)
 
+    if (adplaces != None):
+        Log.out("[Logging...] 广告位总个数 : [%s]" % len(adplaces))
     adstring = str(adconfig)
     adstring = adstring.replace("\'", "\"")
     dirname = os.path.dirname(excel_file)
