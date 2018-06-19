@@ -88,7 +88,7 @@ def check_resdup(masterfolder, slavefolder):
     #filedup = check_lib_assets(masterfolder, slavefolder, dup_list)
     all_dup = id_dup or filedup
     if (all_dup == True):
-        Log.out("[Logging...] 存在重复资源, 请检查\n", True)
+        Log.out("[Logging...] 存在重复资源 : 请检查\n", True)
         '''
         f = open("dup.txt", "w")
         for s in dup_list:

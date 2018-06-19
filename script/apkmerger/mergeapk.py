@@ -24,8 +24,8 @@ import merge_custom
 import merge_smali
 
 TRY_CONFIG = "error.json"
-DUP_CHECK_ONLY = False
-CLEAR_TMP_FOLDER = False
+CHECK_DUP = False
+DEBUG_MODE = False
 
 def fun_apk_decompile(apkfile, apkfolder):
     merge_builder.apk_decompile(apkfile, apkfolder)
@@ -70,7 +70,7 @@ def fun_alignapk(mastersignedapk, masterfinalapk):
 def clean_tmp_folders(masterfolder, slavefolder, file1, file2):
     Log.out("[Logging...] 清除临时文件")
     try:
-        if (CLEAR_TMP_FOLDER):
+        if (not DEBUG_MODE):
             shutil.rmtree(masterfolder, ignore_errors = True)
             shutil.rmtree(slavefolder, ignore_errors = True)
         Utils.deleteFile(file1)
@@ -80,21 +80,21 @@ def clean_tmp_folders(masterfolder, slavefolder, file1, file2):
     Log.out("[Logging...] 文件清除完成\n")
 
 def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
-    (mastername, ext) = os.path.splitext(masterapk)
-    masterfolder = mastername
+    mastername = os.path.splitext(masterapk)
+    masterfolder = mastername[0]
 
-    (slavename, ext) = os.path.splitext(slaveapk)
-    slavefolder = slavename
+    slavename = os.path.splitext(slaveapk)
+    slavefolder = slavename[0]
 
     #生成合并后的apk名称
     tmpapk = masterapk
     if (output != None and output != ""):
         tmpapk = output
 
-    (tmpname, ext) = os.path.splitext(tmpapk)
-    mastermergedapk = tmpname + "-merged.apk"
-    mastersignedapk = tmpname + "-merged-signed.apk"
-    masterfinalapk = tmpname + "-merged-final.apk"
+    tmpname = os.path.splitext(tmpapk)
+    mastermergedapk = tmpname[0] + "-merged.apk"
+    mastersignedapk = tmpname[0] + "-merged-signed.apk"
+    masterfinalapk = tmpname[0] + "-merged-final.apk"
 
     if (newpkgname != None and newpkgname != ""):
         mastermergedapk = tmpname + "-" + newpkgname + "-merged.apk"
@@ -106,7 +106,7 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
     functions += [{"function":"fun_apk_decompile(slaveapk, slavefolder)"}]
     functions += [{"function":"fun_check_resdup(masterfolder, slavefolder)"}]
 
-    if (DUP_CHECK_ONLY == False):
+    if (CHECK_DUP == False):
         functions += [{"function":"fun_merge_xml_change_pkg(masterfolder, slavefolder, newpkgname)"}]
         functions += [{"function":"fun_rebuild_ids(masterfolder, slavefolder)"}]
         functions += [{"function":"fun_merge_res(masterfolder, slavefolder)"}]
@@ -162,7 +162,11 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
 
 def merge_according_cmdline(args):
     if (len(args) < 2):
-        Log.out("[Logging...] 缺少参数: %s [-c] apk1 apk2" % os.path.basename(sys.argv[0]), True);
+        cmd_name = os.path.splitext(os.path.basename(sys.argv[0]))
+        p_desc = "             参数描述:"
+        c_desc = "             -c 仅检查是否有重复资源"
+        d_desc = "             -d 调试模式保留中间文件"
+        Log.out("[Logging...] 缺少参数: %s [-c] [-d] apk1 apk2\n%s\n%s\n%s" % (cmd_name[0], p_desc, c_desc, d_desc), True);
         sys.exit()
     masterapk = os.path.abspath(args[0])
     slaveapk = os.path.abspath(args[1])
@@ -173,10 +177,10 @@ if (__name__ == "__main__"):
     try:
         opts, args = getopt.getopt(sys.argv[1:], "cd")
         for op, value in opts:
-            if (op == "-d"):
-                DUP_CHECK_ONLY = True
-            elif (op == "-c"):
-                CLEAR_TMP_FOLDER = True
+            if (op == "-c"):
+                CHECK_DUP = True
+            elif (op == "-d"):
+                DEBUG_MODE = True
     except getopt.GetoptError as err:
         Log.out(err)
         sys.exit()
