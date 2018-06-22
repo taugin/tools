@@ -57,8 +57,12 @@ def pullspecapk(apkfile, package):
         tempFile = "tmp_file_%ld.apk" % (time.time() * 1000)
         tempFile = os.path.join(os.getcwd(), tempFile)
         tempFile = os.path.normpath(tempFile)
+        f = open(tempFile, "wb")
+        f.close()
         cmdlist = [Common.ADB, "pull", apkfile, tempFile]
         subprocess.call(cmdlist)
+        if not os.path.exists(tempFile):
+            return
         label = getlabel(tempFile)
         if (label == None or len(label) <= 0):
             label = package
