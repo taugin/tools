@@ -20,7 +20,7 @@ def getpackage():
     cmdlist = [Common.ADB, "shell", "dumpsys", "activity", "top"]
     p = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     #p.wait()
-    package = None
+    pkglist = []
     if (p != None):
         for line in p.stdout.readlines():
             string = line.decode().replace("\n", "")
@@ -30,8 +30,9 @@ def getpackage():
                 if (str_list != None and len(str_list) > 1):
                     str_list = str_list[1].split("/")
                     if (str_list != None and len(str_list) > 0):
-                        package = str_list[0]
-                        Log.out("[Logging...] 顶层APK包名 : [%s]" % package)
+                        pkglist += [str_list[0]]
+    package = pkglist[-1] if len(pkglist) > 0 else "Can not find top package"
+    Log.out("[Logging...] 顶层APK包名 : [%s]" % package)
     return package
 
 def getapkfile(package):
