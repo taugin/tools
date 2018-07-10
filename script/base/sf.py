@@ -54,7 +54,7 @@ def printsign_md5(apkFile, signFile):
     '''输出签名文件的MD5'''
     global apk_info
     cmdlist = [Common.KEYTOOL, "-printcert", "-file", signFile]
-    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
     process.wait()
     alllines = process.stdout.readlines()
     sign_md5 = None
@@ -97,7 +97,7 @@ def getpkg(apkFile):
     '''输出apk的包信息'''
     global apk_info
     cmdlist = [Common.AAPT_BIN, "d", "badging", apkFile]
-    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
 
     tmppkg = ""
     tmp = ""
@@ -126,7 +126,7 @@ def getlabel(apkFile):
     global apk_info
     apk_info["apkfile"] = apkFile
     cmdlist = [Common.AAPT_BIN, "d", "badging", apkFile]
-    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
 
     tmppkg = ""
     tmp = ""
@@ -241,7 +241,7 @@ def install_apk(args):
     if (len(args) > 0):
         cmd = [Common.ADB, "-d", "install", "-r", args[0]]
         Log.out("正在安装 : " + os.path.abspath(args[0]))
-        result = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        result = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
         execret = result.stdout.readlines();
         allret = ""
         success = False

@@ -2,7 +2,7 @@
 # coding: UTF-8
 import sys
 import os
-#引入别的文件夹的模块
+# 引入别的文件夹的模块
 DIR = os.path.dirname(sys.argv[0])
 COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR) 
@@ -17,9 +17,9 @@ import time
 
 
 def getpackage():
-    cmdlist = [Common.ADB, "shell", "dumpsys", "activity", "top"]
+    cmdlist = [Common.ADB, "-d", "shell", "dumpsys", "activity", "top"]
     p = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
-    #p.wait()
+    # p.wait()
     pkglist = []
     if (p != None):
         for line in p.stdout.readlines():
@@ -36,31 +36,29 @@ def getpackage():
     return package
 
 def getapkfile(package):
-    cmdlist = [Common.ADB, "shell", "pm", "list", "packages", "-f", package]
+    cmdlist = [Common.ADB, "-d", "shell", "pm", "path", package]
     p = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     apkfile = None
     if (p != None):
         for line in p.stdout.readlines():
             string = line.decode().replace("\n", "")
-            string = string.strip()
-            if (string.startswith("package:")):
-                tmp = string[len("package:"):]
-                tmp = tmp.split("=")
+            tmp = string.strip()
+            if (tmp.startswith("package:")):
+                tmp = tmp[len("package:"):]
                 if (tmp != None and len(tmp) > 1):
-                    if (tmp[1] == package):
-                        Log.out("[Logging...] 顶层APK文件 : [%s]" % tmp[0])
-                        apkfile = tmp[0]
+                    Log.out("[Logging...] 顶层APK文件 : [%s]" % tmp)
+                    apkfile = tmp
     return apkfile
 
 def pullspecapk(apkfile, package):
     if (apkfile != None and apkfile != ""):
         Log.out("[Logging...] 正在获取APK")
-        tempFile = "tmp_file_%ld.apk" % (time.time() * 1000)
+        tempFile = "%s_%ld.apk" % (package, (time.time() * 1000))
         tempFile = os.path.join(os.getcwd(), tempFile)
         tempFile = os.path.normpath(tempFile)
         f = open(tempFile, "wb")
         f.close()
-        cmdlist = [Common.ADB, "pull", apkfile, tempFile]
+        cmdlist = [Common.ADB, "-d", "pull", apkfile, tempFile]
         subprocess.call(cmdlist)
         if not os.path.exists(tempFile):
             return
@@ -75,21 +73,24 @@ def pullspecapk(apkfile, package):
         os.rename(tempFile, newFile)
 
 def getlabel(apkFile):
-    cmdlist = [Common.AAPT_BIN, "d", "badging", apkFile]
-    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
-
-    tmppkg = ""
-    tmp = ""
-    alllines = process.stdout.readlines()
-    for line in alllines :
-        tmp = str(line, "utf-8")
-        if (tmp.startswith("application-label")):
-            tmppkg = tmp
-            break;
-    tmppkg = tmppkg.replace("\r", "")
-    tmppkg = tmppkg.replace("\n", "")
-    tmppkg = tmppkg.replace("'", "")
-    label = tmppkg.split(":")[1]
+    label = None
+    try:
+        cmdlist = [Common.AAPT_BIN, "d", "badging", apkFile]
+        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+        tmppkg = ""
+        tmp = ""
+        alllines = process.stdout.readlines()
+        for line in alllines :
+            tmp = str(line, "utf-8")
+            if (tmp.startswith("application-label")):
+                tmppkg = tmp
+                break;
+        tmppkg = tmppkg.replace("\r", "")
+        tmppkg = tmppkg.replace("\n", "")
+        tmppkg = tmppkg.replace("'", "")
+        label = tmppkg.split(":")[1]
+    except:
+        pass
     return label
 
 def pullapk():
