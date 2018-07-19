@@ -21,15 +21,21 @@ AD_NAME = "name"
 #描述所有广告位
 AD_PIDS = "pids"
 #表示表头的行数
-HEADER_ROWS_COUNT = 3
+HEADER_ROWS_COUNT = 4
 #表示内容开始的位置
-CONTENT_START_POS = 3
+CONTENT_START_POS = 4
 #表示健值的表头位置
 HEADER_KEY_POS = 0
 #表示类型的健值位置
 HEADER_TYPE_POS = 1;
+#表示约束控制的健值位置
+HEADER_CONSTRAINT_POS = 2
 #表示描述信息的健值位置
-HEADER_DESC_POS = 2
+HEADER_DESC_POS = 3
+
+NULL_VALUE = "null"
+
+NOT_NULL_VALUE = "notnull"
 
 def format_value(origin, col_type):
     try:
@@ -37,6 +43,8 @@ def format_value(origin, col_type):
             return int(origin)
         if col_type == "float":
             return float(origin)
+        if col_type == "object":
+            return json.loads(origin)
     except:
         pass
     return origin
@@ -84,6 +92,7 @@ def parse_pidlist(pids_sheet, pids_map):
         return None
     header_row_key = read_rows(pids_sheet, HEADER_KEY_POS)
     header_row_type = read_rows(pids_sheet, HEADER_TYPE_POS)
+    header_row_constraint = read_rows(pids_sheet, HEADER_CONSTRAINT_POS)
     pids_count = pids_sheet.nrows - HEADER_ROWS_COUNT
     for row in range(CONTENT_START_POS, pids_count + HEADER_ROWS_COUNT):
         row_value = read_rows(pids_sheet, row)
@@ -95,10 +104,18 @@ def parse_pidlist(pids_sheet, pids_map):
                 continue
             pid[col] = row_value[find_index(header_row_key, col)]
             col_type = header_row_type[find_index(header_row_key, col)]
-            if pid[col] == None or len(str(pid[col])) <= 0:
-                has_empty_value = True
-                continue
-            pid[col] = format_value(pid[col], col_type)
+            col_constrait = header_row_constraint[find_index(header_row_key, col)]
+
+            if (pid[col] == None or len(str(pid[col])) <= 0):
+                if col_constrait == NOT_NULL_VALUE:
+                    has_empty_value = True
+                elif col_constrait == NULL_VALUE:
+                    try :
+                        pid.pop(col)
+                    except:
+                        pass
+            else:
+                pid[col] = format_value(pid[col], col_type)
         if has_empty_value:
             continue
         if place_name in pids_map:
@@ -183,9 +200,9 @@ def read_excel(excel_file):
             adplace[AD_PIDS] = pids_map[name]
             Log.out("[Logging...] 处理广告位中 : [%s - %s]" % (name, len(adplace[AD_PIDS])))
         except:
-            Log.out("[Logging...] 无法找到健值 : [%s]" % name)
-            Common.pause()
-            sys.exit(0)
+            Log.out("[Error.....] 无法找到健值 : [%s]" % name)
+            #Common.pause()
+            #sys.exit(0)
 
     if (adplaces != None):
         Log.out("[Logging...] 广告位总个数 : [%s]" % len(adplaces))
