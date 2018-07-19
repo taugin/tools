@@ -12,7 +12,7 @@ sys.path.append(COM_DIR)
 import json
 import xlrd
 import Log
-import Common;
+import Common
 
 #描述广告位名称
 AD_PLACES = "adplaces"
@@ -215,7 +215,7 @@ def read_excel(excel_file):
     newfile = os.path.join(dirname, newname)
     output = str(adstring)
     try:
-        output = json.dumps(adconfig, indent=4)
+        output = json.dumps(adconfig, sort_keys=True, indent=4)
     except:
         output = str(adstring)
     f = open(newfile, "w")
