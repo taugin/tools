@@ -16,6 +16,7 @@ import getopt
 import zipfile
 import hashlib
 import subprocess
+import re
 
 SIGNINFO_MD5 = False
 FILE_MD5 = False
@@ -237,10 +238,47 @@ def check_arg(args):
         Log.out("[Logging...] 缺少文件")
         sys.exit()
 
+def input_no(start, end):
+    while True:
+        i = input("请输入设备顺序 : ")
+        if i != None and i.isdigit() and int(i) >= start and int(i) <= end:
+            return i
+    return 1
+
+def get_select_devices():
+    try:
+        cmd = [Common.ADB, "devices", "-l"]
+        devices = []
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        p.wait(5)
+        allLines = p.stdout.readlines()
+        for s in allLines:
+            s = str(s, "utf-8")
+            s = s.replace("\r", "")
+            s = s.replace("\n", "")
+            if (s.startswith("List") or len(s) == 0):
+                continue
+            devices.append([re.split("\s+", s)[0], s])
+        if (len(devices) > 1):
+            Log.out("发现的设备列表")
+            for index in range(0, len(devices)):
+                Log.out("%s : %s" % (index + 1, devices[index][1]))
+            no = input_no(1, len(devices))
+            return devices[int(no) - 1][0]
+        elif(len(devices) == 1):
+            return devices[0][0]
+    except:
+        pass
+    return None
 def install_apk(args):
     if (len(args) > 0):
         cmd = [Common.ADB, "-d", "install", "-r", args[0]]
-        Log.out("正在安装 : " + os.path.abspath(args[0]))
+        device = get_select_devices()
+        if device != None and len(device) > 0 :
+            cmd = [Common.ADB, "-s", device, "install", "-r", args[0]]
+            Log.out("正在安装 : [%s] %s" % (device, os.path.abspath(args[0])))
+        else:
+            Log.out("正在安装 : " + os.path.abspath(args[0]))
         result = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
         execret = result.stdout.readlines();
         allret = ""
