@@ -17,6 +17,7 @@ import zipfile
 import hashlib
 import subprocess
 import re
+import time
 
 SIGNINFO_MD5 = False
 FILE_MD5 = False
@@ -239,10 +240,13 @@ def check_arg(args):
         sys.exit()
 
 def input_no(start, end):
-    while True:
-        i = input("请输入设备顺序 : ")
-        if i != None and i.isdigit() and int(i) >= start and int(i) <= end:
-            return i
+    try:
+        while True:
+            i = input("请输入设备顺序 : ")
+            if i != None and i.isdigit() and int(i) >= start and int(i) <= end:
+                return i
+    except:
+        Log.out("")
     return 1
 
 def get_select_devices():
@@ -259,14 +263,14 @@ def get_select_devices():
             if (s.startswith("List") or len(s) == 0):
                 continue
             devices.append([re.split("\s+", s)[0], s])
-        if (len(devices) > 1):
-            Log.out("发现的设备列表")
+        if (len(devices) > 0):
+            Log.out("发现的设备列表 : ")
             for index in range(0, len(devices)):
                 Log.out("%s : %s" % (index + 1, devices[index][1]))
-            no = input_no(1, len(devices))
+            no = 1
+            if (len(devices) > 1):
+                no = input_no(1, len(devices))
             return devices[int(no) - 1][0]
-        elif(len(devices) == 1):
-            return devices[0][0]
     except:
         pass
     return None
@@ -293,6 +297,8 @@ def install_apk(args):
         Log.out(allret)
         if (success == False):
             Common.pause()
+        else:
+            time.sleep(5)
 
 def print_xml(args):
     manifest = ""
