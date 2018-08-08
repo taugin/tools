@@ -192,6 +192,7 @@ def merge_custom(masterfolder, slavefolder):
     modify_activity_entry(masterfolder)
     move_special_files(masterfolder, os.path.normpath("com/wb/rpadapter"))
     move_special_files(masterfolder, os.path.normpath("com/fitness/dwadapter"))
+    move_special_files(masterfolder, os.path.normpath("com/bass/eqadapter"))
     Log.out("");
 
 if __name__ == "__main__":
