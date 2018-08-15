@@ -2,7 +2,11 @@
 # coding: UTF-8
 
 '''
-检测是否有重复资源，检测的目录包括assets,res,lib
+基本思想：
+1. 查找smali中所有的R文件，包含R文件的子类文件（通过^R.smali 或者^R\$(.*).smali）
+2. 在public.xml中提取出所有的资源ID
+3. 按照public.xml中的资源ID，更新smali文件中的ID
+4. 严格使用类型+名称作为唯一识别
 '''
 import sys
 import os
@@ -116,8 +120,11 @@ def find_rfolder(smali_folder):
                     ret = re.search("^R\$(.*).smali", tmplist[index])
                 if (ret != None):
                     filetmps += [tmplist[index]]
-            if (len(filetmps) > 1 and "R.smali" in filetmps):
-                rtmp += [root]
+            if (len(filetmps) > 1):
+                if "R.smali" in filetmps:
+                    rtmp += [root]
+                else:
+                    Log.out("[Logging...] 缺失关键文件 : [%s]" % os.path.join(root, "R.smali"))
     return rtmp
 
 def find_all_rfolders(masterfolder):
@@ -138,6 +145,7 @@ def find_all_rfolders(masterfolder):
 #---------------------------------------------------------------------#
 
 def find_rfiles(rfolder):
+    '''查找一个文件夹下面所有的R$开头的文件'''
     rfiles = []
     mylist = os.walk(rfolder, True)
     for root, filedir, files in mylist:
@@ -147,6 +155,7 @@ def find_rfiles(rfolder):
     return rfiles
 
 def find_type_byfile(rfile):
+    '''通过文件名字查找类型名字'''
     restype = None
     try:
         bname = os.path.basename(rfile)
@@ -157,6 +166,7 @@ def find_type_byfile(rfile):
     return restype
 
 def update_one_rfile(pubdict, rfile):
+    '''更新R文件的ID'''
     #Log.out("update rfile : %s" % rfile)
     conlist = []
     f = open(rfile, "r");
@@ -192,6 +202,7 @@ def update_one_rfile(pubdict, rfile):
         f.close()
 
 def update_one_rfolder(pubdict, rfolder):
+    '''更新包含R文件的文件夹'''
     r_files = find_rfiles(rfolder)
     for f in r_files:
         update_one_rfile(pubdict, f)
