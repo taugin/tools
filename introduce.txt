@@ -16,3 +16,9 @@ https://bitbucket.org/JesusFreke/smali
 
 Dex合并
 java -cp dx.jar com.android.dx.merge.DexMerger  outDex.dex  mergeDex.dex
+
+apktool下载地址
+https://bitbucket.org/iBotPeaches/apktool/downloads/
+
+处理AndResGuard的apktool
+https://github.com/xxxyanchenxxx/apktool_AndResGuard
