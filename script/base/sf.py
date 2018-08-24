@@ -298,7 +298,7 @@ def install_apk(args):
         if (success == False):
             Common.pause()
         else:
-            time.sleep(5)
+            time.sleep(2)
 
 def print_xml(args):
     manifest = ""
