@@ -108,7 +108,6 @@ def parse_pidlist(pids_sheet, pids_map):
             col_constrait = header_row_constraint[find_index(header_row_key, col)]
 
             if (pid[col] == None or len(str(pid[col])) <= 0):
-                Log.out("col constrait : %s" % col_constrait)
                 if col_constrait == NOT_NULL_VALUE:
                     has_empty_value = True
                 elif col_constrait == NULL_VALUE:
@@ -139,6 +138,7 @@ def generate_adplace(adplaces_sheet, adplaces):
         return None
     header_row_key = read_rows(adplaces_sheet, HEADER_KEY_POS)
     header_row_type = read_rows(adplaces_sheet, HEADER_TYPE_POS)
+    header_row_constraint = read_rows(adplaces_sheet, HEADER_CONSTRAINT_POS)
     adplaces_count = adplaces_sheet.nrows - HEADER_ROWS_COUNT
     for row in range(HEADER_ROWS_COUNT, adplaces_count + HEADER_ROWS_COUNT):
         row_value = read_rows(adplaces_sheet, row)
@@ -147,11 +147,19 @@ def generate_adplace(adplaces_sheet, adplaces):
         for col_key in header_row_key:
             adplace[col_key] = row_value[find_index(header_row_key, col_key)]
             col_type = header_row_type[find_index(header_row_key, col_key)]
+            col_constrait = header_row_constraint[find_index(header_row_key, col_key)]
             if adplace[col_key] == None or (len(str(adplace[col_key])) <= 0):
-                has_empty_value = True
-                Log.out("[Logging...] 发现空白字段: [%s]" % col_key)
-                continue
-            adplace[col_key] = format_value(adplace[col_key], col_type)
+                if col_constrait == NOT_NULL_VALUE:
+                    has_empty_value = True
+                    Log.out("[Logging...] 发现空白字段: [%s]" % col_key)
+                    continue
+                else:
+                    try :
+                        adplace.pop(col_key)
+                    except:
+                        pass
+            else:
+                adplace[col_key] = format_value(adplace[col_key], col_type)
         if not has_empty_value:
             adplaces.append(adplace)
 
