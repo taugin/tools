@@ -13,6 +13,7 @@ import json
 import xlrd
 import Log
 import Common
+import collections
 
 #描述广告位名称
 AD_PLACES = "adplaces"
@@ -96,7 +97,7 @@ def parse_pidlist(pids_sheet, pids_map):
     pids_count = pids_sheet.nrows - HEADER_ROWS_COUNT
     for row in range(CONTENT_START_POS, pids_count + HEADER_ROWS_COUNT):
         row_value = read_rows(pids_sheet, row)
-        pid = {}
+        pid = collections.OrderedDict()
         place_name = row_value[find_index(header_row_key, AD_NAME)]
         has_empty_value = False
         for col in header_row_key:
@@ -107,6 +108,7 @@ def parse_pidlist(pids_sheet, pids_map):
             col_constrait = header_row_constraint[find_index(header_row_key, col)]
 
             if (pid[col] == None or len(str(pid[col])) <= 0):
+                Log.out("col constrait : %s" % col_constrait)
                 if col_constrait == NOT_NULL_VALUE:
                     has_empty_value = True
                 elif col_constrait == NULL_VALUE:
@@ -140,7 +142,7 @@ def generate_adplace(adplaces_sheet, adplaces):
     adplaces_count = adplaces_sheet.nrows - HEADER_ROWS_COUNT
     for row in range(HEADER_ROWS_COUNT, adplaces_count + HEADER_ROWS_COUNT):
         row_value = read_rows(adplaces_sheet, row)
-        adplace = {}
+        adplace = collections.OrderedDict()
         has_empty_value = False
         for col_key in header_row_key:
             adplace[col_key] = row_value[find_index(header_row_key, col_key)]
@@ -156,7 +158,7 @@ def generate_adplace(adplaces_sheet, adplaces):
 def read_excel(excel_file):
     adconfig = {}
     adplaces = []
-    pids_map = {}
+    pids_map = collections.OrderedDict()
     if not os.path.exists(excel_file):
         Log.out("[Logging...] 无法定位文件 : [%s]" % excel_file)
         Common.pause()
@@ -215,7 +217,7 @@ def read_excel(excel_file):
     newfile = os.path.join(dirname, newname)
     output = str(adstring)
     try:
-        output = json.dumps(adconfig, sort_keys=True, indent=4)
+        output = json.dumps(adconfig, sort_keys=False, indent=4)
     except:
         output = str(adstring)
     f = open(newfile, "w")
