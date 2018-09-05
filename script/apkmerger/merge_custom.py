@@ -187,12 +187,36 @@ def update_duplicate_files(masterfolder, spfolder):
                     Utils.movefile(fromfile, tofile)
 
 ###########################################################################
+def move_file_by_appname(masterfolder, slavefolder):
+    slavemanifest = "%s/AndroidManifest.xml" % slavefolder;
+    ET.register_namespace('android', Common.XML_NAMESPACE)
+    slavetree = ET.parse(slavemanifest)
+    if slavetree == None:
+        return
+
+    slaveroot = slavetree.getroot()
+    if slaveroot == None:
+        return
+
+    application = slaveroot.find("application")
+    if application == None:
+        return
+
+    app_name = application.get("{%s}name" % Common.XML_NAMESPACE)
+    if app_name == None or len(app_name) <= 0:
+        return
+
+    index = app_name.rfind(".")
+    if index < 0:
+        return
+    pkgpath = app_name[:index]
+    pkgpath = pkgpath.replace(".", os.path.sep)
+    move_special_files(masterfolder, pkgpath)
+
 def merge_custom(masterfolder, slavefolder):
     add_application(masterfolder, slavefolder)
     modify_activity_entry(masterfolder)
-    move_special_files(masterfolder, os.path.normpath("com/wb/rpadapter"))
-    move_special_files(masterfolder, os.path.normpath("com/fitness/dwadapter"))
-    move_special_files(masterfolder, os.path.normpath("com/bass/eqadapter"))
+    move_file_by_appname(masterfolder, slavefolder)
     Log.out("");
 
 if __name__ == "__main__":
