@@ -4,15 +4,9 @@ import sys
 import os
 from builtins import float
 #引入别的文件夹的模块
-DIR = os.path.dirname(sys.argv[0])
-COM_DIR = os.path.join(DIR, "..", "common")
-COM_DIR = os.path.normpath(COM_DIR)
-sys.path.append(COM_DIR)
 
 import json
 import xlrd
-import Log
-import Common
 import collections
 
 #描述广告位名称
@@ -37,6 +31,12 @@ HEADER_DESC_POS = 3
 NULL_VALUE = "null"
 
 NOT_NULL_VALUE = "notnull"
+
+def log(msg):
+    print(msg)
+
+def pause():
+    input("按回车键退出...")
 
 def format_value(origin, col_type):
     try:
@@ -79,7 +79,7 @@ def read_sheet_by_index(excel_obj, index):
     return excel_obj.sheet_by_index(index)
 
 def show_cell_type(cell):
-    Log.out("cell type : %s" % cell.ctype)
+    log("cell type : %s" % cell.ctype)
 
 def open_excel(excel_file):
     try:
@@ -151,7 +151,7 @@ def generate_adplace(adplaces_sheet, adplaces):
             if adplace[col_key] == None or (len(str(adplace[col_key])) <= 0):
                 if col_constrait == NOT_NULL_VALUE:
                     has_empty_value = True
-                    Log.out("[Logging...] 发现空白字段: [%s]" % col_key)
+                    log("[Logging...] 发现空白字段: [%s]" % col_key)
                     continue
                 else:
                     try :
@@ -168,27 +168,27 @@ def read_excel(excel_file):
     adplaces = []
     pids_map = collections.OrderedDict()
     if not os.path.exists(excel_file):
-        Log.out("[Logging...] 无法定位文件 : [%s]" % excel_file)
-        Common.pause()
+        log("[Logging...] 无法定位文件 : [%s]" % excel_file)
+        pause()
         sys.exit(0)
 
     excel_obj = open_excel(excel_file)
     if not excel_obj:
-        Log.out("[Logging...] 无法解析文件 : [%s]" % excel_file)
-        Common.pause()
+        log("[Logging...] 无法解析文件 : [%s]" % excel_file)
+        pause()
         sys.exit(0)
 
     sheet_names = read_sheet_names(excel_obj)
     if not sheet_names:
-        Log.out("[Logging...] 无法解析表单 : [%s]" % excel_file)
-        Common.pause()
+        log("[Logging...] 无法解析表单 : [%s]" % excel_file)
+        pause()
         sys.exit(0)
 
     #获取adplaces工作表
     adplace_sheet = read_sheet_by_name(excel_obj, AD_PLACES)
     if not adplace_sheet:
-        Log.out("[Logging...] 无法获取表单 : [%s]" % "adplaces")
-        Common.pause()
+        log("[Logging...] 无法获取表单 : [%s]" % "adplaces")
+        pause()
         sys.exit(0)
 
     #获取广告位数据
@@ -208,14 +208,14 @@ def read_excel(excel_file):
         name = adplace[AD_NAME]
         try:
             adplace[AD_PIDS] = pids_map[name]
-            Log.out("[Logging...] 处理广告位中 : [%s - %s]" % (name, len(adplace[AD_PIDS])))
+            log("[Logging...] 处理广告位中 : [%s - %s]" % (name, len(adplace[AD_PIDS])))
         except:
-            Log.out("[Error.....] 无法找到健值 : [%s]" % name)
-            #Common.pause()
+            log("[Error.....] 无法找到健值 : [%s]" % name)
+            #pause()
             #sys.exit(0)
 
     if (adplaces != None):
-        Log.out("[Logging...] 广告位总个数 : [%s]" % len(adplaces))
+        log("[Logging...] 广告位总个数 : [%s]" % len(adplaces))
     adstring = str(adconfig)
     adstring = adstring.replace("\'", "\"")
     dirname = os.path.dirname(excel_file)
@@ -231,8 +231,11 @@ def read_excel(excel_file):
     f = open(newfile, "w")
     f.write(output)
     f.close()
-    Log.out("[Logging...] 文件转换成功 : [%s]" % newfile)
-    Common.pause()
+    log("[Logging...] 文件转换成功 : [%s]" % newfile)
+    pause()
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        log("[Logging...] 缺少文件参数 : %s ad.xls" % os.path.basename(sys.argv[0]))
+        sys.exit(0)
     read_excel(sys.argv[1])
