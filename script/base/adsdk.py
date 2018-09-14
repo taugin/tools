@@ -8,6 +8,9 @@ from builtins import float
 import json
 import xlrd
 import collections
+import getopt
+import subprocess
+import winreg
 
 #描述广告位名称
 AD_PLACES = "adplaces"
@@ -31,6 +34,13 @@ HEADER_DESC_POS = 3
 NULL_VALUE = "null"
 
 NOT_NULL_VALUE = "notnull"
+
+#################################for arguement#################################
+REGISTER_TO_REGISTRY = False
+ONLY_ENCRYPT = False
+ONLY_DECRYPT = False
+###############################################################################
+
 
 def log(msg):
     print(msg)
@@ -164,6 +174,9 @@ def generate_adplace(adplaces_sheet, adplaces):
             adplaces.append(adplace)
 
 def read_excel(excel_file):
+    if (input_file == None or len(input_file) <= 0):
+        log("[Logging...] 缺少表格文件 : [%s]" % input_file)
+        sys.exit(0)
     adconfig = {}
     adplaces = []
     pids_map = collections.OrderedDict()
@@ -233,9 +246,152 @@ def read_excel(excel_file):
     f.close()
     log("[Logging...] 文件转换成功 : [%s]" % newfile)
     pause()
+###############################################################################
+def find_aes_file():
+    aes_dir = os.getcwd()
+    aes_file = os.path.join(aes_dir, "aes.jar")
+    if os.path.exists(aes_file):
+        return aes_file
+    aes_dir = os.path.dirname(sys.argv[0])
+    aes_file = os.path.join(aes_dir, "aes.jar")
+    if os.path.exists(aes_file):
+        return aes_file
+    return None
+
+def find_java_file():
+    try:
+        home = os.environ.get("PATH")
+        patharray = home.split(os.pathsep)
+        for p in patharray:
+            java_file = os.path.join(p, "java.exe")
+            if os.path.exists(java_file):
+                return java_file
+    except:
+        pass
+    return None
+
+def encrypt_config_file(input_file):
+    if (input_file == None or len(input_file) <= 0):
+        log("[Logging...] 缺少明文文件 : [%s]" % input_file)
+        sys.exit(0)
+    output_file = None
+    key = "123456789"
+    if input_file == None or not os.path.exists(input_file):
+        return
+    input_file = os.path.normpath(input_file)
+    if output_file == None or not os.path.exists(output_file):
+        basename = os.path.basename(input_file)
+        name, ext= os.path.splitext(basename)
+        output_file = "%s-encrypt%s" % (name, ext)
+    aes_file = find_aes_file()
+    if (aes_file == None):
+        log("[Logging...] 无法找到文件 : [aes.jar]")
+        pause()
+        return
+    java_file = find_java_file()
+    if (java_file == None):
+        log("[Logging...] 无法找到文件 : [java]")
+        pause()
+        return
+    log("[Logging...] 加密文件 : [%s],  key : [%s], output : [%s]\n" % (aes_file, key, output_file))
+    cmdlist = [java_file, "-jar", aes_file, "-e", "-k", key, "-i", input_file, "-o", output_file]
+    subprocess.call(cmdlist)
+    pause()
+
+def decrypt_config_file(input_file):
+    if (input_file == None or len(input_file) <= 0):
+        log("[Logging...] 缺少密文文件 : [%s]" % input_file)
+        sys.exit(0)
+    output_file = None
+    key = "123456789"
+    if input_file == None or not os.path.exists(input_file):
+        return
+    input_file = os.path.normpath(input_file)
+    if output_file == None or not os.path.exists(output_file):
+        basename = os.path.basename(input_file)
+        name, ext= os.path.splitext(basename)
+        output_file = "%s-decrypt%s" % (name, ext)
+
+    aes_file = find_aes_file()
+    if (aes_file == None):
+        log("[Logging...] 无法找到文件 : [aes.jar]")
+        pause()
+        return
+    java_file = find_java_file()
+    if (java_file == None):
+        log("[Logging...] 无法找到文件 : [java]")
+        pause()
+        return
+    log("[Logging...] 解密文件 : [%s],  key : [%s], output : [%s]\n" % (aes_file, key, output_file))
+    cmdlist = [java_file, "-jar", aes_file, "-d", "-k", key, "-i", input_file, "-o", output_file]
+    subprocess.call(cmdlist)
+    pause()
+
+
+def add_xlsx2json_registry():
+    key = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, r"*\shell")
+    sub_key1 = winreg.CreateKey(key, r"ADSDK转换")
+    #icon = sys.argv[0] + " , 0"
+    #winreg.SetValue(sub_key1, "Icon", winreg.REG_SZ, icon)
+    if sys.argv[0].endswith(".py"):
+        command = "python " + sys.argv[0] + " \"%1\""
+    else:
+        command = sys.argv[0] + " \"%1\""
+    sub_key2 = winreg.CreateKey(sub_key1, r"command")
+    winreg.SetValue(sub_key2, r"", winreg.REG_SZ, command)
+
+def add_encrypt_registry():
+    key = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, r"*\shell")
+    sub_key1 = winreg.CreateKey(key, r"ADSDK加密")
+    #icon = sys.argv[0] + " , 0"
+    #winreg.SetValue(sub_key1, "Icon", winreg.REG_SZ, icon)
+    if sys.argv[0].endswith(".py"):
+        command = "python " + sys.argv[0] + " -e \"%1\""
+    else:
+        command = sys.argv[0] + " -e \"%1\""
+    sub_key2 = winreg.CreateKey(sub_key1, r"command")
+    winreg.SetValue(sub_key2, r"", winreg.REG_SZ, command)
+
+def add_dncrypt_registry():
+    key = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, r"*\shell")
+    sub_key1 = winreg.CreateKey(key, r"ADSDK解密")
+    #icon = sys.argv[0] + " , 0"
+    #winreg.SetValue(sub_key1, "Icon", winreg.REG_SZ, icon)
+    if sys.argv[0].endswith(".py"):
+        command = "python " + sys.argv[0] + " -d \"%1\""
+    else:
+        command = sys.argv[0] + " -d \"%1\""
+    sub_key2 = winreg.CreateKey(sub_key1, r"command")
+    winreg.SetValue(sub_key2, r"", winreg.REG_SZ, command)
+
+def register_to_registry():
+    add_xlsx2json_registry()
+    add_encrypt_registry()
+    add_dncrypt_registry()
+    log("[Logging...] 注册功能成功")
+    pause()
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        log("[Logging...] 缺少文件参数 : %s ad.xls" % os.path.basename(sys.argv[0]))
-        sys.exit(0)
-    read_excel(sys.argv[1])
+    opts, args = getopt.getopt(sys.argv[1:], "der")
+    for op, value in opts:
+        if (op == "-r"):
+            REGISTER_TO_REGISTRY = True
+        elif (op == "-e"):
+            ONLY_ENCRYPT = True
+        elif (op == "-d"):
+            ONLY_DECRYPT = True
+
+    if len(sys.argv[1:]) <= 0:
+        REGISTER_TO_REGISTRY = True
+    input_file = None
+    if (len(args) >= 1):
+        input_file = args[0]
+    log("[Logging...] 注册功能 : [%s] , 加密 : [%s] , 解密 : [%s] , 输入文件 : [%s]" % (REGISTER_TO_REGISTRY, ONLY_ENCRYPT, ONLY_DECRYPT, input_file))
+    if REGISTER_TO_REGISTRY:
+        register_to_registry()
+    elif ONLY_ENCRYPT:
+        encrypt_config_file(input_file)
+    elif ONLY_DECRYPT:
+        decrypt_config_file(input_file)
+    else:
+        read_excel(input_file)
