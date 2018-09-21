@@ -11,6 +11,7 @@ import collections
 import getopt
 import subprocess
 import winreg
+import hashlib
 
 #描述广告位名称
 AD_PLACES = "adplaces"
@@ -41,6 +42,8 @@ ONLY_ENCRYPT = False
 ONLY_DECRYPT = False
 INPUT_FILE = None
 PRO_ID = None
+PRO_NAME = None
+PRO_PKG = None
 ###############################################################################
 
 
@@ -50,18 +53,23 @@ def log(msg):
 def pause():
     input("按回车键退出...")
 
-def find_proid_from_filename():
+def find_info_from_filename():
     if (INPUT_FILE == None or len(INPUT_FILE)) <= 0:
         return None
-    product_name = None
+    proid = None
+    proname = None
+    propkg = None
     try:
         file_name = os.path.basename(INPUT_FILE)
         file_name= os.path.splitext(file_name)[0]
-        if (file_name.find("_") > -1):
-            product_name = file_name.split("_")[-1]
+        file_info = file_name.split("_")
+        proname = file_info[0]
+        propkg = file_info[1]
+        proid = file_info[2]
     except:
         pass
-    return product_name
+    return (proname, propkg, proid)
+
 def find_proid_from_pidname(pid):
     if pid == None or len(pid) <= 0:
         return None
@@ -213,18 +221,27 @@ def generate_adplace(adplaces_sheet, adplaces):
         if not has_empty_value:
             adplaces.append(adplace)
 
+def string_md5(md5str):
+    if (md5str != None and len(md5str) > 0):
+        md5=hashlib.md5(md5str.encode('utf-8')).hexdigest()
+        return md5
+    return None
+
 def read_excel(excel_file):
+    log("[Logging...] 文件格式转换 : [%s]" % input_file)
     if (input_file == None or len(input_file) <= 0):
-        log("[Logging...] 缺少表格文件 : [%s]" % input_file)
+        log("[Logging...] 缺少表格文件")
         sys.exit(0)
 
     global PRO_ID
-    PRO_ID = find_proid_from_filename()
-    if PRO_ID == None or len(PRO_ID) <= 0:
-        log("[Logging...] 缺少产品编号 : [%s]" % input_file)
-    else:
-        log("[Logging...] 当前产品编号 : [%s]" % PRO_ID)
-
+    PRO_NAME, PRO_PKG, PRO_ID = find_info_from_filename()
+    if PRO_NAME == None or len(PRO_NAME) <= 0 or PRO_PKG == None or len(PRO_PKG) <= 0 or PRO_ID == None or len(PRO_ID) <= 0:
+        log("[Logging...] 文件命名异常")
+        log("[Logging...] 正确文件格式 : [productname_pkgname_productid.xlsx]")
+        pause()
+        sys.exit(0)
+    log("[Logging...] 当前产品信息 : [%s] - [%s] - [%s]" % (PRO_NAME, PRO_PKG, PRO_ID))
+    md5 = string_md5(PRO_PKG)
     adconfig = {}
     adplaces = []
     pids_map = collections.OrderedDict()
@@ -283,6 +300,7 @@ def read_excel(excel_file):
     basename = os.path.basename(excel_file)
     name, ext = os.path.splitext(basename)
     newname = name + ".txt"
+    newname = "cfg" + md5[0:8] + ".dat"
     newfile = os.path.join(dirname, newname)
     output = str(adstring)
     try:
