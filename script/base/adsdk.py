@@ -39,6 +39,8 @@ NOT_NULL_VALUE = "notnull"
 REGISTER_TO_REGISTRY = False
 ONLY_ENCRYPT = False
 ONLY_DECRYPT = False
+INPUT_FILE = None
+PRO_ID = None
 ###############################################################################
 
 
@@ -47,6 +49,42 @@ def log(msg):
 
 def pause():
     input("按回车键退出...")
+
+def find_proid_from_filename():
+    if (INPUT_FILE == None or len(INPUT_FILE)) <= 0:
+        return None
+    product_name = None
+    try:
+        file_name = os.path.basename(INPUT_FILE)
+        file_name= os.path.splitext(file_name)[0]
+        if (file_name.find("_") > -1):
+            product_name = file_name.split("_")[-1]
+    except:
+        pass
+    return product_name
+def find_proid_from_pidname(pid):
+    if pid == None or len(pid) <= 0:
+        return None
+    try:
+        index = pid.rfind("/")
+        seg3 = pid[index + 1:]
+        return seg3.split("-")[0]
+    except Exception as e:
+        pass #log("e : %s" % e)
+    return None
+
+def check_product(pid, sdk):
+    if (sdk != "dfp"):
+        #log("[Logging...] 忽略产品检查 : [%s]" % sdk)
+        return
+    if PRO_ID == None or len(PRO_ID) <= 0:
+        return
+    proid_frompid = find_proid_from_pidname(pid)
+    if proid_frompid == None or len(proid_frompid) <= 0:
+        log("[Logging...] 缺少产品编号 : [%s] : [%s]" % (sdk, pid))
+        return
+    if PRO_ID != proid_frompid:
+        log("[Logging...] 产品编号异常 : [%s] : [%s] : [%s]" % (PRO_ID, proid_frompid, pid))
 
 def format_value(origin, col_type):
     try:
@@ -133,6 +171,8 @@ def parse_pidlist(pids_sheet, pids_map):
             pids_map[place_name].append(pid)
         else:
             pids_map[place_name] = [pid]
+        if pid != None and "sdk" in pid and "pid" in pid:
+            check_product(pid["pid"], pid["sdk"])
 
 def find_index(header_list, name):
     '''查找key值所在的index'''
@@ -177,6 +217,14 @@ def read_excel(excel_file):
     if (input_file == None or len(input_file) <= 0):
         log("[Logging...] 缺少表格文件 : [%s]" % input_file)
         sys.exit(0)
+
+    global PRO_ID
+    PRO_ID = find_proid_from_filename()
+    if PRO_ID == None or len(PRO_ID) <= 0:
+        log("[Logging...] 缺少产品编号 : [%s]" % input_file)
+    else:
+        log("[Logging...] 当前产品编号 : [%s]" % PRO_ID)
+
     adconfig = {}
     adplaces = []
     pids_map = collections.OrderedDict()
@@ -386,7 +434,8 @@ if __name__ == "__main__":
     input_file = None
     if (len(args) >= 1):
         input_file = args[0]
-    log("[Logging...] 注册功能 : [%s] , 加密 : [%s] , 解密 : [%s] , 输入文件 : [%s]" % (REGISTER_TO_REGISTRY, ONLY_ENCRYPT, ONLY_DECRYPT, input_file))
+    #log("[Logging...] 变现处理脚本 : 注册功能 : [%s] , 加密 : [%s] , 解密 : [%s] , 输入文件 : [%s]" % (REGISTER_TO_REGISTRY, ONLY_ENCRYPT, ONLY_DECRYPT, input_file))
+    INPUT_FILE = input_file
     if REGISTER_TO_REGISTRY:
         register_to_registry()
     elif ONLY_ENCRYPT:
