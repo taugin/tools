@@ -413,10 +413,13 @@ def add_dncrypt_registry():
     winreg.SetValue(sub_key2, r"", winreg.REG_SZ, command)
 
 def register_to_registry():
-    add_xlsx2json_registry()
-    add_encrypt_registry()
-    add_dncrypt_registry()
-    log("[Logging...] 注册功能成功")
+    try:
+        add_xlsx2json_registry()
+        add_encrypt_registry()
+        add_dncrypt_registry()
+        log("[Logging...] 注册功能成功")
+    except Exception as e:
+        log("[Logging...] 注册功能失败 : [%s]" % e)
     pause()
 
 if __name__ == "__main__":
