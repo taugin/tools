@@ -196,7 +196,7 @@ class WinWidget:
 #获得窗口对象
 root = get_tk()
 #设置窗口大小
-set_tk_geometry(root, '')
+#set_tk_geometry(root, '')
 #设置窗口title
 set_tk_title(root, 'APK修改工具')
 

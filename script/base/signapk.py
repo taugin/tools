@@ -19,6 +19,7 @@ import subprocess;
 
 USE_TESTSIGN_FILE = False
 OUTPUT_SIGNED_APK = None
+ALIGN_APK = False
 
 def pause():
     if (platform.system().lower() == "windows"):
@@ -94,10 +95,13 @@ def signapk(src_apk, dst_apk, keystoreinfo):
 
 def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     global OUTPUT_SIGNED_APK
-    Log.out("[Logging...] APK 文件 : " + src_apk, True)
+    Log.out("[Logging...] APK 文件 : [%s]" % src_apk, True)
+    if not os.path.exists(src_apk):
+        Log.out("[Logging...] 文件丢失", True)
+        return False
     index = src_apk.rfind(".apk")
     if (index == -1):
-        Log.out("[Logging...] 无法识别的的apk压缩包 : %s" % src_apk, True)
+        Log.out("[Logging...] 无法识别 : [%s]" % src_apk, True)
         return
     #Log.out("index : %d " % index)
     #Log.out("substring : %s " % src_apk[0:index])
@@ -115,8 +119,8 @@ def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     signapk(tmp_apk, dst_apk, keystoreinfo)
     Utils.deleteFile(tmp_apk)
 
-def readkeystore(dir):
-    listfile=os.listdir(dir)
+def readkeystore(filedir):
+    listfile=os.listdir(filedir)
     storefiles = []
     #Log.out(listfile)
     index = 0
@@ -158,7 +162,7 @@ def readkeystore(dir):
         Log.out("[Logging...] keystorealias or keystorepass is empty")
         sys.exit()
 
-    keystorepath = os.path.join(dir, keystorefile)
+    keystorepath = os.path.join(filedir, keystorefile)
     retcode = subprocess.call([Common.KEYTOOL, "-list", "-keystore", keystorepath, "-storepass", keystorepass], stdout=subprocess.PIPE)
     if (retcode != 0):
         Log.out("[Logging...] 签名文件不正确", True)
@@ -170,23 +174,63 @@ def readkeystore(dir):
     keystoreinfo.append(keyaliaspass)
     return keystoreinfo
 
-if (len(sys.argv) < 2):
-    Log.out("[Logging...] 缺少参数, %s [-t] <src_apk>" % os.path.basename(sys.argv[0]), True);
-    sys.exit()
-opts, args = getopt.getopt(sys.argv[1:], "to:")
-for op, value in opts:
-    if (op == "-t"):
-        USE_TESTSIGN_FILE = True
-    elif (op == "-o"):
-        OUTPUT_SIGNED_APK = value
+def exec_align_process(src_apk):
+    global OUTPUT_SIGNED_APK
+    Log.out("[Logging...] APK 文件 : [%s]" % src_apk, True)
 
-for file in args :
-    if (os.path.isdir(file)):
-        listfiles = os.listdir(file)
-        for apkfile in listfiles :
-            apkpath = file + Common.SEPERATER + apkfile
-            if (len(apkpath) >= 4 and apkpath[-4:] == ".apk"):
-                exec_sign_process(os.path.abspath(apkpath), USE_TESTSIGN_FILE)
+    if not os.path.exists(src_apk):
+        Log.out("[Logging...] 文件丢失", True)
+        return False
+
+    index = src_apk.rfind(".apk")
+    if (index == -1):
+        Log.out("[Logging...] 无法识别 : [%s]" % src_apk, True)
+        return
+    dst_apk = src_apk[0:index] + "-aligned.apk"
+    if (OUTPUT_SIGNED_APK != None and len(OUTPUT_SIGNED_APK) > 0):
+        dst_apk = OUTPUT_SIGNED_APK
+    alignapk(src_apk, dst_apk)
+
+#apk对齐
+def alignapk(unalignapk, finalapk):
+    finalapk = os.path.normpath(finalapk)
+    Log.out("[Logging...] 对齐文件 : [%s]" % finalapk, True)
+    cmdlist = [Common.ZIPALIGN, "-f", "4", unalignapk, finalapk]
+    subprocess.call(cmdlist, stdout=subprocess.PIPE)
+    Log.out("[Logging...] 对齐成功\n")
+    return True
+
+if __name__ == "__main__":
+    if (len(sys.argv) < 2):
+        Log.out("[Logging...] 缺少参数, %s [-t] <src_apk>, [-a] 对齐apk" % os.path.basename(sys.argv[0]), True);
+        sys.exit()
+    opts, args = getopt.getopt(sys.argv[1:], "ato:")
+    for op, value in opts:
+        if (op == "-t"):
+            USE_TESTSIGN_FILE = True
+        elif (op == "-o"):
+            OUTPUT_SIGNED_APK = value
+        elif (op == "-a"):
+            ALIGN_APK = True
+    if (ALIGN_APK == True):
+        for file in args :
+            if (os.path.isdir(file)):
+                listfiles = os.listdir(file)
+                for apkfile in listfiles :
+                    apkpath = file + Common.SEPERATER + apkfile
+                    if (len(apkpath) >= 4 and apkpath[-4:] == ".apk"):
+                        exec_align_process(os.path.abspath(apkpath))
+            else:
+                if (len(file) >= 4 and file[-4:] == ".apk"):
+                    exec_align_process(os.path.abspath(file))
     else:
-        if (len(file) >= 4 and file[-4:] == ".apk"):
-            exec_sign_process(os.path.abspath(file), USE_TESTSIGN_FILE)
+        for file in args :
+            if (os.path.isdir(file)):
+                listfiles = os.listdir(file)
+                for apkfile in listfiles :
+                    apkpath = file + Common.SEPERATER + apkfile
+                    if (len(apkpath) >= 4 and apkpath[-4:] == ".apk"):
+                        exec_sign_process(os.path.abspath(apkpath), USE_TESTSIGN_FILE)
+            else:
+                if (len(file) >= 4 and file[-4:] == ".apk"):
+                    exec_sign_process(os.path.abspath(file), USE_TESTSIGN_FILE)
