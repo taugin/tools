@@ -19,6 +19,12 @@ AD_PLACES = "adplaces"
 AD_NAME = "name"
 #描述所有广告位
 AD_PIDS = "pids"
+#pidlist
+PLACE_LIST = "placelist"
+#adids
+ADIDS = "adids"
+#gtconfig
+GTCONFIG = "gtconfig"
 #表示表头的行数
 HEADER_ROWS_COUNT = 4
 #表示内容开始的位置
@@ -221,6 +227,32 @@ def generate_adplace(adplaces_sheet, adplaces):
         if not has_empty_value:
             adplaces.append(adplace)
 
+def generate_singleconfig(adplaces_sheet, singleconfig):
+    if adplaces_sheet == None or adplaces_sheet.nrows < HEADER_ROWS_COUNT + 1:
+        return None
+    header_row_key = read_rows(adplaces_sheet, HEADER_KEY_POS)
+    header_row_type = read_rows(adplaces_sheet, HEADER_TYPE_POS)
+    header_row_constraint = read_rows(adplaces_sheet, HEADER_CONSTRAINT_POS)
+    adplaces_count = adplaces_sheet.nrows - HEADER_ROWS_COUNT
+
+    for row in range(HEADER_ROWS_COUNT, adplaces_count + HEADER_ROWS_COUNT):
+        row_value = read_rows(adplaces_sheet, row)
+        for col_key in header_row_key:
+            singleconfig[col_key] = row_value[find_index(header_row_key, col_key)]
+            col_type = header_row_type[find_index(header_row_key, col_key)]
+            col_constrait = header_row_constraint[find_index(header_row_key, col_key)]
+            if singleconfig[col_key] == None or (len(str(singleconfig[col_key])) <= 0):
+                if col_constrait == NOT_NULL_VALUE:
+                    log("[Logging...] 发现空白字段 : [%s]" % col_key)
+                    continue
+                else:
+                    try :
+                        singleconfig.pop(col_key)
+                    except:
+                        pass
+            else:
+                singleconfig[col_key] = format_value(singleconfig[col_key], col_type)
+
 def string_md5(md5str):
     if (md5str != None and len(md5str) > 0):
         md5=hashlib.md5(md5str.encode('utf-8')).hexdigest()
@@ -242,7 +274,7 @@ def read_excel(excel_file):
         sys.exit(0)
     log("[Logging...] 当前产品信息 : [%s] - [%s] - [%s]" % (PRO_NAME, PRO_PKG, PRO_ID))
     md5 = string_md5(PRO_PKG)
-    adconfig = {}
+    adconfig = collections.OrderedDict()
     adplaces = []
     pids_map = collections.OrderedDict()
     if not os.path.exists(excel_file):
@@ -262,23 +294,22 @@ def read_excel(excel_file):
         pause()
         sys.exit(0)
 
-    #获取adplaces工作表
+    #获取adplaces工作表###################################
     adplace_sheet = read_sheet_by_name(excel_obj, AD_PLACES)
     if not adplace_sheet:
-        log("[Logging...] 无法获取表单 : [%s]" % "adplaces")
+        log("[Logging...] 无法获取表单 : [%s]" % AD_PLACES)
         pause()
         sys.exit(0)
 
     #获取广告位数据
     generate_adplace(adplace_sheet, adplaces)
-    for name in sheet_names:
-        if name == AD_PLACES:
-            continue
-        #获取各个广告平台配置数据
-        sheet_sdk = read_sheet_by_name(excel_obj, name)
-        #只处理可见的表单
-        if (sheet_sdk.visibility == 0):
-            parse_pidlist(sheet_sdk, pids_map)
+    sheet_sdk = read_sheet_by_name(excel_obj, PLACE_LIST)
+    if (sheet_sdk != None):
+        parse_pidlist(sheet_sdk, pids_map)
+    else:
+        log("[Error.....] 无法获取表单 : [%s]" % PLACE_LIST)
+        pause()
+        sys.exit(0)
 
     adconfig[AD_PLACES] = adplaces;
 
@@ -294,6 +325,31 @@ def read_excel(excel_file):
 
     if (adplaces != None):
         log("[Logging...] 广告位总个数 : [%s]" % len(adplaces))
+    #######################################################
+
+    for name in sheet_names:
+        if name == AD_PLACES or name == PLACE_LIST:
+            continue
+        adplace_sheet = read_sheet_by_name(excel_obj, name)
+        if (adplace_sheet.visibility != 0):
+            continue
+        if not adplace_sheet:
+            log("[Logging...] 无法获取表单 : [%s]" % name)
+        config = collections.OrderedDict()
+        try:
+            generate_singleconfig(adplace_sheet, config)
+        except Exception as e:
+            log("[Logging...] %s" % e)
+        if (len(config) > 0):
+            adconfig[name] = config;
+            log("[Logging...] 获取配置成功 : [%s]" % name)
+        else:
+            log("[Logging...] 获取配置失败 : [%s]" % name)
+
+    #######################################################
+    adplace = adconfig.pop(AD_PLACES)
+    adconfig[AD_PLACES] = adplace
+    #######################################################
     adstring = str(adconfig)
     adstring = adstring.replace("\'", "\"")
     dirname = os.path.dirname(excel_file)
