@@ -10,32 +10,35 @@ import random
 import subprocess
 
 def copy_smali(masterfolder, slavefolder):
-    Log.out("[Logging...] 复制汇编文件 ")
+    smalidirs = ["smali", "smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6"]
 
-    fromdir = "%s/smali" % slavefolder
-    dstdir = "%s/smali_classes2" % masterfolder
-    if (os.path.exists(fromdir)):
-        Utils.copydir(fromdir, dstdir, False)
-
-    fromdir = "%s/smali_classes2" % slavefolder
-    dstdir = "%s/smali_classes3" % masterfolder
-    if (os.path.exists(fromdir)):
-        Utils.copydir(fromdir, dstdir, False)
+    for smalifrom in smalidirs:
+        fromdir = os.path.join(slavefolder, smalifrom)
+        if not os.path.exists(fromdir):
+            break
+        for smalidst in smalidirs:
+            dstdir = os.path.join(masterfolder, smalidst)
+            if not os.path.exists(dstdir):
+                Log.out("[Logging...] 复制汇编文件 : [%s] -> [%s]" % (os.path.basename(fromdir), os.path.basename(dstdir)))
+                Utils.copydir(fromdir, dstdir, False)
+                break;
 
 def clear_dup_smali(masterfolder):
-    smali = os.path.join(masterfolder, "smali")
-    smali2 = os.path.join(masterfolder, "smali_classes2")
-    if (not os.path.exists(smali2)):
-        return
     Log.out("[Logging...] 清除重复文件 ", True)
-    srclist = os.walk(smali, True)
-    for root, filedir, files in srclist:
-        for file in files:
-            file = os.path.join(root, file)
-            toDeleteFile = file.replace(smali, smali2)
-            if os.path.exists(toDeleteFile):
-                os.remove(toDeleteFile)
-                Utils.deleteEmptyDir(toDeleteFile)
+    smali = os.path.join(masterfolder, "smali")
+    smalidirs = ["smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6"]
+    for smalidir in smalidirs:
+        smalidst = os.path.join(masterfolder, smalidir)
+        if (not os.path.exists(smalidst)):
+            break
+        srclist = os.walk(smali, True)
+        for root, filedir, files in srclist:
+            for file in files:
+                file = os.path.join(root, file)
+                toDeleteFile = file.replace(smali, smalidst)
+                if os.path.exists(toDeleteFile):
+                    os.remove(toDeleteFile)
+                    Utils.deleteEmptyDir(toDeleteFile)
     Log.out("[Logging...] 清除文件完成\n ", True)
 
 def jar2dex(jarfile, dexfile):
