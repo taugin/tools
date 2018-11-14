@@ -70,11 +70,11 @@ def fun_alignapk(mastersignedapk, masterfinalapk):
 def clean_tmp_folders(masterfolder, slavefolder, file1, file2):
     Log.out("[Logging...] 清除临时文件")
     try:
+        Utils.deleteFile(file1)
+        Utils.deleteFile(file2)
         if (not DEBUG_MODE):
             shutil.rmtree(masterfolder, ignore_errors = True)
             shutil.rmtree(slavefolder, ignore_errors = True)
-        Utils.deleteFile(file1)
-        Utils.deleteFile(file2)
     except:
         pass
     Log.out("[Logging...] 文件清除完成\n")
