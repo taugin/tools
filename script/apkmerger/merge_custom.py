@@ -38,12 +38,16 @@ def move_files_recursion(fromdir, prefix, dstdir, recursion):
 '''
 def move_special_files(masterfolder, prefix, recursion = True):
     Log.out("[Logging...] 移动指定文件 : [%s]" % prefix)
-    fromdir2 = os.path.normpath("%s/smali_classes2" % masterfolder)
-    fromdir3 = os.path.normpath("%s/smali_classes3" % masterfolder)
+    smalidirs = ["smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6"]
     dstdir = os.path.normpath("%s/smali" % masterfolder)
     prefix = os.path.normpath(prefix)
-    move_files_recursion(fromdir2, prefix, dstdir, recursion)
-    move_files_recursion(fromdir3, prefix, dstdir, recursion)
+
+    for smalidir in smalidirs:
+        fromdir = os.path.join(masterfolder, smalidir)
+        if os.path.exists(fromdir):
+            move_files_recursion(fromdir, prefix, dstdir, recursion)
+        else:
+            break;
 '''
 增加application文件
 '''
