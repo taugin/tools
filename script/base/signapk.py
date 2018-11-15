@@ -24,7 +24,7 @@ ALIGN_APK = False
 def pause():
     if (platform.system().lower() == "windows"):
         import msvcrt
-        Log.out("操作完成，按任意键退出", True)
+        Log.out("[Logging...] 操作完成，按任意键退出", True)
         msvcrt.getch()
 
 def inputvalue(prompt, max) :
@@ -126,7 +126,7 @@ def readkeystore(filedir):
     index = 0
     storeindex = 0
     for file in listfile:
-        if(file.rfind(".keystore") != -1):
+        if(file.rfind(".keystore") != -1 or file.rfind(".jks") != -1):
             storefiles.append(file)
             storeindex+=1
         index+=1
@@ -166,6 +166,7 @@ def readkeystore(filedir):
     retcode = subprocess.call([Common.KEYTOOL, "-list", "-keystore", keystorepath, "-storepass", keystorepass], stdout=subprocess.PIPE)
     if (retcode != 0):
         Log.out("[Logging...] 签名文件不正确", True)
+        pause()
         sys.exit()
     keystoreinfo = []
     keystoreinfo.append(keystorepath)
