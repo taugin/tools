@@ -3,6 +3,7 @@
 
 import sys
 import os
+import platform
 #引入别的文件夹的模块
 DIR = os.path.dirname(sys.argv[0])
 COM_DIR = os.path.join(DIR, "..", "common")
@@ -27,11 +28,23 @@ TRY_CONFIG = "error.json"
 CHECK_DUP = False
 DEBUG_MODE = False
 
+def pause():
+    if (platform.system().lower() == "windows"):
+        import msvcrt
+        Log.out("[Logging...] 操作完成，按任意键退出", True)
+        msvcrt.getch()
+
 def fun_apk_decompile(apkfile, apkfolder):
-    merge_builder.apk_decompile(apkfile, apkfolder)
+    ret = merge_builder.apk_decompile(apkfile, apkfolder)
+    if ret == False:
+        pause()
+        system.exit(0)
 
 def fun_apk_compile(masterfolder, mastermergedapk):
-    merge_builder.apk_compile(masterfolder, mastermergedapk)
+    ret = merge_builder.apk_compile(masterfolder, mastermergedapk)
+    if ret == False:
+        pause()
+        system.exit(0)
 
 def fun_check_resdup(masterfolder, slavefolder):
     merge_rfile.check_resdup(masterfolder, slavefolder)
