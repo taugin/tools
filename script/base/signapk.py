@@ -146,10 +146,12 @@ def readkeystore(filedir):
     Log.out("[Logging...] 签名文件 : %s" % keystorefile, True)
     keystorename = os.path.basename(keystorefile)
     index = keystorename.rfind(".keystore")
+    if index < 0:
+        index = keystorename.rfind(".jks")
     filename = keystorename[0:index]
     splits = filename.split("_")
     if (len(splits) < 3):
-        Log.out("[Logging...] 无法获取签名文件信息,请重命名签名文件格式 <[alias]_[storepass]_[aliaspass].keystore>", True)
+        Log.out("[Logging...] 无法获取签名文件信息,请重命名签名文件格式 <[alias]_[storepass]_[aliaspass].keystore/jks>", True)
         sys.exit()
     keystorealias = splits[0]
     if (splits[1] != "pwd"):
