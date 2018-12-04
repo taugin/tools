@@ -42,6 +42,8 @@ NULL_VALUE = "null"
 
 NOT_NULL_VALUE = "notnull"
 
+HIDE_FIELD = "hide"
+
 #################################for arguement#################################
 REGISTER_TO_REGISTRY = False
 ONLY_ENCRYPT = False
@@ -97,7 +99,7 @@ def check_product(pid, sdk):
     if proid_frompid == None or len(proid_frompid) <= 0:
         log("[Logging...] 缺少产品编号 : [%s] : [%s]" % (sdk, pid))
         return
-    if PRO_ID != proid_frompid:
+    if PRO_ID.lower() != proid_frompid.lower():
         log("[Logging...] 产品编号异常 : [%s] : [%s] : [%s]" % (PRO_ID, proid_frompid, pid))
 
 def format_value(origin, col_type):
@@ -208,6 +210,9 @@ def generate_adplace(adplaces_sheet, adplaces):
         row_value = read_rows(adplaces_sheet, row)
         adplace = collections.OrderedDict()
         has_empty_value = False
+        hide_value = row_value[find_index(header_row_key, HIDE_FIELD)]
+        if (hide_value != None and hide_value == 1):
+            continue
         for col_key in header_row_key:
             adplace[col_key] = row_value[find_index(header_row_key, col_key)]
             col_type = header_row_type[find_index(header_row_key, col_key)]
@@ -355,7 +360,6 @@ def read_excel(excel_file):
     dirname = os.path.dirname(excel_file)
     basename = os.path.basename(excel_file)
     name, ext = os.path.splitext(basename)
-    newname = name + ".txt"
     newname = "cfg" + md5[0:8] + ".dat"
     newfile = os.path.join(dirname, newname)
     output = str(adstring)
