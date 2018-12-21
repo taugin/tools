@@ -214,6 +214,9 @@ def generate_adplace(adplaces_sheet, adplaces):
         if (hide_value != None and hide_value == 1):
             continue
         for col_key in header_row_key:
+            '''hide字段不加入配置文件'''
+            if col_key == HIDE_FIELD:
+                continue
             adplace[col_key] = row_value[find_index(header_row_key, col_key)]
             col_type = header_row_type[find_index(header_row_key, col_key)]
             col_constrait = header_row_constraint[find_index(header_row_key, col_key)]
