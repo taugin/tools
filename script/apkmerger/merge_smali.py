@@ -10,7 +10,7 @@ import random
 import subprocess
 
 def copy_smali(masterfolder, slavefolder):
-    smalidirs = ["smali", "smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6"]
+    smalidirs = ["smali", "smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6", "smali_classes7", "smali_classes8", "smali_classes9", "smali_classes10"]
 
     for smalifrom in smalidirs:
         fromdir = os.path.join(slavefolder, smalifrom)
@@ -26,7 +26,7 @@ def copy_smali(masterfolder, slavefolder):
 def clear_dup_smali(masterfolder):
     Log.out("[Logging...] 清除重复文件 ", True)
     smali = os.path.join(masterfolder, "smali")
-    smalidirs = ["smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6"]
+    smalidirs = ["smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6", "smali_classes7", "smali_classes8", "smali_classes9", "smali_classes10"]
     for smalidir in smalidirs:
         smalidst = os.path.join(masterfolder, smalidir)
         if (not os.path.exists(smalidst)):

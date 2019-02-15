@@ -129,18 +129,15 @@ def find_rfolder(smali_folder):
 
 def find_all_rfolders(masterfolder):
     rfolders = []
-    smali_folder = os.path.join(masterfolder, "smali")
-    folder = find_rfolder(smali_folder)
-    if (folder != None):
-        rfolders += folder
-    smali_folder = os.path.join(masterfolder, "smali_classes2")
-    folder = find_rfolder(smali_folder)
-    if (folder != None):
-        rfolders += folder
-    smali_folder = os.path.join(masterfolder, "smali_classes3")
-    folder = find_rfolder(smali_folder)
-    if (folder != None):
-        rfolders += folder
+    all_smali_folder = ["smali", "smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6", "smali_classes7", "smali_classes8", "smali_classes9", "smali_classes10"]
+    for tmp_folder in all_smali_folder:
+        smali_folder = os.path.join(masterfolder, tmp_folder)
+        if (os.path.exists(smali_folder)):
+            folder = find_rfolder(smali_folder)
+            if (folder != None):
+                rfolders += folder
+        else:
+            break;
     return rfolders
 #---------------------------------------------------------------------#
 

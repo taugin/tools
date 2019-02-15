@@ -38,7 +38,7 @@ def move_files_recursion(fromdir, prefix, dstdir, recursion):
 '''
 def move_special_files(masterfolder, prefix, recursion = True):
     Log.out("[Logging...] 移动指定文件 : [%s]" % prefix)
-    smalidirs = ["smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6"]
+    smalidirs = ["smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6", "smali_classes7", "smali_classes8", "smali_classes9", "smali_classes10"]
     dstdir = os.path.normpath("%s/smali" % masterfolder)
     prefix = os.path.normpath(prefix)
 
@@ -165,6 +165,7 @@ def contain_special_path(spfolder, spfile):
     return False
 
 def update_duplicate_files(masterfolder, spfolder):
+    #更新重复文件，暂时未使用
     Log.out("[Logging...] 更新指定文件 ")
     fromdir = os.path.normpath("%s/smali_classes2" % masterfolder)
     dstdir = os.path.normpath("%s/smali" % masterfolder)
