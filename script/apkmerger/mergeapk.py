@@ -4,6 +4,8 @@
 import sys
 import os
 import platform
+import subprocess
+import time
 #引入别的文件夹的模块
 DIR = os.path.dirname(sys.argv[0])
 COM_DIR = os.path.join(DIR, "..", "common")
@@ -14,6 +16,7 @@ import Log
 import shutil
 import getopt
 import Utils
+import Common
 
 import merge_builder
 import merge_rfile
@@ -27,6 +30,12 @@ import merge_smali
 TRY_CONFIG = "error.json"
 CHECK_DUP = False
 DEBUG_MODE = False
+NAME_TEMPLATE = None
+FORMAT_LABEL = "{applabel}"
+FORMAT_VERNAME = "{vername}"
+FORMAT_VERCODE = "{vercode}"
+FORMAT_DATETIME = "{datetime}"
+
 
 def pause():
     if (platform.system().lower() == "windows"):
@@ -38,13 +47,13 @@ def fun_apk_decompile(apkfile, apkfolder):
     ret = merge_builder.apk_decompile(apkfile, apkfolder)
     if ret == False:
         pause()
-        system.exit(0)
+        sys.exit(0)
 
 def fun_apk_compile(masterfolder, mastermergedapk):
     ret = merge_builder.apk_compile(masterfolder, mastermergedapk)
     if ret == False:
         pause()
-        system.exit(0)
+        sys.exit(0)
 
 def fun_check_resdup(masterfolder, slavefolder):
     merge_rfile.check_resdup(masterfolder, slavefolder)
@@ -80,6 +89,43 @@ def fun_alignapk(mastersignedapk, masterfinalapk):
     merge_builder.alignapk(mastersignedapk, masterfinalapk)
 
 ###############################################################
+def get_app_info(apkFile):
+    '''输出apk的包信息'''
+    apk_info = {}
+    cmdlist = [Common.AAPT_BIN, "d", "badging", apkFile]
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+
+    tmppkg = ""
+    tmp = ""
+    alllines = process.stdout.readlines()
+    for line in alllines :
+        tmp = str(line, "utf-8")
+        if (tmp.startswith("package: ")):
+            tmppkg = tmp[len("package: "):]
+            tmppkg = tmppkg.replace("\r", "")
+            tmppkg = tmppkg.replace("\n", "")
+            tmppkg = tmppkg.replace("'", "")
+            tmpsplit = tmppkg.split(" ")
+            pkgname = None
+            vercode = None
+            vername = None
+            if tmpsplit != None and len(tmpsplit) >= 3:
+                pkgname = tmpsplit[0].split("=")[1]
+                vercode = tmpsplit[1].split("=")[1]
+                vername = tmpsplit[2].split("=")[1]
+            apk_info["pkgname"] = pkgname
+            apk_info["vercode"] = vercode
+            apk_info["vername"] = vername
+        elif (tmp.startswith("application-label")):
+            tmppkg = tmp
+            tmppkg = tmppkg.replace("\r", "")
+            tmppkg = tmppkg.replace("\n", "")
+            tmppkg = tmppkg.replace("'", "")
+            label = tmppkg.split(":")[1]
+            apk_info["apklabel"] = label
+    apk_info["datetime"] = time.strftime("%Y-%m-%d", time.localtime())
+    return apk_info
+
 def clean_tmp_folders(masterfolder, slavefolder, file1, file2):
     Log.out("[Logging...] 清除临时文件")
     try:
@@ -169,9 +215,30 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
                     fd.write(savestr)
                     fd.close()
                 break
+    rename_with_template(masterfinalapk)
     if (SAVE_ON_FALSE == False):
         Log.out("--------------------------------------------")
         clean_tmp_folders(masterfolder, slavefolder, mastermergedapk, mastersignedapk)
+
+def rename_with_template(mergedapk):
+    if (NAME_TEMPLATE == None or len(NAME_TEMPLATE) <= 0 or mergedapk == None or not os.path.exists(mergedapk)):
+        return
+    apk_info = get_app_info(mergedapk)
+    final_apk_name = mergedapk
+    if "apklabel" in apk_info:
+        final_apk_name = NAME_TEMPLATE.replace(FORMAT_LABEL, apk_info["apklabel"])
+    if "vername" in apk_info:
+        final_apk_name = final_apk_name.replace(FORMAT_VERNAME, apk_info["vername"])
+    if "vercode" in apk_info:
+        final_apk_name = final_apk_name.replace(FORMAT_VERCODE, apk_info["vercode"])
+    if "datetime" in apk_info:
+        final_apk_name = final_apk_name.replace(FORMAT_DATETIME, apk_info["datetime"])
+    folder = os.path.dirname(mergedapk)
+    final_apk_path = os.path.normpath(os.path.join(folder, final_apk_name))
+    Log.out("[Logging...] 生成最终文件 : [%s]" % final_apk_path)
+    if os.path.exists(final_apk_path):
+        os.remove(final_apk_path)
+    os.rename(mergedapk, final_apk_path)
 
 def merge_according_cmdline(args):
     if (len(args) < 2):
@@ -188,14 +255,15 @@ def merge_according_cmdline(args):
 #############################################################################
 if (__name__ == "__main__"):
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "cd")
+        opts, args = getopt.getopt(sys.argv[1:], "cdn:")
         for op, value in opts:
             if (op == "-c"):
                 CHECK_DUP = True
             elif (op == "-d"):
                 DEBUG_MODE = True
+            elif (op == "-n"):
+                NAME_TEMPLATE = value
     except getopt.GetoptError as err:
         Log.out(err)
         sys.exit()
-
     merge_according_cmdline(args)
