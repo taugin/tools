@@ -14,6 +14,7 @@ import Log
 import subprocess
 
 SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "signapk.py")
+INSTALL_FILE = os.path.join(os.path.dirname(sys.argv[0]), "sf.py")
 
 def apktool_cmd():
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR]
@@ -42,6 +43,17 @@ def alignapk(unalignapk, finalapk):
     Log.out("[Logging...] 文件对齐成功\n")
     return True
 
+def needInstall():
+    result = input("[Logging...] 是否需要安装 (Y/N) ")
+    if result == "Y" or result == "y":
+        return True
+    return False
+
+def installApk(finalapk):
+    Log.out("")
+    cmdlist = ["python", INSTALL_FILE, "-i", finalapk]
+    subprocess.call(cmdlist)
+
 ret = apktool_cmd()
 
 #回编译签名
@@ -64,4 +76,6 @@ if (ret and len(sys.argv) > 1 and sys.argv[1] == "b"):
                 if (os.path.exists(signedapk)):
                     os.remove(signedapk)
 
-Common.pause()
+if (needInstall()):
+    installApk(alignedapk)
+#Common.pause()

@@ -280,9 +280,13 @@ def install_apk(args):
         device = get_select_devices()
         if device != None and len(device) > 0 :
             cmd = [Common.ADB, "-s", device, "install", "-r", args[0]]
-            Log.out("正在安装 : [%s] %s" % (device, os.path.abspath(args[0])))
+            Log.out("[Logging...] 正在安装 : [%s] %s" % (device, os.path.abspath(args[0])))
+        elif device == None:
+            Log.out("[Logging...] 没有发现设备")
+            time.sleep(2)
+            return
         else:
-            Log.out("正在安装 : " + os.path.abspath(args[0]))
+            Log.out("[Logging...] 正在安装 : " + os.path.abspath(args[0]))
         result = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
         execret = result.stdout.readlines();
         allret = ""
