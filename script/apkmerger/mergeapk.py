@@ -31,7 +31,7 @@ TRY_CONFIG = "error.json"
 CHECK_DUP = False
 DEBUG_MODE = False
 NAME_TEMPLATE = None
-FORMAT_LABEL = "{applabel}"
+FORMAT_LABEL = "{apklabel}"
 FORMAT_VERNAME = "{vername}"
 FORMAT_VERCODE = "{vercode}"
 FORMAT_DATETIME = "{datetime}"
@@ -221,18 +221,33 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
         clean_tmp_folders(masterfolder, slavefolder, mastermergedapk, mastersignedapk)
 
 def rename_with_template(mergedapk):
-    if (NAME_TEMPLATE == None or len(NAME_TEMPLATE) <= 0 or mergedapk == None or not os.path.exists(mergedapk)):
+    final_name_template =NAME_TEMPLATE
+    if (mergedapk == None or not os.path.exists(mergedapk)):
         return
+    if (final_name_template == None or len(final_name_template) <= 0):
+        final_name_template = "{apklabel}_Release_v{vername}_{datetime}.apk"
     apk_info = get_app_info(mergedapk)
     final_apk_name = mergedapk
     if "apklabel" in apk_info:
-        final_apk_name = NAME_TEMPLATE.replace(FORMAT_LABEL, apk_info["apklabel"])
+        try:
+            final_apk_name = final_name_template.replace(FORMAT_LABEL, apk_info["apklabel"])
+        except:
+            Log.out("[Logging...] %s can not be found in %s" % (FORMAT_LABEL, NAME_TEMPLATE))
     if "vername" in apk_info:
-        final_apk_name = final_apk_name.replace(FORMAT_VERNAME, apk_info["vername"])
+        try:
+            final_apk_name = final_apk_name.replace(FORMAT_VERNAME, apk_info["vername"])
+        except:
+            Log.out("[Logging...] %s can not be found in %s" % (FORMAT_VERNAME, NAME_TEMPLATE))
     if "vercode" in apk_info:
-        final_apk_name = final_apk_name.replace(FORMAT_VERCODE, apk_info["vercode"])
+        try:
+            final_apk_name = final_apk_name.replace(FORMAT_VERCODE, apk_info["vercode"])
+        except:
+            Log.out("[Logging...] %s can not be found in %s" % (FORMAT_VERCODE, NAME_TEMPLATE))
     if "datetime" in apk_info:
-        final_apk_name = final_apk_name.replace(FORMAT_DATETIME, apk_info["datetime"])
+        try:
+            final_apk_name = final_apk_name.replace(FORMAT_DATETIME, apk_info["datetime"])
+        except:
+            Log.out("[Logging...] %s can not be found in %s" % (FORMAT_DATETIME, NAME_TEMPLATE))
     folder = os.path.dirname(mergedapk)
     final_apk_path = os.path.normpath(os.path.join(folder, final_apk_name))
     Log.out("[Logging...] 生成最终文件 : [%s]" % final_apk_path)
