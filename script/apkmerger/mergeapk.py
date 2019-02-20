@@ -100,7 +100,7 @@ def get_app_info(apkFile):
     alllines = process.stdout.readlines()
     for line in alllines :
         tmp = str(line, "utf-8")
-        if (tmp.startswith("package: ")):
+        if (tmp.startswith("package: ")  and "pkgname" not in apk_info):
             tmppkg = tmp[len("package: "):]
             tmppkg = tmppkg.replace("\r", "")
             tmppkg = tmppkg.replace("\n", "")
@@ -116,7 +116,7 @@ def get_app_info(apkFile):
             apk_info["pkgname"] = pkgname
             apk_info["vercode"] = vercode
             apk_info["vername"] = vername
-        elif (tmp.startswith("application-label")):
+        elif (tmp.startswith("application-label") and "apklabel" not in apk_info):
             tmppkg = tmp
             tmppkg = tmppkg.replace("\r", "")
             tmppkg = tmppkg.replace("\n", "")
