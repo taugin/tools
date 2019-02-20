@@ -75,7 +75,7 @@ if (ret and len(sys.argv) > 1 and sys.argv[1] == "b"):
             if (alignapk(signedapk, alignedapk) == True):
                 if (os.path.exists(signedapk)):
                     os.remove(signedapk)
-
-if (needInstall()):
-    installApk(alignedapk)
-#Common.pause()
+    if (needInstall()):
+        installApk(alignedapk)
+else:
+    Common.pause()
