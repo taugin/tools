@@ -42,7 +42,7 @@ NULL_VALUE = "null"
 
 NOT_NULL_VALUE = "notnull"
 
-HIDE_FIELD = "hide"
+SHOW_FIELD = "show"
 
 #################################for arguement#################################
 REGISTER_TO_REGISTRY = False
@@ -210,12 +210,12 @@ def generate_adplace(adplaces_sheet, adplaces):
         row_value = read_rows(adplaces_sheet, row)
         adplace = collections.OrderedDict()
         has_empty_value = False
-        hide_value = row_value[find_index(header_row_key, HIDE_FIELD)]
-        if (hide_value != None and hide_value == 1):
+        show_adplace = row_value[find_index(header_row_key, SHOW_FIELD)]
+        if (show_adplace != None and show_adplace == 0):
             continue
         for col_key in header_row_key:
-            '''hide字段不加入配置文件'''
-            if col_key == HIDE_FIELD:
+            '''show字段不加入配置文件'''
+            if col_key == SHOW_FIELD:
                 continue
             adplace[col_key] = row_value[find_index(header_row_key, col_key)]
             col_type = header_row_type[find_index(header_row_key, col_key)]
