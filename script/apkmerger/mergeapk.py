@@ -99,7 +99,7 @@ def get_app_info(apkFile):
     tmp = ""
     alllines = process.stdout.readlines()
     for line in alllines :
-        tmp = str(line, "utf-8")
+        tmp = parseString(line)
         if (tmp.startswith("package: ")  and "pkgname" not in apk_info):
             tmppkg = tmp[len("package: "):]
             tmppkg = tmppkg.replace("\r", "")
@@ -125,6 +125,17 @@ def get_app_info(apkFile):
             apk_info["apklabel"] = label
     apk_info["datetime"] = time.strftime("%Y-%m-%d", time.localtime())
     return apk_info
+
+def parseString(line):
+    format_code = ["utf8", "gbk", "gb2312"]
+    result = "";
+    for f in format_code:
+        try:
+            result = line.decode(f, "ignore")
+            return result
+        except:
+            pass
+    return result
 
 def clean_tmp_folders(masterfolder, slavefolder, file1, file2):
     Log.out("[Logging...] 清除临时文件")
