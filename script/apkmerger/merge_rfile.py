@@ -162,9 +162,10 @@ def find_type_byfile(rfile):
         pass
     return restype
 
-def update_one_rfile(pubdict, rfile):
+def update_one_rfile(pubdict, rfile, rfolder):
     '''更新R文件的ID'''
     #Log.out("update rfile : %s" % rfile)
+    idlist = []
     conlist = []
     f = open(rfile, "r");
     allcontent = f.readlines()
@@ -190,30 +191,51 @@ def update_one_rfile(pubdict, rfile):
                     #Log.out("%s -> %s" % (c, news))
                     conlist[index] = news
                     modify = True
+                    idlist.append((oid, nid))
             except:
                 pass
+    #TODO : for test
     if (modify) :
         newcontent = "\n".join(conlist)
         f = open(rfile, "w")
         f.write(newcontent)
         f.close()
 
+    """
+    由于attr文件里面的ID可能会出现在styleable文件中，
+    因此，更新attr文件时，需要同步更新styleable文件里面相同的id
+    避免出现当调用
+    TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CardView, defStyleAttr,
+                R.style.CardView);
+    float radius = a.getDimension(R.styleable.CardView_cardCornerRadius, 0);
+    时，出现无法获取值的问题
+    """
+    if ("R$attr.smali" in rfile):
+        update_rstyleable_file(idlist, rfolder)
+
+def update_rstyleable_file(idlist, rfolder):
+    '''更新styleable文件的id'''
+    if (idlist == None or len(idlist) <= 0):
+        return
+    if (rfolder == None or not os.path.exists(rfolder)):
+        return
+    styleable_file = os.path.join(rfolder, "R$styleable.smali")
+    if (not os.path.exists(styleable_file)):
+        return
+    f = open(styleable_file, "r");
+    allcontent = f.read()
+    f.close()
+    for oid, nid in idlist:
+        allcontent = allcontent.replace(oid, nid)
+    f = open(styleable_file, "w")
+    f.write(allcontent)
+    f.close()
+
 def update_one_rfolder(pubdict, rfolder):
     '''更新包含R文件的文件夹'''
     r_files = find_rfiles(rfolder)
     for f in r_files:
-        update_one_rfile(pubdict, f)
-
-def update_all_rfile(masterfolder):
-    ''' 重建R文件 '''
-    Log.out("[Logging...] 重建资源文件", True)
-    all_rfolder = find_all_rfolders(masterfolder)
-    #Log.out("all_rfolder : %s" % all_rfolder)
-    if (all_rfolder != None and len(all_rfolder) > 0):
-        pubdict = prepare_public(masterfolder)
-    for folder in all_rfolder:
-        update_one_rfolder(pubdict, folder)
-    Log.out("")
+        update_one_rfile(pubdict, f, rfolder)
 
 def prepare_public(masterfolder):
     pubdict = {}
@@ -231,6 +253,17 @@ def prepare_public(masterfolder):
             restype = item.get("type")
             pubdict["%s#%s" % (resname, restype)] = item.get("id")
     return pubdict
+
+def update_all_rfile(masterfolder):
+    ''' 重建R文件 '''
+    Log.out("[Logging...] 重建资源文件", True)
+    all_rfolder = find_all_rfolders(masterfolder)
+    #Log.out("all_rfolder : %s" % all_rfolder)
+    if (all_rfolder != None and len(all_rfolder) > 0):
+        pubdict = prepare_public(masterfolder)
+    for folder in all_rfolder:
+        update_one_rfolder(pubdict, folder)
+    Log.out("")
 
 if __name__ == "__main__":
     update_all_rfile(sys.argv[1])
