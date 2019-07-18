@@ -17,8 +17,49 @@ https://bitbucket.org/JesusFreke/smali
 Dex合并
 java -cp dx.jar com.android.dx.merge.DexMerger  outDex.dex  mergeDex.dex
 
-apktool下载地址
+apktool下载地址(旧)
 https://bitbucket.org/iBotPeaches/apktool/downloads/
+
+apktool下载地址(新)
+https://ibotpeaches.github.io/Apktool/build/
 
 处理AndResGuard的apktool
 https://github.com/xxxyanchenxxx/apktool_AndResGuard
+
+用Apktool打包遇到No resource identifier found for attribute "XXX" in package "com.XXX.XXX"的问题解决方案
+解决：
+修改 AXmlResourceParser.java文件中的public String getAttributeName(int index)函数，修改如下：
+    public String getAttributeName(int index) {
+        int offset = getAttributeOffset(index);
+        int nameIndex = m_attributes[offset + ATTRIBUTE_IX_NAME];
+        if (nameIndex == -1) {
+            return "";
+        }
+        String name = m_strings.getString(nameIndex);
+        String namespace = getAttributeNamespace(index);
+
+        // If attribute name is lacking or a private namespace emerges,
+        // retrieve the exact attribute name by its id.
+        if (name == null || name.length() == 0) {
+            try {
+                name = mAttrDecoder
+                        .decodeManifestAttr(getAttributeNameResource(index));
+                if (name == null) {
+                    name = "";
+                }
+            } catch (AndrolibException e) {
+                name = "";
+            }
+        } else if (!namespace.equals(android_ns)) {
+            try {
+                String obfuscatedName = mAttrDecoder
+                        .decodeManifestAttr(getAttributeNameResource(index));
+                if (!(obfuscatedName == null || obfuscatedName.equals(name))) {
+                    name = obfuscatedName;
+                }
+            } catch (AndrolibException e) {
+            }
+        }
+        return name;
+    }
+可以解决此问题
