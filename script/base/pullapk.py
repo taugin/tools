@@ -73,10 +73,10 @@ def getpackage():
                     if (str_list != None and len(str_list) > 1):
                         pkglist += [str_list[0]]
                         actlist += [str_list[1]]
-    package = pkglist[-1] if len(pkglist) > 0 else "Can not find top package"
-    activity = actlist[-1] if len(actlist) > 0 else "Can not find top activity"
-    Log.out("[Logging...] 顶层APK包名 : [%s]" % package)
-    Log.out("[Logging...] 顶层APK类名 : [%s]" % activity)
+    package = pkglist[-1] if len(pkglist) > 0 else None
+    activity = actlist[-1] if len(actlist) > 0 else None
+    Log.out("[Logging...] 顶层APK包名 : [%s]" % (package if package != None else "Can not find top package"))
+    Log.out("[Logging...] 顶层APK类名 : [%s]" % (activity if activity != None else "Can not find top activity"))
     return package
 
 def getapkfile(package):
@@ -144,7 +144,7 @@ def getlabel(apkFile):
     return label
 
 def needPullApk():
-    result = input("[Logging...] 是否拉取APK : [Y/N] ")
+    result = input("[Logging...] 拉取APK文件 : [Y/N] ")
     if result == "Y" or result == "y":
         return True
     return False
@@ -153,9 +153,11 @@ def pullapk():
     global SELECT_DEVICE
     SELECT_DEVICE = get_select_devices()
     package = getpackage()
-    if (package != None and needPullApk() == True):
-        apkfile = getapkfile(package)
-        pullspecapk(apkfile, package)
+    if (package != None):
+        if (needPullApk() == True):
+            apkfile = getapkfile(package)
+            pullspecapk(apkfile, package)
+    else:
         time.sleep(3)
 
 pullapk()
