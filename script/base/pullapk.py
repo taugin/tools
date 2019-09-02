@@ -61,6 +61,7 @@ def getpackage():
     p = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     # p.wait()
     pkglist = []
+    actlist = []
     if (p != None):
         for line in p.stdout.readlines():
             string = line.decode().replace("\n", "")
@@ -69,10 +70,13 @@ def getpackage():
                 str_list = string.split(" ")
                 if (str_list != None and len(str_list) > 1):
                     str_list = str_list[1].split("/")
-                    if (str_list != None and len(str_list) > 0):
+                    if (str_list != None and len(str_list) > 1):
                         pkglist += [str_list[0]]
+                        actlist += [str_list[1]]
     package = pkglist[-1] if len(pkglist) > 0 else "Can not find top package"
+    activity = actlist[-1] if len(actlist) > 0 else "Can not find top activity"
     Log.out("[Logging...] 顶层APK包名 : [%s]" % package)
+    Log.out("[Logging...] 顶层APK类名 : [%s]" % activity)
     return package
 
 def getapkfile(package):
@@ -139,13 +143,19 @@ def getlabel(apkFile):
         pass
     return label
 
+def needPullApk():
+    result = input("[Logging...] 是否拉取APK : [Y/N] ")
+    if result == "Y" or result == "y":
+        return True
+    return False
+
 def pullapk():
     global SELECT_DEVICE
     SELECT_DEVICE = get_select_devices()
     package = getpackage()
-    if (package != None):
+    if (package != None and needPullApk() == True):
         apkfile = getapkfile(package)
         pullspecapk(apkfile, package)
-    time.sleep(3)
+        time.sleep(3)
 
 pullapk()
