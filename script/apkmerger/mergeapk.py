@@ -138,12 +138,15 @@ def parseString(line):
     return result
 
 def clean_tmp_folders(masterfolder, slavefolder, file1, file2):
-    Log.out("[Logging...] 清除临时文件")
     try:
+        Log.out("[Logging...] 清除临时文件 : [%s]" % file1)
         Utils.deleteFile(file1)
+        Log.out("[Logging...] 清除临时文件 : [%s]" % file2)
         Utils.deleteFile(file2)
         if (not DEBUG_MODE):
+            Log.out("[Logging...] 清除临时文件 : [%s]" % masterfolder)
             shutil.rmtree(masterfolder, ignore_errors = True)
+            Log.out("[Logging...] 清除临时文件 : [%s]" % slavefolder)
             shutil.rmtree(slavefolder, ignore_errors = True)
     except:
         pass
@@ -230,13 +233,14 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
     if (SAVE_ON_FALSE == False):
         Log.out("--------------------------------------------")
         clean_tmp_folders(masterfolder, slavefolder, mastermergedapk, mastersignedapk)
+    time.sleep(3)
 
 def rename_with_template(mergedapk):
     final_name_template =NAME_TEMPLATE
     if (mergedapk == None or not os.path.exists(mergedapk)):
         return
     if (final_name_template == None or len(final_name_template) <= 0):
-        final_name_template = "{apklabel}_Release_v{vername}_{datetime}.apk"
+        final_name_template = "{apklabel}_Release_v{vername}_{vercode}_{datetime}.apk"
     apk_info = get_app_info(mergedapk)
     final_apk_name = mergedapk
     if "apklabel" in apk_info:
