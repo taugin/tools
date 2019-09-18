@@ -144,7 +144,10 @@ def getlabel(apkFile):
     return label
 
 def uninstallApk(package):
-    cmdlist = [Common.ADB, "uninstall", package]
+    if (SELECT_DEVICE != None and len(SELECT_DEVICE) > 0) :
+        cmdlist = [Common.ADB, "-s", SELECT_DEVICE, "uninstall", package]
+    else:
+        cmdlist = [Common.ADB, "-d", "uninstall", package]
     subprocess.Popen(cmdlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
 
 def confirmUninstall():
