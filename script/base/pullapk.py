@@ -143,21 +143,36 @@ def getlabel(apkFile):
         pass
     return label
 
-def needPullApk():
-    result = input("[Logging...] 拉取APK文件 : [Y/N] ")
+def uninstallApk(package):
+    cmdlist = [Common.ADB, "uninstall", package]
+    subprocess.Popen(cmdlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+
+def confirmUninstall():
+    result = input("[Logging...] 确认卸载APK : [Y/N] ")
     if result == "Y" or result == "y":
         return True
     return False
+
+def getCmd():
+    result = input("[Logging...] 处理APK文件 : [拉取 : P , 卸载 : U] ")
+    if (result == None) :
+        return None
+    result = result.lower()
+    return result
 
 def pullapk():
     global SELECT_DEVICE
     SELECT_DEVICE = get_select_devices()
     package = getpackage()
     if (package != None):
-        if (needPullApk() == True):
+        cmd = getCmd()
+        if (cmd == "p"):
             apkfile = getapkfile(package)
             pullspecapk(apkfile, package)
+        elif (cmd == "u" and confirmUninstall()):
+            uninstallApk(package)
+            Log.out("[Logging...] 卸载APK成功 : [%s]" % package)
+            Common.pause()
     else:
         time.sleep(3)
-
 pullapk()
