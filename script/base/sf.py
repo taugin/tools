@@ -40,6 +40,7 @@ apk_info["sign_sha256"] = None
 apk_info["apk_size"] = None
 apk_info["target_version"] = None
 apk_info["min_version"] = None
+apk_info["sign_detail"] = None
 
 def md5_classes(apkFile):
     '''    输出classes.dex的MD5    '''
@@ -66,6 +67,8 @@ def printsign_md5(apkFile, signFile):
     sign_sha1 = None
     for line in alllines:
         tmp = str(line, "gbk")
+        if (apk_info["sign_detail"] == None and (tmp != None and len(tmp) > 0)):
+            apk_info["sign_detail"] = tmp[0:len(tmp) - 1]
         tmp = tmp.strip().lower()
         if (tmp.startswith("md5")):
             tmp = tmp[len("md5") + 1:]
@@ -347,7 +350,7 @@ def calc_maxlen():
     global apk_info
     max_len = 0
     for key in apk_info:
-        if apk_info[key] != None:
+        if apk_info[key] != None and key != "sign_detail":
             ilen = len(apk_info[key])
             if ilen > max_len:
                 max_len = ilen
@@ -406,12 +409,17 @@ def print_apkinfo():
     Log.out(output)
 
     Log.out("-" * dash_len)
+    output = " 签名详情 | %s" % apk_info["sign_detail"]
+    Log.out(output)
+
+    Log.out("-" * dash_len)
     output = " 文件摘要 | %s" % apk_info["apk_md5"]
     Log.out(output)
 
     Log.out("-" * dash_len)
     output = " 文件哈希 | %s" % apk_info["apk_sha1"]
     Log.out(output)
+
     Log.out("-" * dash_len)
 
 # start ============================================================================================
