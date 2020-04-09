@@ -24,7 +24,7 @@ LIB_DIR = os.path.join(HOME_DIR, "lib")
 KEYSTORES_DIR = os.path.join(HOME_DIR, "extra/keystore")
 
 #默认的签名文件
-KEYSTORES_DEFAULT_FILE = os.path.join(KEYSTORES_DIR, "taugin_pwd_taugin0426.keystore")
+KEYSTORES_DEFAULT_FILE = os.path.join(KEYSTORES_DIR, "commonalias_pwd_common123456.jks")
 
 #可执行文件后缀
 BIN_SUFFIX = ""
