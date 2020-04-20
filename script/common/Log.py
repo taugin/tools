@@ -4,11 +4,19 @@
 import sys
 import os
 DEBUG_LEVEL = ""
+
+callback_writemsg = None
+def setCallback(writemsg):
+    global callback_writemsg
+    callback_writemsg = writemsg
 # 日志输出函数
 def d(tag, msg):
     print(tag + " : %s" % msg)
 
 def out(msg, show=True):
+    if (callback_writemsg != None):
+        callback_writemsg(msg)
+        return
     if (show):
         try:
             print(msg)

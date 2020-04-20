@@ -282,6 +282,10 @@ def merge_according_cmdline(args):
     slaveapk = os.path.abspath(args[1])
     mergeapk_batch(masterapk, slaveapk, None, None, None)
 
+def mergeapk_byargs(masterapk, slaveapk, debugmode, outputformat):
+    DEBUG_MODE = debugmode
+    NAME_TEMPLATE = outputformat
+    mergeapk_batch(masterapk, slaveapk, None, None, None)
 #############################################################################
 if (__name__ == "__main__"):
     try:
