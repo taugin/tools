@@ -44,6 +44,7 @@ def merge_exist(masterfile, slavefile, override):
             #如果资源内容为空，则不需要合并
             return True
         namelist = {}
+        attrOveride = False
         for item in masterchildren:
             namelist[item.get("name")] = item
 
@@ -57,8 +58,14 @@ def merge_exist(masterfile, slavefile, override):
                 if value == None:
                     masterroot.append(item)
                 else:
+                    #当资源tag为attr时，留下内容长的值
+                    if(item.tag == "attr" and len(ET.tostring(item)) > len(ET.tostring(value))):
+                        attrOveride = True
+                        #Log.out("name : %s" % name, True)
+                    else:
+                        attrOveride = False
                     #资源存在时
-                    if (override == True):
+                    if (override == True or attrOveride == True):
                         masterroot.remove(value)
                         masterroot.append(item)
         indent(masterroot)
