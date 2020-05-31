@@ -14,6 +14,7 @@ SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "..", "base", "signapk
 def apk_compile(folder, compileapk):
     thisdir = os.path.dirname(sys.argv[0])
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "b", folder, "-o", compileapk]
+    cmdlist += ["--only-main-classes"]
     Log.out("[Logging...] 回编文件名称 : [%s]" % compileapk)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
@@ -30,6 +31,7 @@ def apk_decompile(apkfile, decompiled_folder=None):
         decompiled_folder = name
 
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "d", "-f" , apkfile, "-o", decompiled_folder]
+    cmdlist += ["--only-main-classes"]
     Log.out("[Logging...] 反编文件名称 : [%s]" % apkfile)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
