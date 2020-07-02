@@ -29,8 +29,10 @@ KEYSTORES_DEFAULT_FILE = os.path.join(KEYSTORES_DIR, "commonalias_pwd_common1234
 #可执行文件后缀
 BIN_SUFFIX = ""
 if (platform.system().lower() == "windows"):
+    BIN_DIR = os.path.join(HOME_DIR, "bin")
     BIN_SUFFIX = ".exe"
 else:
+    BIN_DIR = os.path.join(HOME_DIR, "elf")
     BIN_SUFFIX = ""
 
 #路径分隔符    
