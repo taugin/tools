@@ -178,10 +178,70 @@ def getCmd():
     result = result.lower()
     return result
 
+def show_apk_detail(package):
+    if (SELECT_DEVICE != None and len(SELECT_DEVICE) > 0) :
+        cmdlist = [Common.ADB, "-s", SELECT_DEVICE, "shell", "pm", "query-activities", package]
+    else:
+        cmdlist = [Common.ADB, "-d", "shell", "pm", "query-activities", package]
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
+    tmppkg = ""
+    tmp = ""
+    str_list = []
+    alllines = process.stdout.readlines()
+    for line in alllines :
+        tmp = str(line, "utf-8")
+        tmp = tmp.replace("\r", "")
+        tmp = tmp.replace("\n", "")
+        tmp = tmp.strip()
+        tmpsplit = tmp.split(" ")
+        str_list += tmpsplit
+
+    for s in str_list:
+        detail = None
+        if s.startswith("nonLocalizedLabel="):
+            detail = s[len("nonLocalizedLabel="):]
+            if detail == "null":
+                detail = None
+            else:
+                detail = s
+        elif (s.startswith("sourceDir=")):
+            detail = s[len("sourceDir="):]
+            if detail == "null":
+                detail = None
+            else:
+                detail = s
+        elif (s.startswith("minSdkVersion=")):
+            detail = s[len("minSdkVersion="):]
+            if detail == "null":
+                detail = None
+            else:
+                detail = s
+        elif (s.startswith("targetSdkVersion=")):
+            detail = s[len("targetSdkVersion="):]
+            if detail == "null":
+                detail = None
+            else:
+                detail = s
+        elif (s.startswith("versionCode=")):
+            detail = s[len("versionCode="):]
+            if detail == "null":
+                detail = None
+            else:
+                detail = s
+        elif (s.startswith("dataDir=")):
+            detail = s[len("dataDir="):]
+            if detail == "null":
+                detail = None
+            else:
+                detail = s
+        if detail != None:
+            Log.out("[Logging...] 显示APK详情 : [%s]" % detail)
 def pullapk():
     global SELECT_DEVICE
     SELECT_DEVICE = get_select_devices()
     package = getpackage()
+    show_apk_detail(package)
+    #sys.exit()
     if (package != None):
         cmd = getCmd()
         if (cmd == "p"):
