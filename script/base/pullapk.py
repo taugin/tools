@@ -17,10 +17,10 @@ import time
 
 SELECT_DEVICE = None
 
-def input_no(start, end):
+def input_no(prompt, start, end):
     try:
         while True:
-            i = input("请输入设备顺序 : ")
+            i = input(prompt)
             if i != None and i.isdigit() and int(i) >= start and int(i) <= end:
                 return i
     except:
@@ -47,7 +47,9 @@ def get_select_devices():
                 Log.out("%s : %s" % (index + 1, devices[index][1]))
             no = 1
             if (len(devices) > 1):
-                no = input_no(1, len(devices))
+                no = input_no("请输入设备顺序 : ", 1, len(devices))
+            else:
+                Log.out("")
             return devices[int(no) - 1][0]
     except:
         pass
@@ -85,6 +87,7 @@ def getapkfile(package):
     else:
         cmdlist = [Common.ADB, "-d", "shell", "pm", "path", package]
     p = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
+    apkFileList = []
     apkfile = None
     if (p != None):
         for line in p.stdout.readlines():
@@ -93,13 +96,25 @@ def getapkfile(package):
             if (tmp.startswith("package:")):
                 tmp = tmp[len("package:"):]
                 if (tmp != None and len(tmp) > 1):
-                    Log.out("[Logging...] 顶层APK文件 : [%s]" % tmp)
-                    apkfile = tmp
+                    apkFileList += [tmp]
+
+    apkfilelen = len(apkFileList)
+    Log.out("[Logging...] 顶层APK数量 : [%d]" % apkfilelen)
+    if (apkfilelen > 1):
+        number = 1
+        for apk in apkFileList:
+            Log.out("[Logging...] 顶层APK文件 : [%d] [%s]" % (number, apk))
+            number = number + 1
+        index = input_no("[Logging...] 输入APK序号 : ", 1, apkfilelen)
+        apkfile = apkFileList[int(index) - 1]
+    elif (apkfilelen == 1):
+        apkfile = apkFileList[0]
+        Log.out("[Logging...] 顶层APK文件 : [%s]" % apkfile)
     return apkfile
 
 def pullspecapk(apkfile, package):
     if (apkfile != None and apkfile != ""):
-        Log.out("[Logging...] 正在获取APK")
+        Log.out("[Logging...] 获取APK文件 : [%s]" % apkfile)
         tempFile = "%s_%ld.apk" % (package, (time.time() * 1000))
         tempFile = os.path.join(os.getcwd(), tempFile)
         tempFile = os.path.normpath(tempFile)
@@ -109,7 +124,7 @@ def pullspecapk(apkfile, package):
             cmdlist = [Common.ADB, "-s", SELECT_DEVICE, "pull", apkfile, tempFile]
         else:
             cmdlist = [Common.ADB, "-d", "pull", apkfile, tempFile]
-        subprocess.call(cmdlist)
+        subprocess.call(cmdlist, stdout=subprocess.PIPE)
         if not os.path.exists(tempFile):
             return
         label = getlabel(tempFile)
@@ -172,6 +187,7 @@ def pullapk():
         if (cmd == "p"):
             apkfile = getapkfile(package)
             pullspecapk(apkfile, package)
+            time.sleep(3)
         elif (cmd == "u" and confirmUninstall()):
             uninstallApk(package)
             Log.out("[Logging...] 卸载APK成功 : [%s]" % package)
