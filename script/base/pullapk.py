@@ -182,9 +182,9 @@ def show_apk_detail(package):
     if (package == None or len(package) <= 0):
         return
     if (SELECT_DEVICE != None and len(SELECT_DEVICE) > 0) :
-        cmdlist = [Common.ADB, "-s", SELECT_DEVICE, "shell", "pm", "query-activities", package]
+        cmdlist = [Common.ADB, "-s", SELECT_DEVICE, "shell", "dumpsys", "package", package]
     else:
-        cmdlist = [Common.ADB, "-d", "shell", "pm", "query-activities", package]
+        cmdlist = [Common.ADB, "-d", "shell", "dumpsys", "package", package]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     tmppkg = ""
     tmp = ""
@@ -199,45 +199,15 @@ def show_apk_detail(package):
         str_list += tmpsplit
 
     for s in str_list:
-        detail = None
-        if s.startswith("nonLocalizedLabel="):
-            detail = s[len("nonLocalizedLabel="):]
-            if detail == "null":
-                detail = None
-            else:
-                detail = s
-        elif (s.startswith("sourceDir=")):
-            detail = s[len("sourceDir="):]
-            if detail == "null":
-                detail = None
-            else:
-                detail = s
-        elif (s.startswith("minSdkVersion=")):
-            detail = s[len("minSdkVersion="):]
-            if detail == "null":
-                detail = None
-            else:
-                detail = s
-        elif (s.startswith("targetSdkVersion=")):
-            detail = s[len("targetSdkVersion="):]
-            if detail == "null":
-                detail = None
-            else:
-                detail = s
-        elif (s.startswith("versionCode=")):
+        if (s.startswith("versionCode=")):
             detail = s[len("versionCode="):]
-            if detail == "null":
-                detail = None
-            else:
-                detail = s
-        elif (s.startswith("dataDir=")):
-            detail = s[len("dataDir="):]
-            if detail == "null":
-                detail = None
-            else:
-                detail = s
-        if detail != None:
-            Log.out("[Logging...] 显示APK详情 : [%s]" % detail)
+            if detail != "null":
+                Log.out("[Logging...] 显示APK版本 : [%s]" % detail)
+        elif (s.startswith("versionName=")):
+            detail = s[len("versionName="):]
+            if detail != "null":
+                Log.out("[Logging...] 显示APK版本 : [%s]" % detail)
+
 def pullapk():
     global SELECT_DEVICE
     SELECT_DEVICE = get_select_devices()
