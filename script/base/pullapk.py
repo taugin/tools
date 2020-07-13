@@ -179,6 +179,8 @@ def getCmd():
     return result
 
 def show_apk_detail(package):
+    if (package == None or len(package) <= 0):
+        return
     if (SELECT_DEVICE != None and len(SELECT_DEVICE) > 0) :
         cmdlist = [Common.ADB, "-s", SELECT_DEVICE, "shell", "pm", "query-activities", package]
     else:
