@@ -63,7 +63,7 @@ LANGUAGES = {
   "mr": "marathi|马拉",
   "ms": "malay|马来语",
   "mt": "maltese|马耳他语",
-  "my": "myanmar (burmese)|缅甸(缅甸语)",
+  "my": "myanmar (burmese)|缅甸语",
   "ne": "nepali|尼泊尔",
   "nl": "dutch|荷兰人",
   "no": "norwegian|挪威",
