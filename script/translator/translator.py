@@ -112,11 +112,12 @@ def input_language():
 def translate_xml(from_language, to_language, xmlfile):
     #创建目标文档 start
     filedir = os.path.dirname(xmlfile)
+    basename = os.path.basename(xmlfile)
     to_dir = "values-%s" % to_language
     dst_dir = os.path.join(filedir, to_dir)
     if not os.path.exists(dst_dir):
         os.mkdir(dst_dir)
-    dstfile = os.path.join(dst_dir, "values.xml")
+    dstfile = os.path.join(dst_dir, basename)
     toDoc = Document()  #创建DOM文档对象
     toRoot = toDoc.createElement('resources') #创建根元素
     toDoc.appendChild(toRoot)
@@ -150,10 +151,10 @@ def translate_xml(from_language, to_language, xmlfile):
             toRoot.appendChild(element)
             index = index + 1
     print("-----------------------------------------------------------------------")
-    print("[Logging...] 翻译字符串数量：[%s]" % len(toRoot.childNodes))
+    print("[Logging...] 翻译字符数量 : [%s]" % len(toRoot.childNodes))
     if not toRoot.hasChildNodes():
         return
-    print("[Logging...] 正在写入文件")
+    print("[Logging...] 正在写入文件 : [%s]" % dstfile)
     if os.path.exists(dstfile):
         os.remove(dstfile)
     f = open(dstfile,'wb')
@@ -163,7 +164,7 @@ def translate_xml(from_language, to_language, xmlfile):
     aroot = atree.getroot()
     indent(aroot)
     atree.write(dstfile, encoding='utf-8', xml_declaration=True)
-    print("[Logging...] 写入文件完成")
+    print("[Logging...] 写入文件完成 : [%s]" % dstfile)
 
 if (__name__ == "__main__"):
     
