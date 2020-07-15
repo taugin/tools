@@ -140,7 +140,7 @@ def translate_xml(from_language, to_language, xmlfile):
         f.close()
         if os.path.exists(dstfile):
             os.remove(dstfile)
-        f = open(dstfile,'w')
+        f = open(dstfile,'wb')
         f.write(toDoc.toxml(encoding="utf-8"))
         f.close()
     print("写入文件完成...")
