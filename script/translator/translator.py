@@ -137,7 +137,7 @@ def translate_xml(from_language, to_language, xmlfile):
             continue
         space = (max_len - len(child.attrib["name"])) * " "
         if ("translatable" in child.attrib and child.attrib["translatable"] == "false"):
-            print("%3. s%s%s : %s -> %s" % (index, child.attrib["name"], space, child.text, "不需要翻译"))
+            print("%3s. %s%s : %s -> %s" % (index, child.attrib["name"], space, child.text, "不需要翻译"))
             continue
         if child.text == None or len(child.text) <= 0:
             continue
