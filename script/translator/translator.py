@@ -128,6 +128,8 @@ def translate_xml(from_language, to_language, xmlfile):
     max_len = calc_attrib_maxlen(children)
     index = 1
     for child in children:
+        if not "name" in child.attrib:
+            continue
         space = (max_len - len(child.attrib["name"])) * " "
         if ("translatable" in child.attrib and child.attrib["translatable"] == "false"):
             print("%3. s%s%s : %s -> %s" % (index, child.attrib["name"], space, child.text, "不需要翻译"))
@@ -143,20 +145,15 @@ def translate_xml(from_language, to_language, xmlfile):
             element.appendChild(textNode)
             toRoot.appendChild(element)
             index = index + 1
+    print("翻译字符串数量：%s" % len(toRoot.childNodes))
+    if not toRoot.hasChildNodes():
+        return
     print("正在写入文件...")
     if os.path.exists(dstfile):
         os.remove(dstfile)
-    f = open(dstfile,'w')
-    try :
-        toDoc.writexml(f, indent='\t', addindent='\t', newl='\n', encoding="utf-8")
-        f.close()
-    except:
-        f.close()
-        if os.path.exists(dstfile):
-            os.remove(dstfile)
-        f = open(dstfile,'wb')
-        f.write(toDoc.toxml(encoding="utf-8"))
-        f.close()
+    f = open(dstfile,'wb')
+    f.write(toDoc.toxml(encoding="utf-8"))
+    f.close()
     atree = ET.parse(dstfile)
     aroot = atree.getroot()
     indent(aroot)
