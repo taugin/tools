@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from xml.dom.minidom import Document
 import os
+import sys
 
 def calc_maxlen(all_language):
     max_len = 0
@@ -48,7 +49,7 @@ def input_no(prompt):
             if i != None and i in list_keys:
                 return i
     except:
-        Log.out("")
+        print("")
     return None
 
 def input_language():
@@ -61,32 +62,50 @@ def input_language():
 
 def translate_xml(from_language, to_language, xmlfile):
     if not os.path.exists(xmlfile):
+        print("%s 不存在" % xmlfile)
         sys.exit(0)
+    #创建目标文档 start
     filedir = os.path.dirname(xmlfile)
     to_dir = "values-%s" % to_language
     dst_dir = os.path.join(filedir, to_dir)
     if not os.path.exists(dst_dir):
         os.mkdir(dst_dir)
-    print(dst_dir)
-    doc = Document()  #创建DOM文档对象
-    root = doc.createElement('resources') #创建根元素
-    doc.appendChild(root)
-    #return
-    tree = ET.parse(xmlfile)
-    root = tree.getroot()
-    children = list(root)
+    dstfile = os.path.join(dst_dir, "values.xml")
+    toDoc = Document()  #创建DOM文档对象
+    toRoot = toDoc.createElement('resources') #创建根元素
+    toDoc.appendChild(toRoot)
+    #创建目标文档 end
+    try:
+        fromTree = ET.parse(xmlfile)
+    except:
+        print("xml文件[%s]解析错误" % xmlfile)
+        return
+    fromRoot = fromTree.getroot()
+    children = list(fromRoot)
     for child in children:
         result = translate(child.text, from_language, to_language)
         print("%s -> %s" % (child.text, result))
-        #print("%s" % child.attrib["name"])
-        element = ET.Element("string", attrib={"name":child.attrib["name"]})
-        element.text = result
-        root.append(element)
-    print("")
-    for r in root:
-        print("%s : %s" % (r.attrib["name"], r.text))
+        element = toDoc.createElement("string")
+        element.setAttribute("name", child.attrib["name"])
+        textNode = toDoc.createTextNode(result)
+        element.appendChild(textNode)
+        toRoot.appendChild(element)
+    print("正在写入文件...")
+    if os.path.exists(dstfile):
+        os.remove(dstfile)
+    f = open(dstfile,'w')
+    toDoc.writexml(f, indent='\t', addindent='\t', newl='\n')
+    f.close()
+    print("写入文件完成...")
+
+if (__name__ == "__main__"):
+    
+    if (len(sys.argv) < 2):
+        print("缺少参数 %s <string.xml>" % os.path.basename(sys.argv[0]))
+        sys.exit(0)
+    xmlfile = sys.argv[1]
 show_all_support_language()
 from_language, to_language = input_language()
-translate_xml(from_language, to_language, r"D:\temp\rpa_strings.xml")
+translate_xml(from_language, to_language, xmlfile)
 
 #后续可以读取xml，然后翻译之后，在写入xml
