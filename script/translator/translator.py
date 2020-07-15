@@ -85,25 +85,28 @@ def translate(text, from_language, to_language):
         pass
     return None
 
-def input_no(prompt):
-    list_keys= [ i for i in LANGUAGES.keys()]
+def input_no(prompt, auto = False):
+    list_keys= [ key for key in LANGUAGES.keys()]
     try:
         while True:
-            i = input(prompt)
-            if i != None and i in list_keys:
-                return i
+            if auto:
+                raw_str = input(prompt) or "auto"
+            else:
+                raw_str = input(prompt)
+            if raw_str != None and raw_str in list_keys:
+                return raw_str
     except:
         print("")
     return None
 
 def input_language():
-    from_language = input_no("请输入源语言：")
+    from_language = input_no("[Logging...] 请输入源语言(默认auto)：", True)
     if from_language == None or len(from_language) <= 0:
         from_language = "auto"
-    to_language = input_no("请输入目标语言：")
+    to_language = input_no("[Logging...] 请输入目标语言：")
     if from_language == None or to_language == None:
         sys.exit(0)
-    print("源语言：%s(%s) -> 目标语言 ：%s(%s)" % (LANGUAGES[from_language].split("|")[1] , from_language, LANGUAGES[to_language].split("|")[1] , to_language))
+    print("[Logging...] 待翻译语言 : [%s(%s)] -> 目标语言 : [%s(%s)]" % (LANGUAGES[from_language].split("|")[1] , from_language, LANGUAGES[to_language].split("|")[1] , to_language))
     return from_language, to_language
 
 def translate_xml(from_language, to_language, xmlfile):
@@ -121,12 +124,13 @@ def translate_xml(from_language, to_language, xmlfile):
     try:
         fromTree = ET.parse(xmlfile)
     except:
-        print("xml文件[%s]解析错误" % xmlfile)
+        print("[Logging...] 文件解析错误[%s]" % xmlfile)
         return
     fromRoot = fromTree.getroot()
     children = list(fromRoot)
     max_len = calc_attrib_maxlen(children)
     index = 1
+    print("-----------------------------------------------------------------------")
     for child in children:
         if not "name" in child.attrib:
             continue
@@ -145,10 +149,11 @@ def translate_xml(from_language, to_language, xmlfile):
             element.appendChild(textNode)
             toRoot.appendChild(element)
             index = index + 1
-    print("翻译字符串数量：%s" % len(toRoot.childNodes))
+    print("-----------------------------------------------------------------------")
+    print("[Logging...] 翻译字符串数量：[%s]" % len(toRoot.childNodes))
     if not toRoot.hasChildNodes():
         return
-    print("正在写入文件...")
+    print("[Logging...] 正在写入文件")
     if os.path.exists(dstfile):
         os.remove(dstfile)
     f = open(dstfile,'wb')
@@ -158,7 +163,7 @@ def translate_xml(from_language, to_language, xmlfile):
     aroot = atree.getroot()
     indent(aroot)
     atree.write(dstfile, encoding='utf-8', xml_declaration=True)
-    print("写入文件完成...")
+    print("[Logging...] 写入文件完成")
 
 if (__name__ == "__main__"):
     
@@ -172,5 +177,5 @@ if not os.path.exists(xmlfile):
 show_all_support_language()
 from_language, to_language = input_language()
 translate_xml(from_language, to_language, xmlfile)
-
+sys.exit(0)
 #后续可以读取xml，然后翻译之后，在写入xml
