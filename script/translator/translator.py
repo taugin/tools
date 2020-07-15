@@ -24,15 +24,37 @@ def calc_maxlen(all_language):
     return max_len
 
 def show_all_support_language():
+    max_column = 4
     max_len = calc_maxlen(LANGUAGES)
     all_languages = sorted(LANGUAGES.keys())
     index = 1
+    column_width = max_len * 2 + 14 + 4
+    sys.stdout.write("+")
+    sys.stdout.write("-" * (column_width * max_column - 1))
+    sys.stdout.write("+\n")
     for item in all_languages:
         c = LANGUAGES[item].split("|")[1]
         leftspace = max_len - len(c)
         space = (2 * leftspace + 2) * " "
-        print("%3d : %s%s%s" % (index, c, space, item))
+        if index % max_column == 0:
+            newl = "\n"
+        else:
+            newl = ""
+        if index % max_column == 1:
+            line = "|"
+        else:
+            line = ""
+        sys.stdout.write("%s%3d : %s%s%8s |%s" % (line, index, c, space, item, newl))
+        #if newl == "\n":
+        #    sys.stdout.write("+")
+        #    sys.stdout.write("-" * (column_width * max_column - 1))
+        #    sys.stdout.write("+\n")
         index += 1
+    if len(all_languages) % max_column != 0:
+        sys.stdout.write("\n")
+    sys.stdout.write("+")
+    sys.stdout.write("-" * (column_width * max_column - 1))
+    sys.stdout.write("+\n")
 
 def translate(text, from_language, to_language):
     try:
