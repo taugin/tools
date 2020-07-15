@@ -16,13 +16,63 @@ import subprocess
 SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "signapk.py")
 INSTALL_FILE = os.path.join(os.path.dirname(sys.argv[0]), "sf.py")
 
+def parseString(line):
+    format_code = ["utf8", "gbk", "gb2312"]
+    result = "";
+    for f in format_code:
+        try:
+            result = line.decode(f, "ignore")
+            return result
+        except:
+            pass
+    return result
+
+def getApkInfo(apkFile):
+    pkgname = ""
+    vercode = ""
+    vername = ""
+    apklabel = ""
+    try:
+        cmdlist = [Common.AAPT_BIN, "d", "badging", apkFile]
+        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+        alllines = process.stdout.readlines()
+        for line in alllines :
+            tmp = parseString(line)
+            if (tmp.startswith("package: ")):
+                try:
+                    tmppkg = tmp[len("package: "):]
+                    tmppkg = tmppkg.replace("\r", "")
+                    tmppkg = tmppkg.replace("\n", "")
+                    tmppkg = tmppkg.replace("'", "")
+                    tmpsplit = tmppkg.split(" ")
+                    if tmpsplit != None and len(tmpsplit) >= 3:
+                        pkgname = tmpsplit[0].split("=")[1]
+                        vercode = tmpsplit[1].split("=")[1]
+                        vername = tmpsplit[2].split("=")[1]
+                except:
+                    pass
+            elif (tmp.startswith("application-label")):
+                try:
+                    tmppkg = tmp
+                    tmppkg = tmppkg.replace("\r", "")
+                    tmppkg = tmppkg.replace("\n", "")
+                    tmppkg = tmppkg.replace("'", "")
+                    label = tmppkg.split(":")[1]
+                    apklabel = label
+                except:
+                    pass
+    except:
+        pass
+    return pkgname, vercode, vername, apklabel
+
 def apktool_cmd():
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR]
     cmdlist += sys.argv[1:]
     cmdlist += ["--only-main-classes"]
-    Log.out("[Logging...]执行操作 ：\n[%s]\n" % " ".join(cmdlist))
-    Log.out("[Logging...]显示详情 ：")
+    Log.out("[Logging...] 执行操作 ：\n[%s]\n" % " ".join(cmdlist))
+    Log.out("[Logging...] 显示详情")
     ret = subprocess.call(cmdlist)
+    Log.out("[Logging...] 编译完成")
     if (ret == 0) :
         return True
     else:
@@ -57,6 +107,19 @@ def installApk(finalapk):
     cmdlist = ["python", INSTALL_FILE, "-i", finalapk]
     subprocess.call(cmdlist)
 
+def showApkInfo(apkFile):
+    Log.out("")
+    pkgname, vercode, vername, apklabel = getApkInfo(srcapk)
+    output = " 应用路径 : [%s] " % srcapk
+    Log.out("[Logging...]%s" %output)
+    output = " 应用名称 : [%s] " % apklabel
+    Log.out("[Logging...]%s" %output)
+    output = " 应用包名 : [%s] " % pkgname
+    Log.out("[Logging...]%s" %output)
+    output = " 应用版本 : [%s] " % vercode
+    Log.out("[Logging...]%s" %output)
+    output = " 应用版本 : [%s] " % vername
+    Log.out("[Logging...]%s" %output)
 ret = apktool_cmd()
 
 #回编译签名
@@ -68,6 +131,7 @@ if (ret and len(sys.argv) > 1 and sys.argv[1] == "b"):
     for op, value in opts:
         if (op == "-o"):
             srcapk = value
+    showApkInfo(srcapk)
     if (srcapk != None and len(srcapk) > 0) :
         (tmpname, ext) = os.path.splitext(srcapk)
         signedapk = tmpname + "-signed.apk"
