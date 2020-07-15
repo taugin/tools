@@ -65,7 +65,7 @@ AXML_EDITOR = os.path.join(LIB_DIR, "AXMLEditor.jar");
 #########################可执行文件文件路径定义#################################
 
 #AAPT可执行文件
-AAPT_BIN = os.path.join(BIN_DIR, "aapt%s" % BIN_SUFFIX)
+AAPT_BIN = os.path.join(BIN_DIR, "aapt2%s" % BIN_SUFFIX)
 
 #keytool可执行文件
 KEYTOOL = "keytool"
