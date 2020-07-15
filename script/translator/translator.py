@@ -112,26 +112,37 @@ def translate_xml(from_language, to_language, xmlfile):
     fromRoot = fromTree.getroot()
     children = list(fromRoot)
     max_len = calc_attrib_maxlen(children)
+    index = 1
     for child in children:
         space = (max_len - len(child.attrib["name"])) * " "
         if ("translatable" in child.attrib and child.attrib["translatable"] == "false"):
-            print("%s%s : %s -> %s" % (child.attrib["name"], space, child.text, "不需要翻译"))
+            print("%3. s%s%s : %s -> %s" % (index, child.attrib["name"], space, child.text, "不需要翻译"))
             continue
         if child.text == None or len(child.text) <= 0:
             continue
         result = translate(child.text, from_language, to_language)
-        print("%s%s : %s -> %s" % (child.attrib["name"], space, child.text, result))
-        element = toDoc.createElement("string")
-        element.setAttribute("name", child.attrib["name"])
-        textNode = toDoc.createTextNode(result)
-        element.appendChild(textNode)
-        toRoot.appendChild(element)
+        print("%3s. %s%s : %s -> %s" % (index, child.attrib["name"], space, child.text, result))
+        if result != None and len(result) > 0:
+            element = toDoc.createElement("string")
+            element.setAttribute("name", child.attrib["name"])
+            textNode = toDoc.createTextNode(result)
+            element.appendChild(textNode)
+            toRoot.appendChild(element)
+            index = index + 1
     print("正在写入文件...")
     if os.path.exists(dstfile):
         os.remove(dstfile)
     f = open(dstfile,'w')
-    toDoc.writexml(f, indent='\t', addindent='\t', newl='\n', encoding="utf-8")
-    f.close()
+    try :
+        toDoc.writexml(f, indent='\t', addindent='\t', newl='\n', encoding="utf-8")
+        f.close()
+    except:
+        f.close()
+        if os.path.exists(dstfile):
+            os.remove(dstfile)
+        f = open(dstfile,'w')
+        f.write(toDoc.toxml(encoding="utf-8"))
+        f.close()
     print("写入文件完成...")
 
 if (__name__ == "__main__"):
