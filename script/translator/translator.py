@@ -23,10 +23,18 @@ def calc_maxlen(all_language):
                 max_len = ilen
     return max_len
 
+def calc_attrib_maxlen(children):
+    max_len = 0
+    for key in children:
+        if key != None and "name" in key.attrib:
+            ilen = len(key.attrib["name"])
+            if ilen > max_len:
+                max_len = ilen
+    return max_len
 def show_all_support_language():
     max_column = 4
     max_len = calc_maxlen(LANGUAGES)
-    all_languages = sorted(LANGUAGES.keys())
+    all_languages = LANGUAGES.keys()
     index = 1
     column_width = max_len * 2 + 14 + 4
     sys.stdout.write("+")
@@ -76,6 +84,8 @@ def input_no(prompt):
 
 def input_language():
     from_language = input_no("请输入源语言：")
+    if from_language == None or len(from_language) <= 0:
+        from_language = "auto"
     to_language = input_no("请输入目标语言：")
     if from_language == None or to_language == None:
         sys.exit(0)
@@ -83,9 +93,6 @@ def input_language():
     return from_language, to_language
 
 def translate_xml(from_language, to_language, xmlfile):
-    if not os.path.exists(xmlfile):
-        print("%s 不存在" % xmlfile)
-        sys.exit(0)
     #创建目标文档 start
     filedir = os.path.dirname(xmlfile)
     to_dir = "values-%s" % to_language
@@ -104,9 +111,16 @@ def translate_xml(from_language, to_language, xmlfile):
         return
     fromRoot = fromTree.getroot()
     children = list(fromRoot)
+    max_len = calc_attrib_maxlen(children)
     for child in children:
+        space = (max_len - len(child.attrib["name"])) * " "
+        if ("translatable" in child.attrib and child.attrib["translatable"] == "false"):
+            print("%s%s : %s -> %s" % (child.attrib["name"], space, child.text, "不需要翻译"))
+            continue
+        if child.text == None or len(child.text) <= 0:
+            continue
         result = translate(child.text, from_language, to_language)
-        print("%s -> %s" % (child.text, result))
+        print("%s%s : %s -> %s" % (child.attrib["name"], space, child.text, result))
         element = toDoc.createElement("string")
         element.setAttribute("name", child.attrib["name"])
         textNode = toDoc.createTextNode(result)
@@ -116,7 +130,7 @@ def translate_xml(from_language, to_language, xmlfile):
     if os.path.exists(dstfile):
         os.remove(dstfile)
     f = open(dstfile,'w')
-    toDoc.writexml(f, indent='\t', addindent='\t', newl='\n')
+    toDoc.writexml(f, indent='\t', addindent='\t', newl='\n', encoding="utf-8")
     f.close()
     print("写入文件完成...")
 
@@ -126,6 +140,9 @@ if (__name__ == "__main__"):
         print("缺少参数 %s <string.xml>" % os.path.basename(sys.argv[0]))
         sys.exit(0)
     xmlfile = sys.argv[1]
+if not os.path.exists(xmlfile):
+        print("%s 不存在" % xmlfile)
+        sys.exit(0)
 show_all_support_language()
 from_language, to_language = input_language()
 translate_xml(from_language, to_language, xmlfile)

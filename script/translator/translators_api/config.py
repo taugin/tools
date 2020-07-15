@@ -1,4 +1,5 @@
 LANGUAGES = {
+  "auto": "auto|自动检测",
   "af": "afrikaans|南非荷兰语",
   "am": "amharic|阿姆哈拉语",
   "ar": "arabic|阿拉伯",
