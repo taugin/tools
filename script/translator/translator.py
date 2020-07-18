@@ -142,7 +142,10 @@ def translate_xml(from_language, to_language, xmlfile):
         if child.text == None or len(child.text) <= 0:
             continue
         result = translate(child.text, from_language, to_language)
-        print("%3s. %s%s : %s -> %s" % (index, child.attrib["name"], space, child.text, result))
+        try:
+            print("%3s. %s%s : %s -> %s" % (index, child.attrib["name"], space, child.text, result))
+        except Exception as e:
+            print("%3s. %s%s : %s -> %s" % (index, child.attrib["name"], space, child.text, "输出结果异常：[%s]" % e))
         if result != None and len(result) > 0:
             element = toDoc.createElement("string")
             element.setAttribute("name", child.attrib["name"])
