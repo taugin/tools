@@ -137,7 +137,12 @@ REG_TEMPLATE = \
 [HKEY_CLASSES_ROOT\Directory\Background\shell\PullApk\command]
 @="$PYTHON_PATH $TOOLS_ROOT\\\\script\\\\base\\\\pullapk.py"
 
-#
+[HKEY_CLASSES_ROOT\Directory\Background\shell\命令提示符]
+"Icon"="$CMD_PATH"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\命令提示符\command]
+@="cmd /k"
+
 [HKEY_CLASSES_ROOT\mydexfile\shell\open]
 "Icon"="$WINRAR_PATH"
 
