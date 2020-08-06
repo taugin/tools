@@ -140,7 +140,7 @@ def pullspecapk(apkfile, package):
 def getlabel(apkFile):
     label = None
     try:
-        cmdlist = [Common.AAPT_BIN, "d", "badging", apkFile]
+        cmdlist = [Common.AAPT2_BIN, "d", "badging", apkFile]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
         tmppkg = ""
         tmp = ""

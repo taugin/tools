@@ -150,10 +150,6 @@ def merge_apkfile(mergedapk, masterapk, slaveapk, company_name):
         Log.out("[Logging...] 无法定位文件 %s" % slaveapk, True)
         sys.exit(0)
 
-    #subprocess.call([Common.AAPT_BIN, "r", mergedapk, Common.PLUGIN_FILE], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    #subprocess.call([Common.AAPT_BIN, "r", mergedapk, Common.ITEM_MAPPER], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    #subprocess.call([Common.AAPT_BIN, "r", mergedapk, Common.PAY_STUBDATA], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
     copy_masterapk(mergedapk, masterapk)
     copy_slaveapk(mergedapk, slaveapk)
 

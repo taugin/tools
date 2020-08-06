@@ -92,7 +92,7 @@ def fun_alignapk(mastersignedapk, masterfinalapk):
 def get_app_info(apkFile):
     '''输出apk的包信息'''
     apk_info = {}
-    cmdlist = [Common.AAPT_BIN, "d", "badging", apkFile]
+    cmdlist = [Common.AAPT2_BIN, "d", "badging", apkFile]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
 
     tmppkg = ""
