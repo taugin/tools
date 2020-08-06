@@ -32,6 +32,8 @@ def getApkInfo(apkFile):
     vercode = ""
     vername = ""
     apklabel = ""
+    targetSdkVersion = ""
+    minSdkVersion = ""
     try:
         cmdlist = [Common.AAPT2_BIN, "d", "badging", apkFile]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
@@ -61,9 +63,29 @@ def getApkInfo(apkFile):
                     apklabel = label
                 except:
                     pass
+            elif (tmp.startswith("targetSdkVersion")):
+                try:
+                    tmppkg = tmp
+                    tmppkg = tmppkg.replace("\r", "")
+                    tmppkg = tmppkg.replace("\n", "")
+                    tmppkg = tmppkg.replace("'", "")
+                    label = tmppkg.split(":")[1]
+                    targetSdkVersion = label
+                except:
+                    pass
+            elif (tmp.startswith("sdkVersion")):
+                try:
+                    tmppkg = tmp
+                    tmppkg = tmppkg.replace("\r", "")
+                    tmppkg = tmppkg.replace("\n", "")
+                    tmppkg = tmppkg.replace("'", "")
+                    label = tmppkg.split(":")[1]
+                    minSdkVersion = label
+                except:
+                    pass
     except:
         pass
-    return pkgname, vercode, vername, apklabel
+    return pkgname, vercode, vername, apklabel, targetSdkVersion, minSdkVersion
 
 def apktool_cmd():
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR]
@@ -109,7 +131,7 @@ def installApk(finalapk):
 
 def showApkInfo(apkFile):
     Log.out("")
-    pkgname, vercode, vername, apklabel = getApkInfo(srcapk)
+    pkgname, vercode, vername, apklabel, targetSdkVersion, minSdkVersion = getApkInfo(srcapk)
     output = " 应用路径 : [%s] " % srcapk
     Log.out("[Logging...]%s" %output)
     output = " 应用名称 : [%s] " % apklabel
@@ -119,6 +141,10 @@ def showApkInfo(apkFile):
     output = " 应用版本 : [%s] " % vercode
     Log.out("[Logging...]%s" %output)
     output = " 应用版本 : [%s] " % vername
+    Log.out("[Logging...]%s" %output)
+    output = " 最小版本 : [%s] " % minSdkVersion
+    Log.out("[Logging...]%s" %output)
+    output = " 目标版本 : [%s] " % targetSdkVersion
     Log.out("[Logging...]%s" %output)
 ret = apktool_cmd()
 
