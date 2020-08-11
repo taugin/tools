@@ -42,6 +42,18 @@ apk_info["target_version"] = None
 apk_info["min_version"] = None
 apk_info["sign_detail"] = None
 
+def addColonForString(ori_string):
+    step = 2
+    size = len(ori_string)
+    dst_string = ""
+    index = 0
+    for s in ori_string:
+        dst_string += s
+        if (index % 2 == 1 and index < size - 1):
+            dst_string += ":"
+        index += 1
+    return dst_string
+
 def md5_classes(apkFile):
     '''    输出classes.dex的MD5    '''
     global apk_info
@@ -52,7 +64,7 @@ def md5_classes(apkFile):
             signfile = f
     if (signfile != ""):
         result = hashlib.md5(z.read(signfile)).hexdigest()
-        apk_info["classes_md5"] = result
+        apk_info["classes_md5"] = addColonForString(result.upper())
     z.close()
 
 def printsign_md5(apkFile, signFile):
@@ -69,16 +81,17 @@ def printsign_md5(apkFile, signFile):
         tmp = str(line, "gbk")
         if (apk_info["sign_detail"] == None and (tmp != None and len(tmp) > 0)):
             apk_info["sign_detail"] = tmp[0:len(tmp) - 1]
+            apk_info["sign_detail"] = apk_info["sign_detail"].replace("所有者: ", "")
         tmp = tmp.strip().lower()
         if (tmp.startswith("md5")):
             tmp = tmp[len("md5") + 1:]
-            sign_md5 = tmp.replace(":", "").strip()
+            sign_md5 = tmp.replace(":", ":").strip().upper()
         if (tmp.startswith("sha256")):
             tmp = tmp[len("sha256") + 1:]
-            sign_sha256 = tmp.strip()
+            sign_sha256 = tmp.strip().upper()
         if (tmp.startswith("sha1")):
             tmp = tmp[len("sha1") + 1:]
-            sign_sha1 = tmp.strip()
+            sign_sha1 = tmp.strip().upper()
     apk_info["sign_md5"] = sign_md5
     apk_info["sign_sha256"] = sign_sha256
     apk_info["sign_sha1"] = sign_sha1
@@ -224,7 +237,7 @@ def file_md5(strFile):
         bytesRead = file.read(1024)
     file.close()
     md5value = m.hexdigest()
-    apk_info["apk_md5"] = md5value
+    apk_info["apk_md5"] = addColonForString(md5value.upper())
 
 def file_sh1(strFile):
     global apk_info
@@ -236,7 +249,7 @@ def file_sh1(strFile):
         bytesRead = file.read(1024)
     file.close()
     sh1value = sha1.hexdigest()
-    apk_info["apk_sha1"] = sh1value
+    apk_info["apk_sha1"] = addColonForString(sh1value.upper())
 
 def file_size(strFile):
     try:
@@ -350,7 +363,7 @@ def calc_maxlen():
     global apk_info
     max_len = 0
     for key in apk_info:
-        if apk_info[key] != None and key != "sign_detail":
+        if apk_info[key] != None:
             ilen = len(apk_info[key])
             if ilen > max_len:
                 max_len = ilen
