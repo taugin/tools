@@ -437,7 +437,7 @@ def print_apkinfo():
 
 # start ============================================================================================
 if (len(sys.argv) < 2):
-    Log.out("[Logging...] 缺少参数 : %s <src_apk> 输出APK文件信息" % os.path.basename(sys.argv[0]), True);
+    Log.out("[Logging...] 脚本缺少参数 : %s <src_apk> 输出APK文件信息" % os.path.basename(sys.argv[0]), True);
     sys.exit()
 
 try:

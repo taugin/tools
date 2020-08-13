@@ -205,7 +205,7 @@ def alignapk(unalignapk, finalapk):
 
 if __name__ == "__main__":
     if (len(sys.argv) < 2):
-        Log.out("[Logging...] 缺少参数, %s [-t] <src_apk>, [-a] 对齐apk" % os.path.basename(sys.argv[0]), True);
+        Log.out("[Logging...] 脚本缺少参数 : %s [-t] <src_apk>, [-a] 对齐apk" % os.path.basename(sys.argv[0]), True);
         sys.exit()
     opts, args = getopt.getopt(sys.argv[1:], "ato:")
     for op, value in opts:

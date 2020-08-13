@@ -74,7 +74,7 @@ def decrypt_string(key, input_string):
     Log.out("")
 # start ============================================================================================
 def usage():
-    Log.out("[Error...] 缺少参数 : %s -e/-d -k 123456 [-i inputfile -o outputfile]/[-s string]" % os.path.basename(sys.argv[0]), True);
+    Log.out("[Logging...] 脚本缺少参数 : %s -e/-d -k 123456 [-i inputfile -o outputfile]/[-s string]" % os.path.basename(sys.argv[0]), True);
 
 if (len(sys.argv) < 4):
     usage()
