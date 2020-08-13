@@ -91,7 +91,10 @@ def apktool_cmd():
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR]
     cmdlist += sys.argv[1:]
     cmdlist += ["--only-main-classes"]
-    Log.out("[Logging...] 执行操作 ：\n[%s]\n" % " ".join(cmdlist))
+    showlist = []
+    for cmd in cmdlist:
+        showlist += [os.path.basename(cmd)]
+    Log.out("[Logging...] 执行命令详情 : [%s]\n" % " ".join(showlist))
     Log.out("[Logging...] 显示详情")
     ret = subprocess.call(cmdlist)
     Log.out("[Logging...] 编译完成")

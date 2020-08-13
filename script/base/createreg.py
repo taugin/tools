@@ -14,13 +14,13 @@ REG_TEMPLATE = \
 "Icon"="$TOOLS_ROOT\\\\extra\\\\winreg\\\\android.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\open\command]
-@="$PYTHON_PATH $TOOLS_ROOT\\\\script\\\\base\\\\sf.py -i \\"%1\\""
+@="$TOOLS_ROOT\\\\bin\\\\sf.bat -i \\"%1\\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\为APK签名]
 "Icon"="$TOOLS_ROOT\\\\extra\\\\winreg\\\\qian.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\为APK签名\command]
-@="$PYTHON_PATH $TOOLS_ROOT\\\\script\\\\base\\\\signapk.py \\"%1\\""
+@="$TOOLS_ROOT\\\\bin\\\\signapk.bat \\"%1\\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\使用WinRAR打开]
 "Icon"="$WINRAR_PATH"
@@ -32,26 +32,26 @@ REG_TEMPLATE = \
 "Icon"="$TOOLS_ROOT\\\\extra\\\\winreg\\\\cha.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\查看APK信息\command]
-@="$PYTHON_PATH $TOOLS_ROOT\\\\script\\\\base\\\\sf.py -p \\"%1\\""
+@="$TOOLS_ROOT\\\\bin\\\\sf.bat -p \\"%1\\""
 
 #[HKEY_CLASSES_ROOT\myapkfile\shell\为APK加壳]
 
 #[HKEY_CLASSES_ROOT\myapkfile\shell\为APK加壳\command]
-#@="$PYTHON_PATH $TOOLS_ROOT\\\\script\\\\base\\\\modapk.py -e \\"%1\\""
+#@="$TOOLS_ROOT\\\\bin\\\\modapk.bat -e \\"%1\\""
 
 #[HKEY_CLASSES_ROOT\myapkfile\shell\生成调试APK]
 
 #[HKEY_CLASSES_ROOT\myapkfile\shell\生成调试APK\command]
-#@="$PYTHON_PATH $TOOLS_ROOT\\\\script\\\\base\\\\modapk.py -j \\"%1\\""
+#@="$TOOLS_ROOT\\\\bin\\\\modapk.bat -j \\"%1\\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\反编译]
 "Icon"="$TOOLS_ROOT\\\\extra\\\\winreg\\\\fan.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\反编译\command]
-@="$PYTHON_PATH $TOOLS_ROOT\\\\script\\\\base\\\\apktool.py d \\"%1\\" -f"
+@="$TOOLS_ROOT\\\\bin\\\\apktool.bat d \\"%1\\" -f"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK对齐\command]
-@="$PYTHON_PATH $TOOLS_ROOT\\\\script\\\\base\\\\signapk.py -a \\"%1\\""
+@="$TOOLS_ROOT\\\\bin\\\\signapk.bat -a \\"%1\\""
 
 [HKEY_CLASSES_ROOT\mydexfile\shell\DEX2JAR]
 "Icon"="$CMD_PATH"
@@ -111,31 +111,31 @@ REG_TEMPLATE = \
 "Icon"="$TOOLS_ROOT\\\\extra\\\\winreg\\\\hui.ico,0"
 
 [HKEY_CLASSES_ROOT\Directory\shell\编译APK\command]
-@="$PYTHON_PATH $TOOLS_ROOT\\\\script\\\\base\\\\apktool.py b \\"%1\\" -o \\"%1-recompile.apk\\""
+@="$TOOLS_ROOT\\\\bin\\\\apktool.bat b \\"%1\\" -o \\"%1-recompile.apk\\""
 
 [HKEY_CLASSES_ROOT\*\shell\查看MD5和SHA1]
 "Icon"="$TOOLS_ROOT\\\\extra\\\\winreg\\\\md5.ico,0"
 
 [HKEY_CLASSES_ROOT\*\shell\查看MD5和SHA1\command]
-@="$PYTHON_PATH $TOOLS_ROOT\\\\script\\\\base\\\\sf.py -m \\"%1\\""
+@="$TOOLS_ROOT\\\\bin\\\\sf.bat -m \\"%1\\""
 
 [HKEY_CLASSES_ROOT\*\shell\AES加密]
 "Icon"="$TOOLS_ROOT\\\\extra\\\\winreg\\\\jia.ico,0"
 
 [HKEY_CLASSES_ROOT\*\shell\AES加密\command]
-@="$PYTHON_PATH $TOOLS_ROOT\\\\script\\\\base\\\\aes.py -e -k 123456789 -i \\"%1\\""
+@="$TOOLS_ROOT\\\\bin\\\\aes.bat -e -k 123456789 -i \\"%1\\""
 
 [HKEY_CLASSES_ROOT\*\shell\AES解密]
 "Icon"="$TOOLS_ROOT\\\\extra\\\\winreg\\\\jie.ico,0"
 
 [HKEY_CLASSES_ROOT\*\shell\AES解密\command]
-@="$PYTHON_PATH $TOOLS_ROOT\\\\script\\\\base\\\\aes.py -d -k 123456789 -i \\"%1\\""
+@="$TOOLS_ROOT\\\\bin\\\\aes.bat -d -k 123456789 -i \\"%1\\""
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\PullApk]
 "Icon"="$TOOLS_ROOT\\\\extra\\\\winreg\\\\android.ico,0"
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\PullApk\command]
-@="$PYTHON_PATH $TOOLS_ROOT\\\\script\\\\base\\\\pullapk.py"
+@="$TOOLS_ROOT\\\\bin\\\\pullapk.bat"
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\命令提示符]
 "Icon"="$CMD_PATH"
@@ -168,7 +168,7 @@ REG_TEMPLATE = \
 "Icon"="$TOOLS_ROOT\\\\extra\\\\winreg\\\\zhuan.ico,0"
 
 [HKEY_CLASSES_ROOT\*\shell\Excel2Json\command]
-@="$PYTHON_PATH $TOOLS_ROOT\\\\script\\\\base\\\\excel2json.py \\"%1\\""
+@="$TOOLS_ROOT\\\\bin\\\\excel2json.bat \\"%1\\""
 '''
 
 import sys
