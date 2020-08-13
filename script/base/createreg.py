@@ -187,19 +187,19 @@ from string import Template
 THIS_FILE_DIR = os.path.dirname(sys.argv[0])
 TEMP_TOOLS_ROOT = os.path.normpath(os.path.join(THIS_FILE_DIR, "..", ".."))
 TEMP_TOOLS_ROOT = TEMP_TOOLS_ROOT.replace("\\", "\\\\")
-Log.out("[Logging...] TEMP_TOOLS_ROOT\t : %s" % TEMP_TOOLS_ROOT)
+Log.out("[Logging...] 脚本执行参数 : [%s]" % TEMP_TOOLS_ROOT)
 
 TEMP_WINRAR_PATH = "C:\Program Files\WinRAR\WinRar.exe"
 TEMP_WINRAR_PATH = TEMP_WINRAR_PATH.replace("\\", "\\\\")
-Log.out("[Logging...] TEMP_WINRAR_PATH\t : %s" % TEMP_WINRAR_PATH)
+Log.out("[Logging...] 脚本执行参数 : [%s]" % TEMP_WINRAR_PATH)
 
 TEMP_PYTHON_PATH = sys.executable
 TEMP_PYTHON_PATH = TEMP_PYTHON_PATH.replace("\\", "\\\\")
-Log.out("[Logging...] TEMP_PYTHON_PATH\t : %s" % TEMP_PYTHON_PATH)
+Log.out("[Logging...] 脚本执行参数 : [%s]" % TEMP_PYTHON_PATH)
 
 TEMP_CMD_PATH = os.popen("where cmd").readline().strip()
 TEMP_CMD_PATH = TEMP_CMD_PATH.replace("\\", "\\\\")
-Log.out("[Logging...] TEMP_CMD_PATH\t : %s" % TEMP_CMD_PATH)
+Log.out("[Logging...] 脚本执行参数 : [%s]" % TEMP_CMD_PATH)
 
 s = Template(REG_TEMPLATE)
 output = s.substitute(WINRAR_PATH=TEMP_WINRAR_PATH,TOOLS_ROOT=TEMP_TOOLS_ROOT, PYTHON_PATH=TEMP_PYTHON_PATH, CMD_PATH=TEMP_CMD_PATH)
@@ -209,5 +209,5 @@ reg_file = os.path.join(TEMP_TOOLS_ROOT, "extra", "winreg", "out.reg")
 f = open(reg_file, "w")
 f.write(output)
 f.close()
-Log.out("[Logging...] TEMP_REG_FILE\t : %s" % reg_file)
+Log.out("[Logging...] 脚本执行参数 : [%s]" % reg_file)
 Common.pause()

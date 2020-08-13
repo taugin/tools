@@ -172,7 +172,7 @@ def translate_xml(from_language, to_language, xmlfile):
 if (__name__ == "__main__"):
     
     if (len(sys.argv) < 2):
-        print("缺少参数 %s <string.xml>" % os.path.basename(sys.argv[0]))
+        print("[Logging...] 脚本执行错误 : 缺少参数 %s <string.xml>" % os.path.basename(sys.argv[0]))
         sys.exit(0)
     xmlfile = sys.argv[1]
 if not os.path.exists(xmlfile):
