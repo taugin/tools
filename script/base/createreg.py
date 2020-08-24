@@ -60,7 +60,7 @@ REG_TEMPLATE = \
 @="$TOOLS_ROOT\\\\bin\\\\dex2jar-2.0\\\\d2j-dex2jar.bat \\"%1\\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\JADX-GUI]
-"Icon"="$WINRAR_PATH"
+"Icon"="$TOOLS_ROOT\\\\extra\\\\winreg\\\\jadx.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\JADX-GUI\command]
 @="$TOOLS_ROOT\\\\bin\\\\jadx\\\\bin\\\\jadx-gui.bat \\"%1\\""
