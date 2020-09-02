@@ -178,6 +178,8 @@ def update_one_rfile(pubdict, rfile, rfolder):
     nid = None
     modify = False
     for index in range(len(conlist)):
+        oid = None
+        nid = None
         c = conlist[index]
         if (c.startswith(".field public static")):
             s = c.split(r" ")
@@ -187,10 +189,9 @@ def update_one_rfile(pubdict, rfile, rfolder):
                     continue
                 oid = s[6]
                 pubkey = "%s#%s" % (resname, restype)
-                if (pubkey not in pubdict):
-                    continue
-                nid = pubdict[pubkey]
-                if (nid != oid):
+                if (pubkey in pubdict):
+                    nid = pubdict[pubkey]
+                if (nid != None and nid != oid):
                     s[6] = nid
                     news = " ".join(s)
                     #Log.out("%s -> %s" % (c, news))

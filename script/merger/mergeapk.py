@@ -177,7 +177,7 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
     functions = []
     functions += [{"function":"fun_apk_decompile(masterapk, masterfolder)"}]
     functions += [{"function":"fun_apk_decompile(slaveapk, slavefolder)"}]
-    functions += [{"function":"fun_check_resdup(masterfolder, slavefolder)"}]
+    #functions += [{"function":"fun_check_resdup(masterfolder, slavefolder)"}]
 
     if (CHECK_DUP == False):
         functions += [{"function":"fun_merge_xml_change_pkg(masterfolder, slavefolder, newpkgname)"}]
