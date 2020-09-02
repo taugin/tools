@@ -183,8 +183,13 @@ def update_one_rfile(pubdict, rfile, rfolder):
             s = c.split(r" ")
             try:
                 resname = s[4].split(":")[0]
+                if len(s) <= 6:
+                    continue
                 oid = s[6]
-                nid = pubdict["%s#%s" % (resname, restype)]
+                pubkey = "%s#%s" % (resname, restype)
+                if (pubkey not in pubdict):
+                    continue
+                nid = pubdict[pubkey]
                 if (nid != oid):
                     s[6] = nid
                     news = " ".join(s)
@@ -192,8 +197,8 @@ def update_one_rfile(pubdict, rfile, rfolder):
                     conlist[index] = news
                     modify = True
                     idlist.append((oid, nid))
-            except:
-                pass
+            except Exception as e:
+                Log.out("[Logging...] 重建标识出错 : %s" % e)
     #TODO : for test
     if (modify) :
         newcontent = "\n".join(conlist)
