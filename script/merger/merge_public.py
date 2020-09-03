@@ -22,7 +22,7 @@ from xml.etree import cElementTree as ET
 from xml.dom import minidom
 from xml.dom.minidom import Document
 
-ATTR_NAME = "attr_name"
+ATTR_TYPE_NAME = "attr_type_name"
 
 #获取所有的ID
 def get_all_ids(publicfile):
@@ -37,10 +37,15 @@ def get_all_ids(publicfile):
             pubdict[restype].append(resid)
         else:
             pubdict[restype] = [resid]
-        if (ATTR_NAME in pubdict):
-            pubdict[ATTR_NAME].append(resname)
+        #记录主apk的所有类型和名称,记录方式"type#name",记录的目的主要是防止同样类型和名称的字段出现多次
+        #如： 出现同样的type和name的字段，id却不同，会造成编译失败
+        #<public type="attr" name="subtitle" id="0x7f040295" />
+        #<public type="attr" name="subtitle" id="0x7f040117" />
+        type_and_name = "%s#%s" % (restype, resname)
+        if (ATTR_TYPE_NAME in pubdict):
+            pubdict[ATTR_TYPE_NAME].append(type_and_name)
         else:
-            pubdict[ATTR_NAME] = [resname]
+            pubdict[ATTR_TYPE_NAME] = [type_and_name]
     return pubdict;
 
 ## Get pretty look
@@ -68,7 +73,7 @@ def process_maxid(maxid, iddict, restype):
 
     idlist = []
     for key in iddict:
-        if key == ATTR_NAME:
+        if key == ATTR_TYPE_NAME:
             continue
         tmplist = iddict[key]
         tmplist.sort()
@@ -149,7 +154,7 @@ def rebuild_ids(masterfolder, slavefolder):
     root = tree.getroot();
     maxids = {}
     for restype in publicdict:
-        if restype == ATTR_NAME:
+        if restype == ATTR_TYPE_NAME:
             continue
         maxid = getmaxids(publicdict, restype)
         if (maxid != "unknown"):
@@ -161,7 +166,8 @@ def rebuild_ids(masterfolder, slavefolder):
     for child in root:
         restype = child.attrib["type"]
         resname = child.attrib["name"]
-        if (resname not in publicdict[ATTR_NAME]):
+        type_and_name = "%s#%s" % (restype, resname)
+        if (type_and_name not in publicdict[ATTR_TYPE_NAME]):
             hexid = get_next_id(restype, publicdict, maxids)
             element = ET.Element("public")
             element.attrib["type"] = restype
