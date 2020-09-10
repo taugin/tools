@@ -40,7 +40,8 @@ SEPERATER = os.path.sep
 
 #########################jar包文件路径定义#################################
 #APKTOOL的jar包，版本是2.1.1
-APKTOOL_JAR = os.path.join(LIB_DIR, "apktool_2.4.1.jar")
+APKTOO_JAR_VERSION = "2.4.1"
+APKTOOL_JAR = os.path.join(LIB_DIR, "apktool_%s.jar" % APKTOO_JAR_VERSION)
 
 #签名jar
 SIGNAPK_JAR = os.path.join(LIB_DIR, "signapk.jar")
@@ -51,13 +52,14 @@ AXMLPRINTER_JAR = os.path.join(LIB_DIR, "AXMLPrinter2.jar")
 #壳DEX文件
 SHELL_DEX = os.path.join(LIB_DIR, "classes.dex")
 
-#smali-2.1.3
-SMALI_JAR = os.path.join(LIB_DIR, "smali-2.1.3.jar")
+SMALI_JAR_VERSION = "2.4.0"
+SMALI_JAR = os.path.join(LIB_DIR, "smali-%s.jar" % SMALI_JAR_VERSION)
 
-#baksmali-2.1.3
-BAKSMALI_JAR = os.path.join(LIB_DIR, "baksmali-2.1.3.jar")
+BAKSMALI_JAR_VERSION = "2.4.0"
+BAKSMALI_JAR = os.path.join(LIB_DIR, "baksmali-%s.jar" % BAKSMALI_JAR_VERSION)
 
-DX_JAR = os.path.join(LIB_DIR, "dx.jar")
+DX_JAR_VERSION = "1.12"
+DX_JAR = os.path.join(LIB_DIR, "dx-%s.jar" % DX_JAR_VERSION)
 
 AES_JAR = os.path.join(LIB_DIR, "aes.jar")
 

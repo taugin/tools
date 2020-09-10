@@ -2,6 +2,11 @@
 # coding: UTF-8
 import sys
 import os
+#引入别的文件夹的模块
+DIR = os.path.dirname(sys.argv[0])
+COM_DIR = os.path.join(DIR, "..", "common")
+COM_DIR = os.path.normpath(COM_DIR)
+sys.path.append(COM_DIR)
 
 import Common
 import Log
@@ -47,6 +52,21 @@ def jar2dex(jarfile, dexfile):
     subprocess.call(cmdlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     Log.out("[Logging...] Jar转换完成 ", True)
 
+def smali2dex(smalidir, dexfile):
+    '''smali文件转dex文件'''
+    smalidir = os.path.normpath(smalidir)
+    dexfile = os.path.normpath(dexfile)
+    Log.out("[Logging...] 开始转换文件 : [%s] --> [%s]" % (smalidir, dexfile))
+    cmdlist = [Common.JAVA, "-jar", Common.SMALI_JAR, "a", "-o", dexfile, smalidir]
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
+    ret = process.wait()
+    if (ret != 0):
+        Log.out("[Logging...] 文件转换失败")
+        return False
+    else:
+        Log.out("[Logging...] 文件转换成功")
+        return True
+
 def baksmali(dexfile, outdir):
     '''dex文件转smali文件，并且输出到outdir'''
     dexfile = os.path.normpath(dexfile)
@@ -55,7 +75,7 @@ def baksmali(dexfile, outdir):
     tmpdir = os.path.join(os.getcwd(), "tmp%s" % random.randint(0, 1000))
     if not os.path.exists(tmpdir):
         os.mkdir(tmpdir)
-    cmdlist = [Common.JAVA, "-jar", Common.BAKSMALI_JAR, "-o", tmpdir, dexfile]
+    cmdlist = [Common.JAVA, "-jar", Common.BAKSMALI_JAR, "d", "-o", tmpdir, dexfile]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     Utils.copydir(tmpdir, outdir, False)
