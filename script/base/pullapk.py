@@ -27,7 +27,19 @@ def input_no(prompt, start, end):
         Log.out("")
     return 1
 
+def wait_usb_devices():
+    Log.out("\n[Logging...] 等待设备连接")
+    try:
+        cmd = [Common.ADB, "wait-for-usb-device"]
+        devices = []
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
+        p.wait()
+    except:
+        pass
+    Log.out("[Logging...] 设备连接成功\n")
+
 def get_select_devices():
+    wait_usb_devices()
     try:
         cmd = [Common.ADB, "devices", "-l"]
         devices = []
