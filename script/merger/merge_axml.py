@@ -69,7 +69,7 @@ def merge_xml_change_pkg(masterfolder, slavefolder, newpkgname = None):
     slaveapplication = slaveroot.find("application")
 
     for item in slaveroot.getchildren():
-        if (item.tag == "uses-permission"):
+        if (item.tag != "application"):
             masterroot.append(item)
 
     for item in slaveapplication.getchildren():
