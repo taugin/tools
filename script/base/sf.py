@@ -37,6 +37,7 @@ apk_info["apk_sha1"] = None
 apk_info["sign_md5"] = None
 apk_info["sign_sha1"] = None
 apk_info["sign_sha256"] = None
+apk_info["sign_file"] = None
 apk_info["apk_size"] = None
 apk_info["target_version"] = None
 apk_info["min_version"] = None
@@ -67,7 +68,7 @@ def md5_classes(apkFile):
         apk_info["classes_md5"] = addColonForString(result.upper())
     z.close()
 
-def printsign_md5(apkFile, signFile):
+def printsign_md5(apkFile, signFile, fullSignfileName):
     '''输出签名文件的MD5'''
     global apk_info
     cmdlist = [Common.KEYTOOL, "-printcert", "-file", signFile]
@@ -95,13 +96,14 @@ def printsign_md5(apkFile, signFile):
     apk_info["sign_md5"] = sign_md5
     apk_info["sign_sha256"] = sign_sha256
     apk_info["sign_sha1"] = sign_sha1
+    apk_info["sign_file"] = fullSignfileName
 
 def md5_signfile(apkFile):
     '''输出一般文件的MD5'''
     signfile = ""
     z = zipfile.ZipFile(apkFile, "r")
     for f in z.namelist() :
-        if (len(f) >=2 and f[-2:] == "SA"):
+        if (len(f) >=2 and f[-2:] == "SA" and f.startswith("META-INF/")):
             signfile = f
             break;
     if (signfile != ""):
@@ -109,7 +111,7 @@ def md5_signfile(apkFile):
         f = open(tmpfile, "wb");
         f.write(z.read(signfile));
         f.close()
-        printsign_md5(apkFile, tmpfile)
+        printsign_md5(apkFile, tmpfile, signfile)
         os.remove(tmpfile)
     z.close()
 
@@ -435,6 +437,10 @@ def print_apkinfo():
 
     Log.out("-" * dash_len)
     output = " 签名详情 | %s" % apk_info["sign_detail"]
+    Log.out(output)
+
+    Log.out("-" * dash_len)
+    output = " 签名文件 | %s" % apk_info["sign_file"]
     Log.out(output)
 
     Log.out("-" * dash_len)
