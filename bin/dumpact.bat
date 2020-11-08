@@ -1,5 +1,6 @@
 @echo off
 :start
+echo [Logging...] ARGS : [%*]
 echo [Logging...] %date% %time%
 rem 获取顶层应用
 for /F "delims=" %%i in ('adb shell dumpsys activity top ^| findstr "ACTIVITY"') do (set ALL_ACTIVITY=%%i)
@@ -21,4 +22,4 @@ echo [Logging...] PACKAGE_NAME : [%PACKAGE_NAME%] , ACTIVITY_NAME : [%ACTIVITY_N
 
 echo.
 choice /t 1 /d y /n >nul
-goto start
+if "%1" == "loop" (goto start)

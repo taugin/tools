@@ -1,4 +1,5 @@
 @echo off
+echo [Logging...] ARGS : [%*]
 rem 获取顶层应用
 for /F "delims=" %%i in ('adb shell dumpsys activity top ^| findstr "TASK"') do (set ALL_TASK=%%i)
 rem echo ALL_TASK=%ALL_TASK%
@@ -24,4 +25,4 @@ echo [Logging...]  %date% %time%
 adb shell ps -A | findstr "%USER_ID%"
 echo.
 choice /t 1 /d y /n >nul
-goto start
+if "%1" == "loop" (goto start)
