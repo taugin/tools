@@ -23,6 +23,11 @@ echo.
 :start
 echo [Logging...]  %date% %time%
 adb shell ps -A | findstr "%USER_ID%"
+if not "%ERRORLEVEL%" == "0" (
+echo [Logging...]  Can not get content, exit...
+goto end
+)
 echo.
 choice /t 1 /d y /n >nul
 if "%1" == "loop" (goto start)
+:end
