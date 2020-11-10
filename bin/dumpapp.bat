@@ -36,5 +36,6 @@ goto end
 
 
 echo.
-choice /t 1 /d y /n >nul
+rem choice /t 1 /d y /n >nul
+ping localhost -n 2 > nul
 if "%1" == "loop" (goto start)
