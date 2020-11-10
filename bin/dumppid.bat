@@ -26,10 +26,10 @@ echo.
 :start
 echo [Logging...]  %date% %time%
 adb shell ps -A | findstr "%USER_ID%"
-if not "%ERRORLEVEL%" == "0" (
-echo [Logging...]  Can not get content, exit...
-goto end
-)
+rem if not "%ERRORLEVEL%" == "0" (
+rem echo [Logging...]  Can not get content, exit...
+rem goto end
+rem )
 echo.
 rem choice /t 1 /d y /n >nul
 ping localhost -n 2 > nul

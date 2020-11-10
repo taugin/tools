@@ -1,4 +1,5 @@
 @echo off
+
 :start
 echo [Logging...] ARGS : [%*]
 echo [Logging...] %date% %time%
@@ -29,10 +30,10 @@ rem echo USER_ID=%USER_ID%
 echo [Logging...] USER_ID : [%USER_ID%] , PACKAGE_NAME : [%PACKAGE_NAME%] , ACTIVITY_NAME : [%ACTIVITY_NAME%]
 
 adb shell ps -A | findstr "%USER_ID%"
-if not "%ERRORLEVEL%" == "0" (
-echo [Logging...]  Can not get content, exit...
-goto end
-)
+rem if not "%ERRORLEVEL%" == "0" (
+rem echo [Logging...]  Can not get content, exit...
+rem goto end
+rem )
 
 
 echo.
