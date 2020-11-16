@@ -420,19 +420,15 @@ def print_apkinfo():
     Log.out(output)
 
     Log.out("-" * dash_len)
-    output = " 内部摘要 | %s" % apk_info["classes_md5"]
-    Log.out(output)
-
-    Log.out("-" * dash_len)
     output = " 签名摘要 | %s" % apk_info["sign_md5"]
     Log.out(output)
 
     Log.out("-" * dash_len)
-    output = " 签名哈希 | %s" % apk_info["sign_sha256"]
-    Log.out(output)
-
-    Log.out("-" * dash_len)
     output = " 签名哈希 | %s" % apk_info["sign_sha1"]
+    Log.out(output)
+    
+    Log.out("-" * dash_len)
+    output = " 签名哈希 | %s" % apk_info["sign_sha256"]
     Log.out(output)
 
     Log.out("-" * dash_len)
@@ -441,6 +437,10 @@ def print_apkinfo():
 
     Log.out("-" * dash_len)
     output = " 签名文件 | %s" % apk_info["sign_file"]
+    Log.out(output)
+
+    Log.out("-" * dash_len)
+    output = " 内部摘要 | %s" % apk_info["classes_md5"]
     Log.out(output)
 
     Log.out("-" * dash_len)
