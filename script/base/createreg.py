@@ -137,6 +137,12 @@ REG_TEMPLATE = \
 [HKEY_CLASSES_ROOT\Directory\Background\shell\PullApk\command]
 @="$TOOLS_ROOT\\\\bin\\\\pullapk.bat"
 
+[HKEY_CLASSES_ROOT\Directory\Background\shell\WLAN调试]
+"Icon"="$CMD_PATH"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\WLAN调试\command]
+@="$TOOLS_ROOT\\\\bin\\\\adbwlan.bat"
+
 [HKEY_CLASSES_ROOT\Directory\Background\shell\命令提示符]
 "Icon"="$CMD_PATH"
 
