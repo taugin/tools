@@ -64,4 +64,5 @@ echo %connect_cmd% > %connect_file%
 echo [Logging...] Connect Command : [%connect_cmd%]
 %connect_cmd%
 :END
-pause
+echo [Logging...] Wait for 3 seconds to exit
+ping localhost -n 5 > nul
