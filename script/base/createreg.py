@@ -50,6 +50,9 @@ REG_TEMPLATE = \
 [HKEY_CLASSES_ROOT\myapkfile\shell\反编译\command]
 @="$TOOLS_ROOT\\\\bin\\\\apktool.bat d \\"%1\\" -f"
 
+[HKEY_CLASSES_ROOT\myapkfile\shell\APK对齐]
+"Icon"="$TOOLS_ROOT\\\\extra\\\\winreg\\\\duiqi.ico,0"
+
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK对齐\command]
 @="$TOOLS_ROOT\\\\bin\\\\signapk.bat -a \\"%1\\""
 
