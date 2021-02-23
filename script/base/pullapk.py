@@ -139,17 +139,52 @@ def pullspecapk(apkfile, package):
         subprocess.call(cmdlist, stdout=subprocess.PIPE)
         if not os.path.exists(tempFile):
             return
-        label = getlabel(tempFile)
-        if (label == None or len(label) <= 0):
-            label = package
+        newFileName = ""
+        apkinfo = get_app_info(tempFile)
+        label = None
+        vercode = None
+        vername = None
+        minver = None
+        tarver = None
+        if (apkinfo != None) :
+            label = apkinfo["apklabel"]
+            vercode = apkinfo["vercode"]
+            vername = apkinfo["vername"]
+            minver = apkinfo["min_version"]
+            tarver = apkinfo["target_version"]
+        if (label != None and len(label) > 0):
+            newFileName += label
+        if (vercode != None and len(vercode) > 0):
+            newFileName += "_"
+            newFileName += vercode
+        if (vername != None and len(vername) > 0):
+            newFileName += "_"
+            newFileName += vername
+        if (minver != None and len(minver) > 0):
+            newFileName += "_"
+            newFileName += minver
+        if (tarver != None and len(tarver) > 0):
+            newFileName += "_"
+            newFileName += tarver
         dirpath = os.path.dirname(tempFile)
-        newFile = os.path.join(dirpath, label + ".apk")
+        newFile = os.path.join(dirpath, newFileName + ".apk")
         if (os.path.exists(newFile)):
             os.remove(newFile)
         Log.out("[Logging...] 获取APK成功 : [%s]" % newFile)
         os.rename(tempFile, newFile)
 
-def getlabel(apkFile):
+
+def parseString(line):
+    format_code = ["utf8", "gbk", "gb2312"]
+    result = "";
+    for f in format_code:
+        try:
+            result = line.decode(f, "ignore")
+            return result
+        except:
+            pass
+    return result
+
     label = None
     try:
         cmdlist = [Common.AAPT2_BIN, "d", "badging", apkFile]
@@ -169,6 +204,62 @@ def getlabel(apkFile):
     except:
         pass
     return label
+
+def get_app_info(apkFile):
+    '''输出apk的包信息'''
+    apk_info = {}
+    cmdlist = [Common.AAPT2_BIN, "d", "badging", apkFile]
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+    apk_info["apkfile"] = apkFile
+    tmppkg = ""
+    tmp = ""
+    alllines = process.stdout.readlines()
+    for line in alllines :
+        tmp = parseString(line)
+        if (tmp.startswith("package: ")):
+            try:
+                tmppkg = tmp[len("package: "):]
+                tmppkg = tmppkg.replace("\r", "")
+                tmppkg = tmppkg.replace("\n", "")
+                tmppkg = tmppkg.replace("'", "")
+                tmpsplit = tmppkg.split(" ")
+                if tmpsplit != None and len(tmpsplit) >= 3:
+                    apk_info["pkgname"] = tmpsplit[0].split("=")[1]
+                    apk_info["vercode"] = tmpsplit[1].split("=")[1]
+                    apk_info["vername"] = tmpsplit[2].split("=")[1]
+            except:
+                pass
+        elif (tmp.startswith("application-label")):
+            try:
+                tmppkg = tmp
+                tmppkg = tmppkg.replace("\r", "")
+                tmppkg = tmppkg.replace("\n", "")
+                tmppkg = tmppkg.replace("'", "")
+                label = tmppkg.split(":")[1]
+                apk_info["apklabel"] = label
+            except:
+                pass
+        elif (tmp.startswith("targetSdkVersion")):
+            try:
+                tmppkg = tmp
+                tmppkg = tmppkg.replace("\r", "")
+                tmppkg = tmppkg.replace("\n", "")
+                tmppkg = tmppkg.replace("'", "")
+                target_version = tmppkg.split(":")[1]
+                apk_info["target_version"] = target_version
+            except:
+                pass
+        elif (tmp.startswith("sdkVersion")):
+            try:
+                tmppkg = tmp
+                tmppkg = tmppkg.replace("\r", "")
+                tmppkg = tmppkg.replace("\n", "")
+                tmppkg = tmppkg.replace("'", "")
+                min_version = tmppkg.split(":")[1]
+                apk_info["min_version"] = min_version
+            except:
+                pass
+    return apk_info
 
 def uninstallApk(package):
     if (SELECT_DEVICE != None and len(SELECT_DEVICE) > 0) :
