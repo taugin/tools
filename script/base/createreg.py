@@ -28,6 +28,12 @@ REG_TEMPLATE = \
 [HKEY_CLASSES_ROOT\myapkfile\shell\使用WinRAR打开\command]
 @="$WINRAR_PATH \\"%1\\""
 
+[HKEY_CLASSES_ROOT\myapkfile\shell\解压APK文件]
+"Icon"="$WINRAR_PATH"
+
+[HKEY_CLASSES_ROOT\myapkfile\shell\解压APK文件\command]
+@="$TOOLS_ROOT\\\\bin\\\\unapk.bat \\"%1\\""
+
 [HKEY_CLASSES_ROOT\myapkfile\shell\查看APK信息]
 "Icon"="$TOOLS_ROOT\\\\extra\\\\winreg\\\\cha.ico,0"
 
