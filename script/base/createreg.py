@@ -29,7 +29,7 @@ REG_TEMPLATE = \
 @="$WINRAR_PATH \\"%1\\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\解压APK文件]
-"Icon"="$WINRAR_PATH"
+"Icon"="$TOOLS_ROOT\\\\extra\\\\winreg\\\\7z.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\解压APK文件\command]
 @="$TOOLS_ROOT\\\\bin\\\\unapk.bat \\"%1\\""
