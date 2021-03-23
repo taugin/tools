@@ -13,7 +13,7 @@ from string import Template
 
 THIS_FILE_DIR = os.path.dirname(sys.argv[0])
 TEMP_TOOLS_ROOT = os.path.normpath(os.path.join(THIS_FILE_DIR, "..", ".."))
-REG_TEMPLATE_FILE = os.path.join(TEMP_TOOLS_ROOT, "extra", "winreg", "tmp.reg")
+REG_TEMPLATE_FILE = os.path.join(TEMP_TOOLS_ROOT, "extra", "winreg", "reg.txt")
 REG_TEMPLATE = None
 with open(REG_TEMPLATE_FILE, "rb") as f:
     REG_TEMPLATE = f.read().decode()
