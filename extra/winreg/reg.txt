@@ -178,14 +178,8 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\.dex]
 @="mydexfile"
 
-[HKEY_CLASSES_ROOT\excel2json\shell\Excel2Json]
+[HKEY_CLASSES_ROOT\*\shell\Excel2Json]
 "Icon"="$TOOLS_ROOT\\extra\\winreg\\zhuan.ico,0"
 
-[HKEY_CLASSES_ROOT\excel2json\shell\Excel2Json\command]
+[HKEY_CLASSES_ROOT\*\shell\Excel2Json\command]
 @="$TOOLS_ROOT\\bin\\excel2json.bat \"%1\""
-
-[HKEY_CLASSES_ROOT\.xls]
-@="excel2json"
-
-[HKEY_CLASSES_ROOT\.xlsx]
-@="excel2json"
