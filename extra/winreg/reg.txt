@@ -91,6 +91,12 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\myaarfile\shell\使用WinRAR打开\command]
 @="$WINRAR_PATH \"%1\""
 
+[HKEY_CLASSES_ROOT\myaarfile\shell\解压AAR文件]
+"Icon"="$TOOLS_ROOT\\extra\\winreg\\7z.ico,0"
+
+[HKEY_CLASSES_ROOT\myaarfile\shell\解压AAR文件\command]
+@="$TOOLS_ROOT\\bin\\unapk.bat \"%1\""
+
 [HKEY_CLASSES_ROOT\.aar]
 @="myaarfile"
 
@@ -157,14 +163,14 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\Directory\Background\shell\命令提示符\command]
 @="cmd /k"
 
-[HKEY_CLASSES_ROOT\mydexfile\shell\open]
-"Icon"="$WINRAR_PATH"
+#[HKEY_CLASSES_ROOT\mydexfile\shell\open]
+#"Icon"="$TOOLS_ROOT\\extra\\winreg\\jadx.ico,0"
 
-[HKEY_CLASSES_ROOT\mydexfile\shell\open\command]
-@="$TOOLS_ROOT\\bin\\jadx\\bin\\jadx-gui.bat \"%1\""
+#[HKEY_CLASSES_ROOT\mydexfile\shell\open\command]
+#@="$TOOLS_ROOT\\bin\\jadx\\bin\\jadx-gui.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\mydexfile\shell\JADX-GUI]
-"Icon"="$WINRAR_PATH"
+"Icon"="$TOOLS_ROOT\\extra\\winreg\\jadx.ico,0"
 
 [HKEY_CLASSES_ROOT\mydexfile\shell\JADX-GUI\command]
 @="$TOOLS_ROOT\\bin\\jadx\\bin\\jadx-gui.bat \"%1\""
