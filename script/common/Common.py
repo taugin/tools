@@ -63,7 +63,10 @@ DX_JAR = os.path.join(LIB_DIR, "dx-%s.jar" % DX_JAR_VERSION)
 
 AES_JAR = os.path.join(LIB_DIR, "aes.jar")
 
-AXML_EDITOR = os.path.join(LIB_DIR, "AXMLEditor.jar");
+AXML_EDITOR = os.path.join(LIB_DIR, "AXMLEditor.jar")
+
+BUNDLE_VERSION = "1.5.0"
+BUNDLE_TOOL = os.path.join(LIB_DIR, "bundletool-all-%s.jar" % BUNDLE_VERSION)
 #########################可执行文件文件路径定义#################################
 
 #AAPT可执行文件
