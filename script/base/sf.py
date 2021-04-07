@@ -10,6 +10,7 @@ sys.path.append(COM_DIR)
 
 import Common
 import Log
+import Utils
 
 import io
 import getopt
@@ -24,6 +25,7 @@ FILE_MD5 = False
 STR_MD5 = False
 APK_INFO = False
 INSTALL_APK = False
+INSTALL_XAPK = False
 AXMLPRINTER = False
 apk_info = {}
 apk_info["apkfile"] = None
@@ -326,10 +328,10 @@ def get_select_devices():
     return None
 def install_apk(args):
     if (len(args) > 0):
-        cmd = [Common.ADB, "-d", "install", "-r", args[0]]
+        cmd = [Common.ADB, "-d", "install", "-t", "-r", args[0]]
         device = get_select_devices()
         if device != None and len(device) > 0 :
-            cmd = [Common.ADB, "-s", device, "install", "-r", args[0]]
+            cmd = [Common.ADB, "-s", device, "install", "-t", "-r", args[0]]
             Log.out("[Logging...] 正在安装 : [%s] %s" % (device, os.path.abspath(args[0])))
         elif device == None:
             Log.out("[Logging...] 没有发现设备")
@@ -353,6 +355,50 @@ def install_apk(args):
             Common.pause()
         else:
             time.sleep(2)
+
+def install_multiple_apks(xapk, apks):
+    if (len(apks) > 0):
+        cmd = [Common.ADB, "-d", "install-multiple", "-t", "-r"] + apks
+        device = get_select_devices()
+        if device != None and len(device) > 0 :
+            cmd = [Common.ADB, "-s", device, "install-multiple", "-t", "-r"] + apks
+            Log.out("[Logging...] 正在安装 : [%s] %s" % (device, os.path.abspath(xapk)))
+        elif device == None:
+            Log.out("[Logging...] 没有发现设备")
+            time.sleep(2)
+            return
+        else:
+            Log.out("[Logging...] 正在安装 : %s" % os.path.abspath(xapk))
+        result = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        execret = result.stdout.readlines();
+        allret = ""
+        success = False
+        for s in execret:
+            s = str(s, "utf-8")
+            s = s.replace("\r", "")
+            s = s.replace("\n", "")
+            allret = allret + s + "\n"
+            if (s.lower() == "success"):
+                success = True
+        Log.out(allret)
+        if (success == False):
+            Common.pause()
+
+def install_xapk(args):
+    if (len(args) > 0):
+        basefilename,ext = os.path.splitext(os.path.basename(args[0]))
+        if not os.path.exists(basefilename):
+            os.mkdir(basefilename)
+        zf = zipfile.ZipFile(os.path.abspath(args[0]), "r")
+        apklist = []
+        for file in zf.namelist():
+            if (file != None and file.endswith(".apk")):
+                apklist += [os.path.join(os.getcwd(), basefilename, file)]
+                zf.extract(file, basefilename)
+        install_multiple_apks(args[0], apklist)
+        Log.out("[Logging...] 删除临时文件 : %s" % basefilename)
+        Utils.deletedir(basefilename)
+        time.sleep(2)
 
 def print_xml(args):
     manifest = ""
@@ -459,7 +505,7 @@ if (len(sys.argv) < 2):
     sys.exit()
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "pmsia")
+    opts, args = getopt.getopt(sys.argv[1:], "pmsiax")
     for op, value in opts:
         if (op == "-m"):
             FILE_MD5 = True
@@ -469,6 +515,8 @@ try:
             APK_INFO = True
         elif (op == "-i") :
             INSTALL_APK = True
+        elif (op == "-x") :
+            INSTALL_XAPK = True
         elif (op == "-a") :
             AXMLPRINTER = True
 except getopt.GetoptError as err:
@@ -477,6 +525,10 @@ except getopt.GetoptError as err:
 #安装apk
 if INSTALL_APK == True:
     install_apk(args)
+    sys.exit()
+#安装apk
+if INSTALL_XAPK == True:
+    install_xapk(args)
     sys.exit()
 #打印Android xml 文件
 if AXMLPRINTER == True:

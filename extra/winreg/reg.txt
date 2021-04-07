@@ -189,3 +189,28 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\*\shell\Excel2Json\command]
 @="$TOOLS_ROOT\\bin\\excel2json.bat \"%1\""
+
+#解析.xapk文件
+[HKEY_CLASSES_ROOT\.xapk]
+@="myxapkfile"
+
+[HKEY_CLASSES_ROOT\myxapkfile]
+@=""
+"Icon"="$WINRAR_PATH"
+
+[HKEY_CLASSES_ROOT\myxapkfile\DefaultIcon]
+@="$TOOLS_ROOT\\extra\\winreg\\android.ico,0"
+
+[HKEY_CLASSES_ROOT\myxapkfile\shell]
+
+[HKEY_CLASSES_ROOT\myxapkfile\shell\open]
+"Icon"="$TOOLS_ROOT\\extra\\winreg\\android.ico,0"
+
+[HKEY_CLASSES_ROOT\myxapkfile\shell\open\command]
+@="$TOOLS_ROOT\\bin\\sf.bat -x \"%1\""
+
+[HKEY_CLASSES_ROOT\myxapkfile\shell\解压XAPK文件]
+"Icon"="$TOOLS_ROOT\\extra\\winreg\\7z.ico,0"
+
+[HKEY_CLASSES_ROOT\myxapkfile\shell\解压XAPK文件\command]
+@="$TOOLS_ROOT\\bin\\unapk.bat \"%1\""
