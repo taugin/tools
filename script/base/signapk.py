@@ -38,7 +38,7 @@ def deletemetainf(src_apk):
     signfilelist = []
     z = zipfile.ZipFile(src_apk, "r")
     for file in z.namelist():
-        if (file.startswith("META-INF")):
+        if ((file.startswith("META-INF") and (file.endswith(".RSA") or file.endswith(".SF") or file.endswith(".MF")))):
             signfilelist.append(file)
     z.close()
     output = ""
