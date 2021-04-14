@@ -61,12 +61,6 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK对齐\command]
 @="$TOOLS_ROOT\\bin\\signapk.bat -a \"%1\""
 
-[HKEY_CLASSES_ROOT\mydexfile\shell\DEX2JAR]
-"Icon"="$CMD_PATH"
-
-[HKEY_CLASSES_ROOT\mydexfile\shell\DEX2JAR\command]
-@="$TOOLS_ROOT\\bin\\dex2jar-2.0\\d2j-dex2jar.bat \"%1\""
-
 [HKEY_CLASSES_ROOT\myapkfile\shell\JADX-GUI]
 "Icon"="$TOOLS_ROOT\\extra\\winreg\\jadx.ico,0"
 
@@ -199,12 +193,12 @@ Windows Registry Editor Version 5.00
 "Icon"="$WINRAR_PATH"
 
 [HKEY_CLASSES_ROOT\myxapkfile\DefaultIcon]
-@="$TOOLS_ROOT\\extra\\winreg\\android.ico,0"
+@="$TOOLS_ROOT\\extra\\winreg\\xapk.ico,0"
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell]
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\open]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\android.ico,0"
+"Icon"="$TOOLS_ROOT\\extra\\winreg\\xapk.ico,0"
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\open\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -x \"%1\""
@@ -214,3 +208,9 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\解压XAPK文件\command]
 @="$TOOLS_ROOT\\bin\\unapk.bat \"%1\""
+
+[HKEY_CLASSES_ROOT\myxapkfile\shell\使用WinRAR打开]
+"Icon"="$WINRAR_PATH"
+
+[HKEY_CLASSES_ROOT\myxapkfile\shell\使用WinRAR打开\command]
+@="$WINRAR_PATH \"%1\""
