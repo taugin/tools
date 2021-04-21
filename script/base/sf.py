@@ -122,57 +122,67 @@ def md5_signfile(apkFile):
 def get_app_info(apkFile):
     '''输出apk的包信息'''
     global apk_info
-    cmdlist = [Common.AAPT2_BIN, "d", "badging", apkFile]
-    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
     apk_info["apkfile"] = apkFile
-    tmppkg = ""
-    tmp = ""
-    alllines = process.stdout.readlines()
-    for line in alllines :
-        tmp = parseString(line)
-        if (tmp.startswith("package: ")):
-            try:
-                tmppkg = tmp[len("package: "):]
-                tmppkg = tmppkg.replace("\r", "")
-                tmppkg = tmppkg.replace("\n", "")
-                tmppkg = tmppkg.replace("'", "")
-                tmpsplit = tmppkg.split(" ")
-                if tmpsplit != None and len(tmpsplit) >= 3:
-                    apk_info["pkgname"] = tmpsplit[0].split("=")[1]
-                    apk_info["vercode"] = tmpsplit[1].split("=")[1]
-                    apk_info["vername"] = tmpsplit[2].split("=")[1]
-            except:
-                pass
-        elif (tmp.startswith("application-label")):
-            try:
-                tmppkg = tmp
-                tmppkg = tmppkg.replace("\r", "")
-                tmppkg = tmppkg.replace("\n", "")
-                tmppkg = tmppkg.replace("'", "")
-                label = tmppkg.split(":")[1]
-                apk_info["apklabel"] = label
-            except:
-                pass
-        elif (tmp.startswith("targetSdkVersion")):
-            try:
-                tmppkg = tmp
-                tmppkg = tmppkg.replace("\r", "")
-                tmppkg = tmppkg.replace("\n", "")
-                tmppkg = tmppkg.replace("'", "")
-                target_version = tmppkg.split(":")[1]
-                apk_info["target_version"] = target_version
-            except:
-                pass
-        elif (tmp.startswith("sdkVersion")):
-            try:
-                tmppkg = tmp
-                tmppkg = tmppkg.replace("\r", "")
-                tmppkg = tmppkg.replace("\n", "")
-                tmppkg = tmppkg.replace("'", "")
-                min_version = tmppkg.split(":")[1]
-                apk_info["min_version"] = min_version
-            except:
-                pass
+    apkname, ext = os.path.splitext(apkFile)
+    if ext == ".apk":
+        cmdlist = [Common.AAPT2_BIN, "d", "badging", apkFile]
+        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+        tmppkg = ""
+        tmp = ""
+        alllines = process.stdout.readlines()
+        for line in alllines :
+            tmp = parseString(line)
+            if (tmp.startswith("package: ")):
+                try:
+                    tmppkg = tmp[len("package: "):]
+                    tmppkg = tmppkg.replace("\r", "")
+                    tmppkg = tmppkg.replace("\n", "")
+                    tmppkg = tmppkg.replace("'", "")
+                    tmpsplit = tmppkg.split(" ")
+                    if tmpsplit != None and len(tmpsplit) >= 3:
+                        apk_info["pkgname"] = tmpsplit[0].split("=")[1]
+                        apk_info["vercode"] = tmpsplit[1].split("=")[1]
+                        apk_info["vername"] = tmpsplit[2].split("=")[1]
+                except:
+                    pass
+            elif (tmp.startswith("application-label")):
+                try:
+                    tmppkg = tmp
+                    tmppkg = tmppkg.replace("\r", "")
+                    tmppkg = tmppkg.replace("\n", "")
+                    tmppkg = tmppkg.replace("'", "")
+                    label = tmppkg.split(":")[1]
+                    apk_info["apklabel"] = label
+                except:
+                    pass
+            elif (tmp.startswith("targetSdkVersion")):
+                try:
+                    tmppkg = tmp
+                    tmppkg = tmppkg.replace("\r", "")
+                    tmppkg = tmppkg.replace("\n", "")
+                    tmppkg = tmppkg.replace("'", "")
+                    target_version = tmppkg.split(":")[1]
+                    apk_info["target_version"] = target_version
+                except:
+                    pass
+            elif (tmp.startswith("sdkVersion")):
+                try:
+                    tmppkg = tmp
+                    tmppkg = tmppkg.replace("\r", "")
+                    tmppkg = tmppkg.replace("\n", "")
+                    tmppkg = tmppkg.replace("'", "")
+                    min_version = tmppkg.split(":")[1]
+                    apk_info["min_version"] = min_version
+                except:
+                    pass
+    elif ext == ".xapk":
+        jobj = readpkgnamefromxapk(apkFile)
+        apk_info["apklabel"] = jobj["name"] if "name" in jobj else None
+        apk_info["pkgname"]  = jobj["package_name"] if "package_name" in jobj else None
+        apk_info["vercode"]  = jobj["version_code"] if "version_code" in jobj else None
+        apk_info["vername"]  = jobj["version_name"] if "version_name" in jobj else None
+        apk_info["min_version"] = jobj["min_sdk_version"] if "min_sdk_version" in jobj else None
+        apk_info["target_version"] = jobj["target_sdk_version"] if "target_sdk_version" in jobj else None
 
 def parseString(line):
     format_code = ["utf8", "gbk", "gb2312"]
@@ -185,7 +195,6 @@ def parseString(line):
             pass
     return result
 
-
 def readapkinfo(apkFile, function):
     function(apkFile)
 
@@ -195,10 +204,12 @@ def processapk(args, function):
             listfiles = os.listdir(file)
             for apkfile in listfiles :
                 apkpath = os.path.join(file, apkfile)
-                if (len(apkpath) >= 4 and apkpath[-4:] == ".apk"):
+                apkname, ext = os.path.splitext(apkpath)
+                if ext == ".apk" or ext == ".xapk":
                     readapkinfo(os.path.abspath(apkpath), function)
         else:
-            if (len(file) >= 4 and file[-4:] == ".apk"):
+            apkname, ext = os.path.splitext(file)
+            if ext == ".apk" or ext == ".xapk":
                 readapkinfo(os.path.abspath(file), function)
 
 def processFileMd5(args):
@@ -446,10 +457,9 @@ def print_xml(args):
 def readpkgnamefromxapk(xapk_path):
     zf = zipfile.ZipFile(xapk_path, "r")
     content = zf.read("manifest.json")
-    import json
-    jobj = json.loads(content)
     zf.close()
-    return jobj["package_name"]
+    import json
+    return json.loads(content)
 
 def openApkGPInBrowser(args):
     """
@@ -460,11 +470,13 @@ def openApkGPInBrowser(args):
     xapk_path = None
     pkgname = None
     for file in args :
-        if (len(file) >= 4 and file[-4:] == ".apk"):
+        apkname, ext = os.path.splitext(file)
+        if (ext == ".apk"):
             apk_path = os.path.abspath(file)
             break
-        elif (len(file) >= 5 and file[-5:] == ".xapk"):
+        elif (ext == ".xapk"):
             xapk_path = os.path.abspath(file)
+            break
     
     if (apk_path != None and len(apk_path) > 0):
         output = "[Logging...] 当前应用路径 : [%s]" % apk_path
@@ -474,7 +486,8 @@ def openApkGPInBrowser(args):
     elif (xapk_path != None and len(xapk_path) > 0):
         output = "[Logging...] 当前应用路径 : [%s]" % xapk_path
         Log.out(output)
-        pkgname = readpkgnamefromxapk(xapk_path)
+        xapkobj = readpkgnamefromxapk(xapk_path)
+        pkgname = xapkobj["package_name"]
     output = "[Logging...] 当前应用包名 : [%s]" % pkgname
     Log.out(output)
     import webbrowser
@@ -547,9 +560,9 @@ def print_apkinfo():
     output = " 签名文件 | %s" % apk_info["sign_file"]
     Log.out(output)
 
-    Log.out("-" * dash_len)
-    output = " 内部摘要 | %s" % apk_info["classes_md5"]
-    Log.out(output)
+    #Log.out("-" * dash_len)
+    #output = " 内部摘要 | %s" % apk_info["classes_md5"]
+    #Log.out(output)
 
     Log.out("-" * dash_len)
     output = " 文件摘要 | %s" % apk_info["apk_md5"]
@@ -623,7 +636,6 @@ if FILE_MD5 == True:
 elif APK_INFO == True:
     processapk(args, get_app_info)
     processapk(args, file_size)
-    processapk(args, md5_classes)
     processapk(args, md5_signfile)
     processapk(args, file_md5)
     processapk(args, file_sh1)

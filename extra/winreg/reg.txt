@@ -222,6 +222,12 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\myxapkfile\shell\使用WinRAR打开\command]
 @="$WINRAR_PATH \"%1\""
 
+[HKEY_CLASSES_ROOT\myxapkfile\shell\查看XAPK信息]
+"Icon"="$TOOLS_ROOT\\extra\\winreg\\cha.ico,0"
+
+[HKEY_CLASSES_ROOT\myxapkfile\shell\查看XAPK信息\command]
+@="$TOOLS_ROOT\\bin\\sf.bat -p \"%1\""
+
 [HKEY_CLASSES_ROOT\myxapkfile\shell\打开GP详情]
 "Icon"="$TOOLS_ROOT\\extra\\winreg\\gp.ico,0"
 
