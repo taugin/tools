@@ -27,6 +27,7 @@ APK_INFO = False
 INSTALL_APK = False
 INSTALL_XAPK = False
 AXMLPRINTER = False
+OPEN_IN_GP = False
 apk_info = {}
 apk_info["apkfile"] = None
 apk_info["apklabel"] = None
@@ -217,6 +218,7 @@ def processFileMd5(args):
                 file_sh256(os.path.abspath(file))
 
 def formatSize(bytesLen):
+    """格式化文件大小"""
     try:
         bytesLen = float(bytesLen)
         kb = bytesLen / 1024
@@ -235,6 +237,7 @@ def formatSize(bytesLen):
         return "%.2fkb" % (kb)
 
 def file_md5(strFile):
+    """计算文件md5"""
     global apk_info
     m = hashlib.md5()
     file = io.FileIO(strFile,'rb')
@@ -247,6 +250,7 @@ def file_md5(strFile):
     apk_info["apk_md5"] = addColonForString(md5value.upper())
 
 def file_sh1(strFile):
+    """计算文件hash"""
     global apk_info
     sha1 = hashlib.sha1()
     file = io.FileIO(strFile,'rb')
@@ -259,6 +263,7 @@ def file_sh1(strFile):
     apk_info["apk_sha1"] = addColonForString(sh1value.upper())
 
 def file_sh256(strFile):
+    """计算文件hash256"""
     global apk_info
     sha256 = hashlib.sha256()
     file = io.FileIO(strFile,'rb')
@@ -271,12 +276,15 @@ def file_sh256(strFile):
     apk_info["apk_sha256"] = addColonForString(sh256value.upper())
 
 def file_size(strFile):
+    """计算文件大小"""
     try:
         size = os.path.getsize(strFile)
         apk_info["apk_size"] = formatSize(size)
     except:
         pass
+
 def string_md5(srcStr):
+    """计算字符串的md5值"""
     if (len(srcStr) > 0):
         md5=hashlib.md5(srcStr[0].encode('utf-8')).hexdigest()
         Log.out("[MD5..] " + md5)
@@ -341,6 +349,7 @@ def get_select_devices():
     except:
         pass
     return None
+
 def install_apk(args):
     if (len(args) > 0):
         cmd = [Common.ADB, "-d", "install", "-t", "-r", args[0]]
@@ -434,7 +443,45 @@ def print_xml(args):
                 os.remove(tmpfile)
             zf.close()
 
+def readpkgnamefromxapk(xapk_path):
+    zf = zipfile.ZipFile(xapk_path, "r")
+    content = zf.read("manifest.json")
+    import json
+    jobj = json.loads(content)
+    zf.close()
+    return jobj["package_name"]
+
+def openApkGPInBrowser(args):
+    """
+    通过浏览器打开googleplay上的详情页面
+    """
+    global apk_info
+    apk_path = None
+    xapk_path = None
+    pkgname = None
+    for file in args :
+        if (len(file) >= 4 and file[-4:] == ".apk"):
+            apk_path = os.path.abspath(file)
+            break
+        elif (len(file) >= 5 and file[-5:] == ".xapk"):
+            xapk_path = os.path.abspath(file)
+    
+    if (apk_path != None and len(apk_path) > 0):
+        output = "[Logging...] 当前应用路径 : [%s]" % apk_path
+        Log.out(output)
+        get_app_info(apk_path)
+        pkgname = apk_info["pkgname"]
+    elif (xapk_path != None and len(xapk_path) > 0):
+        output = "[Logging...] 当前应用路径 : [%s]" % xapk_path
+        Log.out(output)
+        pkgname = readpkgnamefromxapk(xapk_path)
+    output = "[Logging...] 当前应用包名 : [%s]" % pkgname
+    Log.out(output)
+    import webbrowser
+    webbrowser.open("https://play.google.com/store/apps/details?id=%s" % pkgname)
+
 def calc_maxlen():
+    """计算每一行文字长度"""
     global apk_info
     max_len = 0
     for key in apk_info:
@@ -523,7 +570,7 @@ if (len(sys.argv) < 2):
     sys.exit()
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "pmsiax")
+    opts, args = getopt.getopt(sys.argv[1:], "pmsiaxg")
     for op, value in opts:
         if (op == "-m"):
             FILE_MD5 = True
@@ -537,6 +584,8 @@ try:
             INSTALL_XAPK = True
         elif (op == "-a") :
             AXMLPRINTER = True
+        elif (op == "-g") :
+            OPEN_IN_GP = True
 except getopt.GetoptError as err:
     Log.out(err)
     sys.exit()
@@ -581,4 +630,7 @@ elif APK_INFO == True:
     processapk(args, file_sh256)
     print_apkinfo()
     Log.out("")
+elif OPEN_IN_GP == True:
+    openApkGPInBrowser(args)
+    sys.exit(0)
 Common.pause()
