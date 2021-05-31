@@ -117,16 +117,21 @@ def getapkfile(package):
         for apk in apkFileList:
             Log.out("[Logging...] 顶层APK文件 : [%d] [%s]" % (number, apk))
             number = number + 1
-        index = input_no("[Logging...] 输入APK序号 : ", 1, apkfilelen)
-        apkfile = apkFileList[int(index) - 1]
+        index = input_no("[Logging...] 输入APK序号 : ", 0, apkfilelen)
+        if (int(index) == 0):
+            return apkFileList
+        else:
+            apkfile = apkFileList[int(index) - 1]
     elif (apkfilelen == 1):
         apkfile = apkFileList[0]
         Log.out("[Logging...] 顶层APK文件 : [%s]" % apkfile)
-    return apkfile
+    return [apkfile]
 
 def pullspecapk(apkfile, package):
     if (apkfile != None and apkfile != ""):
         Log.out("[Logging...] 获取APK文件 : [%s]" % apkfile)
+        basename = os.path.basename(apkfile)
+        basename, ext = os.path.splitext(basename)
         tempFile = "%s_%ld.apk" % (package, (time.time() * 1000))
         tempFile = os.path.join(os.getcwd(), tempFile)
         tempFile = os.path.normpath(tempFile)
@@ -139,6 +144,7 @@ def pullspecapk(apkfile, package):
         subprocess.call(cmdlist, stdout=subprocess.PIPE)
         if not os.path.exists(tempFile):
             return
+        dirpath = os.path.dirname(tempFile)
         newFileName = ""
         apkinfo = get_app_info(tempFile)
         label = None
@@ -147,26 +153,27 @@ def pullspecapk(apkfile, package):
         minver = None
         tarver = None
         if (apkinfo != None) :
-            label = apkinfo["apklabel"]
-            vercode = apkinfo["vercode"]
-            vername = apkinfo["vername"]
-            minver = apkinfo["min_version"]
-            tarver = apkinfo["target_version"]
+            label = apkinfo["apklabel"] if "apklabel" in apkinfo else ""
+            vercode = apkinfo["vercode"] if "vercode" in apkinfo else ""
+            vername = apkinfo["vername"] if "vername" in apkinfo else ""
+            minver = apkinfo["min_version"] if "min_version" in apkinfo else ""
+            tarver = apkinfo["target_version"] if "target_version" in apkinfo else ""
         if (label != None and len(label) > 0):
             newFileName += label
-        if (vercode != None and len(vercode) > 0):
-            newFileName += "_"
-            newFileName += vercode
-        if (vername != None and len(vername) > 0):
-            newFileName += "_"
-            newFileName += vername
-        if (minver != None and len(minver) > 0):
-            newFileName += "_"
-            newFileName += minver
-        if (tarver != None and len(tarver) > 0):
-            newFileName += "_"
-            newFileName += tarver
-        dirpath = os.path.dirname(tempFile)
+            if (vercode != None and len(vercode) > 0):
+                newFileName += "_"
+                newFileName += vercode
+            if (vername != None and len(vername) > 0):
+                newFileName += "_"
+                newFileName += vername
+            if (minver != None and len(minver) > 0):
+                newFileName += "_"
+                newFileName += minver
+            if (tarver != None and len(tarver) > 0):
+                newFileName += "_"
+                newFileName += tarver
+        if (basename != "base"):
+            newFileName += basename
         newFile = os.path.join(dirpath, newFileName + ".apk")
         if (os.path.exists(newFile)):
             os.remove(newFile)
@@ -320,8 +327,9 @@ def pullapk():
     if (package != None):
         cmd = getCmd()
         if (cmd == "p"):
-            apkfile = getapkfile(package)
-            pullspecapk(apkfile, package)
+            apkfiles = getapkfile(package)
+            for apkfile in apkfiles:
+                pullspecapk(apkfile, package)
             time.sleep(3)
         elif (cmd == "u" and confirmUninstall()):
             uninstallApk(package)
