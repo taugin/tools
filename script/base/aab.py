@@ -159,6 +159,7 @@ def aab2apks(aab_file):
     cmdlist.append("--bundle=%s" % aab_file)
     cmdlist.append("--output=%s" % apks_file)
     cmdlist.append("--overwrite")
+    cmdlist.append("--verbose")
     cmdlist.append("--ks=%s" % keystoreinfo[0])
     cmdlist.append("--ks-pass=pass:%s" % keystoreinfo[1])
     cmdlist.append("--ks-key-alias=%s" % keystoreinfo[2])
@@ -181,7 +182,7 @@ def aab2apks(aab_file):
         if (index >= 3):
             Log.out("\t\t\t\t" + cmdlist[index])
     start_time = time.time()
-    retcode = subprocess.call(cmdlist, stdout=subprocess.PIPE)
+    retcode = subprocess.call(cmdlist)
     end_time = time.time()
     if (retcode == 0):
         Log.out("[Logging...] 转换成功 : [%s -> %s]" % (aab_file, apks_file), True)
@@ -200,6 +201,8 @@ def install_apks(apks_file):
     cmdlist.append("-jar")
     cmdlist.append(Common.BUNDLE_TOOL)
     cmdlist.append("install-apks")
+    cmdlist.append("--allow-test-only")
+    cmdlist.append("--allow-downgrade")
     cmdlist.append("--apks=%s" % apks_file)
     if (select_device != None):
         cmdlist.append("--device-id=%s" % select_device)
@@ -211,7 +214,7 @@ def install_apks(apks_file):
     for index in range(0, len(cmdlist)):
         if (index >= 3):
             Log.out("\t\t\t\t" + cmdlist[index])
-    retcode = subprocess.call(cmdlist, stdout=subprocess.PIPE)
+    retcode = subprocess.call(cmdlist)
     if (retcode == 0):
         Log.out("[Logging...] 安装成功 : [%s]" % (apks_file), True)
         time.sleep(2)
