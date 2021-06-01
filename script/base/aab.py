@@ -188,7 +188,7 @@ def aab2apks(aab_file):
         Log.out("[Logging...] 转换成功 : [%s -> %s]" % (aab_file, apks_file), True)
         exp_time = end_time - start_time
         Log.out("[Logging...] 转换耗时 : [%.2fs]" % exp_time, True)
-        pause()
+        time.sleep(2)
     else:
         Log.out("[Logging...] 转换失败", True)
         pause()
