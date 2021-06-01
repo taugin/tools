@@ -233,3 +233,74 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\打开GP详情\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -g \"%1\""
+
+
+#==========================================================
+#解析.aab文件
+[HKEY_CLASSES_ROOT\.aab]
+@="myaabfile"
+
+[HKEY_CLASSES_ROOT\myaabfile]
+@=""
+"Icon"="$WINRAR_PATH"
+
+[HKEY_CLASSES_ROOT\myaabfile\DefaultIcon]
+@="$TOOLS_ROOT\\extra\\winreg\\aab.ico,0"
+
+[HKEY_CLASSES_ROOT\myaabfile\shell]
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\解压aab文件]
+"Icon"="$TOOLS_ROOT\\extra\\winreg\\7z.ico,0"
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\解压aab文件\command]
+@="$TOOLS_ROOT\\bin\\unapk.bat \"%1\""
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\使用WinRAR打开]
+"Icon"="$WINRAR_PATH"
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\使用WinRAR打开\command]
+@="$WINRAR_PATH \"%1\""
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\转换aab文件]
+"Icon"="$TOOLS_ROOT\\extra\\winreg\\zhuan.ico,0"
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\转换aab文件\command]
+@="$TOOLS_ROOT\\bin\\aab.bat -t \"%1\""
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\转换aab文件连接设备]
+"Icon"="$TOOLS_ROOT\\extra\\winreg\\zhuan.ico,0"
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\转换aab文件连接设备\command]
+@="$TOOLS_ROOT\\bin\\aab.bat -t -c \"%1\""
+
+#==========================================================
+#解析.apks文件
+[HKEY_CLASSES_ROOT\.apks]
+@="myapksfile"
+
+[HKEY_CLASSES_ROOT\myapksfile]
+@=""
+"Icon"="$WINRAR_PATH"
+
+[HKEY_CLASSES_ROOT\myapksfile\DefaultIcon]
+@="$TOOLS_ROOT\\extra\\winreg\\apks.ico,0"
+
+[HKEY_CLASSES_ROOT\myapksfile\shell]
+
+[HKEY_CLASSES_ROOT\myapksfile\shell\open]
+"Icon"="$TOOLS_ROOT\\extra\\winreg\\apks.ico,0"
+
+[HKEY_CLASSES_ROOT\myapksfile\shell\open\command]
+@="$TOOLS_ROOT\\bin\\aab.bat -i \"%1\""
+
+[HKEY_CLASSES_ROOT\myapksfile\shell\解压apks文件]
+"Icon"="$TOOLS_ROOT\\extra\\winreg\\7z.ico,0"
+
+[HKEY_CLASSES_ROOT\myapksfile\shell\解压apks文件\command]
+@="$TOOLS_ROOT\\bin\\unapk.bat \"%1\""
+
+[HKEY_CLASSES_ROOT\myapksfile\shell\使用WinRAR打开]
+"Icon"="$WINRAR_PATH"
+
+[HKEY_CLASSES_ROOT\myapksfile\shell\使用WinRAR打开\command]
+@="$WINRAR_PATH \"%1\""

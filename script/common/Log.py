@@ -13,13 +13,13 @@ def setCallback(writemsg):
 def d(tag, msg):
     print(tag + " : %s" % msg)
 
-def out(msg, show=True):
+def out(msg, show=True, end="\n"):
     if (callback_writemsg != None):
         callback_writemsg(msg)
         return
     if (show):
         try:
-            print(msg)
+            print(msg, end=end)
         except:
             pass
 
