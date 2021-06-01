@@ -261,17 +261,11 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\myaabfile\shell\使用WinRAR打开\command]
 @="$WINRAR_PATH \"%1\""
 
-[HKEY_CLASSES_ROOT\myaabfile\shell\转换aab文件]
+[HKEY_CLASSES_ROOT\myaabfile\shell\aab转apks]
 "Icon"="$TOOLS_ROOT\\extra\\winreg\\zhuan.ico,0"
 
-[HKEY_CLASSES_ROOT\myaabfile\shell\转换aab文件\command]
+[HKEY_CLASSES_ROOT\myaabfile\shell\aab转apks\command]
 @="$TOOLS_ROOT\\bin\\aab.bat -t \"%1\""
-
-[HKEY_CLASSES_ROOT\myaabfile\shell\转换aab文件连接设备]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\zhuan.ico,0"
-
-[HKEY_CLASSES_ROOT\myaabfile\shell\转换aab文件连接设备\command]
-@="$TOOLS_ROOT\\bin\\aab.bat -t -c \"%1\""
 
 #==========================================================
 #解析.apks文件

@@ -20,7 +20,6 @@ import subprocess
 import platform
 
 AAB2APKS = False
-CONNECT_DEVICE = False
 INSTALL_APKS = False
 DEVICE_SPEC_FILE = None
 
@@ -134,7 +133,7 @@ def get_select_devices(wait_devices):
                 continue
             devices.append([re.split("\s+", s)[0], s])
         if (len(devices) > 0):
-            Log.out("发现的设备列表 : ")
+            Log.out("\n发现的设备列表 : ")
             for index in range(0, len(devices)):
                 Log.out("%s : %s" % (index + 1, devices[index][1]))
             
@@ -164,14 +163,11 @@ def aab2apks(aab_file):
     cmdlist.append("--ks-pass=pass:%s" % keystoreinfo[1])
     cmdlist.append("--ks-key-alias=%s" % keystoreinfo[2])
     cmdlist.append("--key-pass=pass:%s" % keystoreinfo[3])
-    if (CONNECT_DEVICE):
-        select_device = get_select_devices(False)
-        Log.out("[Logging...] 连接设备 : [%s]\n" % select_device, True)
-        if (select_device != None):
-            cmdlist.append("--connected-device")
-            cmdlist.append("--device-id=%s" % select_device)
-        else:
-            Log.out("[Logging...] 未找到正在连接的设备\n", True)
+    select_device = get_select_devices(False)
+    Log.out("[Logging...] 连接设备 : [%s]\n" % select_device, True)
+    if (select_device != None):
+        cmdlist.append("--connected-device")
+        cmdlist.append("--device-id=%s" % select_device)
     if (DEVICE_SPEC_FILE != None and len(DEVICE_SPEC_FILE) > 0 and os.path.exists(DEVICE_SPEC_FILE)):
         cmdlist.append("--device-spec=%s" % DEVICE_SPEC_FILE)
     
@@ -184,9 +180,9 @@ def aab2apks(aab_file):
     for index in range(0, len(cmdlist)):
         if (index >= 3):
             Log.out("\t\t\t\t" + cmdlist[index])
-    start_time = time()
+    start_time = time.time()
     retcode = subprocess.call(cmdlist, stdout=subprocess.PIPE)
-    end_time = time()
+    end_time = time.time()
     if (retcode == 0):
         Log.out("[Logging...] 转换成功 : [%s -> %s]" % (aab_file, apks_file), True)
         exp_time = end_time - start_time
@@ -227,12 +223,10 @@ if (len(sys.argv) < 2):
     sys.exit()
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "tcis:")
+    opts, args = getopt.getopt(sys.argv[1:], "tis:")
     for op, value in opts:
         if (op == "-t"):
             AAB2APKS = True
-        elif (op == "-c") :
-            CONNECT_DEVICE = True
         elif (op == "-i") :
             INSTALL_APKS = True
         elif (op == "-s"):
