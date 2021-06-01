@@ -127,13 +127,19 @@ def getapkfile(package):
         Log.out("[Logging...] 顶层APK文件 : [%s]" % apkfile)
     return [apkfile]
 
-def pullspecapk(apkfile, package):
+def pullspecapk(apkfile, package, to_dir):
     if (apkfile != None and apkfile != ""):
         Log.out("[Logging...] 获取APK文件 : [%s]" % apkfile)
         basename = os.path.basename(apkfile)
         basename, ext = os.path.splitext(basename)
         tempFile = "%s_%ld.apk" % (package, (time.time() * 1000))
-        tempFile = os.path.join(os.getcwd(), tempFile)
+        if (to_dir):
+            tempDir = os.path.join(os.getcwd(), package)
+            if (not os.path.exists(tempDir)):
+                os.mkdir(tempDir)
+            tempFile = os.path.join(tempDir, tempFile)
+        else:
+            tempFile = os.path.join(os.getcwd(), tempFile)
         tempFile = os.path.normpath(tempFile)
         f = open(tempFile, "wb")
         f.close()
@@ -328,8 +334,9 @@ def pullapk():
         cmd = getCmd()
         if (cmd == "p"):
             apkfiles = getapkfile(package)
+            to_dir = len(apkfiles) > 1
             for apkfile in apkfiles:
-                pullspecapk(apkfile, package)
+                pullspecapk(apkfile, package, to_dir)
             time.sleep(3)
         elif (cmd == "u" and confirmUninstall()):
             uninstallApk(package)
