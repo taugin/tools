@@ -103,9 +103,14 @@ class Google:
         #         + '&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&source=bh&ssel=0&tsel=0&kc=1&tk='
         #         + str(TK) + '&q=' + QQ).format('t',from_language,to_language)
 
+        #url2 = (host + '/translate_a/single?client={0}&sl={1}&tl={2}&hl=zh-CN&dt=at&dt=bd&dt=ex&dt=ld&dt=md'
+        #        + '&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&source=bh&ssel=0&tsel=0&kc=1&tk='
+        #        + str(TK) + '&q=' + QQ).format('webapp',from_language,to_language)
+
         url2 = (host + '/translate_a/single?client={0}&sl={1}&tl={2}&hl=zh-CN&dt=at&dt=bd&dt=ex&dt=ld&dt=md'
-                + '&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&source=bh&ssel=0&tsel=0&kc=1&tk='
-                + str(TK) + '&q=' + QQ).format('webapp',from_language,to_language)
+                + '&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&source=bh&ssel=0&tsel=0&kc=1&q=' + QQ).format('gtx',from_language,to_language)
+
+        #print("url2 : %s" % url2)
 
         session = requests.Session()
 
@@ -145,8 +150,9 @@ class SizeInputError(Exception):
 def google_api(text=r'', from_language='en',to_language='zh-CN',host='https://translate.google.cn',proxy=None):
     if len(text) < 5000:
         api = Google()
-        tkk = api.get_tkk(host,proxy)
-        TK = api.acquire(text, tkk)
+        #tkk = api.get_tkk(host,proxy)
+        #TK = api.acquire(text, tkk)
+        TK = None
         result = api.translate(text, TK, from_language,to_language,host,proxy)
         return result
     else:
