@@ -3,3 +3,4 @@ __author__ = "UlionTse"
 
 from .google import google_api as google
 from .youdao import youdao_api as youdao
+from .config import LANGUAGES as LANGUAGES

@@ -121,7 +121,8 @@ class Google:
         if res.status_code == 200:
             data = res.json()
         else:
-            raise('RequestsError: Response <{}>'.format(res.status_code))
+            error_msg = 'RequestsError: Response <{}>'.format(res.status_code)
+            raise(GoogleResponseError(res.status_code, error_msg, url2))
 
         result = ''
         for dt in data[0]:
@@ -130,6 +131,12 @@ class Google:
         session.close()
         return result
 
+class GoogleResponseError(Exception):
+    def __init__(self, code, msg, url):
+        Exception.__init__(self)
+        self.code = code
+        self.msg = msg
+        self.url = url
 
 class LanguageInputError(Exception):
     def __init__(self,from_language,to_language):
