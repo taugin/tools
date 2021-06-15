@@ -80,7 +80,7 @@ def show_all_support_language():
     sys.stdout.write("+\n")
 
 def translate(text, from_language, to_language):
-    return google_api(text, from_language=from_language, to_language=to_language)
+    return google_api(text, from_language=from_language, to_language=to_language, host="https://translate.googleapis.com")
 
 def input_no(prompt, auto = False):
     list_keys= [ key for key in LANGUAGES.keys()]
