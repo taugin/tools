@@ -1,6 +1,7 @@
 # coding=utf-8
 # author=UlionTse
 
+from http import client
 import re
 import requests
 from urllib.parse import quote
@@ -106,9 +107,12 @@ class Google:
         #url2 = (host + '/translate_a/single?client={0}&sl={1}&tl={2}&hl=zh-CN&dt=at&dt=bd&dt=ex&dt=ld&dt=md'
         #        + '&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&source=bh&ssel=0&tsel=0&kc=1&tk='
         #        + str(TK) + '&q=' + QQ).format('webapp',from_language,to_language)
-
+        support_clients = ["web", "gtx"]
+        import random
+        index = random.randint(1, 2) - 1
+        client = support_clients[index]
         url2 = (host + '/translate_a/single?client={0}&sl={1}&tl={2}&hl=zh-CN&dt=at&dt=bd&dt=ex&dt=ld&dt=md'
-                + '&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&source=bh&ssel=0&tsel=0&kc=1&q=' + QQ).format('gtx',from_language,to_language)
+                + '&dt=qca&dt=rw&dt=rm&dt=ss&dt=t&ie=UTF-8&oe=UTF-8&source=bh&ssel=0&tsel=0&kc=1&q=' + QQ).format(client,from_language,to_language)
 
         #print("url2 : %s" % url2)
 

@@ -80,13 +80,7 @@ def show_all_support_language():
     sys.stdout.write("+\n")
 
 def translate(text, from_language, to_language):
-    try:
-        return google_api(text, from_language=from_language, to_language=to_language)
-    except GoogleResponseError as e:
-        if (e.code == 429):
-            print("[Logging...] 请求太多，被google拦截，请稍后再试, 错误码 : [%s], 请求地址 : [%s]" % (e.code, e.url))
-            sys.exit(0)
-    return None
+    return google_api(text, from_language=from_language, to_language=to_language)
 
 def input_no(prompt, auto = False):
     list_keys= [ key for key in LANGUAGES.keys()]
@@ -144,7 +138,12 @@ def translate_xml(from_language, to_language, xmlfile):
             continue
         if child.text == None or len(child.text) <= 0:
             continue
-        result = translate(child.text, from_language, to_language)
+        try:
+            result = translate(child.text, from_language, to_language)
+        except GoogleResponseError as e:
+            if (e.code == 429):
+                print("[Logging...] 请求太多，被google拦截，请稍后再试, 错误码 : [%s], 请求地址 : [%s]" % (e.code, e.url))
+                break
         time.sleep(2)
         try:
             print("%3s. %s%s : %s -> %s" % (index, child.attrib["name"], space, child.text, result))
