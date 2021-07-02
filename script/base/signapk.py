@@ -51,13 +51,15 @@ def deletemetainf(src_apk):
         Log.out("[Logging...] 正在删除 : %s" % output, True)
         subprocess.call([Common.AAPT_BIN, "r", src_apk] + signfilelist)
 
-def signapk(src_apk, dst_apk, keystoreinfo):
-    deletemetainf(src_apk)
-    Log.out("[Signing...] 执行签名 : %s -> %s" % (os.path.basename(src_apk), os.path.basename(dst_apk)), True)
+def signapk_with_jarsigner(src_apk, tmp_apk, dst_apk, keystoreinfo):
+    Log.out("")
+    alignapk(src_apk, tmp_apk)
+    deletemetainf(tmp_apk)
+    Log.out("[Signing...] 执行签名 : %s -> %s" % (os.path.basename(tmp_apk), os.path.basename(dst_apk)), True)
     if (len(keystoreinfo) <= 0):
         Log.out ("[Logging...] 签名信息 : [testkey.x509.pem], [testkey.pk8]", True)
         #deletemetainf "$1"
-        retcode = subprocess.call([Common.JAVA, "-jar", Common.SIGNAPK_JAR, Common.X509, Common.PK8, src_apk, dst_apk], stdout=subprocess.PIPE)
+        retcode = subprocess.call([Common.JAVA, "-jar", Common.SIGNAPK_JAR, Common.X509, Common.PK8, tmp_apk, dst_apk], stdout=subprocess.PIPE)
         if (retcode == 0):
             Log.out("[Signing...] 签名成功 : %s" % dst_apk, True)
         else:
@@ -83,7 +85,7 @@ def signapk(src_apk, dst_apk, keystoreinfo):
         cmdlist.append(keystoreinfo[3])
         cmdlist.append("-signedjar")
         cmdlist.append(dst_apk)
-        cmdlist.append(src_apk)
+        cmdlist.append(tmp_apk)
         cmdlist.append(keystoreinfo[2])
         retcode = subprocess.call(cmdlist, stdout=subprocess.PIPE)
         if (retcode == 0):
@@ -91,6 +93,43 @@ def signapk(src_apk, dst_apk, keystoreinfo):
         else:
             Log.out("[Signing...] 签名失败", True)
             pause()
+    Log.out("", True);
+
+def signapk_with_apksigner(src_apk, tmp_apk, dst_apk, keystoreinfo):
+    Log.out("")
+    alignapk(src_apk, tmp_apk)
+    deletemetainf(tmp_apk)
+    Log.out("[Signing...] 执行签名 : %s -> %s" % (os.path.basename(tmp_apk), os.path.basename(dst_apk)), True)
+    if (len(keystoreinfo) <= 0):
+        Log.out("[Signing...] 签名失败 : 签名文件信息有误", True)
+        pause()
+    else:
+        Log.out("[Logging...] 签名信息 : keystore : [%s], storepass : [%s] , keyalias : [%s], keypass : [%s]" % (os.path.basename(keystoreinfo[0]),keystoreinfo[1], keystoreinfo[2], keystoreinfo[3]), True)
+        Log.out("[Logging...] 版本信息 : [%s]" % os.path.basename(Common.APKSIGNER))
+        dir = os.path.dirname(src_apk)
+        cmdlist = []
+        cmdlist.append("java")
+        cmdlist.append("-jar")
+        cmdlist.append(Common.APKSIGNER)
+
+        cmdlist.append("sign")
+        cmdlist.append("--ks")
+        cmdlist.append(keystoreinfo[0])
+        cmdlist.append("--ks-key-alias")
+        cmdlist.append(keystoreinfo[2])
+        cmdlist.append("--ks-pass")
+        cmdlist.append("pass:" + keystoreinfo[1])
+        cmdlist.append("--key-pass")
+        cmdlist.append("pass:" + keystoreinfo[3])
+        cmdlist.append("--out")
+        cmdlist.append(dst_apk)
+        cmdlist.append(tmp_apk)
+        retcode = subprocess.call(cmdlist, stdout=subprocess.PIPE)
+        if (retcode == 0):
+            Log.out("[Signing...] 签名成功 : %s" % dst_apk, True)
+        else:
+            Log.out("[Signing...] 签名失败", True)
+    pause()
     Log.out("", True);
 
 def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
@@ -113,10 +152,9 @@ def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     if(USE_TESTSIGN_FILE == False):
         keystoreinfo = readkeystore(os.path.dirname(src_apk))
     dirname = os.path.dirname(src_apk);
-    basename = os.path.basename(src_apk) + "-tmp.apk"
-    tmp_apk = os.path.join(dirname, basename)
-    Utils.copyfile(src_apk, tmp_apk, True);
-    signapk(tmp_apk, dst_apk, keystoreinfo)
+    tmp_name = os.path.basename(src_apk) + "-tmp.apk"
+    tmp_apk = os.path.join(dirname, tmp_name)
+    signapk_with_apksigner(src_apk, tmp_apk, dst_apk, keystoreinfo)
     Utils.deleteFile(tmp_apk)
 
 def readkeystore(filedir):
