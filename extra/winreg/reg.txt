@@ -152,16 +152,16 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\Directory\Background\shell\PullApk\command]
 @="$TOOLS_ROOT\\bin\\pullapk.bat"
 
-[HKEY_CLASSES_ROOT\Directory\Background\shell\打开ADB]
+[HKEY_CLASSES_ROOT\Directory\Background\shell\连接ADB]
 "Icon"="$CMD_PATH"
 
-[HKEY_CLASSES_ROOT\Directory\Background\shell\打开ADB\command]
+[HKEY_CLASSES_ROOT\Directory\Background\shell\连接ADB\command]
 @="$TOOLS_ROOT\\bin\\adbconnect.bat"
 
-[HKEY_CLASSES_ROOT\Directory\Background\shell\关闭ADB]
+[HKEY_CLASSES_ROOT\Directory\Background\shell\断开ADB]
 "Icon"="$CMD_PATH"
 
-[HKEY_CLASSES_ROOT\Directory\Background\shell\关闭ADB\command]
+[HKEY_CLASSES_ROOT\Directory\Background\shell\断开ADB\command]
 @="$TOOLS_ROOT\\bin\\adbdisconnect.bat"
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\命令提示符]
