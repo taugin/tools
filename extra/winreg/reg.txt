@@ -152,11 +152,17 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\Directory\Background\shell\PullApk\command]
 @="$TOOLS_ROOT\\bin\\pullapk.bat"
 
-[HKEY_CLASSES_ROOT\Directory\Background\shell\WLAN调试]
+[HKEY_CLASSES_ROOT\Directory\Background\shell\打开ADB]
 "Icon"="$CMD_PATH"
 
-[HKEY_CLASSES_ROOT\Directory\Background\shell\WLAN调试\command]
-@="$TOOLS_ROOT\\bin\\adbwlan.bat"
+[HKEY_CLASSES_ROOT\Directory\Background\shell\打开ADB\command]
+@="$TOOLS_ROOT\\bin\\adbconnect.bat"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\关闭ADB]
+"Icon"="$CMD_PATH"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\关闭ADB\command]
+@="$TOOLS_ROOT\\bin\\adbdisconnect.bat"
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\命令提示符]
 "Icon"="$CMD_PATH"
