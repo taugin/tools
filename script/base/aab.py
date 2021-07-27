@@ -147,6 +147,12 @@ def get_select_devices(wait_devices):
         pass
     return None
 
+def transformAabForDevice():
+    result = input("[Logging...] 设备转换 : [AAB -> APKS](Y/N) ")
+    if result == "Y" or result == "y":
+        return True
+    return False
+
 def aab2apks(aab_file):
     keystoreinfo = readkeystore(aab_file)
     basename, ext = os.path.splitext(aab_file)
@@ -165,10 +171,11 @@ def aab2apks(aab_file):
     cmdlist.append("--ks-key-alias=%s" % keystoreinfo[2])
     cmdlist.append("--key-pass=pass:%s" % keystoreinfo[3])
     select_device = get_select_devices(False)
-    Log.out("[Logging...] 连接设备 : [%s]\n" % select_device, True)
-    if (select_device != None):
+    if (select_device != None and transformAabForDevice()):
+        Log.out("[Logging...] 连接设备 : [%s]\n" % select_device, True)
         cmdlist.append("--connected-device")
         cmdlist.append("--device-id=%s" % select_device)
+
     if (DEVICE_SPEC_FILE != None and len(DEVICE_SPEC_FILE) > 0 and os.path.exists(DEVICE_SPEC_FILE)):
         cmdlist.append("--device-spec=%s" % DEVICE_SPEC_FILE)
     
@@ -181,6 +188,7 @@ def aab2apks(aab_file):
     for index in range(0, len(cmdlist)):
         if (index >= 3):
             Log.out("\t\t\t\t" + cmdlist[index])
+    Log.out("")
     start_time = time.time()
     retcode = subprocess.call(cmdlist)
     end_time = time.time()
@@ -188,7 +196,8 @@ def aab2apks(aab_file):
         Log.out("[Logging...] 转换成功 : [%s -> %s]" % (aab_file, apks_file), True)
         exp_time = end_time - start_time
         Log.out("[Logging...] 转换耗时 : [%.2fs]" % exp_time, True)
-        time.sleep(2)
+        #time.sleep(3)
+        pause()
     else:
         Log.out("[Logging...] 转换失败", True)
         pause()
