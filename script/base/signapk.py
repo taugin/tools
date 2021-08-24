@@ -15,7 +15,8 @@ import Utils
 import getopt
 import platform
 import zipfile
-import subprocess;
+import subprocess
+import time
 
 USE_TESTSIGN_FILE = False
 OUTPUT_SIGNED_APK = None
@@ -127,9 +128,10 @@ def signapk_with_apksigner(src_apk, tmp_apk, dst_apk, keystoreinfo):
         retcode = subprocess.call(cmdlist, stdout=subprocess.PIPE)
         if (retcode == 0):
             Log.out("[Signing...] 签名成功 : %s" % dst_apk, True)
+            time.sleep(1)
         else:
             Log.out("[Signing...] 签名失败", True)
-    pause()
+            pause()
     Log.out("", True);
 
 def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
