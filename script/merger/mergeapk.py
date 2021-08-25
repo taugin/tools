@@ -235,14 +235,14 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
         clean_tmp_folders(masterfolder, slavefolder, mastermergedapk, mastersignedapk)
     time.sleep(3)
 
-def rename_with_template(mergedapk):
+def rename_with_template(masterfinalapk):
     final_name_template =NAME_TEMPLATE
-    if (mergedapk == None or not os.path.exists(mergedapk)):
+    if (masterfinalapk == None or not os.path.exists(masterfinalapk)):
         return
     if (final_name_template == None or len(final_name_template) <= 0):
         final_name_template = "{apklabel}_Release_v{vername}_{vercode}_{datetime}.apk"
-    apk_info = get_app_info(mergedapk)
-    final_apk_name = mergedapk
+    apk_info = get_app_info(masterfinalapk)
+    final_apk_name = masterfinalapk
     if "apklabel" in apk_info:
         try:
             final_apk_name = final_name_template.replace(FORMAT_LABEL, apk_info["apklabel"])
@@ -263,12 +263,12 @@ def rename_with_template(mergedapk):
             final_apk_name = final_apk_name.replace(FORMAT_DATETIME, apk_info["datetime"])
         except:
             Log.out("[Logging...] %s can not be found in %s" % (FORMAT_DATETIME, NAME_TEMPLATE))
-    folder = os.path.dirname(mergedapk)
+    folder = os.path.dirname(masterfinalapk)
     final_apk_path = os.path.normpath(os.path.join(folder, final_apk_name))
     Log.out("[Logging...] 生成最终文件 : [%s]" % final_apk_path)
     if os.path.exists(final_apk_path):
         os.remove(final_apk_path)
-    os.rename(mergedapk, final_apk_path)
+    os.rename(masterfinalapk, final_apk_path)
 
 def merge_according_cmdline(args):
     if (len(args) < 2):
