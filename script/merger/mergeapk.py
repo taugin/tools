@@ -190,7 +190,14 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
         functions += [{"function":"fun_apk_compile(masterfolder, mastermergedapk)", "saveonfalse":"True"}]
         functions += [{"function":"fun_merge_apkfile(mastermergedapk, masterapk, slaveapk, company)"}]
         functions += [{"function":"fun_signapk(mastermergedapk, mastersignedapk)"}]
-        functions += [{"function":"fun_alignapk(mastersignedapk, masterfinalapk)"}]
+        #functions += [{"function":"fun_alignapk(mastersignedapk, masterfinalapk)"}]
+
+    has_align_fun = False
+    for fun in functions:
+        if (fun["function"].startswith("fun_alignapk")):
+            has_align_fun = True
+            break;
+    Log.out("[Logging...] 允许文件对齐 : %s" % has_align_fun)
 
     result = False
     length = len(functions)
@@ -229,7 +236,8 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
                     fd.write(savestr)
                     fd.close()
                 break
-    rename_with_template(masterfinalapk)
+    #允许文件对齐的话，使用masterfinalapk，否则使用mastersignedapk
+    rename_with_template(masterfinalapk if has_align_fun else mastersignedapk)
     if (SAVE_ON_FALSE == False):
         Log.out("--------------------------------------------")
         clean_tmp_folders(masterfolder, slavefolder, mastermergedapk, mastersignedapk)
