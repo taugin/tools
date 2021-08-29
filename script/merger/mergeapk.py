@@ -71,7 +71,7 @@ def fun_merge_smali(masterfolder, slavefolder):
     merge_smali.merge_smali(masterfolder, slavefolder)
 
 def fun_update_all_rfile(masterfolder):
-    merge_rfile.update_all_rfile(masterfolder)
+    merge_rfile.update_all_rfile(masterfolder, DEBUG_MODE)
 
 def fun_merge_custom(masterfolder, slavefolder):
     merge_custom.merge_custom(masterfolder, slavefolder)
@@ -291,6 +291,7 @@ def merge_according_cmdline(args):
     mergeapk_batch(masterapk, slaveapk, None, None, None)
 
 def mergeapk_byargs(masterapk, slaveapk, debugmode, outputformat):
+    global DEBUG_MODE
     DEBUG_MODE = debugmode
     NAME_TEMPLATE = outputformat
     mergeapk_batch(masterapk, slaveapk, None, None, None)

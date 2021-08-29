@@ -20,6 +20,7 @@ import Common
 import Log
 import re
 import xml.etree.ElementTree as ET
+DEBUG_MODE = False
 
 def read_idlist(publicfile):
     tree = ET.parse(publicfile)
@@ -184,20 +185,24 @@ def update_one_rfile(pubdict, rfile, rfolder):
         if (c.startswith(".field public static")):
             s = c.split(r" ")
             try:
-                resname = s[4].split(":")[0]
-                if len(s) <= 6:
-                    continue
-                oid = s[6]
-                pubkey = "%s#%s" % (resname, restype)
-                if (pubkey in pubdict):
-                    nid = pubdict[pubkey]
-                if (nid != None and nid != oid):
-                    s[6] = nid
-                    news = " ".join(s)
-                    #Log.out("%s -> %s" % (c, news))
-                    conlist[index] = news
-                    modify = True
-                    idlist.append((oid, nid))
+                if len(s) > 4:
+                    resname = s[4].split(":")[0]
+                    if len(s) <= 6:
+                        continue
+                    oid = s[6]
+                    pubkey = "%s#%s" % (resname, restype)
+                    if (pubkey in pubdict):
+                        nid = pubdict[pubkey]
+                    if (nid != None and nid != oid):
+                        s[6] = nid
+                        news = " ".join(s)
+                        #Log.out("%s -> %s" % (c, news))
+                        conlist[index] = news
+                        modify = True
+                        idlist.append((oid, nid))
+                else:
+                    if DEBUG_MODE:
+                        Log.out("[Logging...] 重建标识出错 : %s, 文件 : %s" % (s, rfile))
             except Exception as e:
                 Log.out("[Logging...] 重建标识出错 : %s" % e)
     #TODO : for test
@@ -260,8 +265,10 @@ def prepare_public(masterfolder):
             pubdict["%s#%s" % (resname, restype)] = item.get("id")
     return pubdict
 
-def update_all_rfile(masterfolder):
+def update_all_rfile(masterfolder, debug_mode = False):
     ''' 重建R文件 '''
+    global DEBUG_MODE
+    DEBUG_MODE = debug_mode
     Log.out("[Logging...] 重建资源文件", True)
     all_rfolder = find_all_rfolders(masterfolder)
     #Log.out("all_rfolder : %s" % all_rfolder)
