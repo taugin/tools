@@ -213,17 +213,20 @@ def processapk(args, function):
                 readapkinfo(os.path.abspath(file), function)
 
 def processFileMd5(args):
+    global apk_info
     for file in args :
         if (os.path.isdir(file)):
             listfiles = os.listdir(file)
             for apkfile in listfiles :
                 apkpath = os.path.join(file, apkfile)
                 if (os.path.isfile(os.path.abspath(apkpath))):
+                    apk_info["apk_file"] = os.path.abspath(apkpath)
                     file_md5(os.path.abspath(apkpath))
                     file_sh1(os.path.abspath(apkpath))
                     file_sh256(os.path.abspath(apkpath))
         else:
             if (os.path.isfile(os.path.abspath(file))):
+                apk_info["apk_file"] = os.path.abspath(file)
                 file_md5(os.path.abspath(file))
                 file_sh1(os.path.abspath(file))
                 file_sh256(os.path.abspath(file))
@@ -625,6 +628,9 @@ if FILE_MD5 == True:
     processFileMd5(args)
     max_len = calc_maxlen()
     dash_len = 13 + max_len
+    Log.out("-" * dash_len)
+    output = " 文件名称 | %s" % apk_info["apk_file"]
+    Log.out(output)
     Log.out("-" * dash_len)
     output = " 文件摘要 | %s" % apk_info["apk_md5"]
     output +="\n"
