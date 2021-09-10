@@ -115,10 +115,13 @@ def signapk(srcapk, dstapk):
 #apk对齐
 def alignapk(unalignapk, finalapk):
     finalapk = os.path.normpath(finalapk)
-    Log.out("[Logging...] 正在对齐文件 : [%s]" % finalapk, True)
-    cmdlist = [Common.ZIPALIGN, "-f", "4", unalignapk, finalapk]
-    subprocess.call(cmdlist, stdout=subprocess.PIPE)
-    Log.out("[Logging...] 文件对齐成功\n")
+    if (False):
+        Log.out("[Logging...] 正在对齐文件 : [%s]" % finalapk, True)
+        cmdlist = [Common.ZIPALIGN, "-f", "4", unalignapk, finalapk]
+        subprocess.call(cmdlist, stdout=subprocess.PIPE)
+        Log.out("[Logging...] 文件对齐成功\n")
+    else:
+        os.rename(unalignapk, finalapk)
     return True
 
 def needInstall():
