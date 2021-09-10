@@ -121,6 +121,8 @@ def alignapk(unalignapk, finalapk):
         subprocess.call(cmdlist, stdout=subprocess.PIPE)
         Log.out("[Logging...] 文件对齐成功\n")
     else:
+        if (os.path.exists(finalapk)):
+            os.remove(finalapk)
         os.rename(unalignapk, finalapk)
     return True
 
