@@ -145,11 +145,10 @@ def find_all_rfolders(masterfolder):
 def find_rfiles(rfolder):
     '''查找一个文件夹下面所有的R$开头的文件'''
     rfiles = []
-    mylist = os.walk(rfolder, True)
-    for root, filedir, files in mylist:
-        for file in files:
-            if (file.startswith("R$")):
-                rfiles += [os.path.join(root, file)]
+    mylist = os.listdir(rfolder)
+    for file in mylist:
+        if (file.startswith("R$")):
+            rfiles += [os.path.join(rfolder, file)]
     return rfiles
 
 def find_type_byfile(rfile):
@@ -163,10 +162,9 @@ def find_type_byfile(rfile):
         pass
     return restype
 
-def update_one_rfile(pubdict, rfile, rfolder):
+def update_one_rfile(pubdict, rfile, rfolder, idlist):
     '''更新R文件的ID'''
     #Log.out("update rfile : %s" % rfile)
-    idlist = []
     conlist = []
     f = open(rfile, "r");
     allcontent = f.readlines()
@@ -199,7 +197,8 @@ def update_one_rfile(pubdict, rfile, rfolder):
                         #Log.out("%s -> %s" % (c, news))
                         conlist[index] = news
                         modify = True
-                        idlist.append((oid, nid))
+                        if ("R$attr.smali" in rfile):
+                            idlist.append((oid, nid, pubkey))
                 else:
                     if DEBUG_MODE:
                         Log.out("[Logging...] 重建标识出错 : %s, 文件 : %s" % (s, rfile))
@@ -212,6 +211,47 @@ def update_one_rfile(pubdict, rfile, rfolder):
         f.write(newcontent)
         f.close()
 
+def update_rstyleable_file(idlist, rfolder):
+    '''
+    function:更新styleable文件的id
+    desc:只针对R$attr.smali文件发生变化时，更新对应的R$styleable.smali
+    1. 更新方案为：按照更新id的先后顺序对R$styleable.smali文件里面相同的id进行更新
+    2. 每个id只更新一次
+    '''
+    if (idlist == None or len(idlist) <= 0):
+        return
+    if (rfolder == None or not os.path.exists(rfolder)):
+        return
+    styleable_file = os.path.join(rfolder, "R$styleable.smali")
+    if (not os.path.exists(styleable_file)):
+        return
+    f = open(styleable_file, "r");
+    alllines = f.readlines()
+    f.close()
+    newlines = alllines[:]
+    #Log.out("rfile : %s" % styleable_file)
+    for oid, nid, pubkey in idlist:
+        for index in range(0, len(alllines)):
+            line = alllines[index]
+            if (line != None and line.find(oid) > -1):
+                newline = line.replace(oid, nid)
+                newlines[index] = newline
+                alllines[index] = None
+                #Log.out("pubkey : %s , oid : %s , nid : %s , index : %s" % (pubkey, oid, nid, index))
+
+    newcontent = "".join(newlines)
+    f = open(styleable_file, "w")
+    f.write(newcontent)
+    f.close()
+
+def update_one_rfolder(pubdict, rfolder):
+    '''更新包含R文件的文件夹'''
+    r_files = find_rfiles(rfolder)
+    idlist = []
+    for f in r_files:
+        if ("R$styleable.smali" not in f):
+            update_one_rfile(pubdict, f, rfolder, idlist)
+
     """
     由于attr文件里面的ID可能会出现在styleable文件中，
     因此，更新attr文件时，需要同步更新styleable文件里面相同的id
@@ -221,32 +261,7 @@ def update_one_rfile(pubdict, rfile, rfolder):
     float radius = a.getDimension(R.styleable.CardView_cardCornerRadius, 0);
     时，出现无法获取值的问题
     """
-    if ("R$attr.smali" in rfile):
-        update_rstyleable_file(idlist, rfolder)
-
-def update_rstyleable_file(idlist, rfolder):
-    '''更新styleable文件的id'''
-    if (idlist == None or len(idlist) <= 0):
-        return
-    if (rfolder == None or not os.path.exists(rfolder)):
-        return
-    styleable_file = os.path.join(rfolder, "R$styleable.smali")
-    if (not os.path.exists(styleable_file)):
-        return
-    f = open(styleable_file, "r");
-    allcontent = f.read()
-    f.close()
-    for oid, nid in idlist:
-        allcontent = allcontent.replace(oid, nid)
-    f = open(styleable_file, "w")
-    f.write(allcontent)
-    f.close()
-
-def update_one_rfolder(pubdict, rfolder):
-    '''更新包含R文件的文件夹'''
-    r_files = find_rfiles(rfolder)
-    for f in r_files:
-        update_one_rfile(pubdict, f, rfolder)
+    update_rstyleable_file(idlist, rfolder)
 
 def prepare_public(masterfolder):
     pubdict = {}

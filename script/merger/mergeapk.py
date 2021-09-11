@@ -228,7 +228,10 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
                 pass
             SAVE_ON_FALSE = saveonfalse
             Log.out("[Logging...] 当前函数编号 : [%.2d] [%s]" % (item + 1, functions[item]["function"].split("(")[0]))
+            start_time = time.time()
             result = eval(functions[item]["function"])
+            end_time = time.time()
+            Log.out("[Logging...] 功能运行耗时 : [%.2fs]" % (end_time - start_time))
             if (result == False):
                 if (saveonfalse == True):
                     savestr = '{"position":%d,"filename":r"%s"}' % (item, os.path.abspath(mastermergedapk))
