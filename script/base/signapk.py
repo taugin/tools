@@ -20,6 +20,7 @@ import time
 
 USE_TESTSIGN_FILE = False
 OUTPUT_SIGNED_APK = None
+USE_JARSIGNER = False
 ALIGN_APK = False
 
 def pause():
@@ -140,13 +141,14 @@ def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     if not os.path.exists(src_apk):
         Log.out("[Logging...] 文件丢失", True)
         return False
-    index = src_apk.rfind(".apk")
+    name,ext = os.path.splitext(src_apk)
+    index = src_apk.rfind(ext)
     if (index == -1):
         Log.out("[Logging...] 无法识别 : [%s]" % src_apk, True)
         return
     #Log.out("index : %d " % index)
     #Log.out("substring : %s " % src_apk[0:index])
-    dst_apk = src_apk[0:index] + "-signed.apk"
+    dst_apk = src_apk[0:index] + "-signed" + ext
     if (OUTPUT_SIGNED_APK != None and len(OUTPUT_SIGNED_APK) > 0):
         dst_apk = OUTPUT_SIGNED_APK
     #Log.out("dst_apk : %s " % dst_apk)
@@ -154,9 +156,12 @@ def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     if(USE_TESTSIGN_FILE == False):
         keystoreinfo = readkeystore(os.path.dirname(src_apk))
     dirname = os.path.dirname(src_apk);
-    tmp_name = os.path.basename(src_apk) + "-tmp.apk"
+    tmp_name = os.path.basename(src_apk) + "-tmp" + ext
     tmp_apk = os.path.join(dirname, tmp_name)
-    signapk_with_apksigner(src_apk, tmp_apk, dst_apk, keystoreinfo)
+    if (USE_JARSIGNER):
+        signapk_with_jarsigner(src_apk, tmp_apk, dst_apk, keystoreinfo)
+    else:
+        signapk_with_apksigner(src_apk, tmp_apk, dst_apk, keystoreinfo)
     Utils.deleteFile(tmp_apk)
 
 def readkeystore(filedir):
@@ -247,7 +252,7 @@ if __name__ == "__main__":
     if (len(sys.argv) < 2):
         Log.out("[Logging...] 脚本缺少参数 : %s [-t] <src_apk>, [-a] 对齐apk" % os.path.basename(sys.argv[0]), True);
         sys.exit()
-    opts, args = getopt.getopt(sys.argv[1:], "ato:")
+    opts, args = getopt.getopt(sys.argv[1:], "atjo:")
     for op, value in opts:
         if (op == "-t"):
             USE_TESTSIGN_FILE = True
@@ -255,6 +260,8 @@ if __name__ == "__main__":
             OUTPUT_SIGNED_APK = value
         elif (op == "-a"):
             ALIGN_APK = True
+        elif (op == "-j"):
+            USE_JARSIGNER = True
     if (ALIGN_APK == True):
         for file in args :
             if (os.path.isdir(file)):
@@ -272,8 +279,8 @@ if __name__ == "__main__":
                 listfiles = os.listdir(file)
                 for apkfile in listfiles :
                     apkpath = file + Common.SEPERATER + apkfile
-                    if (len(apkpath) >= 4 and apkpath[-4:] == ".apk"):
+                    if (len(apkpath) >= 4 and (apkpath[-4:] == ".apk" or apkpath[-4:] == ".aab")):
                         exec_sign_process(os.path.abspath(apkpath), USE_TESTSIGN_FILE)
             else:
-                if (len(file) >= 4 and file[-4:] == ".apk"):
+                if (len(file) >= 4 and (file[-4:] == ".apk" or file[-4:] == ".aab")):
                     exec_sign_process(os.path.abspath(file), USE_TESTSIGN_FILE)

@@ -15,11 +15,17 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\myapkfile\shell\open\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -i \"%1\""
 
-[HKEY_CLASSES_ROOT\myapkfile\shell\为APK签名]
+[HKEY_CLASSES_ROOT\myapkfile\shell\APK签名(ApkSigner)]
 "Icon"="$TOOLS_ROOT\\extra\\winreg\\qian.ico,0"
 
-[HKEY_CLASSES_ROOT\myapkfile\shell\为APK签名\command]
+[HKEY_CLASSES_ROOT\myapkfile\shell\APK签名(ApkSigner)\command]
 @="$TOOLS_ROOT\\bin\\signapk.bat \"%1\""
+
+[HKEY_CLASSES_ROOT\myapkfile\shell\APK签名(JarSigner)]
+"Icon"="$TOOLS_ROOT\\extra\\winreg\\qian.ico,0"
+
+[HKEY_CLASSES_ROOT\myapkfile\shell\APK签名(JarSigner)\command]
+@="$TOOLS_ROOT\\bin\\signapk.bat -j \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\使用WinRAR打开]
 "Icon"="$WINRAR_PATH"
@@ -273,6 +279,11 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\myaabfile\shell\aab转apks\command]
 @="$TOOLS_ROOT\\bin\\aab.bat -t \"%1\""
 
+[HKEY_CLASSES_ROOT\myaabfile\shell\AAB签名(JarSigner)]
+"Icon"="$TOOLS_ROOT\\extra\\winreg\\qian.ico,0"
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\AAB签名(JarSigner)\command]
+@="$TOOLS_ROOT\\bin\\signapk.bat -j \"%1\""
 #==========================================================
 #解析.apks文件
 [HKEY_CLASSES_ROOT\.apks]
