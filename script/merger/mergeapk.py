@@ -37,6 +37,13 @@ FORMAT_VERCODE = "{vercode}"
 FORMAT_DATETIME = "{datetime}"
 
 
+def task(task_name, fun, *args, **kwargs):
+    Log.out("[Logging...] 当前函数名称 : [%s]" % task_name)
+    start_time = time.time()
+    fun(*args, **kwargs)
+    end_time = time.time()
+    Log.out("[Logging...] 功能运行耗时 : [%.2fs]" % (end_time - start_time))
+
 def pause():
     if (platform.system().lower() == "windows"):
         import msvcrt
