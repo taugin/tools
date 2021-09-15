@@ -273,10 +273,16 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\myaabfile\shell\使用WinRAR打开\command]
 @="$WINRAR_PATH \"%1\""
 
-[HKEY_CLASSES_ROOT\myaabfile\shell\aab转apks]
+[HKEY_CLASSES_ROOT\myaabfile\shell\open]
 "Icon"="$TOOLS_ROOT\\extra\\winreg\\zhuan.ico,0"
 
-[HKEY_CLASSES_ROOT\myaabfile\shell\aab转apks\command]
+[HKEY_CLASSES_ROOT\myaabfile\shell\open\command]
+@="$TOOLS_ROOT\\bin\\aab.bat -t \"%1\""
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\AAB转APKS]
+"Icon"="$TOOLS_ROOT\\extra\\winreg\\zhuan.ico,0"
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\AAB转APKS\command]
 @="$TOOLS_ROOT\\bin\\aab.bat -t \"%1\""
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\AAB签名(JarSigner)]
