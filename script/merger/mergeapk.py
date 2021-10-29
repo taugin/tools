@@ -100,7 +100,7 @@ def get_app_info(apkFile):
     '''输出apk的包信息'''
     apk_info = {}
     cmdlist = [Common.AAPT2_BIN, "d", "badging", apkFile]
-    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
 
     tmppkg = ""
     tmp = ""

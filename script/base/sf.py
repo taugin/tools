@@ -76,7 +76,7 @@ def printsign_md5(apkFile, signFile, fullSignfileName):
     '''输出签名文件的MD5'''
     global apk_info
     cmdlist = [Common.KEYTOOL, "-printcert", "-file", signFile]
-    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
     process.wait()
     alllines = process.stdout.readlines()
     sign_md5 = None
@@ -342,7 +342,7 @@ def get_select_devices():
     try:
         cmd = [Common.ADB, "devices", "-l"]
         devices = []
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
         p.wait(5)
         allLines = p.stdout.readlines()
         for s in allLines:
@@ -377,7 +377,7 @@ def install_apk(args):
             return
         else:
             Log.out("[Logging...] 正在安装 : " + os.path.abspath(args[0]))
-        result = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        result = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
         execret = result.stdout.readlines();
         allret = ""
         success = False
@@ -407,7 +407,7 @@ def install_multiple_apks(xapk, apks):
             return
         else:
             Log.out("[Logging...] 正在安装 : %s" % os.path.abspath(xapk))
-        result = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        result = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
         execret = result.stdout.readlines();
         allret = ""
         success = False

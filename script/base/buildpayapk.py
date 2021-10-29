@@ -106,7 +106,7 @@ def build_apk(key):
     for cmd in cmdlist:
         cmdstr += cmd + " "
     log(cmdstr)
-    subprocess.call(cmdlist, shell=True)
+    subprocess.call(cmdlist, shell=False)
 
 def add_filter(filter, apkfile):
     if (filter == None or filter == ""):
