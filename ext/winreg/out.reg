@@ -5,24 +5,24 @@ Windows Registry Editor Version 5.00
 "Icon"="C:\\Program Files\\WinRAR\\WinRar.exe"
 
 [HKEY_CLASSES_ROOT\myapkfile\DefaultIcon]
-@="D:\\github\\tools\\extra\\winreg\\android.ico,0"
+@="D:\\github\\tools\\ext\\winreg\\android.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell]
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\open]
-"Icon"="D:\\github\\tools\\extra\\winreg\\android.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\android.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\open\command]
 @="D:\\github\\tools\\bin\\sf.bat -i \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK签名(ApkSigner)]
-"Icon"="D:\\github\\tools\\extra\\winreg\\qian.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\qian.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK签名(ApkSigner)\command]
 @="D:\\github\\tools\\bin\\signapk.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK签名(JarSigner)]
-"Icon"="D:\\github\\tools\\extra\\winreg\\qian.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\qian.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK签名(JarSigner)\command]
 @="D:\\github\\tools\\bin\\signapk.bat -j \"%1\""
@@ -34,13 +34,13 @@ Windows Registry Editor Version 5.00
 @="C:\\Program Files\\WinRAR\\WinRar.exe \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\解压APK文件]
-"Icon"="D:\\github\\tools\\extra\\winreg\\7z.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\7z.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\解压APK文件\command]
 @="D:\\github\\tools\\bin\\unapk.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\查看APK信息]
-"Icon"="D:\\github\\tools\\extra\\winreg\\cha.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\cha.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\查看APK信息\command]
 @="D:\\github\\tools\\bin\\sf.bat -p \"%1\""
@@ -56,25 +56,25 @@ Windows Registry Editor Version 5.00
 #@="D:\\github\\tools\\bin\\modapk.bat -j \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\反编译]
-"Icon"="D:\\github\\tools\\extra\\winreg\\fan.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\fan.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\反编译\command]
 @="D:\\github\\tools\\bin\\apktool.bat d \"%1\" -f"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK对齐]
-"Icon"="D:\\github\\tools\\extra\\winreg\\duiqi.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\duiqi.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK对齐\command]
 @="D:\\github\\tools\\bin\\signapk.bat -a \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\JADX-GUI]
-"Icon"="D:\\github\\tools\\extra\\winreg\\jadx.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\jadx.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\JADX-GUI\command]
 @="D:\\github\\tools\\bin\\jadx\\bin\\jadx-gui.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\打开GP详情]
-"Icon"="D:\\github\\tools\\extra\\winreg\\gp.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\gp.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\打开GP详情\command]
 @="D:\\github\\tools\\bin\\sf.bat -g \"%1\""
@@ -88,7 +88,7 @@ Windows Registry Editor Version 5.00
 "Icon"="C:\\Program Files\\WinRAR\\WinRar.exe"
 
 [HKEY_CLASSES_ROOT\myaarfile\DefaultIcon]
-@="D:\\github\\tools\\extra\\winreg\\android.ico,0"
+@="D:\\github\\tools\\ext\\winreg\\android.ico,0"
 
 [HKEY_CLASSES_ROOT\myaarfile\shell]
 
@@ -99,7 +99,7 @@ Windows Registry Editor Version 5.00
 @="C:\\Program Files\\WinRAR\\WinRar.exe \"%1\""
 
 [HKEY_CLASSES_ROOT\myaarfile\shell\解压AAR文件]
-"Icon"="D:\\github\\tools\\extra\\winreg\\7z.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\7z.ico,0"
 
 [HKEY_CLASSES_ROOT\myaarfile\shell\解压AAR文件\command]
 @="D:\\github\\tools\\bin\\unapk.bat \"%1\""
@@ -129,31 +129,31 @@ Windows Registry Editor Version 5.00
 @="cmd /k cd %1"
 
 [HKEY_CLASSES_ROOT\Directory\shell\编译APK]
-"Icon"="D:\\github\\tools\\extra\\winreg\\hui.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\hui.ico,0"
 
 [HKEY_CLASSES_ROOT\Directory\shell\编译APK\command]
 @="D:\\github\\tools\\bin\\apktool.bat b \"%1\" -o \"%1-recompile.apk\""
 
 [HKEY_CLASSES_ROOT\*\shell\查看MD5和SHA1]
-"Icon"="D:\\github\\tools\\extra\\winreg\\md5.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\md5.ico,0"
 
 [HKEY_CLASSES_ROOT\*\shell\查看MD5和SHA1\command]
 @="D:\\github\\tools\\bin\\sf.bat -m \"%1\""
 
 [HKEY_CLASSES_ROOT\*\shell\AES加密]
-"Icon"="D:\\github\\tools\\extra\\winreg\\jia.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\jia.ico,0"
 
 [HKEY_CLASSES_ROOT\*\shell\AES加密\command]
 @="D:\\github\\tools\\bin\\aes.bat -e -k 123456789 -i \"%1\""
 
 [HKEY_CLASSES_ROOT\*\shell\AES解密]
-"Icon"="D:\\github\\tools\\extra\\winreg\\jie.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\jie.ico,0"
 
 [HKEY_CLASSES_ROOT\*\shell\AES解密\command]
 @="D:\\github\\tools\\bin\\aes.bat -d -k 123456789 -i \"%1\""
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\PullApk]
-"Icon"="D:\\github\\tools\\extra\\winreg\\android.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\android.ico,0"
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\PullApk\command]
 @="D:\\github\\tools\\bin\\pullapk.bat"
@@ -177,13 +177,13 @@ Windows Registry Editor Version 5.00
 @="cmd /k"
 
 #[HKEY_CLASSES_ROOT\mydexfile\shell\open]
-#"Icon"="D:\\github\\tools\\extra\\winreg\\jadx.ico,0"
+#"Icon"="D:\\github\\tools\\ext\\winreg\\jadx.ico,0"
 
 #[HKEY_CLASSES_ROOT\mydexfile\shell\open\command]
 #@="D:\\github\\tools\\bin\\jadx\\bin\\jadx-gui.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\mydexfile\shell\JADX-GUI]
-"Icon"="D:\\github\\tools\\extra\\winreg\\jadx.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\jadx.ico,0"
 
 [HKEY_CLASSES_ROOT\mydexfile\shell\JADX-GUI\command]
 @="D:\\github\\tools\\bin\\jadx\\bin\\jadx-gui.bat \"%1\""
@@ -198,7 +198,7 @@ Windows Registry Editor Version 5.00
 @="mydexfile"
 
 [HKEY_CLASSES_ROOT\*\shell\Excel2Json]
-"Icon"="D:\\github\\tools\\extra\\winreg\\zhuan.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\zhuan.ico,0"
 
 [HKEY_CLASSES_ROOT\*\shell\Excel2Json\command]
 @="D:\\github\\tools\\bin\\excel2json.bat \"%1\""
@@ -212,18 +212,18 @@ Windows Registry Editor Version 5.00
 "Icon"="C:\\Program Files\\WinRAR\\WinRar.exe"
 
 [HKEY_CLASSES_ROOT\myxapkfile\DefaultIcon]
-@="D:\\github\\tools\\extra\\winreg\\xapk.ico,0"
+@="D:\\github\\tools\\ext\\winreg\\xapk.ico,0"
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell]
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\open]
-"Icon"="D:\\github\\tools\\extra\\winreg\\xapk.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\xapk.ico,0"
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\open\command]
 @="D:\\github\\tools\\bin\\sf.bat -x \"%1\""
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\解压XAPK文件]
-"Icon"="D:\\github\\tools\\extra\\winreg\\7z.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\7z.ico,0"
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\解压XAPK文件\command]
 @="D:\\github\\tools\\bin\\unapk.bat \"%1\""
@@ -235,13 +235,13 @@ Windows Registry Editor Version 5.00
 @="C:\\Program Files\\WinRAR\\WinRar.exe \"%1\""
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\查看XAPK信息]
-"Icon"="D:\\github\\tools\\extra\\winreg\\cha.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\cha.ico,0"
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\查看XAPK信息\command]
 @="D:\\github\\tools\\bin\\sf.bat -p \"%1\""
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\打开GP详情]
-"Icon"="D:\\github\\tools\\extra\\winreg\\gp.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\gp.ico,0"
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\打开GP详情\command]
 @="D:\\github\\tools\\bin\\sf.bat -g \"%1\""
@@ -257,12 +257,12 @@ Windows Registry Editor Version 5.00
 "Icon"="C:\\Program Files\\WinRAR\\WinRar.exe"
 
 [HKEY_CLASSES_ROOT\myaabfile\DefaultIcon]
-@="D:\\github\\tools\\extra\\winreg\\aab.ico,0"
+@="D:\\github\\tools\\ext\\winreg\\aab.ico,0"
 
 [HKEY_CLASSES_ROOT\myaabfile\shell]
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\解压aab文件]
-"Icon"="D:\\github\\tools\\extra\\winreg\\7z.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\7z.ico,0"
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\解压aab文件\command]
 @="D:\\github\\tools\\bin\\unapk.bat \"%1\""
@@ -274,19 +274,19 @@ Windows Registry Editor Version 5.00
 @="C:\\Program Files\\WinRAR\\WinRar.exe \"%1\""
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\open]
-"Icon"="D:\\github\\tools\\extra\\winreg\\zhuan.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\zhuan.ico,0"
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\open\command]
 @="D:\\github\\tools\\bin\\aab.bat -t \"%1\""
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\AAB转APKS]
-"Icon"="D:\\github\\tools\\extra\\winreg\\zhuan.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\zhuan.ico,0"
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\AAB转APKS\command]
 @="D:\\github\\tools\\bin\\aab.bat -t \"%1\""
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\AAB签名(JarSigner)]
-"Icon"="D:\\github\\tools\\extra\\winreg\\qian.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\qian.ico,0"
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\AAB签名(JarSigner)\command]
 @="D:\\github\\tools\\bin\\signapk.bat -j \"%1\""
@@ -300,18 +300,18 @@ Windows Registry Editor Version 5.00
 "Icon"="C:\\Program Files\\WinRAR\\WinRar.exe"
 
 [HKEY_CLASSES_ROOT\myapksfile\DefaultIcon]
-@="D:\\github\\tools\\extra\\winreg\\apks.ico,0"
+@="D:\\github\\tools\\ext\\winreg\\apks.ico,0"
 
 [HKEY_CLASSES_ROOT\myapksfile\shell]
 
 [HKEY_CLASSES_ROOT\myapksfile\shell\open]
-"Icon"="D:\\github\\tools\\extra\\winreg\\apks.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\apks.ico,0"
 
 [HKEY_CLASSES_ROOT\myapksfile\shell\open\command]
 @="D:\\github\\tools\\bin\\aab.bat -i \"%1\""
 
 [HKEY_CLASSES_ROOT\myapksfile\shell\解压apks文件]
-"Icon"="D:\\github\\tools\\extra\\winreg\\7z.ico,0"
+"Icon"="D:\\github\\tools\\ext\\winreg\\7z.ico,0"
 
 [HKEY_CLASSES_ROOT\myapksfile\shell\解压apks文件\command]
 @="D:\\github\\tools\\bin\\unapk.bat \"%1\""

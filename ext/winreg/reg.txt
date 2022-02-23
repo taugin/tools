@@ -5,24 +5,24 @@ Windows Registry Editor Version 5.00
 "Icon"="$WINRAR_PATH"
 
 [HKEY_CLASSES_ROOT\myapkfile\DefaultIcon]
-@="$TOOLS_ROOT\\extra\\winreg\\android.ico,0"
+@="$TOOLS_ROOT\\ext\\winreg\\android.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell]
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\open]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\android.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\android.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\open\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -i \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK签名(ApkSigner)]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\qian.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\qian.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK签名(ApkSigner)\command]
 @="$TOOLS_ROOT\\bin\\signapk.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK签名(JarSigner)]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\qian.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\qian.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK签名(JarSigner)\command]
 @="$TOOLS_ROOT\\bin\\signapk.bat -j \"%1\""
@@ -34,13 +34,13 @@ Windows Registry Editor Version 5.00
 @="$WINRAR_PATH \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\解压APK文件]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\7z.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\7z.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\解压APK文件\command]
 @="$TOOLS_ROOT\\bin\\unapk.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\查看APK信息]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\cha.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\cha.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\查看APK信息\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -p \"%1\""
@@ -56,25 +56,25 @@ Windows Registry Editor Version 5.00
 #@="$TOOLS_ROOT\\bin\\modapk.bat -j \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\反编译]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\fan.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\fan.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\反编译\command]
 @="$TOOLS_ROOT\\bin\\apktool.bat d \"%1\" -f"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK对齐]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\duiqi.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\duiqi.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK对齐\command]
 @="$TOOLS_ROOT\\bin\\signapk.bat -a \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\JADX-GUI]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\jadx.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\jadx.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\JADX-GUI\command]
 @="$TOOLS_ROOT\\bin\\jadx\\bin\\jadx-gui.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\打开GP详情]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\gp.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\gp.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\打开GP详情\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -g \"%1\""
@@ -88,7 +88,7 @@ Windows Registry Editor Version 5.00
 "Icon"="$WINRAR_PATH"
 
 [HKEY_CLASSES_ROOT\myaarfile\DefaultIcon]
-@="$TOOLS_ROOT\\extra\\winreg\\android.ico,0"
+@="$TOOLS_ROOT\\ext\\winreg\\android.ico,0"
 
 [HKEY_CLASSES_ROOT\myaarfile\shell]
 
@@ -99,7 +99,7 @@ Windows Registry Editor Version 5.00
 @="$WINRAR_PATH \"%1\""
 
 [HKEY_CLASSES_ROOT\myaarfile\shell\解压AAR文件]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\7z.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\7z.ico,0"
 
 [HKEY_CLASSES_ROOT\myaarfile\shell\解压AAR文件\command]
 @="$TOOLS_ROOT\\bin\\unapk.bat \"%1\""
@@ -129,31 +129,31 @@ Windows Registry Editor Version 5.00
 @="cmd /k cd %1"
 
 [HKEY_CLASSES_ROOT\Directory\shell\编译APK]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\hui.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\hui.ico,0"
 
 [HKEY_CLASSES_ROOT\Directory\shell\编译APK\command]
 @="$TOOLS_ROOT\\bin\\apktool.bat b \"%1\" -o \"%1-recompile.apk\""
 
 [HKEY_CLASSES_ROOT\*\shell\查看MD5和SHA1]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\md5.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\md5.ico,0"
 
 [HKEY_CLASSES_ROOT\*\shell\查看MD5和SHA1\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -m \"%1\""
 
 [HKEY_CLASSES_ROOT\*\shell\AES加密]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\jia.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\jia.ico,0"
 
 [HKEY_CLASSES_ROOT\*\shell\AES加密\command]
 @="$TOOLS_ROOT\\bin\\aes.bat -e -k 123456789 -i \"%1\""
 
 [HKEY_CLASSES_ROOT\*\shell\AES解密]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\jie.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\jie.ico,0"
 
 [HKEY_CLASSES_ROOT\*\shell\AES解密\command]
 @="$TOOLS_ROOT\\bin\\aes.bat -d -k 123456789 -i \"%1\""
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\PullApk]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\android.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\android.ico,0"
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\PullApk\command]
 @="$TOOLS_ROOT\\bin\\pullapk.bat"
@@ -177,13 +177,13 @@ Windows Registry Editor Version 5.00
 @="cmd /k"
 
 #[HKEY_CLASSES_ROOT\mydexfile\shell\open]
-#"Icon"="$TOOLS_ROOT\\extra\\winreg\\jadx.ico,0"
+#"Icon"="$TOOLS_ROOT\\ext\\winreg\\jadx.ico,0"
 
 #[HKEY_CLASSES_ROOT\mydexfile\shell\open\command]
 #@="$TOOLS_ROOT\\bin\\jadx\\bin\\jadx-gui.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\mydexfile\shell\JADX-GUI]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\jadx.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\jadx.ico,0"
 
 [HKEY_CLASSES_ROOT\mydexfile\shell\JADX-GUI\command]
 @="$TOOLS_ROOT\\bin\\jadx\\bin\\jadx-gui.bat \"%1\""
@@ -198,7 +198,7 @@ Windows Registry Editor Version 5.00
 @="mydexfile"
 
 [HKEY_CLASSES_ROOT\*\shell\Excel2Json]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\zhuan.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\zhuan.ico,0"
 
 [HKEY_CLASSES_ROOT\*\shell\Excel2Json\command]
 @="$TOOLS_ROOT\\bin\\excel2json.bat \"%1\""
@@ -212,18 +212,18 @@ Windows Registry Editor Version 5.00
 "Icon"="$WINRAR_PATH"
 
 [HKEY_CLASSES_ROOT\myxapkfile\DefaultIcon]
-@="$TOOLS_ROOT\\extra\\winreg\\xapk.ico,0"
+@="$TOOLS_ROOT\\ext\\winreg\\xapk.ico,0"
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell]
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\open]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\xapk.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\xapk.ico,0"
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\open\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -x \"%1\""
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\解压XAPK文件]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\7z.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\7z.ico,0"
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\解压XAPK文件\command]
 @="$TOOLS_ROOT\\bin\\unapk.bat \"%1\""
@@ -235,13 +235,13 @@ Windows Registry Editor Version 5.00
 @="$WINRAR_PATH \"%1\""
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\查看XAPK信息]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\cha.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\cha.ico,0"
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\查看XAPK信息\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -p \"%1\""
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\打开GP详情]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\gp.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\gp.ico,0"
 
 [HKEY_CLASSES_ROOT\myxapkfile\shell\打开GP详情\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -g \"%1\""
@@ -257,12 +257,12 @@ Windows Registry Editor Version 5.00
 "Icon"="$WINRAR_PATH"
 
 [HKEY_CLASSES_ROOT\myaabfile\DefaultIcon]
-@="$TOOLS_ROOT\\extra\\winreg\\aab.ico,0"
+@="$TOOLS_ROOT\\ext\\winreg\\aab.ico,0"
 
 [HKEY_CLASSES_ROOT\myaabfile\shell]
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\解压aab文件]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\7z.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\7z.ico,0"
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\解压aab文件\command]
 @="$TOOLS_ROOT\\bin\\unapk.bat \"%1\""
@@ -274,19 +274,19 @@ Windows Registry Editor Version 5.00
 @="$WINRAR_PATH \"%1\""
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\open]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\zhuan.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\zhuan.ico,0"
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\open\command]
 @="$TOOLS_ROOT\\bin\\aab.bat -t \"%1\""
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\AAB转APKS]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\zhuan.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\zhuan.ico,0"
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\AAB转APKS\command]
 @="$TOOLS_ROOT\\bin\\aab.bat -t \"%1\""
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\AAB签名(JarSigner)]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\qian.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\qian.ico,0"
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\AAB签名(JarSigner)\command]
 @="$TOOLS_ROOT\\bin\\signapk.bat -j \"%1\""
@@ -300,18 +300,18 @@ Windows Registry Editor Version 5.00
 "Icon"="$WINRAR_PATH"
 
 [HKEY_CLASSES_ROOT\myapksfile\DefaultIcon]
-@="$TOOLS_ROOT\\extra\\winreg\\apks.ico,0"
+@="$TOOLS_ROOT\\ext\\winreg\\apks.ico,0"
 
 [HKEY_CLASSES_ROOT\myapksfile\shell]
 
 [HKEY_CLASSES_ROOT\myapksfile\shell\open]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\apks.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\apks.ico,0"
 
 [HKEY_CLASSES_ROOT\myapksfile\shell\open\command]
 @="$TOOLS_ROOT\\bin\\aab.bat -i \"%1\""
 
 [HKEY_CLASSES_ROOT\myapksfile\shell\解压apks文件]
-"Icon"="$TOOLS_ROOT\\extra\\winreg\\7z.ico,0"
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\7z.ico,0"
 
 [HKEY_CLASSES_ROOT\myapksfile\shell\解压apks文件\command]
 @="$TOOLS_ROOT\\bin\\unapk.bat \"%1\""
