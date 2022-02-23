@@ -21,7 +21,7 @@ SCRIPT_DIR = os.path.join(HOME_DIR, "script")
 LIB_DIR = os.path.join(HOME_DIR, "lib")
 
 #签名文件存放目录
-KEYSTORES_DIR = os.path.join(HOME_DIR, "extra/keystore")
+KEYSTORES_DIR = os.path.join(HOME_DIR, "ext/keystore")
 
 #默认的签名文件
 KEYSTORES_DEFAULT_FILE = os.path.join(KEYSTORES_DIR, "commonalias_pwd_common123456.jks")
