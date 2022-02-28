@@ -15,8 +15,8 @@ SET temp_extract_result_file=%TMPFOLDER%\temp_extract_result_file.txt
 if 0 == %ERRORLEVEL% (
     del %temp_extract_result_file%
     ECHO [Logging...] 文件解压成功
-    echo [Logging...] Wait for 3 seconds to exit
-    ping localhost -n 5 > nul
+    echo [Logging...] Wait for 2 seconds to exit
+    ping localhost -n 3 > nul
 ) else (
     ECHO [Logging...] 文件解压失败
     for /F "delims=" %%i in ('TYPE %temp_extract_result_file%') do (

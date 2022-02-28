@@ -22,6 +22,8 @@ import platform
 AAB2APKS = False
 INSTALL_APKS = False
 DEVICE_SPEC_FILE = None
+UNIVERSAL = False
+LOCAL_TESTING = False
 
 def input_no(start, end):
     try:
@@ -176,6 +178,12 @@ def aab2apks(aab_file):
         cmdlist.append("--connected-device")
         cmdlist.append("--device-id=%s" % select_device)
 
+    if (UNIVERSAL == True):
+        cmdlist.append("--mode=universal")
+
+    if (LOCAL_TESTING == True):
+        cmdlist.append("--local-testing")
+
     if (DEVICE_SPEC_FILE != None and len(DEVICE_SPEC_FILE) > 0 and os.path.exists(DEVICE_SPEC_FILE)):
         cmdlist.append("--device-spec=%s" % DEVICE_SPEC_FILE)
     
@@ -235,14 +243,19 @@ if (len(sys.argv) < 2):
     sys.exit()
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "tis:")
+    opts, args = getopt.getopt(sys.argv[1:], "tiuls:")
     for op, value in opts:
         if (op == "-t"):
             AAB2APKS = True
         elif (op == "-i") :
             INSTALL_APKS = True
+        elif (op == "-u"):
+            UNIVERSAL = True
+        elif (op == "-l"):
+            LOCAL_TESTING = True
         elif (op == "-s"):
             DEVICE_SPEC_FILE = value
+
 except getopt.GetoptError as err:
     Log.out(err)
     sys.exit()

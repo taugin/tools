@@ -261,10 +261,10 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\myaabfile\shell]
 
-[HKEY_CLASSES_ROOT\myaabfile\shell\解压aab文件]
+[HKEY_CLASSES_ROOT\myaabfile\shell\解压AAB文件]
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\7z.ico,0"
 
-[HKEY_CLASSES_ROOT\myaabfile\shell\解压aab文件\command]
+[HKEY_CLASSES_ROOT\myaabfile\shell\解压AAB文件\command]
 @="$TOOLS_ROOT\\bin\\unapk.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\使用WinRAR打开]
@@ -284,6 +284,18 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\AAB转APKS\command]
 @="$TOOLS_ROOT\\bin\\aab.bat -t \"%1\""
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\AAB转APKS(universal)]
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\zhuan.ico,0"
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\AAB转APKS(universal)\command]
+@="$TOOLS_ROOT\\bin\\aab.bat -t -u \"%1\""
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\AAB转APKS(local_testing)]
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\zhuan.ico,0"
+
+[HKEY_CLASSES_ROOT\myaabfile\shell\AAB转APKS(local_testing)\command]
+@="$TOOLS_ROOT\\bin\\aab.bat -t -l \"%1\""
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\AAB签名(JarSigner)]
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\qian.ico,0"
