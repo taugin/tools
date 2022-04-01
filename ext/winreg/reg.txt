@@ -61,6 +61,18 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\myapkfile\shell\反编译\command]
 @="$TOOLS_ROOT\\bin\\apktool.bat d \"%1\" -f"
 
+[HKEY_CLASSES_ROOT\myapkfile\shell\反编译(仅源码)]
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\fan.ico,0"
+
+[HKEY_CLASSES_ROOT\myapkfile\shell\反编译(仅源码)\command]
+@="$TOOLS_ROOT\\bin\\apktool.bat d -r \"%1\" -f"
+
+[HKEY_CLASSES_ROOT\myapkfile\shell\反编译(仅资源)]
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\fan.ico,0"
+
+[HKEY_CLASSES_ROOT\myapkfile\shell\反编译(仅资源)\command]
+@="$TOOLS_ROOT\\bin\\apktool.bat d -s \"%1\" -f"
+
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK对齐]
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\duiqi.ico,0"
 
@@ -322,10 +334,10 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\myapksfile\shell\open\command]
 @="$TOOLS_ROOT\\bin\\aab.bat -i \"%1\""
 
-[HKEY_CLASSES_ROOT\myapksfile\shell\解压apks文件]
+[HKEY_CLASSES_ROOT\myapksfile\shell\解压APKS文件]
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\7z.ico,0"
 
-[HKEY_CLASSES_ROOT\myapksfile\shell\解压apks文件\command]
+[HKEY_CLASSES_ROOT\myapksfile\shell\解压APKS文件\command]
 @="$TOOLS_ROOT\\bin\\unapk.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\myapksfile\shell\使用WinRAR打开]
