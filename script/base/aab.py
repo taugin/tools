@@ -172,7 +172,9 @@ def aab2apks(aab_file):
     cmdlist.append("--ks-pass=pass:%s" % keystoreinfo[1])
     cmdlist.append("--ks-key-alias=%s" % keystoreinfo[2])
     cmdlist.append("--key-pass=pass:%s" % keystoreinfo[3])
-    select_device = get_select_devices(False)
+    select_device = None
+    if UNIVERSAL != True:
+        select_device = get_select_devices(False)
     if (select_device != None and transformAabForDevice()):
         Log.out("[Logging...] 连接设备 : [%s]\n" % select_device, True)
         cmdlist.append("--connected-device")
