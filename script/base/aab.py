@@ -18,6 +18,7 @@ import Utils
 import getopt
 import subprocess
 import platform
+import zipfile
 
 AAB2APKS = False
 INSTALL_APKS = False
@@ -207,11 +208,27 @@ def aab2apks(aab_file):
         exp_time = end_time - start_time
         Log.out("[Logging...] 转换耗时 : [%.2fs]" % exp_time, True)
         #time.sleep(3)
+        if UNIVERSAL == True and os.path.exists(apks_file):
+            extractApksInUniversalMode(apks_file, basename)
         pause()
     else:
         Log.out("[Logging...] 转换失败", True)
         pause()
     pass
+
+def extractApksInUniversalMode(apks_file, basename):
+    final_apk_name = "%s.apk" % basename
+    cur_dir = os.path.dirname(apks_file)
+    universal_path = os.path.join(cur_dir, "universal.apk")
+    if (os.path.exists(universal_path)):
+        os.remove(universal_path)
+    if (os.path.exists(final_apk_name)):
+        os.remove(final_apk_name)
+    Log.out("[Logging...] 解压文件 : [%s -> %s]" % (apks_file, final_apk_name), True)
+    apks_zip_file = zipfile.ZipFile(apks_file, "r")
+    apks_zip_file.extract("universal.apk", ".")
+    apks_zip_file.close()
+    os.rename(universal_path, final_apk_name)
 
 def install_apks(apks_file):
     select_device = get_select_devices(True)
