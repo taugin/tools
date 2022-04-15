@@ -43,7 +43,7 @@ def usage():
     sys.exit()
 
 def test_port(dst, port):
-    sys.stdout.write(SCANNING_STATUS % (SCANNING_IP, str(port)) + '\r')
+    sys.stdout.write(SCANNING_STATUS % (dst, str(port)) + '\r')
     sys.stdout.flush()
     cli_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
