@@ -49,6 +49,25 @@ def inputvalue(prompt, max) :
             if (int(p) >= 1 and int(p) <= max):
                 return p
 
+def getaabpackagename(file):
+    result = None
+    try:
+        cmdlist = []
+        cmdlist.append("java")
+        cmdlist.append("-jar")
+        cmdlist.append(Common.BUNDLE_TOOL)
+        cmdlist.append("dump")
+        cmdlist.append("manifest")
+        cmdlist.append("--bundle=%s" % file)
+        cmdlist.append("--xpath=/manifest/@package")
+        #Log.out("cmdlist : %s" % (" ".join(cmdlist)))
+        p = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
+        result = p.stdout.read()
+        result = result.decode().strip()
+    except:
+        pass
+    return result
+
 def readkeystore(src_file):
     filedir = os.path.dirname(src_file)
     listfile = os.listdir(filedir)
@@ -61,6 +80,23 @@ def readkeystore(src_file):
             storefiles.append(file)
             storeindex+=1
         index+=1
+    ##############################################
+    if (len(storefiles) <= 0):
+        packagename = getaabpackagename(src_file)
+        if (packagename != None and len(packagename) > 0):
+            pkg_storefile = os.path.join(Common.KEYSTORES_DIR, packagename)
+            if (pkg_storefile != None and os.path.isdir(pkg_storefile)):
+                Log.out("[Logging...] 文件包名 : [%s]" % packagename)
+                listfile=os.listdir(pkg_storefile)
+                #Log.out(listfile)
+                index = 0
+                storeindex = 0
+                for file in listfile:
+                    if(file.endswith(".keystore") or file.endswith(".jks")):
+                        storefiles.append(os.path.join(pkg_storefile, file))
+                        storeindex+=1
+                    index+=1
+    ##############################################
     if (storeindex > 1):
         index = 1
         for keyfile in storefiles:
