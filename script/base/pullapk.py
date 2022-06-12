@@ -10,6 +10,7 @@ sys.path.append(COM_DIR)
 
 import Common
 import Log
+import Utils
 
 import re
 import subprocess
@@ -186,38 +187,6 @@ def pullspecapk(apkfile, package, to_dir):
         Log.out("[Logging...] 获取APK成功 : [%s]" % newFile)
         os.rename(tempFile, newFile)
 
-
-def parseString(line):
-    format_code = ["utf8", "gbk", "gb2312"]
-    result = "";
-    for f in format_code:
-        try:
-            result = line.decode(f, "ignore")
-            return result
-        except:
-            pass
-    return result
-
-    label = None
-    try:
-        cmdlist = [Common.AAPT2_BIN, "d", "badging", apkFile]
-        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
-        tmppkg = ""
-        tmp = ""
-        alllines = process.stdout.readlines()
-        for line in alllines :
-            tmp = str(line, "utf-8")
-            if (tmp.startswith("application-label")):
-                tmppkg = tmp
-                break;
-        tmppkg = tmppkg.replace("\r", "")
-        tmppkg = tmppkg.replace("\n", "")
-        tmppkg = tmppkg.replace("'", "")
-        label = tmppkg.split(":")[1]
-    except:
-        pass
-    return label
-
 def get_app_info(apkFile):
     '''输出apk的包信息'''
     apk_info = {}
@@ -228,7 +197,7 @@ def get_app_info(apkFile):
     tmp = ""
     alllines = process.stdout.readlines()
     for line in alllines :
-        tmp = parseString(line)
+        tmp = Utils.parseString(line)
         if (tmp.startswith("package: ")):
             try:
                 tmppkg = tmp[len("package: "):]

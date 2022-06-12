@@ -113,3 +113,14 @@ def list_files(dirname):
 def deleteFile(file):
     if (os.path.exists(file)):
         os.remove(file)
+
+def parseString(line):
+    format_code = ["utf8", "gbk", "gb2312"]
+    result = "";
+    for f in format_code:
+        try:
+            result = line.decode(f, "ignore")
+            return result
+        except:
+            pass
+    return result

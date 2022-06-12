@@ -35,7 +35,58 @@ def inputvalue(prompt, max) :
         if (p.isdigit()):
             if (int(p) >= 1 and int(p) <= max):
                 return p
-    
+
+def getaabpackagename(file):
+    result = None
+    try:
+        cmdlist = []
+        cmdlist.append("java")
+        cmdlist.append("-jar")
+        cmdlist.append(Common.BUNDLE_TOOL)
+        cmdlist.append("dump")
+        cmdlist.append("manifest")
+        cmdlist.append("--bundle=%s" % file)
+        cmdlist.append("--xpath=/manifest/@package")
+        #Log.out("cmdlist : %s" % (" ".join(cmdlist)))
+        p = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
+        result = p.stdout.read()
+        result = result.decode().strip()
+    except:
+        pass
+    return result
+
+def getapkpackagename(file):
+    result = None
+    try :
+        cmdlist = [Common.AAPT2_BIN, "d", "badging", file]
+        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
+        alllines = process.stdout.readlines()
+        for line in alllines :
+            tmp = Utils.parseString(line)
+            if (tmp.startswith("package: ")):
+                try:
+                    tmppkg = tmp[len("package: "):]
+                    tmppkg = tmppkg.replace("\r", "")
+                    tmppkg = tmppkg.replace("\n", "")
+                    tmppkg = tmppkg.replace("'", "")
+                    tmpsplit = tmppkg.split(" ")
+                    if tmpsplit != None and len(tmpsplit) >= 3:
+                        result = tmpsplit[0].split("=")[1]
+                        break;
+                except:
+                    pass
+    except:
+        pass
+    return result
+
+def getpackagename(file):
+    name, ext = os.path.splitext(file)
+    if (ext == ".apk"):
+        return getapkpackagename(file)
+    if (ext == ".aab"):
+        return getaabpackagename(file)
+    return None
+
 def deletemetainf(src_apk):
     signfilelist = []
     z = zipfile.ZipFile(src_apk, "r")
@@ -142,6 +193,8 @@ def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
         Log.out("[Logging...] 文件丢失", True)
         return False
     name,ext = os.path.splitext(src_apk)
+    if (ext != None):
+        ext = ext.lower()
     index = src_apk.rfind(ext)
     if (index == -1):
         Log.out("[Logging...] 无法识别 : [%s]" % src_apk, True)
@@ -154,17 +207,17 @@ def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     #Log.out("dst_apk : %s " % dst_apk)
     keystoreinfo = []
     if(USE_TESTSIGN_FILE == False):
-        keystoreinfo = readkeystore(os.path.dirname(src_apk))
+        keystoreinfo = readkeystore(src_apk, os.path.dirname(src_apk))
     dirname = os.path.dirname(src_apk);
     tmp_name = os.path.basename(src_apk) + "-tmp" + ext
     tmp_apk = os.path.join(dirname, tmp_name)
-    if (USE_JARSIGNER):
+    if (USE_JARSIGNER or ext == ".aab"):
         signapk_with_jarsigner(src_apk, tmp_apk, dst_apk, keystoreinfo)
     else:
         signapk_with_apksigner(src_apk, tmp_apk, dst_apk, keystoreinfo)
     Utils.deleteFile(tmp_apk)
 
-def readkeystore(filedir):
+def readkeystore(src_apk, filedir):
     listfile=os.listdir(filedir)
     storefiles = []
     #Log.out(listfile)
@@ -175,6 +228,23 @@ def readkeystore(filedir):
             storefiles.append(file)
             storeindex+=1
         index+=1
+    ###########################################
+    if (len(storefiles) <= 0):
+        packagename = getpackagename(src_apk)
+        if (packagename != None and len(packagename) > 0):
+            pkg_storefile = os.path.join(Common.KEYSTORES_DIR, packagename)
+            if (pkg_storefile != None and os.path.isdir(pkg_storefile)):
+                Log.out("[Logging...] 文件包名 : [%s]" % packagename)
+                listfile=os.listdir(pkg_storefile)
+                #Log.out(listfile)
+                index = 0
+                storeindex = 0
+                for file in listfile:
+                    if(file.endswith(".keystore") or file.endswith(".jks")):
+                        storefiles.append(os.path.join(pkg_storefile, file))
+                        storeindex+=1
+                    index+=1
+    ###########################################
     if (storeindex > 1):
         index = 1
         for keyfile in storefiles:

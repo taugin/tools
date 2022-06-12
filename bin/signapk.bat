@@ -14,6 +14,7 @@ set  fullpypath=%curdir%..\%pythoncode%
 echo [Logging...] 脚本文件路径 : [%pythonpath%]
 echo [Logging...] 脚本文件版本 : [%pythonversion%]
 echo [Logging...] 脚本代码路径 : [%pythoncode%]
+echo.
 @rem echo curdir=%curdir%
 @rem echo pythoncode=%pythoncode%
 @rem echo pythonpath=%pythonpath%
