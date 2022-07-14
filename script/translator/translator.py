@@ -84,24 +84,39 @@ def translate(text, from_language, to_language):
 
 def input_no(prompt, auto = False):
     list_keys= [ key for key in LANGUAGES.keys()]
+    length = len(list_keys)
     try:
         while True:
             if auto:
                 raw_str = input(prompt) or "auto"
             else:
                 raw_str = input(prompt)
-            if raw_str != None and raw_str in list_keys:
+            if raw_str != None and ((raw_str in list_keys) or (raw_str.isdigit() and (int(raw_str) in range(1,length+1)))):
                 return raw_str
-    except:
-        print("")
+    except Exception as e:
+        print("e : %s" % e)
     return None
 
 def input_language():
-    from_language = input_no("[Logging...] 请输入源语言(默认auto)：", True)
+    input_text = input_no("[Logging...] 请输入源语言(默认auto)：", True)
+    if input_text == None:
+        sys.exit(0)
+    if input_text.isdigit():
+        from_language = LANGUAGES_LIST[int(input_text) - 1]
+    else:
+        from_language = input_text
     if from_language == None or len(from_language) <= 0:
         from_language = "auto"
-    to_language = input_no("[Logging...] 请输入目标语言：")
-    if from_language == None or to_language == None:
+    if from_language == None:
+        sys.exit(0)
+    input_text = input_no("[Logging...] 请输入目标语言：")
+    if input_text == None:
+        sys.exit(0)
+    if input_text.isdigit():
+        to_language = LANGUAGES_LIST[int(input_text) - 1]
+    else:
+        to_language = input_text
+    if to_language == None:
         sys.exit(0)
     print("[Logging...] 待翻译语言 : [%s(%s)] -> 目标语言 : [%s(%s)]" % (LANGUAGES[from_language].split("|")[1] , from_language, LANGUAGES[to_language].split("|")[1] , to_language))
     return from_language, to_language

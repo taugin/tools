@@ -105,7 +105,9 @@ LANGUAGES = {
   "zh-TW": "chinese (traditional)|繁体中文",
   "zu": "zulu|祖鲁"
 }
-
+LANGUAGES_LIST = []
+for key in LANGUAGES.keys():
+      LANGUAGES_LIST.append(key)
 LANGUAGES_OLD = {
     'af': 'afrikaans',
     'sq': 'albanian',
