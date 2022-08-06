@@ -131,7 +131,7 @@ def get_app_info(apkFile):
         tmp = ""
         alllines = process.stdout.readlines()
         for line in alllines :
-            tmp = parseString(line)
+            tmp = Utils.parseString(line)
             if (tmp.startswith("package: ")):
                 try:
                     tmppkg = tmp[len("package: "):]
@@ -183,17 +183,6 @@ def get_app_info(apkFile):
         apk_info["vername"]  = jobj["version_name"] if "version_name" in jobj else None
         apk_info["min_version"] = jobj["min_sdk_version"] if "min_sdk_version" in jobj else None
         apk_info["target_version"] = jobj["target_sdk_version"] if "target_sdk_version" in jobj else None
-
-def parseString(line):
-    format_code = ["utf8", "gbk", "gb2312"]
-    result = "";
-    for f in format_code:
-        try:
-            result = line.decode(f, "ignore")
-            return result
-        except:
-            pass
-    return result
 
 def readapkinfo(apkFile, function):
     function(apkFile)

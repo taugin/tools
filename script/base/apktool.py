@@ -11,21 +11,11 @@ sys.path.append(COM_DIR)
 import Common
 import getopt
 import Log
+import Utils
 import subprocess
 
 SIGNAPK_FILE = os.path.join(os.path.dirname(sys.argv[0]), "signapk.py")
 INSTALL_FILE = os.path.join(os.path.dirname(sys.argv[0]), "sf.py")
-
-def parseString(line):
-    format_code = ["utf8", "gbk", "gb2312"]
-    result = "";
-    for f in format_code:
-        try:
-            result = line.decode(f, "ignore")
-            return result
-        except:
-            pass
-    return result
 
 def getApkInfo(apkFile):
     pkgname = ""
@@ -39,7 +29,7 @@ def getApkInfo(apkFile):
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
         alllines = process.stdout.readlines()
         for line in alllines :
-            tmp = parseString(line)
+            tmp = Utils.parseString(line)
             if (tmp.startswith("package: ")):
                 try:
                     tmppkg = tmp[len("package: "):]
