@@ -11,29 +11,23 @@ packer          :       打包主目录
     \workspace  :       工作目录
 script          :       脚本文件存放目录
 
-smali和baksmali下载地址
-https://bitbucket.org/JesusFreke/smali
+python版本下载地址 ：https://www.python.org/ftp/python/
 
-Dex合并
-java -cp dx.jar com.android.dx.merge.DexMerger  outDex.dex  mergeDex.dex
+smali和baksmali下载地址 ：https://bitbucket.org/JesusFreke/smali
 
-apktool下载地址(旧)
-https://bitbucket.org/iBotPeaches/apktool/downloads/
+Dex合并 ：java -cp dx.jar com.android.dx.merge.DexMerger  outDex.dex  mergeDex.dex
 
-apktool下载地址(新)
-https://ibotpeaches.github.io/Apktool/build/
+apktool下载地址(旧) ：https://bitbucket.org/iBotPeaches/apktool/downloads/
 
-Jd-Gui下载地址：
-http://java-decompiler.github.io/
+apktool下载地址(新) ：https://ibotpeaches.github.io/Apktool/build/
 
-jadx下载地址：
-https://www.softpedia.com/get/Programming/Other-Programming-Files/Jadx.shtml
+Jd-Gui下载地址 ：http://java-decompiler.github.io/
 
-dex2jar下载地址：
-https://sourceforge.net/projects/dex2jar/
+jadx下载地址 ：https://www.softpedia.com/get/Programming/Other-Programming-Files/Jadx.shtml
 
-处理AndResGuard的apktool
-https://github.com/xxxyanchenxxx/apktool_AndResGuard
+dex2jar下载地址 ：https://sourceforge.net/projects/dex2jar/
+
+处理AndResGuard的apktool ：https://github.com/xxxyanchenxxx/apktool_AndResGuard
 
 用Apktool打包遇到No resource identifier found for attribute "XXX" in package "com.XXX.XXX"的问题解决方案
 解决：
