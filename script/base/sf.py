@@ -547,6 +547,8 @@ def check_apk_process(args):
                     dump_process = False
                     break;
             thread.join()
+        else:
+            Log.out("[Logging...] 应用包未安装")
     elif device == None:
         Log.out("[Logging...] 没有发现设备")
         time.sleep(2)
