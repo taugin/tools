@@ -91,6 +91,11 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\myapkfile\shell\打开GP详情\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -g \"%1\""
 
+[HKEY_CLASSES_ROOT\myapkfile\shell\查看应用进程]
+"Icon"="$CMD_PATH"
+
+[HKEY_CLASSES_ROOT\myapkfile\shell\查看应用进程\command]
+@="$TOOLS_ROOT\\bin\\sf.bat -u \"%1\""
 
 [HKEY_CLASSES_ROOT\.apk]
 @="myapkfile"
@@ -264,6 +269,11 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\myxapkfile\shell\打开GP详情\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -g \"%1\""
 
+[HKEY_CLASSES_ROOT\myxapkfile\shell\查看应用进程]
+"Icon"="$CMD_PATH"
+
+[HKEY_CLASSES_ROOT\myxapkfile\shell\查看应用进程\command]
+@="$TOOLS_ROOT\\bin\\sf.bat -u \"%1\""
 
 #==========================================================
 #解析.aab文件

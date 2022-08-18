@@ -1,24 +1,24 @@
 #!/usr/bin/python
 # coding: UTF-8
+from threading import Thread
+import time
+import re
+import subprocess
+import hashlib
+import zipfile
+import getopt
+import io
 import sys
 import os
-#引入别的文件夹的模块
+# 引入别的文件夹的模块
 DIR = os.path.dirname(sys.argv[0])
 COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
 
-import Common
-import Log
 import Utils
-
-import io
-import getopt
-import zipfile
-import hashlib
-import subprocess
-import re
-import time
+import Log
+import Common
 
 SIGNINFO_MD5 = False
 FILE_MD5 = False
@@ -28,6 +28,7 @@ INSTALL_APK = False
 INSTALL_XAPK = False
 AXMLPRINTER = False
 OPEN_IN_GP = False
+CHECK_PROCESS = False
 apk_info = {}
 apk_info["apkfile"] = None
 apk_info["apklabel"] = None
@@ -47,6 +48,7 @@ apk_info["target_version"] = None
 apk_info["min_version"] = None
 apk_info["sign_detail"] = None
 
+
 def addColonForString(ori_string):
     step = 2
     size = len(ori_string)
@@ -59,18 +61,20 @@ def addColonForString(ori_string):
         index += 1
     return dst_string
 
+
 def md5_classes(apkFile):
     '''    输出classes.dex的MD5    '''
     global apk_info
     signfile = ""
     z = zipfile.ZipFile(apkFile, "r")
-    for f in z.namelist() :
+    for f in z.namelist():
         if (f == "classes.dex"):
             signfile = f
     if (signfile != ""):
         result = hashlib.md5(z.read(signfile)).hexdigest()
         apk_info["classes_md5"] = addColonForString(result.upper())
     z.close()
+
 
 def printsign_md5(apkFile, signFile, fullSignfileName):
     '''输出签名文件的MD5'''
@@ -86,7 +90,8 @@ def printsign_md5(apkFile, signFile, fullSignfileName):
         tmp = str(line, "gbk")
         if (apk_info["sign_detail"] == None and (tmp != None and len(tmp) > 0)):
             apk_info["sign_detail"] = tmp[0:len(tmp) - 1]
-            apk_info["sign_detail"] = apk_info["sign_detail"].replace("所有者: ", "")
+            apk_info["sign_detail"] = apk_info["sign_detail"].replace(
+                "所有者: ", "")
         tmp = tmp.strip().lower()
         if (tmp.startswith("md5")):
             tmp = tmp[len("md5") + 1:]
@@ -102,22 +107,24 @@ def printsign_md5(apkFile, signFile, fullSignfileName):
     apk_info["sign_sha1"] = sign_sha1
     apk_info["sign_file"] = fullSignfileName
 
+
 def md5_signfile(apkFile):
     '''输出一般文件的MD5'''
     signfile = ""
     z = zipfile.ZipFile(apkFile, "r")
-    for f in z.namelist() :
-        if (len(f) >=2 and f[-2:] == "SA" and f.startswith("META-INF/")):
+    for f in z.namelist():
+        if (len(f) >= 2 and f[-2:] == "SA" and f.startswith("META-INF/")):
             signfile = f
-            break;
+            break
     if (signfile != ""):
         tmpfile = os.path.basename(signfile)
-        f = open(tmpfile, "wb");
-        f.write(z.read(signfile));
+        f = open(tmpfile, "wb")
+        f.write(z.read(signfile))
         f.close()
         printsign_md5(apkFile, tmpfile, signfile)
         os.remove(tmpfile)
     z.close()
+
 
 def get_app_info(apkFile):
     '''输出apk的包信息'''
@@ -130,7 +137,7 @@ def get_app_info(apkFile):
         tmppkg = ""
         tmp = ""
         alllines = process.stdout.readlines()
-        for line in alllines :
+        for line in alllines:
             tmp = Utils.parseString(line)
             if (tmp.startswith("package: ")):
                 try:
@@ -178,20 +185,22 @@ def get_app_info(apkFile):
     elif ext == ".xapk":
         jobj = readpkgnamefromxapk(apkFile)
         apk_info["apklabel"] = jobj["name"] if "name" in jobj else None
-        apk_info["pkgname"]  = jobj["package_name"] if "package_name" in jobj else None
-        apk_info["vercode"]  = jobj["version_code"] if "version_code" in jobj else None
-        apk_info["vername"]  = jobj["version_name"] if "version_name" in jobj else None
+        apk_info["pkgname"] = jobj["package_name"] if "package_name" in jobj else None
+        apk_info["vercode"] = jobj["version_code"] if "version_code" in jobj else None
+        apk_info["vername"] = jobj["version_name"] if "version_name" in jobj else None
         apk_info["min_version"] = jobj["min_sdk_version"] if "min_sdk_version" in jobj else None
         apk_info["target_version"] = jobj["target_sdk_version"] if "target_sdk_version" in jobj else None
+
 
 def readapkinfo(apkFile, function):
     function(apkFile)
 
+
 def processapk(args, function):
-    for file in args :
+    for file in args:
         if (os.path.isdir(file)):
             listfiles = os.listdir(file)
-            for apkfile in listfiles :
+            for apkfile in listfiles:
                 apkpath = os.path.join(file, apkfile)
                 apkname, ext = os.path.splitext(apkpath)
                 if ext == ".apk" or ext == ".xapk":
@@ -201,12 +210,13 @@ def processapk(args, function):
             if ext == ".apk" or ext == ".xapk":
                 readapkinfo(os.path.abspath(file), function)
 
+
 def processFileMd5(args):
     global apk_info
-    for file in args :
+    for file in args:
         if (os.path.isdir(file)):
             listfiles = os.listdir(file)
-            for apkfile in listfiles :
+            for apkfile in listfiles:
                 apkpath = os.path.join(file, apkfile)
                 if (os.path.isfile(os.path.abspath(apkpath))):
                     apk_info["apk_file"] = os.path.abspath(apkpath)
@@ -219,6 +229,7 @@ def processFileMd5(args):
                 file_md5(os.path.abspath(file))
                 file_sh1(os.path.abspath(file))
                 file_sh256(os.path.abspath(file))
+
 
 def formatSize(bytesLen):
     """格式化文件大小"""
@@ -239,11 +250,12 @@ def formatSize(bytesLen):
     else:
         return "%.2fkb" % (kb)
 
+
 def file_md5(strFile):
     """计算文件md5"""
     global apk_info
     m = hashlib.md5()
-    file = io.FileIO(strFile,'rb')
+    file = io.FileIO(strFile, 'rb')
     bytesRead = file.read(1024)
     while(bytesRead != b''):
         m.update(bytesRead)
@@ -252,11 +264,12 @@ def file_md5(strFile):
     md5value = m.hexdigest()
     apk_info["apk_md5"] = addColonForString(md5value.upper())
 
+
 def file_sh1(strFile):
     """计算文件hash"""
     global apk_info
     sha1 = hashlib.sha1()
-    file = io.FileIO(strFile,'rb')
+    file = io.FileIO(strFile, 'rb')
     bytesRead = file.read(1024)
     while(bytesRead != b''):
         sha1.update(bytesRead)
@@ -265,11 +278,12 @@ def file_sh1(strFile):
     sh1value = sha1.hexdigest()
     apk_info["apk_sha1"] = addColonForString(sh1value.upper())
 
+
 def file_sh256(strFile):
     """计算文件hash256"""
     global apk_info
     sha256 = hashlib.sha256()
-    file = io.FileIO(strFile,'rb')
+    file = io.FileIO(strFile, 'rb')
     bytesRead = file.read(1024)
     while(bytesRead != b''):
         sha256.update(bytesRead)
@@ -277,6 +291,7 @@ def file_sh256(strFile):
     file.close()
     sh256value = sha256.hexdigest()
     apk_info["apk_sha256"] = addColonForString(sh256value.upper())
+
 
 def file_size(strFile):
     """计算文件大小"""
@@ -286,13 +301,15 @@ def file_size(strFile):
     except:
         pass
 
+
 def string_md5(srcStr):
     """计算字符串的md5值"""
     if (len(srcStr) > 0):
-        md5=hashlib.md5(srcStr[0].encode('utf-8')).hexdigest()
+        md5 = hashlib.md5(srcStr[0].encode('utf-8')).hexdigest()
         Log.out("[MD5..] " + md5)
     else:
         Log.out("[Logging...] 缺少参数")
+
 
 def check_arg(args):
     if (len(args) > 0):
@@ -305,6 +322,7 @@ def check_arg(args):
         Log.out("[Logging...] 缺少文件")
         sys.exit()
 
+
 def input_no(start, end):
     try:
         while True:
@@ -314,6 +332,7 @@ def input_no(start, end):
     except:
         Log.out("")
     return 1
+
 
 def wait_usb_devices():
     Log.out("\n[Logging...] 等待设备连接")
@@ -325,6 +344,7 @@ def wait_usb_devices():
     except:
         pass
     Log.out("[Logging...] 设备连接成功\n")
+
 
 def get_select_devices():
     wait_usb_devices()
@@ -353,13 +373,15 @@ def get_select_devices():
         pass
     return None
 
+
 def install_apk(args):
     if (len(args) > 0):
         cmd = [Common.ADB, "-d", "install", "-t", "-r", args[0]]
         device = get_select_devices()
-        if device != None and len(device) > 0 :
+        if device != None and len(device) > 0:
             cmd = [Common.ADB, "-s", device, "install", "-t", "-r", args[0]]
-            Log.out("[Logging...] 正在安装 : [%s] %s" % (device, os.path.abspath(args[0])))
+            Log.out("[Logging...] 正在安装 : [%s] %s" %
+                    (device, os.path.abspath(args[0])))
         elif device == None:
             Log.out("[Logging...] 没有发现设备")
             time.sleep(2)
@@ -367,7 +389,7 @@ def install_apk(args):
         else:
             Log.out("[Logging...] 正在安装 : " + os.path.abspath(args[0]))
         result = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
-        execret = result.stdout.readlines();
+        execret = result.stdout.readlines()
         allret = ""
         success = False
         for s in execret:
@@ -383,13 +405,16 @@ def install_apk(args):
         else:
             time.sleep(2)
 
+
 def install_multiple_apks(xapk, apks):
     if (len(apks) > 0):
         cmd = [Common.ADB, "-d", "install-multiple", "-t", "-r"] + apks
         device = get_select_devices()
-        if device != None and len(device) > 0 :
-            cmd = [Common.ADB, "-s", device, "install-multiple", "-t", "-r"] + apks
-            Log.out("[Logging...] 正在安装 : [%s] %s" % (device, os.path.abspath(xapk)))
+        if device != None and len(device) > 0:
+            cmd = [Common.ADB, "-s", device,
+                   "install-multiple", "-t", "-r"] + apks
+            Log.out("[Logging...] 正在安装 : [%s] %s" %
+                    (device, os.path.abspath(xapk)))
         elif device == None:
             Log.out("[Logging...] 没有发现设备")
             time.sleep(2)
@@ -397,7 +422,7 @@ def install_multiple_apks(xapk, apks):
         else:
             Log.out("[Logging...] 正在安装 : %s" % os.path.abspath(xapk))
         result = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
-        execret = result.stdout.readlines();
+        execret = result.stdout.readlines()
         allret = ""
         success = False
         for s in execret:
@@ -411,9 +436,10 @@ def install_multiple_apks(xapk, apks):
         if (success == False):
             Common.pause()
 
+
 def install_xapk(args):
     if (len(args) > 0):
-        basefilename,ext = os.path.splitext(os.path.basename(args[0]))
+        basefilename, ext = os.path.splitext(os.path.basename(args[0]))
         if not os.path.exists(basefilename):
             os.mkdir(basefilename)
         zf = zipfile.ZipFile(os.path.abspath(args[0]), "r")
@@ -427,6 +453,7 @@ def install_xapk(args):
         Utils.deletedir(basefilename)
         time.sleep(2)
 
+
 def print_xml(args):
     manifest = ""
     if (len(args) > 0):
@@ -435,16 +462,17 @@ def print_xml(args):
             for file in zf.namelist():
                 if (file == "AndroidManifest.xml"):
                     manifest = file
-                    break;
+                    break
             if (manifest != ""):
                 tmpfile = os.path.basename(manifest)
-                f = open(tmpfile, "wb");
-                f.write(zf.read(manifest));
+                f = open(tmpfile, "wb")
+                f.write(zf.read(manifest))
                 f.close()
                 cmd = [Common.JAVA, "-jar", Common.AXMLPRINTER_JAR, tmpfile]
                 subprocess.call(cmd)
                 os.remove(tmpfile)
             zf.close()
+
 
 def readpkgnamefromxapk(xapk_path):
     zf = zipfile.ZipFile(xapk_path, "r")
@@ -453,15 +481,13 @@ def readpkgnamefromxapk(xapk_path):
     import json
     return json.loads(content)
 
-def openApkGPInBrowser(args):
-    """
-    通过浏览器打开googleplay上的详情页面
-    """
+
+def get_package_name(args):
     global apk_info
     apk_path = None
     xapk_path = None
     pkgname = None
-    for file in args :
+    for file in args:
         apkname, ext = os.path.splitext(file)
         if (ext == ".apk"):
             apk_path = os.path.abspath(file)
@@ -469,7 +495,7 @@ def openApkGPInBrowser(args):
         elif (ext == ".xapk"):
             xapk_path = os.path.abspath(file)
             break
-    
+
     if (apk_path != None and len(apk_path) > 0):
         output = "[Logging...] 当前应用路径 : [%s]" % apk_path
         Log.out(output)
@@ -482,8 +508,56 @@ def openApkGPInBrowser(args):
         pkgname = xapkobj["package_name"]
     output = "[Logging...] 当前应用包名 : [%s]" % pkgname
     Log.out(output)
+    return pkgname
+
+
+def openApkGPInBrowser(args):
+    """
+    通过浏览器打开googleplay上的详情页面
+    """
+    pkgname = get_package_name(args)
     import webbrowser
-    webbrowser.open("https://play.google.com/store/apps/details?id=%s" % pkgname)
+    webbrowser.open(
+        "https://play.google.com/store/apps/details?id=%s" % pkgname)
+
+
+def check_apk_process(args):
+    device = get_select_devices()
+    if device != None and len(device) > 0:
+        user_id = None
+        pkgname = get_package_name(args)
+        cmd = [Common.ADB, "-s", device, "shell", "ps"]
+        result = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
+        execret = result.stdout.readlines()
+        for item in execret:
+            item = str(item, "utf-8")
+            item_list = item.split()
+            if pkgname in item_list:
+                user_id = item_list[0]
+        if user_id != None and user_id.strip() != "":
+            global dump_process
+            dump_process = True
+            print()
+            thread = Thread(target=start_process_check, args=(device, user_id))
+            thread.daemon = True
+            thread.start()
+            while True:
+                exit_flag = input()
+                if exit_flag == 'e' or exit_flag == "E":
+                    dump_process = False
+                    break;
+            thread.join()
+    elif device == None:
+        Log.out("[Logging...] 没有发现设备")
+        time.sleep(2)
+        return
+dump_process = False
+def start_process_check(device, user_id):
+    cmd = [Common.ADB, "-s", device, "shell", "ps", "|", "grep", user_id]
+    while dump_process:
+        subprocess.call(cmd)
+        print()
+        time.sleep(1)
 
 def calc_maxlen():
     """计算每一行文字长度"""
@@ -495,6 +569,7 @@ def calc_maxlen():
             if ilen > max_len:
                 max_len = ilen
     return max_len
+
 
 def print_apkinfo():
     global apk_info
@@ -539,7 +614,7 @@ def print_apkinfo():
     Log.out("-" * dash_len)
     output = " 签名哈希 | %s" % apk_info["sign_sha1"]
     Log.out(output)
-    
+
     Log.out("-" * dash_len)
     output = " 签名哈希 | %s" % apk_info["sign_sha256"]
     Log.out(output)
@@ -554,7 +629,7 @@ def print_apkinfo():
 
     #Log.out("-" * dash_len)
     #output = " 内部摘要 | %s" % apk_info["classes_md5"]
-    #Log.out(output)
+    # Log.out(output)
 
     Log.out("-" * dash_len)
     output = " 文件摘要 | %s" % apk_info["apk_md5"]
@@ -569,44 +644,48 @@ def print_apkinfo():
     Log.out(output)
     Log.out("-" * dash_len)
 
+
 # start ============================================================================================
 if (len(sys.argv) < 2):
-    Log.out("[Logging...] 脚本缺少参数 : %s <src_apk> 输出APK文件信息" % os.path.basename(sys.argv[0]), True);
+    Log.out("[Logging...] 脚本缺少参数 : %s <src_apk> 输出APK文件信息" %
+            os.path.basename(sys.argv[0]), True)
     sys.exit()
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "pmsiaxg")
+    opts, args = getopt.getopt(sys.argv[1:], "pmsiaxgu")
     for op, value in opts:
         if (op == "-m"):
             FILE_MD5 = True
-        elif (op == "-s") :
+        elif (op == "-s"):
             STR_MD5 = True
-        elif (op == "-p") :
+        elif (op == "-p"):
             APK_INFO = True
-        elif (op == "-i") :
+        elif (op == "-i"):
             INSTALL_APK = True
-        elif (op == "-x") :
+        elif (op == "-x"):
             INSTALL_XAPK = True
-        elif (op == "-a") :
+        elif (op == "-a"):
             AXMLPRINTER = True
-        elif (op == "-g") :
+        elif (op == "-g"):
             OPEN_IN_GP = True
+        elif op == '-u':
+            CHECK_PROCESS = True
 except getopt.GetoptError as err:
     Log.out(err)
     sys.exit()
-#安装apk
+# 安装apk
 if INSTALL_APK == True:
     install_apk(args)
     sys.exit()
-#安装apk
+# 安装apk
 if INSTALL_XAPK == True:
     install_xapk(args)
     sys.exit()
-#打印Android xml 文件
+# 打印Android xml 文件
 if AXMLPRINTER == True:
     print_xml(args)
     sys.exit()
-#求字符串的MD5值
+# 求字符串的MD5值
 if STR_MD5 == True:
     string_md5(args)
     sys.exit()
@@ -622,9 +701,9 @@ if FILE_MD5 == True:
     Log.out(output)
     Log.out("-" * dash_len)
     output = " 文件摘要 | %s" % apk_info["apk_md5"]
-    output +="\n"
+    output += "\n"
     output += " 文件哈希 | %s" % apk_info["apk_sha1"]
-    output +="\n"
+    output += "\n"
     output += " 文件哈希 | %s" % apk_info["apk_sha256"]
     Log.out(output)
     Log.out("-" * dash_len)
@@ -640,4 +719,6 @@ elif APK_INFO == True:
 elif OPEN_IN_GP == True:
     openApkGPInBrowser(args)
     sys.exit(0)
+elif CHECK_PROCESS:
+    check_apk_process(args)
 Common.pause()
