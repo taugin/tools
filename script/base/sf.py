@@ -61,6 +61,47 @@ def addColonForString(ori_string):
         index += 1
     return dst_string
 
+def file_sign_info(keystorefilepath):
+    filedir = os.path.dirname(keystorefilepath)
+    keystorefile = os.path.basename(keystorefilepath)
+    Log.out("[Logging...] 签名文件 : %s" % keystorefile, True)
+    keystorename = os.path.basename(keystorefile)
+    index = keystorename.rfind(".keystore")
+    if index < 0:
+        index = keystorename.rfind(".jks")
+    if index < 0:
+        Log.out("[Logging...] 不是一个有效的签名文件 : %s" % keystorefile, True)
+        return None
+    filename = keystorename[0:index]
+    splits = filename.split("_")
+    if (len(splits) < 3):
+        Log.out("[Logging...] 无法获取签名文件信息,请重命名签名文件格式 <[alias]_[storepass]_[aliaspass].keystore/jks>", True)
+        return None
+    keystorealias = splits[0]
+    if (splits[1] != "pwd"):
+        keystorepass = splits[1]
+    else:
+        keystorepass = splits[2]
+
+    if (keystorealias == "" or keystorepass == ""):
+        Log.out("[Logging...] keystorealias or keystorepass is empty")
+        sys.exit()
+
+    global apk_info
+    keystorepath = os.path.join(filedir, keystorefile)
+    p = subprocess.Popen([Common.KEYTOOL, "-v", "-list", "-keystore", keystorepath, "-storepass", keystorepass], stdout=subprocess.PIPE)
+    alllines = p.stdout.readlines()
+    for line in alllines:
+        tmp = Utils.parseString(line)
+        tmp = tmp.replace("\r", "")
+        tmp = tmp.replace("\n", "")
+        tmp = tmp.strip()
+        if tmp.startswith('MD5:'):
+            apk_info['sign_md5'] = tmp.replace("MD5:", "").strip()
+        if tmp.startswith('SHA1:'):
+            apk_info['sign_sha1'] = tmp.replace("SHA1:", "").strip()
+        if tmp.startswith('SHA256:'):
+            apk_info['sign_sha256'] = tmp.replace("SHA256:", "").strip()
 
 def md5_classes(apkFile):
     '''    输出classes.dex的MD5    '''
@@ -223,12 +264,14 @@ def processFileMd5(args):
                     file_md5(os.path.abspath(apkpath))
                     file_sh1(os.path.abspath(apkpath))
                     file_sh256(os.path.abspath(apkpath))
+                    file_sign_info(os.path.abspath(apkpath))
         else:
             if (os.path.isfile(os.path.abspath(file))):
                 apk_info["apk_file"] = os.path.abspath(file)
                 file_md5(os.path.abspath(file))
                 file_sh1(os.path.abspath(file))
                 file_sh256(os.path.abspath(file))
+                file_sign_info(os.path.abspath(file))
 
 
 def formatSize(bytesLen):
@@ -675,6 +718,8 @@ try:
 except getopt.GetoptError as err:
     Log.out(err)
     sys.exit()
+
+check_arg(args)
 # 安装apk
 if INSTALL_APK == True:
     install_apk(args)
@@ -692,7 +737,6 @@ if STR_MD5 == True:
     string_md5(args)
     sys.exit()
 
-check_arg(args)
 
 if FILE_MD5 == True:
     processFileMd5(args)
@@ -707,6 +751,17 @@ if FILE_MD5 == True:
     output += " 文件哈希 | %s" % apk_info["apk_sha1"]
     output += "\n"
     output += " 文件哈希 | %s" % apk_info["apk_sha256"]
+    if apk_info.get('sign_md5') != None:
+        output += "\n"
+        output += ("-" * dash_len)
+        output += "\n"
+        output += " 签名摘要 | %s" % apk_info["sign_md5"]
+    if apk_info.get('sign_sha1') != None:
+        output += "\n"
+        output += " 签名哈希 | %s" % apk_info["sign_sha1"]
+    if apk_info.get('sign_sha256') != None:
+        output += "\n"
+        output += " 签名哈希 | %s" % apk_info["sign_sha256"]
     Log.out(output)
     Log.out("-" * dash_len)
 elif APK_INFO == True:
