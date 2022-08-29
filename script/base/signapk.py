@@ -173,6 +173,8 @@ def signapk_with_apksigner(src_apk, tmp_apk, dst_apk, keystoreinfo):
         cmdlist.append("pass:" + keystoreinfo[1])
         cmdlist.append("--key-pass")
         cmdlist.append("pass:" + keystoreinfo[3])
+        cmdlist.append("--v2-signing-enabled")
+        cmdlist.append("true")
         cmdlist.append("--v4-signing-enabled")
         cmdlist.append("false")
         cmdlist.append("--out")
@@ -217,6 +219,18 @@ def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     else:
         signapk_with_apksigner(src_apk, tmp_apk, dst_apk, keystoreinfo)
     Utils.deleteFile(tmp_apk)
+    try:
+        cmdlist = [Common.ZIPALIGN, "-c", "-v", "4", dst_apk]
+        p = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
+        all_lines = p.stdout.readlines()
+        last_line = None
+        if len(all_lines) > 0:
+            last_line = str(all_lines[-1], "utf-8").strip()
+        Log.out("[Logging...] 对齐结果 : [%s]" % last_line)
+        if "FAILED" in last_line:
+            Common.pause()
+    except:
+        pass
 
 def readkeystore(src_apk, filedir):
     listfile=os.listdir(filedir)
@@ -309,6 +323,7 @@ def exec_align_process(src_apk):
     if (OUTPUT_SIGNED_APK != None and len(OUTPUT_SIGNED_APK) > 0):
         dst_apk = OUTPUT_SIGNED_APK
     alignapk(src_apk, dst_apk)
+    time.sleep(2)
 
 #apk对齐
 def alignapk(unalignapk, finalapk):
@@ -316,7 +331,19 @@ def alignapk(unalignapk, finalapk):
     Log.out("[Logging...] 对齐文件 : [%s]" % finalapk, True)
     cmdlist = [Common.ZIPALIGN, "-p", "-f", "4", unalignapk, finalapk]
     subprocess.call(cmdlist, stdout=subprocess.PIPE)
-    Log.out("[Logging...] 对齐成功\n")
+    try:
+        cmdlist = [Common.ZIPALIGN, "-c", "-v", "4", finalapk]
+        p = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
+        all_lines = p.stdout.readlines()
+        last_line = None
+        if len(all_lines) > 0:
+            last_line = str(all_lines[-1], "utf-8").strip()
+        Log.out("[Logging...] 对齐结果 : [%s]" % last_line)
+        if "FAILED" in last_line:
+            Common.pause()
+    except:
+        pass
+    Log.out("\n")
     return True
 
 if __name__ == "__main__":
