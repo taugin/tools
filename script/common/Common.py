@@ -69,7 +69,7 @@ BUNDLE_VERSION = "1.6.1"
 BUNDLE_TOOL = os.path.join(LIB_DIR, "bundletool-all-%s.jar" % BUNDLE_VERSION)
 
 #apksigner可执行文件
-APKSIGNER_VERSION = "0.8"
+APKSIGNER_VERSION = "0.9"
 APKSIGNER=os.path.join(LIB_DIR, "apksigner_v%s.jar" % APKSIGNER_VERSION)
 #########################可执行文件文件路径定义#################################
 

@@ -159,7 +159,6 @@ def signapk_with_apksigner(src_apk, tmp_apk, dst_apk, keystoreinfo):
     else:
         Log.out("[Logging...] 签名信息 : keystore : [%s], storepass : [%s] , keyalias : [%s], keypass : [%s]" % (os.path.basename(keystoreinfo[0]),keystoreinfo[1], keystoreinfo[2], keystoreinfo[3]), True)
         Log.out("[Logging...] 版本信息 : [%s]" % os.path.basename(Common.APKSIGNER))
-        dir = os.path.dirname(src_apk)
         cmdlist = []
         cmdlist.append("java")
         cmdlist.append("-jar")
@@ -174,6 +173,8 @@ def signapk_with_apksigner(src_apk, tmp_apk, dst_apk, keystoreinfo):
         cmdlist.append("pass:" + keystoreinfo[1])
         cmdlist.append("--key-pass")
         cmdlist.append("pass:" + keystoreinfo[3])
+        cmdlist.append("--v4-signing-enabled")
+        cmdlist.append("false")
         cmdlist.append("--out")
         cmdlist.append(dst_apk)
         cmdlist.append(tmp_apk)
@@ -313,7 +314,7 @@ def exec_align_process(src_apk):
 def alignapk(unalignapk, finalapk):
     finalapk = os.path.normpath(finalapk)
     Log.out("[Logging...] 对齐文件 : [%s]" % finalapk, True)
-    cmdlist = [Common.ZIPALIGN, "-f", "4", unalignapk, finalapk]
+    cmdlist = [Common.ZIPALIGN, "-p", "-f", "4", unalignapk, finalapk]
     subprocess.call(cmdlist, stdout=subprocess.PIPE)
     Log.out("[Logging...] 对齐成功\n")
     return True
