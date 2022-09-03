@@ -131,7 +131,7 @@ def readkeystore(src_file):
         Log.out("[Logging...] keystorealias or keystorepass is empty")
         sys.exit()
 
-    keystorepath = os.path.join(filedir, keystorefile)
+    keystorepath = os.path.normpath(os.path.join(filedir, keystorefile))
     retcode = subprocess.call([Common.KEYTOOL, "-list", "-keystore", keystorepath, "-storepass", keystorepass], stdout=subprocess.PIPE)
     if (retcode != 0):
         Log.out("[Logging...] 签名文件不正确", True)

@@ -88,7 +88,7 @@ def file_sign_info(keystorefilepath):
         sys.exit()
 
     global apk_info
-    keystorepath = os.path.join(filedir, keystorefile)
+    keystorepath = os.path.normpath(os.path.join(filedir, keystorefile))
     p = subprocess.Popen([Common.KEYTOOL, "-v", "-list", "-keystore", keystorepath, "-storepass", keystorepass], stdout=subprocess.PIPE)
     alllines = p.stdout.readlines()
     for line in alllines:
