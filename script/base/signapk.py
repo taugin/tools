@@ -104,7 +104,7 @@ def deletemetainf(src_apk):
         Log.out("[Logging...] 正在删除 : %s" % output, True)
         subprocess.call([Common.AAPT_BIN, "r", src_apk] + signfilelist)
 
-def signapk_with_jarsigner(src_apk, tmp_apk, dst_apk, keystoreinfo):
+def signapk_with_jarsigner(src_apk, tmp_apk, aligned_apk, dst_apk, keystoreinfo):
     Log.out("")
     alignapk(src_apk, tmp_apk)
     deletemetainf(tmp_apk)
@@ -148,11 +148,12 @@ def signapk_with_jarsigner(src_apk, tmp_apk, dst_apk, keystoreinfo):
             pause()
     Log.out("", True);
 
-def signapk_with_apksigner(src_apk, tmp_apk, dst_apk, keystoreinfo):
+def signapk_with_apksigner(src_apk, tmp_apk, aligned_apk, dst_apk, keystoreinfo):
     Log.out("")
-    alignapk(src_apk, tmp_apk)
+    Utils.copyfile(src_apk, tmp_apk)
     deletemetainf(tmp_apk)
-    Log.out("[Signing...] 执行签名 : %s -> %s" % (os.path.basename(tmp_apk), os.path.basename(dst_apk)), True)
+    alignapk(tmp_apk, aligned_apk)
+    Log.out("[Signing...] 执行签名 : %s -> %s" % (os.path.basename(aligned_apk), os.path.basename(dst_apk)), True)
     if (len(keystoreinfo) <= 0):
         Log.out("[Signing...] 签名失败 : 签名文件信息有误", True)
         pause()
@@ -179,7 +180,7 @@ def signapk_with_apksigner(src_apk, tmp_apk, dst_apk, keystoreinfo):
         cmdlist.append("false")
         cmdlist.append("--out")
         cmdlist.append(dst_apk)
-        cmdlist.append(tmp_apk)
+        cmdlist.append(aligned_apk)
         retcode = subprocess.call(cmdlist, stdout=subprocess.PIPE)
         if (retcode == 0):
             Log.out("[Signing...] 签名成功 : %s" % dst_apk, True)
@@ -214,11 +215,14 @@ def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     dirname = os.path.dirname(src_apk);
     tmp_name = os.path.basename(src_apk) + "-tmp" + ext
     tmp_apk = os.path.join(dirname, tmp_name)
+    aligned_name = os.path.basename(src_apk) + "-aligned" + ext
+    aligned_apk = os.path.join(dirname, aligned_name)
     if (USE_JARSIGNER or ext == ".aab"):
-        signapk_with_jarsigner(src_apk, tmp_apk, dst_apk, keystoreinfo)
+        signapk_with_jarsigner(src_apk, tmp_apk, aligned_apk, dst_apk, keystoreinfo)
     else:
-        signapk_with_apksigner(src_apk, tmp_apk, dst_apk, keystoreinfo)
+        signapk_with_apksigner(src_apk, tmp_apk, aligned_apk, dst_apk, keystoreinfo)
     Utils.deleteFile(tmp_apk)
+    Utils.deleteFile(aligned_apk)
     try:
         cmdlist = [Common.ZIPALIGN, "-c", "-v", "4", dst_apk]
         p = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
