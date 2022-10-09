@@ -39,8 +39,8 @@ else:
 SEPERATER = os.path.sep
 
 #########################jar包文件路径定义#################################
-#APKTOOL的jar包，版本是2.1.1
-APKTOO_JAR_VERSION = "2.6.1"
+#APKTOOL的jar包
+APKTOO_JAR_VERSION = "2.6.2-snapshot"
 APKTOOL_JAR = os.path.join(LIB_DIR, "apktool_%s.jar" % APKTOO_JAR_VERSION)
 
 #签名jar
