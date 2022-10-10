@@ -215,7 +215,7 @@ Windows Registry Editor Version 5.00
 "Icon"="$CMD_PATH"
 
 [HKEY_CLASSES_ROOT\mydexfile\shell\DEX2JAR\command]
-@="$TOOLS_ROOT\\bin\\dex2jar-2.0\\d2j-dex2jar.bat \"%1\""
+@="$TOOLS_ROOT\\bin\\dex-tools-2.1\\d2j-dex2jar.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\.dex]
 @="mydexfile"

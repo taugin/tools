@@ -25,7 +25,8 @@ Jd-Gui下载地址 ：http://java-decompiler.github.io/
 
 jadx下载地址 ：https://www.softpedia.com/get/Programming/Other-Programming-Files/Jadx.shtml
 
-dex2jar下载地址 ：https://sourceforge.net/projects/dex2jar/
+dex2jar下载地址(旧) ：https://sourceforge.net/projects/dex2jar/
+dex2jar下载地址(新) ：https://github.com/pxb1988/dex2jar
 
 处理AndResGuard的apktool ：https://github.com/xxxyanchenxxx/apktool_AndResGuard
 
