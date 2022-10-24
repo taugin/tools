@@ -40,7 +40,7 @@ def deletedir(path):
     try:
         shutil.rmtree(path)
     except Exception as e:
-        print("e : %s" % e)
+        print("Exception : %s" % e)
 
 def movefile(fromfile, tofile):
     try:
