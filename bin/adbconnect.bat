@@ -3,6 +3,10 @@ setlocal
 SET TMPFOLDER=%TMP%
 SET connect_file=%TMPFOLDER%\adb_connect_tcpid.txt
 SET cmd_connect_result_file=%TMPFOLDER%\cmd_connect_result.txt
+goto :connect_usb_device
+rem #井号内部的代码是从文件中读取上次记录的连接命令，因换手机时有
+rem bug，所以，不再记录上次的连接命令，而是每次重新获取设备IP
+rem #############################################################
 echo [Logging...] Connect File : [%connect_file%]
 IF EXIST %connect_file% (
 	echo [Logging...] Read Connect Info From : [%connect_file%]
@@ -37,6 +41,7 @@ IF "%first_word%" == "already" (
 IF "%first_word%" == "connected" (
 	goto :END
 )
+rem ###################################################################
 
 :connect_usb_device
 set waitdevice=adb -d wait-for-usb-device
