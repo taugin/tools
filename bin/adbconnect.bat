@@ -44,11 +44,11 @@ echo [Logging...] Wait for usb device connected : [%waitdevice%]
 %waitdevice%
 echo [Logging...] Adb connected successfully
 rem wlan的信息
-for /F "delims=" %%i in ('adb -d shell netcfg ^| findstr "wlan"') do (set WLAN_INFO=%%i)
+for /F "delims=" %%i in ('adb -d shell ip addr show wlan0 ^| findstr /c:"inet "') do (set WLAN_INFO=%%i)
 rem echo WLAN_INFO=%WLAN_INFO%
 
 rem 获取手机ip地址信息
-for /F "tokens=3 delims= " %%i in ("%WLAN_INFO%") do (set IP_ADDR_MASK=%%i)
+for /F "tokens=2 delims= " %%i in ("%WLAN_INFO%") do (set IP_ADDR_MASK=%%i)
 rem echo IP_ADDR_MASK=%IP_ADDR_MASK%
 
 rem 获取手机ip地址信息
