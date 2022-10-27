@@ -26,7 +26,7 @@ def input_no(prompt, start, end):
                 return i
     except:
         Log.out("")
-    return 1
+    return None
 
 def wait_usb_devices():
     Log.out("\n[Logging...] 等待设备连接")
@@ -60,7 +60,7 @@ def get_select_devices():
                 Log.out("%s : %s" % (index + 1, devices[index][1]))
             no = 1
             if (len(devices) > 1):
-                no = input_no("请输入设备顺序 : ", 1, len(devices))
+                no = input_no("请输入设备顺序 : ", 1, len(devices)) or 1
             else:
                 Log.out("")
             return devices[int(no) - 1][0]
@@ -115,10 +115,13 @@ def getapkfile(package):
     Log.out("[Logging...] 顶层APK数量 : [%d]" % apkfilelen)
     if (apkfilelen > 1):
         number = 1
+        Log.out("[Logging...] 顶层APK文件 : [0] 拉取所有apk")
         for apk in apkFileList:
             Log.out("[Logging...] 顶层APK文件 : [%d] [%s]" % (number, apk))
             number = number + 1
         index = input_no("[Logging...] 输入APK序号 : ", 0, apkfilelen)
+        if index == None:
+            return []
         if (int(index) == 0):
             return apkFileList
         else:
@@ -303,10 +306,11 @@ def pullapk():
         cmd = getCmd()
         if (cmd == "p"):
             apkfiles = getapkfile(package)
-            to_dir = len(apkfiles) > 1
-            for apkfile in apkfiles:
-                pullspecapk(apkfile, package, to_dir)
-            time.sleep(3)
+            if len(apkfiles) > 0:
+                to_dir = len(apkfiles) > 1
+                for apkfile in apkfiles:
+                    pullspecapk(apkfile, package, to_dir)
+                time.sleep(3)
         elif (cmd == "u" and confirmUninstall()):
             uninstallApk(package)
             Log.out("[Logging...] 卸载APK成功 : [%s]" % package)
