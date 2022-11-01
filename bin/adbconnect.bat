@@ -3,7 +3,11 @@ setlocal
 SET TMPFOLDER=%TMP%
 SET connect_file=%TMPFOLDER%\adb_connect_tcpid.txt
 SET cmd_connect_result_file=%TMPFOLDER%\cmd_connect_result.txt
-goto :connect_usb_device
+
+for /F "delims=" %%i in ('adb -d devices ^| findstr /e "device" ^| findstr -v ":9999"') do (
+		set ADB_DEVICE=%%i
+	)
+IF not "%ADB_DEVICE%" == "" goto:connect_usb_device
 rem #井号内部的代码是从文件中读取上次记录的连接命令，因换手机时有
 rem bug，所以，不再记录上次的连接命令，而是每次重新获取设备IP
 rem #############################################################
@@ -77,11 +81,15 @@ echo [Logging...] Current Phone IP Address : [%IP_ADDR%]
 set ADB_PORT=9999
 set adb_tcpip=adb -d tcpip %ADB_PORT%
 echo [Logging...] TcpIp Command : [%adb_tcpip%]
-%adb_tcpip%
+rem 执行adb端口转发命令
+for /F "delims=" %%i in ('%adb_tcpip%') do (set TCPIP_RESULT=%%i)
+echo [Logging...] TCP PORT FOWARDS : %TCPIP_RESULT%
 set connect_cmd=adb -d connect %IP_ADDR%:%ADB_PORT%
 echo %connect_cmd% > %connect_file%
 echo [Logging...] Connect Command : [%connect_cmd%]
-%connect_cmd%
+rem 执行连接到adb服务端命令
+for /F "delims=" %%i in ('%connect_cmd%') do (set CONNECT_RESULT=%%i)
+echo [Logging...] CONNECT TO ADB : %CONNECT_RESULT%
 :END
-echo [Logging...] Wait for 3 seconds to exit
-ping localhost -n 5 > nul
+echo [Logging...] Wait for 2 seconds to exit
+ping localhost -n 3 > nul
