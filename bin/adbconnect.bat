@@ -91,5 +91,10 @@ rem 执行连接到adb服务端命令
 for /F "delims=" %%i in ('%connect_cmd%') do (set CONNECT_RESULT=%%i)
 echo [Logging...] CONNECT TO ADB : %CONNECT_RESULT%
 :END
-echo [Logging...] Wait for 2 seconds to exit
-ping localhost -n 3 > nul
+echo ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+for /F "delims=" %%i in ('adb -d devices -l') do (
+		echo [Logging...] %%i
+	)
+echo ================================================================
+echo [Logging...] Wait for 3 seconds to exit
+ping localhost -n 5 > nul
