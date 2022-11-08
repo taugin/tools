@@ -2,7 +2,6 @@
 # coding: UTF-8
 import sys
 import os
-from telnetlib import ENCRYPT
 #引入别的文件夹的模块
 DIR = os.path.dirname(sys.argv[0])
 COM_DIR = os.path.join(DIR, "..", "common")
@@ -12,43 +11,72 @@ sys.path.append(COM_DIR)
 import Common
 import Log
 
-import io
 import getopt
-import zipfile
-import hashlib
 import subprocess
 
 ENCRYPT = True
+BINARY = False
 
 def encrypt_file(key, input_file, output_file):
+    global BINARY
     if input_file == None or not os.path.exists(input_file):
         usage()
         return False
-    input_file = os.path.normpath(input_file)
-    if output_file == None or not os.path.exists(output_file):
+    input_file = os.path.abspath(input_file)
+    if output_file == None or output_file.strip() == "":
         basename = os.path.basename(input_file)
         name, ext= os.path.splitext(basename)
         output_file = "%s-encrypt%s" % (name, ext)
-        pass
+        output_file = os.path.abspath(output_file)
+    else:
+        output_file = os.path.abspath(output_file)
     if key == None or len(key) <= 0:
-        key = "123456"
-    Log.out("\n[Logging...] 加密文件 key : [%s], input : [%s], output : [%s]\n" % (key, input_file, output_file))
-    cmdlist = [Common.JAVA, "-jar", Common.AES_JAR, "-e", "-k", key, "-i", input_file, "-o", output_file]
+        key = "123456789"
+    Log.out("\n[Logging...] 加密文件 key : [%s], binary : [%s], input : [%s], output : [%s]\n" % (key, BINARY, input_file, output_file))
+    cmdlist = []
+    cmdlist.append(Common.JAVA)
+    cmdlist.append("-jar")
+    cmdlist.append(Common.AES_JAR)
+    cmdlist.append("-e")
+    if BINARY:
+        cmdlist.append("-b")
+    cmdlist.append("-k")
+    cmdlist.append(key)
+    cmdlist.append("-i")
+    cmdlist.append(input_file)
+    cmdlist.append("-o")
+    cmdlist.append(output_file)
     subprocess.call(cmdlist)
 
 def decrypt_file(key, input_file, output_file):
+    global BINARY
     if input_file == None or not os.path.exists(input_file):
         usage()
         sys.exit(-1)
-    input_file = os.path.normpath(input_file)
-    if output_file == None or not os.path.exists(output_file):
+    input_file = os.path.abspath(input_file)
+    if output_file == None or output_file.strip() == "":
         basename = os.path.basename(input_file)
         name, ext= os.path.splitext(basename)
-        output_file = "%s-decrypt%s" % (name, ext)
+        output_file = "%s-encrypt%s" % (name, ext)
+        output_file = os.path.abspath(output_file)
+    else:
+        output_file = os.path.abspath(output_file)
     if key == None or len(key) <= 0:
-        key = "123456"
-    Log.out("\n[Logging] 解密文件 key : [%s], input : [%s], output : [%s]\n" % (key, input_file, output_file))
-    cmdlist = [Common.JAVA, "-jar", Common.AES_JAR, "-d", "-k", key, "-i", input_file, "-o", output_file]
+        key = "123456789"
+    Log.out("\n[Logging] 解密文件 key : [%s], binary : [%s], input : [%s], output : [%s]\n" % (key, BINARY, input_file, output_file))
+    cmdlist = []
+    cmdlist.append(Common.JAVA)
+    cmdlist.append("-jar")
+    cmdlist.append(Common.AES_JAR)
+    cmdlist.append("-d")
+    if BINARY:
+        cmdlist.append("-b")
+    cmdlist.append("-k")
+    cmdlist.append(key)
+    cmdlist.append("-i")
+    cmdlist.append(input_file)
+    cmdlist.append("-o")
+    cmdlist.append(output_file)
     subprocess.call(cmdlist)
     
 def encrypt_string(key, input_string):
@@ -84,7 +112,7 @@ input_file = None
 output_file = None
 key = None
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "s:k:i:o:ed")
+    opts, args = getopt.getopt(sys.argv[1:], "s:k:i:o:edb")
     for op, value in opts:
         if (op == "-k"):
             key = value
@@ -98,6 +126,8 @@ try:
             ENCRYPT = False
         elif (op == "-s"):
             input_string = value
+        elif (op == "-b"):
+            BINARY = True
 except getopt.GetoptError as err:
     Log.out(err)
     sys.exit()

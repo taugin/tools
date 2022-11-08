@@ -132,6 +132,12 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\myjarfile\shell\JD-GUI\command]
 @="D:\\github\\tools\\bin\\jd-gui.exe \"%1\""
 
+[HKEY_CLASSES_ROOT\myjarfile\shell\JAR2DEX]
+"Icon"="C:\\Windows\\System32\\cmd.exe"
+
+[HKEY_CLASSES_ROOT\myjarfile\shell\JAR2DEX\command]
+@="D:\\github\\tools\\bin\\jar2dex.bat \"%1\""
+
 [HKEY_CLASSES_ROOT\.jar]
 @="myjarfile"
 
@@ -170,6 +176,18 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\*\shell\AES解密\command]
 @="D:\\github\\tools\\bin\\aes.bat -d -k 123456789 -i \"%1\""
+
+[HKEY_CLASSES_ROOT\*\shell\AES加密(二进制)]
+"Icon"="D:\\github\\tools\\ext\\winreg\\jia.ico,0"
+
+[HKEY_CLASSES_ROOT\*\shell\AES加密(二进制)\command]
+@="D:\\github\\tools\\bin\\aes.bat -e -k 123456789 -b -i \"%1\""
+
+[HKEY_CLASSES_ROOT\*\shell\AES解密(二进制)]
+"Icon"="D:\\github\\tools\\ext\\winreg\\jie.ico,0"
+
+[HKEY_CLASSES_ROOT\*\shell\AES解密(二进制)\command]
+@="D:\\github\\tools\\bin\\aes.bat -d -k 123456789 -b -i \"%1\""
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\PullApk]
 "Icon"="D:\\github\\tools\\ext\\winreg\\android.ico,0"
