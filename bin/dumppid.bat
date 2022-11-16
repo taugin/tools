@@ -1,5 +1,7 @@
 @echo off
 echo [Logging...] ARGS : [%*]
+echo [Logging...] Wait for device connected...
+adb wait-for-device
 rem 获取顶层应用
 for /F "delims=" %%i in ('adb shell dumpsys activity top ^| findstr "ACTIVITY"') do (set ALL_ACTIVITY=%%i)
 rem echo ALL_ACTIVITY=%ALL_ACTIVITY%
@@ -25,6 +27,7 @@ echo.
 
 :start
 echo [Logging...]  %date% %time%
+adb wait-for-device
 adb shell ps -A | findstr "%USER_ID%"
 rem if not "%ERRORLEVEL%" == "0" (
 rem echo [Logging...]  Can not get content, exit...
