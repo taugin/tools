@@ -2,22 +2,11 @@ echo [Logging...] ARGS : [$*]
 echo [Logging...] 等待设备连接...
 adb wait-for-device
 #获取顶层Activity包名
-adb shell dumpsys activity top | grep "ACTIVITY" > .activity.tmp
-
-TOP_ACTIVITY=""
-while read line
-do
-TOP_ACTIVITY=$line
-done < .activity.tmp
-rm .activity.tmp
+TOP_ACTIVITY=$(adb shell dumpsys activity top | grep "ACTIVITY" | tail -1)
 COMPONENT_NAME=$(echo $TOP_ACTIVITY | awk -F" " {'print $2'})
-
 PACKAGE_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $1'})
-
 ACTIVITY_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $2'})
-
 #echo $PACKAGE_NAME
-
 #获取顶层Activity用户名
 USER_NAME_ARRAY=($(adb shell ps -A | grep $PACKAGE_NAME | awk {'print $1'}))
 USER_NAME=${USER_NAME_ARRAY[0]}
@@ -28,9 +17,15 @@ echo
 
 while true
 do
-    echo [Logging...]  $(date +"%Y:%m:%d %H:%M:%S")
     adb wait-for-device
-	#echo [Logging...] Activity : $ACTIVITY_NAME
+    TOP_ACTIVITY=$(adb shell dumpsys activity top | grep "ACTIVITY" | tail -1)
+    COMPONENT_NAME=$(echo $TOP_ACTIVITY | awk -F" " {'print $2'})
+    PACKAGE_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $1'})
+    ACTIVITY_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $2'})
+    echo "--------------------------------------------------------------"
+	echo [Logging...] Top Package : [$PACKAGE_NAME]
+	echo [Logging...] TopActivity : [$ACTIVITY_NAME]
+    echo [Logging...]  $(date +"%Y:%m:%d %H:%M:%S")
     adb shell ps -A | grep $USER_NAME
     if [ "$1" != "loop" ]; then
         break;
