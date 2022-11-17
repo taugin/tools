@@ -30,7 +30,7 @@ while true
 do
     echo [Logging...]  $(date +"%Y:%m:%d %H:%M:%S")
     adb wait-for-device
-	echo [Logging...] Activity : $ACTIVITY_NAME
+	#echo [Logging...] Activity : $ACTIVITY_NAME
     adb shell ps -A | grep $USER_NAME
     if [ "$1" != "loop" ]; then
         break;
