@@ -265,6 +265,8 @@ def extractApksInUniversalMode(apks_file, basename):
     apks_zip_file.extract("universal.apk", ".")
     apks_zip_file.close()
     os.rename(universal_path, final_apk_name)
+    if (os.path.exists(apks_file)):
+        os.remove(apks_file)
 
 def install_apks(apks_file):
     select_device = get_select_devices(True)
