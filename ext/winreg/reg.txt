@@ -333,7 +333,7 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\AAB处理]
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\aab.ico,0"
-"SubCommands"="AAB转APKS;AAB转APKS(universal);AAB转APKS(local_testing);AAB签名(JarSigner)"
+"SubCommands"="查看AAB信息;AAB转APKS;AAB转APKS(universal);AAB转APKS(local_testing);AAB签名(JarSigner)"
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\AAB转APKS]
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\zhuan.ico,0"
@@ -358,6 +358,12 @@ Windows Registry Editor Version 5.00
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\AAB签名(JarSigner)\command]
 @="$TOOLS_ROOT\\bin\\signapk.bat -j \"%1\""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\查看AAB信息]
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\cha.ico,0"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\查看AAB信息\command]
+@="$TOOLS_ROOT\\bin\\sf.bat -p \"%1\""
 #==========================================================
 #解析.apks文件
 [HKEY_CLASSES_ROOT\.apks]

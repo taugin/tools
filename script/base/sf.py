@@ -282,6 +282,27 @@ def get_app_info(apkFile):
         apk_info["vername"] = jobj["version_name"] if "version_name" in jobj else None
         apk_info["min_version"] = jobj["min_sdk_version"] if "min_sdk_version" in jobj else None
         apk_info["target_version"] = jobj["target_sdk_version"] if "target_sdk_version" in jobj else None
+    elif ext == ".aab":
+        cmdlist = [Common.JAVA, "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@package"]
+        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+        process.wait()
+        apk_info["pkgname"] = Utils.parseString(process.stdout.readline()).strip()
+        cmdlist = [Common.JAVA, "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@android:versionCode"]
+        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+        process.wait()
+        apk_info["vercode"] = Utils.parseString(process.stdout.readline()).strip()
+        cmdlist = [Common.JAVA, "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@android:versionName"]
+        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+        process.wait()
+        apk_info["vername"] = Utils.parseString(process.stdout.readline()).strip()
+        cmdlist = [Common.JAVA, "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/uses-sdk/@android:minSdkVersion"]
+        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+        process.wait()
+        apk_info["min_version"] = Utils.parseString(process.stdout.readline()).strip()
+        cmdlist = [Common.JAVA, "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/uses-sdk/@android:targetSdkVersion"]
+        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+        process.wait()
+        apk_info["target_version"] = Utils.parseString(process.stdout.readline()).strip()
 
 
 def readapkinfo(apkFile, function):
@@ -295,11 +316,11 @@ def processapk(args, function):
             for apkfile in listfiles:
                 apkpath = os.path.join(file, apkfile)
                 apkname, ext = os.path.splitext(apkpath)
-                if ext == ".apk" or ext == ".xapk":
+                if ext == ".apk" or ext == ".xapk" or ext == ".aab":
                     readapkinfo(os.path.abspath(apkpath), function)
         else:
             apkname, ext = os.path.splitext(file)
-            if ext == ".apk" or ext == ".xapk":
+            if ext == ".apk" or ext == ".xapk" or ext == ".aab":
                 readapkinfo(os.path.abspath(file), function)
 
 
