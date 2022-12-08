@@ -1,0 +1,18 @@
+echo [Logging...] ARGS : [$*]
+echo [Logging...] 等待设备连接...
+adb wait-for-device
+#获取顶层Activity包名
+TOP_ACTIVITY=$(adb shell dumpsys activity top | grep "ACTIVITY" | tail -1)
+COMPONENT_NAME=$(echo $TOP_ACTIVITY | awk -F" " {'print $2'})
+PACKAGE_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $1'})
+ACTIVITY_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $2'})
+#echo $PACKAGE_NAME
+#获取顶层Activity用户名
+USER_NAME_ARRAY=($(adb shell ps -A | grep $PACKAGE_NAME | awk {'print $2'}))
+USER_NAME=${USER_NAME_ARRAY[0]}
+#echo $USER_NAME
+
+echo [Logging...] $USER_NAME      $PACKAGE_NAME
+echo
+
+adb logcat  --pid=$USER_NAME

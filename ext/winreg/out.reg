@@ -42,7 +42,7 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK处理]
 "Icon"="D:\\github\\tools\\ext\\winreg\\android.ico,0"
-"SubCommands"="APK签名(ApkSigner);APK签名(JarSigner);查看APK信息;反编译;反编译(仅源码);反编译(仅资源);APK转AAB;APK对齐;打开GP详情"
+"SubCommands"="查看APK信息;打开GP详情;APK签名(ApkSigner);APK签名(JarSigner);反编译;反编译(仅源码);反编译(仅资源);APK转AAB;APK对齐"
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\APK签名(ApkSigner)]
 "Icon"="D:\\github\\tools\\ext\\winreg\\qian.ico,0"
