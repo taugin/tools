@@ -30,6 +30,8 @@ dex2jar下载地址(新) ：https://github.com/pxb1988/dex2jar
 
 处理AndResGuard的apktool ：https://github.com/xxxyanchenxxx/apktool_AndResGuard
 
+处理APK转AAB的流程 ：https://juejin.cn/post/6982111395621896229
+
 用Apktool打包遇到No resource identifier found for attribute "XXX" in package "com.XXX.XXX"的问题解决方案
 解决：
 修改 AXmlResourceParser.java文件中的public String getAttributeName(int index)函数，修改如下：
