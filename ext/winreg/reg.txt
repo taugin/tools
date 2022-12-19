@@ -159,6 +159,12 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\Directory\shell\编译APK\command]
 @="$TOOLS_ROOT\\bin\\apktool.bat b \"%1\" -o \"%1-recompile.apk\""
 
+[HKEY_CLASSES_ROOT\Directory\shell\编译APK(aapt2)]
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\hui.ico,0"
+
+[HKEY_CLASSES_ROOT\Directory\shell\编译APK(aapt2)\command]
+@="$TOOLS_ROOT\\bin\\apktool.bat b \"%1\" --use-aapt2 -o \"%1-recompile.apk\""
+
 [HKEY_CLASSES_ROOT\Directory\shell\编译APK(强制)]
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\hui.ico,0"
 

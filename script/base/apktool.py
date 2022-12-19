@@ -145,29 +145,30 @@ def showApkInfo(apkFile):
     Log.out("[Logging...]%s" %output)
     output = " 目标版本 : [%s] " % targetSdkVersion
     Log.out("[Logging...]%s" %output)
-ret = apktool_cmd()
 
-#回编译签名
-if (ret and len(sys.argv) > 1 and sys.argv[1] == "b"):
-    srcapk = None
-    signedapk = None
-    alignedapk = None;
-    opts, args = getopt.getopt(sys.argv[3:], "o:")
-    for op, value in opts:
-        if (op == "-o"):
-            srcapk = value
-    showApkInfo(srcapk)
-    if (srcapk != None and len(srcapk) > 0) :
-        (tmpname, ext) = os.path.splitext(srcapk)
-        signedapk = tmpname + "-signed.apk"
-        alignedapk = tmpname + "-final.apk"
-        if (signapk(srcapk, signedapk) == True):
-            if (os.path.exists(srcapk)):
-                os.remove(srcapk)
-            if (alignapk(signedapk, alignedapk) == True):
-                if (os.path.exists(signedapk)):
-                    os.remove(signedapk)
-    if (needInstall()):
-        installApk(alignedapk)
-else:
-    Common.pause()
+if __name__ == "__main__":
+    ret = apktool_cmd()
+    #回编译签名
+    if (ret and len(sys.argv) > 1 and sys.argv[1] == "b"):
+        srcapk = None
+        signedapk = None
+        alignedapk = None;
+        opts, args = getopt.getopt(sys.argv[3:], "o:", ['use-aapt2'])
+        for op, value in opts:
+            if (op == "-o"):
+                srcapk = value
+        showApkInfo(srcapk)
+        if (srcapk != None and len(srcapk) > 0) :
+            (tmpname, ext) = os.path.splitext(srcapk)
+            signedapk = tmpname + "-signed.apk"
+            alignedapk = tmpname + "-final.apk"
+            if (signapk(srcapk, signedapk) == True):
+                if (os.path.exists(srcapk)):
+                    os.remove(srcapk)
+                if (alignapk(signedapk, alignedapk) == True):
+                    if (os.path.exists(signedapk)):
+                        os.remove(signedapk)
+        if (needInstall()):
+            installApk(alignedapk)
+    else:
+        Common.pause()
