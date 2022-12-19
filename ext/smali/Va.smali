@@ -1,5 +1,5 @@
 .class public LVa;
-.super Ljava/lang/Object;
+.super Ljava/net/ProxySelector;
 .source "Va.java"
 
 # interfaces
@@ -7,19 +7,66 @@
 
 
 # static fields
-.field private static final PROXY_HOST:Ljava/lang/String; = "172.16.170.218"
+.field private static final PROXY_HOST:Ljava/lang/String; = "172.16.170.247"
 
 .field private static final PROXY_PORT:Ljava/lang/String; = "8888"
 
 .field private static final TAG:Ljava/lang/String; = "va"
 
+.field private static final sProxyList:Ljava/util/List;
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "Ljava/util/List<",
+            "Ljava/net/Proxy;",
+            ">;"
+        }
+    .end annotation
+.end field
+
 
 # direct methods
+.method static constructor <clinit>()V
+    .locals 5
+
+    .line 1
+    new-instance v0, Ljava/util/ArrayList;
+
+    invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
+
+    sput-object v0, LVa;->sProxyList:Ljava/util/List;
+
+    .line 2
+    new-instance v0, Ljava/net/Proxy;
+
+    sget-object v1, Ljava/net/Proxy$Type;->HTTP:Ljava/net/Proxy$Type;
+
+    new-instance v2, Ljava/net/InetSocketAddress;
+
+    const-string v3, "8888"
+
+    invoke-static {v3}, Ljava/lang/Integer;->parseInt(Ljava/lang/String;)I
+
+    move-result v3
+
+    const-string v4, "172.16.170.247"
+
+    invoke-direct {v2, v4, v3}, Ljava/net/InetSocketAddress;-><init>(Ljava/lang/String;I)V
+
+    invoke-direct {v0, v1, v2}, Ljava/net/Proxy;-><init>(Ljava/net/Proxy$Type;Ljava/net/SocketAddress;)V
+
+    .line 3
+    sget-object v1, LVa;->sProxyList:Ljava/util/List;
+
+    invoke-interface {v1, v0}, Ljava/util/List;->add(Ljava/lang/Object;)Z
+
+    return-void
+.end method
+
 .method public constructor <init>()V
     .locals 0
 
     .line 1
-    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+    invoke-direct {p0}, Ljava/net/ProxySelector;-><init>()V
 
     return-void
 .end method
@@ -1377,12 +1424,25 @@
     return-void
 .end method
 
+.method public static setAutoProxy()V
+    .locals 1
+
+    .line 1
+    new-instance v0, LVa;
+
+    invoke-direct {v0}, LVa;-><init>()V
+
+    invoke-static {v0}, Ljava/net/ProxySelector;->setDefault(Ljava/net/ProxySelector;)V
+
+    return-void
+.end method
+
 .method public static setNetworkProxy()V
     .locals 3
 
     const-string v0, "http.proxyHost"
 
-    const-string v1, "172.16.170.218"
+    const-string v1, "172.16.170.247"
 
     .line 1
     invoke-static {v0, v1}, Ljava/lang/System;->setProperty(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
@@ -1560,6 +1620,41 @@
 
 
 # virtual methods
+.method public connectFailed(Ljava/net/URI;Ljava/net/SocketAddress;Ljava/io/IOException;)V
+    .locals 2
+
+    .line 1
+    new-instance v0, Ljava/lang/StringBuilder;
+
+    invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
+
+    const-string v1, "ProxySelector.connectFailed uri : "
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+
+    const-string p1, " , sa : "
+
+    invoke-virtual {v0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0, p2}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+
+    const-string p1, " , ioe : "
+
+    invoke-virtual {v0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0, p3}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object p1
+
+    invoke-static {p1}, LVa;->log(Ljava/lang/String;)V
+
+    return-void
+.end method
+
 .method public onActivityCreated(Landroid/app/Activity;Landroid/os/Bundle;)V
     .locals 1
 
@@ -1719,4 +1814,40 @@
     invoke-static {p1}, LVa;->log(Ljava/lang/String;)V
 
     return-void
+.end method
+
+.method public select(Ljava/net/URI;)Ljava/util/List;
+    .locals 2
+    .annotation system Ldalvik/annotation/Signature;
+        value = {
+            "(",
+            "Ljava/net/URI;",
+            ")",
+            "Ljava/util/List<",
+            "Ljava/net/Proxy;",
+            ">;"
+        }
+    .end annotation
+
+    .line 1
+    new-instance v0, Ljava/lang/StringBuilder;
+
+    invoke-direct {v0}, Ljava/lang/StringBuilder;-><init>()V
+
+    const-string v1, "ProxySelector.select uri : "
+
+    invoke-virtual {v0, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object p1
+
+    invoke-static {p1}, LVa;->log(Ljava/lang/String;)V
+
+    .line 2
+    sget-object p1, LVa;->sProxyList:Ljava/util/List;
+
+    return-object p1
 .end method
