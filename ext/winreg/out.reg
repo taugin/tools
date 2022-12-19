@@ -159,12 +159,6 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\Directory\shell\±‡“ÎAPK\command]
 @="D:\\github\\tools\\bin\\apktool.bat b \"%1\" -o \"%1-recompile.apk\""
 
-[HKEY_CLASSES_ROOT\Directory\shell\±‡“ÎAPK(aapt2)]
-"Icon"="D:\\github\\tools\\ext\\winreg\\hui.ico,0"
-
-[HKEY_CLASSES_ROOT\Directory\shell\±‡“ÎAPK(aapt2)\command]
-@="D:\\github\\tools\\bin\\apktool.bat b \"%1\" --use-aapt2 -o \"%1-recompile.apk\""
-
 [HKEY_CLASSES_ROOT\Directory\shell\±‡“ÎAPK(«ø÷∆)]
 "Icon"="D:\\github\\tools\\ext\\winreg\\hui.ico,0"
 

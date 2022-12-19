@@ -82,6 +82,7 @@ def apktool_cmd():
     cmdlist += sys.argv[1:]
     if not '-s' in cmdlist and not '--no-src' in cmdlist:
         cmdlist += ["--only-main-classes"]
+    cmdlist += ["--use-aapt2"]
     showlist = []
     for cmd in cmdlist:
         showlist += [os.path.basename(cmd)]
@@ -153,7 +154,7 @@ if __name__ == "__main__":
         srcapk = None
         signedapk = None
         alignedapk = None;
-        opts, args = getopt.getopt(sys.argv[3:], "o:", ['use-aapt2'])
+        opts, args = getopt.getopt(sys.argv[3:], "o:")
         for op, value in opts:
             if (op == "-o"):
                 srcapk = value
