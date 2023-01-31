@@ -119,7 +119,7 @@ def alignapk(unalignapk, finalapk):
     return True
 
 def needInstall():
-    result = input("[Logging...] 是否需要安装 (Y/N) ")
+    result = input("[Logging...] 是否安装 : [Y/N] ")
     if result == "Y" or result == "y":
         return True
     return False
