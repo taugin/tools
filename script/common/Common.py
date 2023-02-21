@@ -1,9 +1,20 @@
 ﻿import os
 import platform
+import subprocess
 
 ##############################通用函数###########################
 __all__ = []
 
+def parseString(line):
+    format_code = ["utf8", "gbk", "gb2312"]
+    result = "";
+    for f in format_code:
+        try:
+            result = line.decode(f, "ignore")
+            return result
+        except:
+            pass
+    return result
 #主目录
 #获取Common.py文件所在的目录
 _DIR = os.path.dirname(__file__)
@@ -34,6 +45,7 @@ if (platform.system().lower() == "windows"):
 else:
     BIN_DIR = os.path.join(HOME_DIR, "elf")
     BIN_SUFFIX = ""
+    os.environ["LD_LIBRARY_PATH"] = BIN_DIR
 
 #路径分隔符    
 SEPERATER = os.path.sep
@@ -88,7 +100,11 @@ AAPT_BIN = os.path.join(BIN_DIR, "aapt%s" % AAPT_BIN_SUFFIX)
 KEYTOOL = "keytool"
 
 #jarsigner可执行文件
-JARSIGNER=os.path.join(BIN_DIR, "jarsigner%s" % BIN_SUFFIX)
+if (platform.system().lower() == "windows"):
+    JARSIGNER=os.path.join(BIN_DIR, "jarsigner")
+else:
+    process = subprocess.Popen(["which", "jarsigner"], stdout=subprocess.PIPE)
+    JARSIGNER=parseString(process.stdout.readline().strip())
 
 #adb
 ADB = os.path.join(BIN_DIR, "adb%s" % BIN_SUFFIX);

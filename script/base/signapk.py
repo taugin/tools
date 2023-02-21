@@ -107,6 +107,8 @@ def deletemetainf(src_apk):
 def signapk_with_jarsigner(src_apk, tmp_apk, aligned_apk, dst_apk, keystoreinfo):
     Log.out("")
     alignapk(src_apk, tmp_apk)
+    if not os.path.exists(tmp_apk):
+        tmp_apk = src_apk
     deletemetainf(tmp_apk)
     Log.out("[Signing...] 执行签名 : %s -> %s" % (os.path.basename(tmp_apk), os.path.basename(dst_apk)), True)
     if (len(keystoreinfo) <= 0):
