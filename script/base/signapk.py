@@ -253,7 +253,7 @@ def readkeystore(src_apk, filedir):
     if (len(storefiles) <= 0):
         packagename = getpackagename(src_apk)
         if (packagename != None and len(packagename) > 0):
-            pkg_storefile = os.path.join(Common.KEYSTORES_DIR, packagename)
+            pkg_storefile = os.path.join(Common.KEYSTORES_DIR, "appsignfiles", packagename)
             if (pkg_storefile != None and os.path.isdir(pkg_storefile)):
                 Log.out("[Logging...] 文件包名 : [%s]" % packagename)
                 listfile=os.listdir(pkg_storefile)

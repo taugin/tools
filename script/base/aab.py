@@ -84,7 +84,7 @@ def readkeystore(src_file):
     if (len(storefiles) <= 0):
         packagename = getaabpackagename(src_file)
         if (packagename != None and len(packagename) > 0):
-            pkg_storefile = os.path.join(Common.KEYSTORES_DIR, packagename)
+            pkg_storefile = os.path.join(Common.KEYSTORES_DIR, "appsignfiles", packagename)
             if (pkg_storefile != None and os.path.isdir(pkg_storefile)):
                 Log.out("[Logging...] 文件包名 : [%s]" % packagename)
                 listfile=os.listdir(pkg_storefile)
