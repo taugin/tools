@@ -791,6 +791,11 @@ except getopt.GetoptError as err:
     Log.out(err)
     sys.exit()
 
+# 求字符串的MD5值
+if STR_MD5 == True:
+    string_md5(args)
+    sys.exit()
+
 check_arg(args)
 # 安装apk
 if INSTALL_APK == True:
@@ -804,11 +809,6 @@ if INSTALL_XAPK == True:
 if AXMLPRINTER == True:
     print_xml(args)
     sys.exit()
-# 求字符串的MD5值
-if STR_MD5 == True:
-    string_md5(args)
-    sys.exit()
-
 
 if FILE_MD5 == True:
     processFileMd5(args)
