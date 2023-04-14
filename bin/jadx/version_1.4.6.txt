@@ -1,0 +1,10 @@
+需要java11或更高版本
+JAVA11参考的CSDN：https://blog.csdn.net/weixin_53185848/article/details/111827608
+下面是 jdk11的下载地方
+方法1：百度网盘链接：https://pan.baidu.com/s/11yQTrDv653hceNA-wfcFsg
+提取码：qgfk
+方法2：阿里云盘：https://www.aliyundrive.com/s/iBWXu67iuV1
+提取码: 51ya
+————————————————
+版权声明：本文为CSDN博主「卟呤～」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/weixin_53185848/article/details/111827608
