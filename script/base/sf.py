@@ -117,11 +117,11 @@ def md5_classes(apkFile):
     z.close()
 
 
-def printsign_md5(apkFile, signFile, fullSignfileName):
+def printsign_md5_with_jarsigner(apkFile):
     '''输出签名文件的MD5'''
     global apk_info
-    if signFile != None and os.path.exists(signFile):
-        cmdlist = [Common.KEYTOOL, "-printcert", "-file", signFile]
+    if apkFile != None and os.path.exists(apkFile):
+        cmdlist = [Common.KEYTOOL, "-printcert", "-jarfile", apkFile]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
         process.wait()
         alllines = process.stdout.readlines()
@@ -130,10 +130,8 @@ def printsign_md5(apkFile, signFile, fullSignfileName):
         sign_sha1 = None
         for line in alllines:
             tmp = str(line, "gbk")
-            if (apk_info["sign_detail"] == None and (tmp != None and len(tmp) > 0)):
-                apk_info["sign_detail"] = tmp[0:len(tmp) - 1]
-                apk_info["sign_detail"] = apk_info["sign_detail"].replace(
-                    "所有者: ", "")
+            if tmp != None and tmp.startswith("所有者:"):
+                apk_info["sign_detail"] = tmp.replace("所有者: ", "").replace("\n", "")
             tmp = tmp.strip().lower()
             if (tmp.startswith("md5")):
                 tmp = tmp[len("md5") + 1:]
@@ -147,75 +145,62 @@ def printsign_md5(apkFile, signFile, fullSignfileName):
         apk_info["sign_md5"] = sign_md5
         apk_info["sign_sha256"] = sign_sha256
         apk_info["sign_sha1"] = sign_sha1
-        apk_info["sign_file"] = fullSignfileName
-    else:
-        cmdlist = [Common.JAVA, "-jar", Common.APKSIGNER, "verify", "-print-certs", apkFile]
-        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
-        process.wait()
-        alllines = process.stdout.readlines()
-        sign_md5 = None
-        sign_sha256 = None
-        sign_sha1 = None
-        sign_detail = None
-        for line in alllines:
-            tmp = str(line, "gbk")
-            tmp = tmp.strip()
-            if (tmp.startswith("Signer #1 certificate MD5 digest:")):
-                tmp = tmp[len("Signer #1 certificate MD5 digest:") + 1:]
-                tmp = tmp.strip().upper()
-                tmp_list = []
-                length = len(tmp)
-                for index in range(0, length):
-                    tmp_list.append(tmp[index])
-                    if index % 2 == 1 and index < length - 1:
-                        tmp_list.append(":")
-                sign_md5 = "".join(tmp_list)
-            elif (tmp.startswith("Signer #1 certificate SHA-1 digest:")):
-                tmp = tmp[len("Signer #1 certificate SHA-1 digest:") + 1:]
-                tmp = tmp.strip().upper()
-                tmp_list = []
-                length = len(tmp)
-                for index in range(0, length):
-                    tmp_list.append(tmp[index])
-                    if index % 2 == 1 and index < length - 1:
-                        tmp_list.append(":")
-                sign_sha1 = "".join(tmp_list)
-            elif (tmp.startswith("Signer #1 certificate SHA-256 digest:")):
-                tmp = tmp[len("Signer #1 certificate SHA-256 digest:") + 1:]
-                tmp = tmp.strip().upper()
-                tmp_list = []
-                length = len(tmp)
-                for index in range(0, length):
-                    tmp_list.append(tmp[index])
-                    if index % 2 == 1 and index < length - 1:
-                        tmp_list.append(":")
-                sign_sha256 = "".join(tmp_list)
-            elif (tmp.startswith("Signer #1 certificate DN:")):
-                sign_detail = tmp[len("Signer #1 certificate DN:") + 1:]
-        apk_info["sign_md5"] = sign_md5
-        apk_info["sign_sha256"] = sign_sha256
-        apk_info["sign_sha1"] = sign_sha1
-        apk_info["sign_detail"] = sign_detail
 
+def printsign_md5_with_apksigner(apkFile):
+    cmdlist = [Common.JAVA, "-jar", Common.APKSIGNER, "verify", "-print-certs", apkFile]
+    process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
+    #process.wait()
+    alllines = process.stdout.readlines()
+    sign_md5 = None
+    sign_sha256 = None
+    sign_sha1 = None
+    sign_detail = None
+    for line in alllines:
+        tmp = str(line, "gbk")
+        tmp = tmp.strip()
+        if (tmp.startswith("Signer #1 certificate MD5 digest:")):
+            tmp = tmp[len("Signer #1 certificate MD5 digest:") + 1:]
+            tmp = tmp.strip().upper()
+            tmp_list = []
+            length = len(tmp)
+            for index in range(0, length):
+                tmp_list.append(tmp[index])
+                if index % 2 == 1 and index < length - 1:
+                    tmp_list.append(":")
+            sign_md5 = "".join(tmp_list)
+        elif (tmp.startswith("Signer #1 certificate SHA-1 digest:")):
+            tmp = tmp[len("Signer #1 certificate SHA-1 digest:") + 1:]
+            tmp = tmp.strip().upper()
+            tmp_list = []
+            length = len(tmp)
+            for index in range(0, length):
+                tmp_list.append(tmp[index])
+                if index % 2 == 1 and index < length - 1:
+                    tmp_list.append(":")
+            sign_sha1 = "".join(tmp_list)
+        elif (tmp.startswith("Signer #1 certificate SHA-256 digest:")):
+            tmp = tmp[len("Signer #1 certificate SHA-256 digest:") + 1:]
+            tmp = tmp.strip().upper()
+            tmp_list = []
+            length = len(tmp)
+            for index in range(0, length):
+                tmp_list.append(tmp[index])
+                if index % 2 == 1 and index < length - 1:
+                    tmp_list.append(":")
+            sign_sha256 = "".join(tmp_list)
+        elif (tmp.startswith("Signer #1 certificate DN:")):
+            sign_detail = tmp[len("Signer #1 certificate DN:") + 1:]
+    apk_info["sign_md5"] = sign_md5
+    apk_info["sign_sha256"] = sign_sha256
+    apk_info["sign_sha1"] = sign_sha1
+    apk_info["sign_detail"] = sign_detail
 
 def md5_signfile(apkFile):
     '''输出一般文件的MD5'''
-    signfile = ""
-    z = zipfile.ZipFile(apkFile, "r")
-    for f in z.namelist():
-        if (len(f) >= 2 and f[-2:] == "SA" and f.startswith("META-INF/")):
-            signfile = f
-            break
-    if signfile != None and signfile != "":
-        tmpfile = os.path.basename(signfile)
-        f = open(tmpfile, "wb")
-        f.write(z.read(signfile))
-        f.close()
-        printsign_md5(apkFile, tmpfile, signfile)
-        os.remove(tmpfile)
-    else:
-        printsign_md5(apkFile, None, None)
-    z.close()
+    if apkFile != None and apkFile.endswith(".apk"):
+        printsign_md5_with_apksigner(apkFile)
+    if apk_info["sign_md5"] == None or len(apk_info["sign_md5"]) <= 0:
+        printsign_md5_with_jarsigner(apkFile)
 
 
 def get_app_info(apkFile):
@@ -740,9 +725,10 @@ def print_apkinfo():
     output = " 签名详情 | %s" % apk_info["sign_detail"]
     Log.out(output)
 
-    Log.out("-" * dash_len)
-    output = " 签名文件 | %s" % apk_info["sign_file"]
-    Log.out(output)
+    if apk_info["sign_file"] != None and len(apk_info["sign_file"]) > 0:
+        Log.out("-" * dash_len)
+        output = " 签名文件 | %s" % apk_info["sign_file"]
+        Log.out(output)
 
     #Log.out("-" * dash_len)
     #output = " 内部摘要 | %s" % apk_info["classes_md5"]
@@ -823,6 +809,7 @@ if FILE_MD5 == True:
     output += " 文件哈希 | %s" % apk_info["apk_sha1"]
     output += "\n"
     output += " 文件哈希 | %s" % apk_info["apk_sha256"]
+    output += "\n"
     if apk_info.get('sign_md5') != None:
         output += "\n"
         output += ("-" * dash_len)
