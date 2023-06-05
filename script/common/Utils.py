@@ -1,10 +1,12 @@
 ﻿#!/usr/bin/python
 # coding: UTF-8
 
+from copy import deepcopy
 import os
 import sys
 import shutil
 import platform
+import Log
 
 def pause():
     if (platform.system().lower() == "windows"):
@@ -124,3 +126,8 @@ def parseString(line):
         except:
             pass
     return result
+
+def printExecCmdString(cmdlist):
+    cmdlist_deepcopy = deepcopy(cmdlist)
+    cmdlist_deepcopy[0] = os.path.basename(cmdlist_deepcopy[0])
+    Log.out("[Logging...] 执行程序 : [{}]".format(' '.join(cmdlist_deepcopy)))

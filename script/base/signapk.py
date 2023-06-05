@@ -121,6 +121,9 @@ def signapk_with_jarsigner(src_apk, tmp_apk, aligned_apk, dst_apk, keystoreinfo)
             Log.out("[Signing...] 签名失败", True)
             pause()
     else:
+        if Common.JARSIGNER == None or len(Common.JARSIGNER) < 0 or not os.path.exists(Common.JARSIGNER):
+            Log.out("[Signing...] 签名失败 : 无法找到签名文件 [jarsigner]", True)
+            return
         Log.out("[Logging...] 签名信息 : [jarsigner] keystore : [%s], storepass : [%s] , keyalias : [%s], keypass : [%s]" % (os.path.basename(keystoreinfo[0]),keystoreinfo[1], keystoreinfo[2], keystoreinfo[3]), True)
 
         dir = os.path.dirname(src_apk)
@@ -142,6 +145,7 @@ def signapk_with_jarsigner(src_apk, tmp_apk, aligned_apk, dst_apk, keystoreinfo)
         cmdlist.append(dst_apk)
         cmdlist.append(tmp_apk)
         cmdlist.append(keystoreinfo[2])
+        Utils.printExecCmdString(cmdlist)
         retcode = subprocess.call(cmdlist, stdout=subprocess.PIPE)
         if (retcode == 0):
             Log.out("[Signing...] 签名成功 : %s" % dst_apk, True)
@@ -183,6 +187,7 @@ def signapk_with_apksigner(src_apk, tmp_apk, aligned_apk, dst_apk, keystoreinfo)
         cmdlist.append("--out")
         cmdlist.append(dst_apk)
         cmdlist.append(aligned_apk)
+        Utils.printExecCmdString(cmdlist)
         retcode = subprocess.call(cmdlist, stdout=subprocess.PIPE)
         if (retcode == 0):
             Log.out("[Signing...] 签名成功 : %s" % dst_apk, True)
@@ -301,11 +306,15 @@ def readkeystore(src_apk, filedir):
         sys.exit()
 
     keystorepath = os.path.normpath(os.path.join(filedir, keystorefile))
-    retcode = subprocess.call([Common.KEYTOOL, "-list", "-keystore", keystorepath, "-storepass", keystorepass], stdout=subprocess.PIPE)
-    if (retcode != 0):
-        Log.out("[Logging...] 签名文件不正确", True)
-        pause()
-        sys.exit()
+
+    if Common.KEYTOOL == None or len(Common.KEYTOOL) <= 0 or not os.path.exists(Common.KEYTOOL):
+        Log.out("[Logging...] 验签失败 : 无法找到签名文件 [keytool]")
+    else:
+        retcode = subprocess.call([Common.KEYTOOL, "-list", "-keystore", keystorepath, "-storepass", keystorepass], stdout=subprocess.PIPE)
+        if (retcode != 0):
+            Log.out("[Logging...] 签名文件不正确", True)
+            pause()
+            sys.exit()
     keystoreinfo = []
     keystoreinfo.append(keystorepath)
     keystoreinfo.append(keystorepass)

@@ -1,7 +1,7 @@
 ﻿import os
 import platform
 import subprocess
-
+import Log
 ##############################通用函数###########################
 __all__ = []
 
@@ -77,7 +77,7 @@ AES_JAR = os.path.join(LIB_DIR, "aes.jar")
 
 AXML_EDITOR = os.path.join(LIB_DIR, "AXMLEditor.jar")
 
-BUNDLE_VERSION = "1.6.1"
+BUNDLE_VERSION = "1.15.1"
 BUNDLE_TOOL = os.path.join(LIB_DIR, "bundletool-all-%s.jar" % BUNDLE_VERSION)
 
 #apksigner可执行文件
@@ -96,16 +96,43 @@ if (os_bit == "64bit" and AAPT_BIN_SUFFIX == ""):
 AAPT2_BIN = os.path.join(BIN_DIR, "aapt2%s" % AAPT_BIN_SUFFIX)
 AAPT_BIN = os.path.join(BIN_DIR, "aapt%s" % AAPT_BIN_SUFFIX)
 
+#优先读取jdk1.8.0的可执行文件
+def find_sdk_version_180(process):
+    all_exec_path = []
+    exec_path_180 = None
+    alllines = process.stdout.readlines()
+    for item in alllines:
+        exec_path = parseString(item).strip()
+        all_exec_path.append(exec_path)
+        if '1.8.0' in exec_path:
+            exec_path_180 = exec_path
+            break;
+    if exec_path_180 == None or len(exec_path_180) <= 0 and all_exec_path != None and len(all_exec_path) > 0:
+        exec_path_180 = all_exec_path[0]
+    return exec_path_180
 #keytool可执行文件
 KEYTOOL = "keytool"
+if (platform.system().lower() == "windows"):
+    process = subprocess.Popen(["where", "keytool"], stdout=subprocess.PIPE)
+    KEYTOOL=find_sdk_version_180(process)
+    #KEYTOOL=os.path.join(BIN_DIR, "keytool.exe")
+    Log.out("[Logging...] 执行文件路径 : [{}]".format(KEYTOOL))
+else:
+    process = subprocess.Popen(["which", "keytool"], stdout=subprocess.PIPE)
+    KEYTOOL=find_sdk_version_180(process)
+    Log.out("[Logging...] 执行文件路径 : [{}]".format(KEYTOOL))
 
 #jarsigner可执行文件
 if (platform.system().lower() == "windows"):
-    JARSIGNER=os.path.join(BIN_DIR, "jarsigner")
+    process = subprocess.Popen(["where", "jarsigner"], stdout=subprocess.PIPE)
+    JARSIGNER=find_sdk_version_180(process)
+    #JARSIGNER=os.path.join(BIN_DIR, "jarsigner.exe")
+    Log.out("[Logging...] 执行文件路径 : [{}]".format(JARSIGNER))
 else:
     process = subprocess.Popen(["which", "jarsigner"], stdout=subprocess.PIPE)
-    JARSIGNER=parseString(process.stdout.readline().strip())
-
+    JARSIGNER=find_sdk_version_180(process)
+    Log.out("[Logging...] 执行文件路径 : [{}]".format(JARSIGNER))
+Log.out("")
 #adb
 ADB = os.path.join(BIN_DIR, "adb%s" % BIN_SUFFIX);
 

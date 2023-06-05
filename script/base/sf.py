@@ -89,19 +89,22 @@ def file_sign_info(keystorefilepath):
 
     global apk_info
     keystorepath = os.path.normpath(os.path.join(filedir, keystorefile))
-    p = subprocess.Popen([Common.KEYTOOL, "-v", "-list", "-keystore", keystorepath, "-storepass", keystorepass], stdout=subprocess.PIPE)
-    alllines = p.stdout.readlines()
-    for line in alllines:
-        tmp = Utils.parseString(line)
-        tmp = tmp.replace("\r", "")
-        tmp = tmp.replace("\n", "")
-        tmp = tmp.strip()
-        if tmp.startswith('MD5:'):
-            apk_info['sign_md5'] = tmp.replace("MD5:", "").strip()
-        if tmp.startswith('SHA1:'):
-            apk_info['sign_sha1'] = tmp.replace("SHA1:", "").strip()
-        if tmp.startswith('SHA256:'):
-            apk_info['sign_sha256'] = tmp.replace("SHA256:", "").strip()
+    if Common.KEYTOOL == None or len(Common.KEYTOOL) <= 0 or not os.path.exists(Common.KEYTOOL):
+        Log.out("[Logging...] 签名程序路径 : 无法找到签名文件 [keytool]")
+    else:
+        p = subprocess.Popen([Common.KEYTOOL, "-v", "-list", "-keystore", keystorepath, "-storepass", keystorepass], stdout=subprocess.PIPE)
+        alllines = p.stdout.readlines()
+        for line in alllines:
+            tmp = Utils.parseString(line)
+            tmp = tmp.replace("\r", "")
+            tmp = tmp.replace("\n", "")
+            tmp = tmp.strip()
+            if tmp.startswith('MD5:'):
+                apk_info['sign_md5'] = tmp.replace("MD5:", "").strip()
+            if tmp.startswith('SHA1:'):
+                apk_info['sign_sha1'] = tmp.replace("SHA1:", "").strip()
+            if tmp.startswith('SHA256:'):
+                apk_info['sign_sha256'] = tmp.replace("SHA256:", "").strip()
 
 def md5_classes(apkFile):
     '''    输出classes.dex的MD5    '''
@@ -120,8 +123,12 @@ def md5_classes(apkFile):
 def printsign_md5_with_jarsigner(apkFile):
     '''输出签名文件的MD5'''
     global apk_info
+    if Common.KEYTOOL == None or len(Common.KEYTOOL) <= 0 or not os.path.exists(Common.KEYTOOL):
+        Log.out("[Logging...] 签名程序路径 : 无法找到签名文件 [keytool]")
+        return
     if apkFile != None and os.path.exists(apkFile):
         cmdlist = [Common.KEYTOOL, "-printcert", "-jarfile", apkFile]
+        Utils.printExecCmdString(cmdlist)
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
         process.wait()
         alllines = process.stdout.readlines()
@@ -148,6 +155,7 @@ def printsign_md5_with_jarsigner(apkFile):
 
 def printsign_md5_with_apksigner(apkFile):
     cmdlist = [Common.JAVA, "-jar", Common.APKSIGNER, "verify", "-print-certs", apkFile]
+    Utils.printExecCmdString(cmdlist)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
     #process.wait()
     alllines = process.stdout.readlines()
