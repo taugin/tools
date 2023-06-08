@@ -19,4 +19,4 @@ echo.
 @rem echo pythoncode=%pythoncode%
 @rem echo pythonpath=%pythonpath%
 @rem echo fullpypath=%fullpypath%
-%pythonpath% %fullpypath% %1 %2 %3 %4 %5 %6 %7 %8 %9
+%pythonpath% %fullpypath% -f %1 %2 %3 %4 %5 %6 %7 %8 %9
