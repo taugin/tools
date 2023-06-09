@@ -140,6 +140,12 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\myjarfile\shell\open\command]
 @="C:\\Program Files\\WinRAR\\WinRar.exe \"%1\""
 
+[HKEY_CLASSES_ROOT\myjarfile\shell\JADX-GUI]
+"Icon"="D:\\github\\tools\\ext\\winreg\\jadx.ico,0"
+
+[HKEY_CLASSES_ROOT\myjarfile\shell\JADX-GUI\command]
+@="D:\\github\\tools\\bin\\jadx\\bin\\jadx-gui.bat \"%1\""
+
 [HKEY_CLASSES_ROOT\myjarfile\shell\JD-GUI]
 "Icon"="D:\\github\\tools\\bin\\jd-gui.exe"
 
