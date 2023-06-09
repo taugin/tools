@@ -126,6 +126,14 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\.aar]
 @="myaarfile"
 
+
+[HKEY_CLASSES_ROOT\myjarfile]
+@=""
+"Icon"="C:\\Program Files\\WinRAR\\WinRar.exe"
+
+[HKEY_CLASSES_ROOT\myjarfile\DefaultIcon]
+@="D:\\github\\tools\\ext\\winreg\\android.ico,0"
+
 [HKEY_CLASSES_ROOT\myjarfile\shell\open]
 "Icon"="C:\\Program Files\\WinRAR\\WinRar.exe"
 
