@@ -222,6 +222,7 @@ def apk2aab(apk_file):
     compiled_resource_file = os.path.join(apk_dir, 'compiled_resources.zip')
     base_zip = os.path.join(apk_dir, "base.zip")
     base_aab = os.path.join(apk_dir, "base.aab")
+    unsign_aab_file = os.path.join(apk_dir, '%s-unsigned.aab' % apk_base_name)
     final_aab_file = os.path.join(apk_dir, '%s-final.aab' % apk_base_name)
     result = decode_apk_resource(apk_file, decode_apk_dir)
     if not result:
@@ -252,10 +253,13 @@ def apk2aab(apk_file):
     if not result:
         Common.pause()
         return
-    sign_aab_file(base_aab, final_aab_file)
+    result = sign_aab_file(base_aab, final_aab_file)
+    Log.out("[Logging...] 文件签名{}".format("成功" if result else "失败"))
+    if not result:
+        Utils.movefile(base_aab, unsign_aab_file)
     delete_temp_file(decode_apk_dir, base_apk_dir, base_apk, compiled_resource_file, base_zip, base_aab)
-    Log.out("\n[Logging...] 生成AAB文件 : %s" % final_aab_file)
-    sleep(2)
+    Log.out("\n[Logging...] 生成AAB文件 : %s" % (final_aab_file if result else unsign_aab_file))
+    Common.pause()
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
