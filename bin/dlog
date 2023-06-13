@@ -1,0 +1,29 @@
+echo "********* args count : [$#], args : [$*]"
+if [ $# -le 0 ];then
+    args="hauyu simple rabbit ch"
+else
+    args="$*"
+fi
+while true
+do
+    echo "********* wait for usb device connected ..."
+    adb.exe wait-for-device
+    for arg in $args
+    do
+        adb shell setprop log.tag.$arg V
+    done
+    cmd="adb logcat -s $args"
+    echo "********* $cmd"
+    $cmd
+    sleep 1
+    while true
+    do
+        echo ""
+        read -a input -n 1 -p "********* press [Y/y] key to continue:"
+        if [ "$input" == "y" -o "$input" == "Y" ];then
+            break
+        fi
+    done
+    echo "." 
+    killall adb
+done
