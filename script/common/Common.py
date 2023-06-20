@@ -107,9 +107,10 @@ def find_sdk_version_180(process):
         if '1.8.0' in exec_path:
             exec_path_180 = exec_path
             break;
-    if exec_path_180 == None or len(exec_path_180) <= 0 and all_exec_path != None and len(all_exec_path) > 0:
+    if (exec_path_180 == None or len(exec_path_180) <= 0) and (all_exec_path != None and len(all_exec_path)) > 0:
         exec_path_180 = all_exec_path[0]
     return exec_path_180
+
 #keytool可执行文件
 KEYTOOL = "keytool"
 if (platform.system().lower() == "windows"):

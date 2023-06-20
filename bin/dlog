@@ -7,6 +7,8 @@ fi
 while true
 do
     echo "********* wait for usb device connected ..."
+    devices=$(adb devices)
+    echo "$devices"
     adb.exe wait-for-device
     for arg in $args
     do
@@ -25,5 +27,5 @@ do
         fi
     done
     echo "." 
-    killall adb
+    #killall adb
 done
