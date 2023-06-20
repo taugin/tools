@@ -203,27 +203,31 @@ def sign_aab_file(base_aab, final_aab_file):
     else:
         return False
 
-def delete_temp_file(decode_apk_dir, base_apk_dir, base_apk, compiled_resource_file, base_zip, base_aab):
+def delete_temp_file(decode_apk_dir, base_apk_dir, base_apk, compiled_resource_file, base_zip, base_aab, intermediates_dir):
     Utils.deletedir(decode_apk_dir)
     Utils.deletedir(base_apk_dir)
     Utils.deleteFile(base_apk)
     Utils.deleteFile(compiled_resource_file)
     Utils.deleteFile(base_zip)
     Utils.deleteFile(base_aab)
+    Utils.deletedir(intermediates_dir)
     pass
 
 def apk2aab(apk_file):
     apk_dir = os.path.dirname(apk_file)
     apk_name = os.path.basename(apk_file)
+    intermediates_dir = os.path.join(apk_dir, "intermediates")
+    os.makedirs(intermediates_dir)
     apk_base_name,_ = os.path.splitext(apk_name)
-    decode_apk_dir = os.path.join(apk_dir, 'decode_apk_dir')
-    base_apk = os.path.join(apk_dir, "base.apk")
-    base_apk_dir = os.path.join(apk_dir, "base")
-    compiled_resource_file = os.path.join(apk_dir, 'compiled_resources.zip')
-    base_zip = os.path.join(apk_dir, "base.zip")
-    base_aab = os.path.join(apk_dir, "base.aab")
+    decode_apk_dir = os.path.join(intermediates_dir, 'decode_apk_dir')
+    base_apk = os.path.join(intermediates_dir, "base.apk")
+    base_apk_dir = os.path.join(intermediates_dir, "base")
+    compiled_resource_file = os.path.join(intermediates_dir, 'compiled_resources.zip')
+    base_zip = os.path.join(intermediates_dir, "base.zip")
+    base_aab = os.path.join(intermediates_dir, "base.aab")
     unsign_aab_file = os.path.join(apk_dir, '%s-unsigned.aab' % apk_base_name)
     final_aab_file = os.path.join(apk_dir, '%s-final.aab' % apk_base_name)
+    #start
     result = decode_apk_resource(apk_file, decode_apk_dir)
     if not result:
         Common.pause()
@@ -257,7 +261,7 @@ def apk2aab(apk_file):
     Log.out("[Logging...] 文件签名{}".format("成功" if result else "失败"))
     if not result:
         Utils.movefile(base_aab, unsign_aab_file)
-    delete_temp_file(decode_apk_dir, base_apk_dir, base_apk, compiled_resource_file, base_zip, base_aab)
+    delete_temp_file(decode_apk_dir, base_apk_dir, base_apk, compiled_resource_file, base_zip, base_aab, intermediates_dir)
     Log.out("\n[Logging...] 生成AAB文件 : %s" % (final_aab_file if result else unsign_aab_file))
     Common.pause()
 
