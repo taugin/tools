@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import os
+import re
 from time import sleep
 import zipfile
 #引入别的文件夹的模块
@@ -29,7 +30,43 @@ def decode_apk_resource(apk_file, decode_apk_dir):
         Log.out("[Logging...] 反编文件成功\n")
         return True
 
+def check_resource(decode_apk_dir):
+    public_file = os.path.join(decode_apk_dir, "res", "values", "public.xml")
+    Log.out("[Logging...] 检查无效资源 : %s" % public_file)
+    if not os.path.exists(public_file):
+        return
+    error_index_list = []
+    alllines = None
+    with open(public_file) as f:
+        alllines = f.readlines()
+        error_index = 0
+        invalid_name_re = re.compile('name=\"(.*?)\"')
+        for line in alllines:
+            invalid_name = None
+            invalid_name_values = invalid_name_re.findall(line)
+            if invalid_name_values != None and len(invalid_name_values) > 0:
+                invalid_name = invalid_name_values[0]
+            if invalid_name != None and invalid_name.startswith("$"):
+                error_index_list.append(error_index)
+            error_index += 1
+    Log.out("[Logging...] 无效资源数量 : [{}]\n".format(len(error_index_list) if error_index_list != None else 0))
+    if error_index_list != None and len(error_index_list) and alllines != None and len(alllines) > 0:
+        error_index_list.reverse()
+        for item in error_index_list:
+            try:
+                del alllines[item]
+            except Exception as e:
+                print("exception : {}".format(e))
+        with open(public_file, "w") as f:
+            f.write("".join(alllines))
+
 def compile_resource(decode_apk_dir, compiled_resource_file):
+    try:
+        check_resource(decode_apk_dir)
+    except Exception as e:
+        Log.out("[Logging...] 检查资源异常 : {}".format(e))
+        import traceback
+        traceback.print_exc()
     Log.out("[Logging...] 开始编译资源 : %s" % compiled_resource_file)
     if os.path.exists(compiled_resource_file):
         Log.out("[Logging...] 编译资源成功\n")
@@ -43,7 +80,6 @@ def compile_resource(decode_apk_dir, compiled_resource_file):
     else:
         Log.out("[Logging...] 编译资源成功\n")
         return True
-    pass
 
 def fetch_apk_arguement(apk_file):
     apk_arguement = {}
@@ -178,10 +214,9 @@ def zip_base_dir(base_dir, base_zip):
     z.close()
     Log.out("[Logging...] 压缩文件成功\n")
     return True
-    pass
 
 def bundle_aab(base_zip, base_aab):
-    Log.out("[Logging...] 生成AAB文件")
+    Log.out("[Logging...] 生成AAB 文件")
     if os.path.exists(base_aab):
         os.remove(base_aab)
     cmdlist = [Common.JAVA, '-jar', Common.BUNDLE_TOOL, 'build-bundle', '--modules=%s' % base_zip, '--output=%s' % base_aab]
@@ -262,7 +297,7 @@ def apk2aab(apk_file):
     if not result:
         Utils.movefile(base_aab, unsign_aab_file)
     delete_temp_file(decode_apk_dir, base_apk_dir, base_apk, compiled_resource_file, base_zip, base_aab, intermediates_dir)
-    Log.out("\n[Logging...] 生成AAB文件 : %s" % (final_aab_file if result else unsign_aab_file))
+    Log.out("\n[Logging...] 生成AAB 文件 : %s" % (final_aab_file if result else unsign_aab_file))
     Common.pause()
 
 if __name__ == '__main__':
