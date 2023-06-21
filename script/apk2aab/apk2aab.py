@@ -259,7 +259,7 @@ def apk2aab(apk_file):
     base_apk_dir = os.path.join(intermediates_dir, "base")
     compiled_resource_file = os.path.join(intermediates_dir, 'compiled_resources.zip')
     base_zip = os.path.join(intermediates_dir, "base.zip")
-    base_aab = os.path.join(intermediates_dir, "base.aab")
+    base_aab = os.path.join(apk_dir, "base.aab")
     unsign_aab_file = os.path.join(apk_dir, '%s-unsigned.aab' % apk_base_name)
     final_aab_file = os.path.join(apk_dir, '%s-final.aab' % apk_base_name)
     #start
