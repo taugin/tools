@@ -131,9 +131,9 @@ def signapk_with_jarsigner(src_apk, tmp_apk, aligned_apk, dst_apk, keystoreinfo)
         cmdlist.append(Common.JARSIGNER)
 
         cmdlist.append("-digestalg")
-        cmdlist.append("SHA1")
+        cmdlist.append("SHA-256")
         cmdlist.append("-sigalg")
-        cmdlist.append("MD5withRSA")
+        cmdlist.append("SHA256withRSA")
         
         cmdlist.append("-keystore")
         cmdlist.append(keystoreinfo[0])
