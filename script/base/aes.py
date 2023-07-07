@@ -57,7 +57,7 @@ def decrypt_file(key, input_file, output_file):
     if output_file == None or output_file.strip() == "":
         basename = os.path.basename(input_file)
         name, ext= os.path.splitext(basename)
-        output_file = "%s-encrypt%s" % (name, ext)
+        output_file = "%s-decrypt%s" % (name, ext)
         output_file = os.path.abspath(output_file)
     else:
         output_file = os.path.abspath(output_file)
