@@ -2,9 +2,9 @@ echo [Logging...] ARGS : [$*]
 echo [Logging...] 等待设备连接...
 adb wait-for-device
 #获取顶层Activity包名
-TOP_ACTIVITY=$(adb shell dumpsys activity activities | grep "mFocusedWindow" | tail -1)
+TOP_ACTIVITY=$(adb shell dumpsys activity top | grep "ACTIVITY" | tail -1)
 #echo $TOP_ACTIVITY
-COMPONENT_NAME=$(echo $TOP_ACTIVITY | awk -F" " {'print $3'})
+COMPONENT_NAME=$(echo $TOP_ACTIVITY | awk -F" " {'print $2'})
 PACKAGE_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $1'})
 ACTIVITY_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $2'})
 ACTIVITY_NAME=$(echo $ACTIVITY_NAME | awk -F"}" {'print $1'})
@@ -20,8 +20,8 @@ echo
 while true
 do
     adb wait-for-device
-    TOP_ACTIVITY=$(adb shell dumpsys activity activities | grep "mFocusedWindow" | tail -1)
-    COMPONENT_NAME=$(echo $TOP_ACTIVITY | awk -F" " {'print $3'})
+	TOP_ACTIVITY=$(adb shell dumpsys activity top | grep "ACTIVITY" | tail -1)
+    COMPONENT_NAME=$(echo $TOP_ACTIVITY | awk -F" " {'print $2'})
     PACKAGE_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $1'})
     ACTIVITY_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $2'})
     ACTIVITY_NAME=$(echo $ACTIVITY_NAME | awk -F"}" {'print $1'})
