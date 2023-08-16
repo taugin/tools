@@ -17,17 +17,23 @@ USER_NAME=${USER_NAME_ARRAY[0]}
 echo [Logging...] $USER_NAME      $PACKAGE_NAME
 echo
 
+SHOW_TOP_ACTIVITY_ALWAYS=false
+
 while true
 do
     adb wait-for-device
-	TOP_ACTIVITY=$(adb shell dumpsys activity top | grep "ACTIVITY" | tail -1)
-    COMPONENT_NAME=$(echo $TOP_ACTIVITY | awk -F" " {'print $2'})
-    PACKAGE_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $1'})
-    ACTIVITY_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $2'})
-    ACTIVITY_NAME=$(echo $ACTIVITY_NAME | awk -F"}" {'print $1'})
-    echo "--------------------------------------------------------------"
-	echo [Logging...] Top Package : [$PACKAGE_NAME]
-	echo [Logging...] TopActivity : [$ACTIVITY_NAME]
+    if [ SHOW_TOP_ACTIVITY_ALWAYS == true ];then
+        TOP_ACTIVITY=$(adb shell dumpsys activity top | grep "ACTIVITY" | tail -1)
+        COMPONENT_NAME=$(echo $TOP_ACTIVITY | awk -F" " {'print $2'})
+        PACKAGE_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $1'})
+        ACTIVITY_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $2'})
+        ACTIVITY_NAME=$(echo $ACTIVITY_NAME | awk -F"}" {'print $1'})
+        echo "--------------------------------------------------------------"
+        echo [Logging...] Top Package : [$PACKAGE_NAME]
+        echo [Logging...] TopActivity : [$ACTIVITY_NAME]
+    else
+        echo "--------------------------------------------------------------"
+    fi
     echo [Logging...]  $(date +"%Y:%m:%d %H:%M:%S")
     adb shell ps -A | grep $USER_NAME
     if [ "$1" != "loop" ]; then
