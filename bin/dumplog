@@ -17,9 +17,11 @@ fi
 USER_NAME_ARRAY=($(adb shell ps -A | grep $PACKAGE_NAME | awk {'print $1,$2'}))
 USER_NAME=${USER_NAME_ARRAY[0]}
 PID=${USER_NAME_ARRAY[1]}
-#echo $PID
-
-echo [Logging...] $USER_NAME    $PID      $PACKAGE_NAME
-echo
-
-adb logcat  --pid=$PID
+#echo "pid = " $PID
+if [ "$PID" != "" ];then
+	echo [Logging...] $USER_NAME    $PID      $PACKAGE_NAME
+	echo
+	adb logcat  --pid=$PID
+else
+	echo [Logging...] "进程未运行"
+fi
