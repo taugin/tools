@@ -1,3 +1,4 @@
+import getopt
 import subprocess
 import sys
 import os
@@ -14,15 +15,22 @@ import Log
 import Utils
 import xml.etree.ElementTree as ET
 
+SEARCH_KEYWORDS_IN_CODE = False
+COMPARE_APK_FILE = False
+
 def decompiled_apk(apk_file, out_dir):
+    Log.out("[Logging...] {}".format("反编译文件中"))
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, 'd', apk_file, '-o', out_dir]
-    cmdlist += ["--only-main-classes"]
+    if not SEARCH_KEYWORDS_IN_CODE:
+        cmdlist += ["-s"]
+    if not '-s' in cmdlist and not '--no-src' in cmdlist:
+        cmdlist += ["--only-main-classes"]
     cmdlist += ["--use-aapt2"]
     showlist = []
     for cmd in cmdlist:
         showlist += [os.path.basename(cmd)]
     Log.out("[Logging...] 执行命令详情 : [%s]\n" % " ".join(showlist))
-    ret = subprocess.call(cmdlist)
+    ret = subprocess.call(cmdlist, stdout=subprocess.PIPE)
     Log.out("[Logging...] 编译完成")
     Log.out("")
     if (ret == 0) :
@@ -74,8 +82,8 @@ def analyze_self_active(decompiled_apk_dir):
                     meta_value = meta_data.attrib.get("{%s}value" % Common.XML_NAMESPACE)
                     if meta_name == 'android.content.ContactDirectory' and meta_value == 'true':
                         contains_self_active = True
-                        break;
-    Log.out("[Logging...] 是否有自激活 : {}".format("有自激活" if contains_self_active else "无自激活"))
+                        break
+    Log.out("[Logging...] 是否有自激活 : {}".format("有" if contains_self_active else "无"))
 
 def analyze_instrumentation(decompiled_apk_dir):
     '''分析是否包含instrumentation, 疑似保活'''
@@ -87,10 +95,39 @@ def analyze_instrumentation(decompiled_apk_dir):
         if elem.tag == 'instrumentation':
             ins_name = elem.attrib.get("{%s}name" % Common.XML_NAMESPACE)
     output = "有 : {}".format(ins_name) if ins_name != None else "无"
-    Log.out("[Logging...] 是否保活组件 : {}".format(output))
+    Log.out("[Logging...] 有无保活组件 : {}".format(output))
+
+def analyze_fullscreen_intent(decompiled_apk_dir):
+    '''分析是否包含instrumentation, 疑似保活'''
+    manifest_file = os.path.join(decompiled_apk_dir, "AndroidManifest.xml")
+    manifest_et = ET.parse(manifest_file)
+    root = manifest_et.getroot()
+    has_fullscreen_intent = None
+    for elem in root.iter():
+        if elem.tag == 'uses-permission':
+            permission = elem.attrib.get("{%s}name" % Common.XML_NAMESPACE)
+            has_fullscreen_intent = permission == "android.permission.USE_FULL_SCREEN_INTENT"
+            if has_fullscreen_intent:
+                break
+    output = "有" if has_fullscreen_intent else "无"
+    Log.out("[Logging...] 全屏通知权限 : {}".format(output))
+
+def analyze_account_sync(decompiled_apk_dir):
+    '''分析是否包含instrumentation, 疑似保活'''
+    manifest_file = os.path.join(decompiled_apk_dir, "AndroidManifest.xml")
+    manifest_et = ET.parse(manifest_file)
+    root = manifest_et.getroot()
+    sync_adapter = root.find(".//service/meta-data[@{%s}name='android.content.SyncAdapter']" % Common.XML_NAMESPACE)
+    account_authenticator = root.find(".//service/meta-data[@{%s}name='android.accounts.AccountAuthenticator']" % Common.XML_NAMESPACE)
+    has_account_sync = (sync_adapter != None) and (account_authenticator != None)
+    output = "有" if has_account_sync else "无"
+    Log.out("[Logging...] 有无账户同步 : {}".format(output))
+
 
 def analize_keywords(decompiled_apk_dir):
-    keywords = ["makePathElements", "makeDexElements", "pathList", "dexElements"]
+    keywords = ["makePathElements", "makeDexElements", "pathList", "dexElements", "createVirtualDisplay"]
+    Log.out("\n[Logging...] 关键字段搜索+++++++++++++++++++++++++")
+    Log.out("[Logging...] 关键字搜索中 : {}".format(keywords))
     smalidirs = ["smali", "smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6", "smali_classes7", "smali_classes8", "smali_classes9", "smali_classes10"]
     search_result_set = set()
     for item in smalidirs:
@@ -107,7 +144,7 @@ def analize_keywords(decompiled_apk_dir):
                             for word in keywords:
                                 if word in content:
                                     search_result_set.add("{}#{}".format(word, relative_file))
-    Log.out("[Logging...] 搜索结果 :")
+    Log.out("[Logging...] 搜索关键结果 :")
     if search_result_set != None and len(search_result_set) > 0:
         for item in search_result_set:
             item_array = item.split("#")
@@ -275,32 +312,39 @@ def compare_apk(intermediates_old_dir, intermediates_new_dir):
     compare_string(intermediates_old_dir, intermediates_new_dir)
     compare_public(intermediates_old_dir, intermediates_new_dir)
 
-def analyze_apk(intermediates_dir):
-    Log.out("[Logging...] {}".format("安卓整体分析+++++++++++++++++++++++++"))
+def analyze_apk(intermediates_dir, apk_file):
+    Log.out("\n[Logging...] {}".format("安卓整体分析+++++++++++++++++++++++++"))
+    Log.out("[Logging...] {}".format("安卓文件路径 : {}".format(os.path.realpath(apk_file))))
     analytics_ad_platform(intermediates_dir)
     analyze_self_active(intermediates_dir)
     analyze_instrumentation(intermediates_dir)
-    analize_keywords(intermediates_dir)
+    analyze_fullscreen_intent(intermediates_dir)
+    analyze_account_sync(intermediates_dir)
+    if SEARCH_KEYWORDS_IN_CODE:
+        analize_keywords(intermediates_dir)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "sc")
+        for op, value in opts:
+            if (op == "-s"):
+                SEARCH_KEYWORDS_IN_CODE = True
+            elif (op == "-c"):
+                COMPARE_APK_FILE = True
+    except getopt.GetoptError as err:
+        Log.out(err)
+        sys.exit()
+
+    if len(args) < 0:
         Log.out("[Logging...] 缺少apk参数: {} <apk>".format(os.path.basename(sys.argv[0])))
-        Log.out("[Logging...] 缺少apk参数: {} <apk_old> <apk_new>".format(os.path.basename(sys.argv[0])))
         sys.exit(0)
+
     intermediates_old_dir = None
     intermediates_new_dir = None
-    if len(sys.argv) == 2:
-        apk_file = sys.argv[1]
-        if not os.path.exists(apk_file):
-            Log.out("[Logging...] apk文件不存在: {}".format(apk_file))
-            sys.exit(0)
-        intermediates_old_dir, intermediates_new_dir = decompile_input_apk(None, apk_file)
-        analyze_apk(intermediates_new_dir)
-        sys.exit(0)
-    if len(sys.argv) == 3:
-        apk_old = sys.argv[1]
-        apk_new = sys.argv[2]
+    if len(args) >=2 and COMPARE_APK_FILE:
+        apk_old = args[0]
+        apk_new = args[1]
         if not os.path.exists(apk_old):
             Log.out("[Logging...] apk文件不存在: {}".format(apk_old))
             sys.exit(0)
@@ -309,4 +353,10 @@ if __name__ == "__main__":
             sys.exit(0)
         intermediates_old_dir, intermediates_new_dir = decompile_input_apk(apk_old, apk_new)
         compare_apk(intermediates_old_dir, intermediates_new_dir)
-        analyze_apk(intermediates_new_dir)
+        analyze_apk(intermediates_new_dir, apk_new)
+    else:
+        for item in args:
+            apk_file = item
+            if os.path.exists(apk_file):
+                intermediates_old_dir, intermediates_new_dir = decompile_input_apk(None, apk_file)
+                analyze_apk(intermediates_new_dir, apk_file)
