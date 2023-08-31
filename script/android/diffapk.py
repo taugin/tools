@@ -14,6 +14,33 @@ import Log
 import Utils
 import xml.etree.ElementTree as ET
 
+def analytics_ad_platform(decompiled_apk_dir):
+    script_file = os.path.normpath(sys.argv[0])
+    script_dir = os.path.dirname(script_file)
+    ad_info_file = os.path.join(script_dir, "ad_info.json")
+    Log.out("[Logging...] 配置文件路径 : {}".format(ad_info_file))
+    ad_info_json = None
+    with open(ad_info_file, "r", encoding="utf-8") as f:
+        ad_info_json = eval(f.read())
+    #Log.out("ad_info_json : {}".format(ad_info_json))
+
+    ad_platform_set = set()
+    manifest_file = os.path.join(decompiled_apk_dir, "AndroidManifest.xml")
+    manifest_et = ET.parse(manifest_file)
+    root = manifest_et.getroot()
+    for elem in root.iter():
+        if elem.tag == "activity":
+            element_name = elem.attrib["{%s}name" % Common.XML_NAMESPACE]
+            for jitem in ad_info_json:
+                platform = jitem.get('ad_platform')
+                ad_prefix = jitem.get('ad_prefix')
+                if ad_prefix != None and len(ad_prefix) > 0:
+                    for prefix in ad_prefix:
+                        if element_name.startswith(prefix):
+                            ad_platform_set.add(platform)
+    if ad_platform_set != None and len(ad_platform_set) > 0:
+        Log.out("[Logging...] 已接广告平台 : {}".format(ad_platform_set))
+
 def decompiled_apk(apk_file, out_dir):
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, 'd', apk_file, '-o', out_dir]
     cmdlist += ["--only-main-classes"]
@@ -144,9 +171,18 @@ def diff_apk(apk_left, apk_right):
     compare_manifest(intermediates_left_dir, intermediates_right_dir)
     compare_resources(intermediates_left_dir, intermediates_right_dir)
 
+def analyze_apk(apk_file):
+    work_dir = os.path.dirname(apk_file)
+    intermediates_dir = os.path.join(work_dir, 'intermediates')
+    apk_file_name, ext = os.path.splitext(os.path.basename(apk_file))
+    intermediates_dir = os.path.join(intermediates_dir, apk_file_name)
+    if not os.path.exists(intermediates_dir):
+        decompiled_apk(apk_file, intermediates_dir)
+    analytics_ad_platform(intermediates_dir)
 
 
 if __name__ == "__main__":
     apk1_path = r"F:\workdir\decompile_analytics\TurboClean\3.7.1\TurboClean_3.7.1_Apkpure.apk"
     apk2_path = r"F:\workdir\decompile_analytics\TurboClean\3.7.2\TurboClean_3.7.2_Apkpure.apk"
     diff_apk(apk1_path, apk2_path)
+    analyze_apk(apk1_path)

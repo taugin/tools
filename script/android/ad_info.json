@@ -1,0 +1,139 @@
+[
+  {
+    "ad_platform": "Google",
+    "ad_prefix": [
+      "com.google.android.gms.ads.AdActivity"
+    ]
+  },
+  {
+    "ad_platform": "Applovin",
+    "ad_prefix": [
+      "com.applovin.adview.AppLovinFullscreenActivity",
+      "com.applovin.adview.AppLovinFullscreenThemedActivity"
+    ]
+  },
+  {
+    "ad_platform": "Vungle",
+    "ad_prefix": [
+      "com.vungle.warren.ui.VungleActivity"
+    ]
+  },
+  {
+    "ad_platform": "Facebook",
+    "ad_prefix": [
+      "com.facebook.ads.AudienceNetworkActivity"
+    ]
+  },
+  {
+    "ad_platform": "Bigo",
+    "ad_prefix": [
+      "sg.bigo.ads.ad.splash.AdSplashActivity",
+      "sg.bigo.ads.ad.splash.LandscapeAdSplashActivity",
+      "sg.bigo.ads.api.AdActivity",
+      "sg.bigo.ads.core.mraid.MraidVideoActivity"
+    ]
+  },
+  {
+    "ad_platform": "Chartboost",
+    "ad_prefix": [
+      "com.chartboost.sdk.view.CBImpressionActivity"
+    ]
+  },
+  {
+    "ad_platform": "Fyber",
+    "ad_prefix": [
+      "com.fyber.inneractive.sdk.activities"
+    ]
+  },
+  {
+    "ad_platform": "Fyber",
+    "ad_prefix": [
+      "com.fyber.inneractive.sdk.activities"
+    ]
+  },
+  {
+    "ad_platform": "Inmobi",
+    "ad_prefix": [
+      "com.inmobi.ads.rendering.InMobiAdActivity"
+    ]
+  },
+  {
+    "ad_platform": "Ironsource",
+    "ad_prefix": [
+      "com.ironsource.sdk.controller.ControllerActivity",
+      "com.ironsource.sdk.controller.InterstitialActivity"
+    ]
+  },
+  {
+    "ad_platform": "Mintegral",
+    "ad_prefix": [
+      "com.mbridge.msdk.interstitial.view.MBInterstitialActivity",
+      "com.mbridge.msdk.reward.player.MBRewardVideoActivity"
+    ]
+  },
+  {
+    "ad_platform": "MyTarget",
+    "ad_prefix": [
+      "com.my.target.common.MyTargetActivity"
+    ]
+  },
+  {
+    "ad_platform": "Pangle",
+    "ad_prefix": [
+      "com.bytedance.sdk.openadsdk.activity"
+    ]
+  },
+  {
+    "ad_platform": "Tapjoy",
+    "ad_prefix": [
+      "com.tapjoy.TJAdUnitActivity"
+    ]
+  },
+  {
+    "ad_platform": "TradPlusAdx",
+    "ad_prefix": [
+      "com.tp.adx.sdk.ui.InnerWebViewActivity",
+      "com.tp.adx.sdk.ui.InnerActivity"
+    ]
+  },
+  {
+    "ad_platform": "Unity3D",
+    "ad_prefix": [
+      "com.unity3d.services.ads.adunit"
+    ]
+  },
+  {
+    "ad_platform": "Yahoo",
+    "ad_prefix": [
+      "com.yahoo.ads"
+    ]
+  },
+  {
+    "ad_platform": "Yandex",
+    "ad_prefix": [
+      "com.yandex.mobile.ads.common.AdActivity"
+    ]
+  },
+  {
+    "ad_platform": "AdColony",
+    "ad_prefix": [
+      "com.adcolony.sdk.AdColonyInterstitialActivity",
+      "com.adcolony.sdk.AdColonyAdViewActivity"
+    ]
+  },
+  {
+    "ad_platform": "AdColony",
+    "ad_prefix": [
+      "com.adcolony.sdk.AdColonyInterstitialActivity",
+      "com.adcolony.sdk.AdColonyAdViewActivity"
+    ]
+  },
+  {
+    "ad_platform": "ToponAdx",
+    "ad_prefix": [
+      "com.anythink.basead",
+      "com.anythink.expressad",
+      "com.anythink.core"
+    ]
+  }
+]
