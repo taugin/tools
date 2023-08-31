@@ -45,8 +45,13 @@ def decompiled_apk(apk_file, out_dir):
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, 'd', apk_file, '-o', out_dir]
     cmdlist += ["--only-main-classes"]
     cmdlist += ["--use-aapt2"]
+    showlist = []
+    for cmd in cmdlist:
+        showlist += [os.path.basename(cmd)]
+    Log.out("[Logging...] 执行命令详情 : [%s]\n" % " ".join(showlist))
     ret = subprocess.call(cmdlist)
     Log.out("[Logging...] 编译完成")
+    Log.out("")
     if (ret == 0) :
         return True
     else:
@@ -157,7 +162,7 @@ def compare_resources(decompiled_dir_old, decompiled_dir_new):
         Log.out("")
 
 def diff_apk(apk_old, apk_new):
-    work_dir = os.path.dirname(apk_old)
+    work_dir = os.path.dirname(apk_new)
     intermediates_dir = os.path.join(work_dir, 'intermediates')
     apk_old_name, ext = os.path.splitext(os.path.basename(apk_old))
     apk_new_name, ext = os.path.splitext(os.path.basename(apk_new))
@@ -185,4 +190,4 @@ if __name__ == "__main__":
     apk1_path = r"F:\workdir\decompile_analytics\TurboClean\3.7.1\TurboClean_3.7.1_Apkpure.apk"
     apk2_path = r"F:\workdir\decompile_analytics\TurboClean\3.7.2\TurboClean_3.7.2_Apkpure.apk"
     diff_apk(apk1_path, apk2_path)
-    analyze_apk(apk1_path)
+    analyze_apk(apk2_path)
