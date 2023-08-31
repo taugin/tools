@@ -14,7 +14,24 @@ import Log
 import Utils
 import xml.etree.ElementTree as ET
 
+def decompiled_apk(apk_file, out_dir):
+    cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, 'd', apk_file, '-o', out_dir]
+    cmdlist += ["--only-main-classes"]
+    cmdlist += ["--use-aapt2"]
+    showlist = []
+    for cmd in cmdlist:
+        showlist += [os.path.basename(cmd)]
+    Log.out("[Logging...] 执行命令详情 : [%s]\n" % " ".join(showlist))
+    ret = subprocess.call(cmdlist)
+    Log.out("[Logging...] 编译完成")
+    Log.out("")
+    if (ret == 0) :
+        return True
+    else:
+        return False
+
 def analytics_ad_platform(decompiled_apk_dir):
+    '''分析接入的广告平台'''
     script_file = os.path.normpath(sys.argv[0])
     script_dir = os.path.dirname(script_file)
     ad_info_file = os.path.join(script_dir, "ad_info.json")
@@ -39,24 +56,38 @@ def analytics_ad_platform(decompiled_apk_dir):
                         if element_name.startswith(prefix):
                             ad_platform_set.add(platform)
     if ad_platform_set != None and len(ad_platform_set) > 0:
-        Log.out("[Logging...] {}".format("已接广告平台+++++++++++++++++++++++++"))
-        Log.out("[Logging...] {}".format(ad_platform_set))
+        Log.out("[Logging...] 已接广告平台 : {}".format(ad_platform_set))
 
-def decompiled_apk(apk_file, out_dir):
-    cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, 'd', apk_file, '-o', out_dir]
-    cmdlist += ["--only-main-classes"]
-    cmdlist += ["--use-aapt2"]
-    showlist = []
-    for cmd in cmdlist:
-        showlist += [os.path.basename(cmd)]
-    Log.out("[Logging...] 执行命令详情 : [%s]\n" % " ".join(showlist))
-    ret = subprocess.call(cmdlist)
-    Log.out("[Logging...] 编译完成")
-    Log.out("")
-    if (ret == 0) :
-        return True
-    else:
-        return False
+def analyze_self_active(decompiled_apk_dir):
+    '''分析自激活'''
+    contains_self_active = False
+    manifest_file = os.path.join(decompiled_apk_dir, "AndroidManifest.xml")
+    manifest_et = ET.parse(manifest_file)
+    root = manifest_et.getroot()
+    for elem in root.iter():
+        if elem.tag == 'provider':
+            sync_value = elem.attrib.get("{%s}syncable" % Common.XML_NAMESPACE)
+            if sync_value == 'true':
+                meta_data = elem.find("meta-data")
+                if meta_data != None:
+                    meta_name = meta_data.attrib.get("{%s}name" % Common.XML_NAMESPACE)
+                    meta_value = meta_data.attrib.get("{%s}value" % Common.XML_NAMESPACE)
+                    if meta_name == 'android.content.ContactDirectory' and meta_value == 'true':
+                        contains_self_active = True
+                        break;
+    Log.out("[Logging...] 是否有自激活 : {}".format("有自激活" if contains_self_active else "无自激活"))
+
+def analyze_instrumentation(decompiled_apk_dir):
+    '''分析是否包含instrumentation, 疑似保活'''
+    manifest_file = os.path.join(decompiled_apk_dir, "AndroidManifest.xml")
+    manifest_et = ET.parse(manifest_file)
+    root = manifest_et.getroot()
+    ins_name = None
+    for elem in root.iter():
+        if elem.tag == 'instrumentation':
+            ins_name = elem.attrib.get("{%s}name" % Common.XML_NAMESPACE)
+    output = "有 : {}".format(ins_name) if ins_name != None else "无"
+    Log.out("[Logging...] 是否保活组件 : {}".format(output))
 
 def compare_manifest_element(old_root, new_root, tag):
     '''对比活动'''
@@ -126,11 +157,10 @@ def compare_manifest(decompiled_dir_old, decompiled_dir_new):
     compare_manifest_element(old_root, new_root, "provider")
     compare_manifest_element(old_root, new_root, "meta-data")
 
-def compare_resources(decompiled_dir_old, decompiled_dir_new):
+def compare_string(decompiled_dir_old, decompiled_dir_new):
     '''对比字符串的变化'''
     string_old_file = os.path.join(decompiled_dir_old, "res", "values", "strings.xml")
     string_new_file = os.path.join(decompiled_dir_new, "res", "values", "strings.xml")
-    #Log.out("[Logging...] 临时中间文件 : [{}, {}]".format(string_old_file, string_new_file))
     string_old_et = ET.parse(string_old_file)
     string_new_et = ET.parse(string_new_file)
     old_root = string_old_et.getroot()
@@ -153,7 +183,7 @@ def compare_resources(decompiled_dir_old, decompiled_dir_new):
     added_apk_set = new_apk_set - old_apk_set
     removed_apk_set = old_apk_set - new_apk_set
     if len(added_apk_set) > 0 or len(removed_apk_set) > 0:
-        Log.out("[Logging...] {}".format("字符串对比结果+++++++++++++++++++++++++"))
+        Log.out("[Logging...] {}".format("资源对比结果+++++++++++++++++++++++++"))
         Log.out("[Logging...] {}".format("增加的条目"))
         for item in added_apk_set:
             Log.out("[Logging...] {} -> {}".format(new_apk_map.get(item), item))
@@ -162,9 +192,48 @@ def compare_resources(decompiled_dir_old, decompiled_dir_new):
             Log.out("[Logging...] {} -> {}".format(old_apk_map.get(item), item))
         Log.out("")
 
+def compare_public(decompiled_dir_old, decompiled_dir_new):
+    '''对比字符串的变化'''
+    string_old_file = os.path.join(decompiled_dir_old, "res", "values", "public.xml")
+    string_new_file = os.path.join(decompiled_dir_new, "res", "values", "public.xml")
+    string_old_et = ET.parse(string_old_file)
+    string_new_et = ET.parse(string_new_file)
+    old_root = string_old_et.getroot()
+    new_root = string_new_et.getroot()
+    old_apk_set = set()
+    new_apk_set = set()
+    for elem in old_root.iter():
+        if elem.tag == "public":
+            name = elem.get('name')
+            type = elem.get('type')
+            attrib = "{}#{}".format(type, name)
+            old_apk_set.add(attrib)
+
+    for elem in new_root.iter():
+        if elem.tag == "public":
+            name = elem.get('name')
+            type = elem.get('type')
+            attrib = "{}#{}".format(type, name)
+            new_apk_set.add(attrib)
+    added_apk_set = new_apk_set - old_apk_set
+    removed_apk_set = old_apk_set - new_apk_set
+    if len(added_apk_set) > 0 or len(removed_apk_set) > 0:
+        Log.out("[Logging...] {}".format("资源对比结果+++++++++++++++++++++++++"))
+        Log.out("[Logging...] {}".format("增加的条目"))
+        for item in added_apk_set:
+            item_array = item.split('#')
+            Log.out("[Logging...] {} -> {}".format(item_array[0], item_array[1]))
+        Log.out("\n[Logging...] {}".format("减少的条目"))
+        for item in removed_apk_set:
+            item_array = item.split('#')
+            Log.out("[Logging...] {} -> {}".format(item_array[0], item_array[1]))
+        Log.out("")
+
 def decompile_input_apk(apk_old, apk_new):
     work_dir = os.path.dirname(apk_new)
     intermediates_dir = os.path.join(work_dir, 'intermediates')
+    intermediates_old_dir = None
+    intermediates_new_dir = None
     if apk_old != None and len(apk_old) > 0:
         apk_old_name, ext = os.path.splitext(os.path.basename(apk_old))
         intermediates_old_dir = os.path.join(intermediates_dir, apk_old_name)
@@ -179,10 +248,14 @@ def decompile_input_apk(apk_old, apk_new):
 
 def compare_apk(intermediates_old_dir, intermediates_new_dir):
     compare_manifest(intermediates_old_dir, intermediates_new_dir)
-    compare_resources(intermediates_old_dir, intermediates_new_dir)
+    compare_string(intermediates_old_dir, intermediates_new_dir)
+    compare_public(intermediates_old_dir, intermediates_new_dir)
 
 def analyze_apk(intermediates_dir):
+    Log.out("[Logging...] {}".format("安卓整体分析+++++++++++++++++++++++++"))
     analytics_ad_platform(intermediates_dir)
+    analyze_self_active(intermediates_dir)
+    analyze_instrumentation(intermediates_dir)
 
 
 if __name__ == "__main__":
