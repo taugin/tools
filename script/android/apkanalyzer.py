@@ -89,6 +89,30 @@ def analyze_instrumentation(decompiled_apk_dir):
     output = "有 : {}".format(ins_name) if ins_name != None else "无"
     Log.out("[Logging...] 是否保活组件 : {}".format(output))
 
+def analize_keywords(decompiled_apk_dir):
+    keywords = ["makePathElements", "makeDexElements", "pathList", "dexElements"]
+    smalidirs = ["smali", "smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6", "smali_classes7", "smali_classes8", "smali_classes9", "smali_classes10"]
+    search_result_set = set()
+    for item in smalidirs:
+        smali_dir = os.path.join(decompiled_apk_dir, item)
+        if os.path.exists(smali_dir):
+            mylist = os.walk(smali_dir, True)
+            for root, filedir, files in mylist:
+                for file in files:
+                    relative_file = os.path.join(root, file)
+                    abs_file = os.path.abspath(relative_file)
+                    if os.path.exists(abs_file):
+                        with open(abs_file, "r") as f:
+                            content = f.read()
+                            for word in keywords:
+                                if word in content:
+                                    search_result_set.add("{}#{}".format(word, relative_file))
+    Log.out("[Logging...] 搜索结果 :")
+    if search_result_set != None and len(search_result_set) > 0:
+        for item in search_result_set:
+            item_array = item.split("#")
+            Log.out("[Logging...] {} : {}".format(item_array[0], item_array[1]))
+
 def compare_manifest_element(old_root, new_root, tag):
     '''对比活动'''
     old_apk_set = set()
@@ -256,6 +280,7 @@ def analyze_apk(intermediates_dir):
     analytics_ad_platform(intermediates_dir)
     analyze_self_active(intermediates_dir)
     analyze_instrumentation(intermediates_dir)
+    analize_keywords(intermediates_dir)
 
 
 if __name__ == "__main__":
