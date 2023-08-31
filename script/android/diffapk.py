@@ -52,26 +52,26 @@ def decompiled_apk(apk_file, out_dir):
     else:
         return False
 
-def compare_manifest_element(left_root, right_root, tag):
+def compare_manifest_element(old_root, new_root, tag):
     '''对比活动'''
-    left_apk_set = set()
-    right_apk_set = set()
-    left_apk_map = {}
-    right_apk_map = {}
-    for elem in left_root.iter():
+    old_apk_set = set()
+    new_apk_set = set()
+    old_apk_map = {}
+    new_apk_map = {}
+    for elem in old_root.iter():
         if elem.tag == tag:
             attrib = elem.attrib["{%s}name" % Common.XML_NAMESPACE]
-            left_apk_set.add(attrib)
-            left_apk_map[attrib] = elem
+            old_apk_set.add(attrib)
+            old_apk_map[attrib] = elem
 
-    for elem in right_root.iter():
+    for elem in new_root.iter():
         if elem.tag == tag:
             attrib = elem.attrib["{%s}name" % Common.XML_NAMESPACE]
-            right_apk_set.add(attrib)
-            right_apk_map[attrib] = elem
+            new_apk_set.add(attrib)
+            new_apk_map[attrib] = elem
         
-    added_apk_set = right_apk_set - left_apk_set
-    removed_apk_set = left_apk_set - right_apk_set
+    added_apk_set = new_apk_set - old_apk_set
+    removed_apk_set = old_apk_set - new_apk_set
     if len(added_apk_set) > 0 or len(removed_apk_set) > 0:
         readable_compare_name = None
         if tag == "uses-permission":
@@ -92,84 +92,84 @@ def compare_manifest_element(left_root, right_root, tag):
         if len(added_apk_set) > 0:
             Log.out("[Logging...] {}".format("增加的条目"))
             for item in added_apk_set:
-                desc = ET.tostring(right_apk_map.get(item), encoding='unicode')
+                desc = ET.tostring(new_apk_map.get(item), encoding='unicode')
                 desc = ""
                 Log.out("[Logging...] {} : {}".format(tag, item, desc))
         if len(removed_apk_set) > 0:
             Log.out("[Logging...] {}".format("减少的条目"))
             for item in removed_apk_set:
-                desc = ET.tostring(left_apk_map.get(item), encoding='unicode')
+                desc = ET.tostring(old_apk_map.get(item), encoding='unicode')
                 desc = ""
                 Log.out("[Logging...] {} : {}".format(tag, item, desc))
         Log.out("")
 
-def compare_manifest(decompiled_dir_left, decompiled_dir_right):
+def compare_manifest(decompiled_dir_old, decompiled_dir_new):
     '''对比AndroidManifest的变化'''
-    manifest_left_file = os.path.join(decompiled_dir_left, "AndroidManifest.xml")
-    manifest_right_file = os.path.join(decompiled_dir_right, "AndroidManifest.xml")
-    #Log.out("[Logging...] 临时中间文件 : [{}, {}]".format(manifest_left_file, manifest_right_file))
-    manifest_left_et = ET.parse(manifest_left_file)
-    manifest_right_et = ET.parse(manifest_right_file)
-    left_root = manifest_left_et.getroot()
-    right_root = manifest_right_et.getroot()
-    compare_manifest_element(left_root, right_root, "uses-permission")
-    compare_manifest_element(left_root, right_root, "permission")
-    compare_manifest_element(left_root, right_root, "activity")
-    compare_manifest_element(left_root, right_root, "service")
-    compare_manifest_element(left_root, right_root, "receiver")
-    compare_manifest_element(left_root, right_root, "provider")
-    compare_manifest_element(left_root, right_root, "meta-data")
+    manifest_old_file = os.path.join(decompiled_dir_old, "AndroidManifest.xml")
+    manifest_new_file = os.path.join(decompiled_dir_new, "AndroidManifest.xml")
+    #Log.out("[Logging...] 临时中间文件 : [{}, {}]".format(manifest_old_file, manifest_new_file))
+    manifest_old_et = ET.parse(manifest_old_file)
+    manifest_new_et = ET.parse(manifest_new_file)
+    old_root = manifest_old_et.getroot()
+    new_root = manifest_new_et.getroot()
+    compare_manifest_element(old_root, new_root, "uses-permission")
+    compare_manifest_element(old_root, new_root, "permission")
+    compare_manifest_element(old_root, new_root, "activity")
+    compare_manifest_element(old_root, new_root, "service")
+    compare_manifest_element(old_root, new_root, "receiver")
+    compare_manifest_element(old_root, new_root, "provider")
+    compare_manifest_element(old_root, new_root, "meta-data")
 
-def compare_resources(decompiled_dir_left, decompiled_dir_right):
+def compare_resources(decompiled_dir_old, decompiled_dir_new):
     '''对比字符串的变化'''
-    string_left_file = os.path.join(decompiled_dir_left, "res", "values", "strings.xml")
-    string_right_file = os.path.join(decompiled_dir_right, "res", "values", "strings.xml")
-    #Log.out("[Logging...] 临时中间文件 : [{}, {}]".format(string_left_file, string_right_file))
-    string_left_et = ET.parse(string_left_file)
-    string_right_et = ET.parse(string_right_file)
-    left_root = string_left_et.getroot()
-    right_root = string_right_et.getroot()
-    left_apk_set = set()
-    right_apk_set = set()
-    left_apk_map = {}
-    right_apk_map = {}
-    for elem in left_root.iter():
+    string_old_file = os.path.join(decompiled_dir_old, "res", "values", "strings.xml")
+    string_new_file = os.path.join(decompiled_dir_new, "res", "values", "strings.xml")
+    #Log.out("[Logging...] 临时中间文件 : [{}, {}]".format(string_old_file, string_new_file))
+    string_old_et = ET.parse(string_old_file)
+    string_new_et = ET.parse(string_new_file)
+    old_root = string_old_et.getroot()
+    new_root = string_new_et.getroot()
+    old_apk_set = set()
+    new_apk_set = set()
+    old_apk_map = {}
+    new_apk_map = {}
+    for elem in old_root.iter():
         if elem.tag == "string":
             attrib = elem.text
-            left_apk_map[attrib] = elem.attrib['name']
-            left_apk_set.add(attrib)
+            old_apk_map[attrib] = elem.attrib['name']
+            old_apk_set.add(attrib)
 
-    for elem in right_root.iter():
+    for elem in new_root.iter():
         if elem.tag == "string":
             attrib = elem.text
-            right_apk_map[attrib] = elem.attrib['name']
-            right_apk_set.add(attrib)
-    added_apk_set = right_apk_set - left_apk_set
-    removed_apk_set = left_apk_set - right_apk_set
+            new_apk_map[attrib] = elem.attrib['name']
+            new_apk_set.add(attrib)
+    added_apk_set = new_apk_set - old_apk_set
+    removed_apk_set = old_apk_set - new_apk_set
     if len(added_apk_set) > 0 or len(removed_apk_set) > 0:
         Log.out("[Logging...] {}".format("字符串对比结果+++++++++++++++++++++++++"))
         Log.out("[Logging...] {}".format("增加的条目"))
         for item in added_apk_set:
-            Log.out("[Logging...] {} -> {}".format(right_apk_map.get(item), item))
+            Log.out("[Logging...] {} -> {}".format(new_apk_map.get(item), item))
         Log.out("[Logging...] {}".format("减少的条目"))
         for item in removed_apk_set:
-            Log.out("[Logging...] {} -> {}".format(left_apk_map.get(item), item))
+            Log.out("[Logging...] {} -> {}".format(old_apk_map.get(item), item))
         Log.out("")
 
-def diff_apk(apk_left, apk_right):
-    work_dir = os.path.dirname(apk_left)
+def diff_apk(apk_old, apk_new):
+    work_dir = os.path.dirname(apk_old)
     intermediates_dir = os.path.join(work_dir, 'intermediates')
-    apk_left_name, ext = os.path.splitext(os.path.basename(apk_left))
-    apk_right_name, ext = os.path.splitext(os.path.basename(apk_right))
-    intermediates_left_dir = os.path.join(intermediates_dir, apk_left_name)
-    intermediates_right_dir = os.path.join(intermediates_dir, apk_right_name)
-    #Log.out("[Logging...] 临时中间目录 : [{}, {}]".format(intermediates_left_dir, intermediates_right_dir))
-    if not os.path.exists(intermediates_left_dir):
-        decompiled_apk(apk_left, intermediates_left_dir)
-    if not os.path.exists(intermediates_right_dir):
-        decompiled_apk(apk_right, intermediates_right_dir)
-    compare_manifest(intermediates_left_dir, intermediates_right_dir)
-    compare_resources(intermediates_left_dir, intermediates_right_dir)
+    apk_old_name, ext = os.path.splitext(os.path.basename(apk_old))
+    apk_new_name, ext = os.path.splitext(os.path.basename(apk_new))
+    intermediates_old_dir = os.path.join(intermediates_dir, apk_old_name)
+    intermediates_new_dir = os.path.join(intermediates_dir, apk_new_name)
+    #Log.out("[Logging...] 临时中间目录 : [{}, {}]".format(intermediates_old_dir, intermediates_new_dir))
+    if not os.path.exists(intermediates_old_dir):
+        decompiled_apk(apk_old, intermediates_old_dir)
+    if not os.path.exists(intermediates_new_dir):
+        decompiled_apk(apk_new, intermediates_new_dir)
+    compare_manifest(intermediates_old_dir, intermediates_new_dir)
+    compare_resources(intermediates_old_dir, intermediates_new_dir)
 
 def analyze_apk(apk_file):
     work_dir = os.path.dirname(apk_file)
