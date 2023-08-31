@@ -39,7 +39,8 @@ def analytics_ad_platform(decompiled_apk_dir):
                         if element_name.startswith(prefix):
                             ad_platform_set.add(platform)
     if ad_platform_set != None and len(ad_platform_set) > 0:
-        Log.out("[Logging...] 已接广告平台 : {}".format(ad_platform_set))
+        Log.out("[Logging...] {}".format("已接广告平台+++++++++++++++++++++++++"))
+        Log.out("[Logging...] {}".format(ad_platform_set))
 
 def decompiled_apk(apk_file, out_dir):
     cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, 'd', apk_file, '-o', out_dir]
@@ -161,33 +162,53 @@ def compare_resources(decompiled_dir_old, decompiled_dir_new):
             Log.out("[Logging...] {} -> {}".format(old_apk_map.get(item), item))
         Log.out("")
 
-def diff_apk(apk_old, apk_new):
+def decompile_input_apk(apk_old, apk_new):
     work_dir = os.path.dirname(apk_new)
     intermediates_dir = os.path.join(work_dir, 'intermediates')
-    apk_old_name, ext = os.path.splitext(os.path.basename(apk_old))
-    apk_new_name, ext = os.path.splitext(os.path.basename(apk_new))
-    intermediates_old_dir = os.path.join(intermediates_dir, apk_old_name)
-    intermediates_new_dir = os.path.join(intermediates_dir, apk_new_name)
-    #Log.out("[Logging...] 临时中间目录 : [{}, {}]".format(intermediates_old_dir, intermediates_new_dir))
-    if not os.path.exists(intermediates_old_dir):
-        decompiled_apk(apk_old, intermediates_old_dir)
-    if not os.path.exists(intermediates_new_dir):
-        decompiled_apk(apk_new, intermediates_new_dir)
+    if apk_old != None and len(apk_old) > 0:
+        apk_old_name, ext = os.path.splitext(os.path.basename(apk_old))
+        intermediates_old_dir = os.path.join(intermediates_dir, apk_old_name)
+        if not os.path.exists(intermediates_old_dir):
+            decompiled_apk(apk_old, intermediates_old_dir)
+    if apk_new != None and len(apk_new) > 0:
+        apk_new_name, ext = os.path.splitext(os.path.basename(apk_new))
+        intermediates_new_dir = os.path.join(intermediates_dir, apk_new_name)
+        if not os.path.exists(intermediates_new_dir):
+            decompiled_apk(apk_new, intermediates_new_dir)
+    return intermediates_old_dir, intermediates_new_dir
+
+def compare_apk(intermediates_old_dir, intermediates_new_dir):
     compare_manifest(intermediates_old_dir, intermediates_new_dir)
     compare_resources(intermediates_old_dir, intermediates_new_dir)
 
-def analyze_apk(apk_file):
-    work_dir = os.path.dirname(apk_file)
-    intermediates_dir = os.path.join(work_dir, 'intermediates')
-    apk_file_name, ext = os.path.splitext(os.path.basename(apk_file))
-    intermediates_dir = os.path.join(intermediates_dir, apk_file_name)
-    if not os.path.exists(intermediates_dir):
-        decompiled_apk(apk_file, intermediates_dir)
+def analyze_apk(intermediates_dir):
     analytics_ad_platform(intermediates_dir)
 
 
 if __name__ == "__main__":
-    apk1_path = r"F:\workdir\decompile_analytics\TurboClean\3.7.1\TurboClean_3.7.1_Apkpure.apk"
-    apk2_path = r"F:\workdir\decompile_analytics\TurboClean\3.7.2\TurboClean_3.7.2_Apkpure.apk"
-    diff_apk(apk1_path, apk2_path)
-    analyze_apk(apk2_path)
+    if len(sys.argv) < 2:
+        Log.out("[Logging...] 缺少apk参数: {} <apk>".format(os.path.basename(sys.argv[0])))
+        Log.out("[Logging...] 缺少apk参数: {} <apk_old> <apk_new>".format(os.path.basename(sys.argv[0])))
+        sys.exit(0)
+    intermediates_old_dir = None
+    intermediates_new_dir = None
+    if len(sys.argv) == 2:
+        apk_file = sys.argv[1]
+        if not os.path.exists(apk_file):
+            Log.out("[Logging...] apk文件不存在: {}".format(apk_file))
+            sys.exit(0)
+        intermediates_old_dir, intermediates_new_dir = decompile_input_apk(None, apk_file)
+        analyze_apk(intermediates_new_dir)
+        sys.exit(0)
+    if len(sys.argv) == 3:
+        apk_old = sys.argv[1]
+        apk_new = sys.argv[2]
+        if not os.path.exists(apk_old):
+            Log.out("[Logging...] apk文件不存在: {}".format(apk_old))
+            sys.exit(0)
+        if not os.path.exists(apk_new):
+            Log.out("[Logging...] apk文件不存在: {}".format(apk_new))
+            sys.exit(0)
+        intermediates_old_dir, intermediates_new_dir = decompile_input_apk(apk_old, apk_new)
+        compare_apk(intermediates_old_dir, intermediates_new_dir)
+        analyze_apk(intermediates_new_dir)
