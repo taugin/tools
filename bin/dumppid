@@ -37,6 +37,8 @@ if [ "$PACKAGE_NAME" == "" ];then
     USER_NAME_ARRAY=($(adb shell ps -A | grep $PACKAGE_NAME | awk {'print $1'}))
     USER_NAME=${USER_NAME_ARRAY[0]}
     #echo $USER_NAME
+	echo [Logging...] Top Package : [$PACKAGE_NAME]
+    echo [Logging...] TopActivity : [$ACTIVITY_NAME]
 else
     USER_NAME=$(adb shell ps -A | grep $PACKAGE_NAME | head -1 | awk {'print $1'})
 fi

@@ -9,7 +9,7 @@ for /F %%i in ('where python') do (
 for /F "delims=" %%i in ('%pythonpath% --version') do (
 		set pythonversion=%%i
 	)
-set  pythoncode=script\apk2aab\apk2aab.py
+set  pythoncode=script\android\apk2aab.py
 set  curdir=%~dp0
 set  fullpypath=%curdir%..\%pythoncode%
 echo [Logging...] 脚本文件路径 : [%pythonpath%]
