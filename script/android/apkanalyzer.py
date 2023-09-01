@@ -173,13 +173,13 @@ def compare_manifest_element(old_root, new_root, tag):
             readable_compare_name = "元数据对比结果"
         Log.out("[Logging...] {}{}".format(readable_compare_name, "+++++++++++++++++++++++++"))
         if len(added_apk_set) > 0:
-            Log.out("[Logging...] {}".format("增加的条目"))
+            Log.out("[Logging...] {}".format("增加的条目 : [{}]".format(len(added_apk_set))))
             for item in added_apk_set:
                 desc = ET.tostring(new_apk_map.get(item), encoding='unicode')
                 desc = ""
                 Log.out("[Logging...] {} : {}".format(tag, item, desc))
         if len(removed_apk_set) > 0:
-            Log.out("[Logging...] {}".format("减少的条目"))
+            Log.out("[Logging...] {}".format("移除的条目 : [{}]".format(len(removed_apk_set))))
             for item in removed_apk_set:
                 desc = ET.tostring(old_apk_map.get(item), encoding='unicode')
                 desc = ""
@@ -230,10 +230,10 @@ def compare_string(decompiled_dir_old, decompiled_dir_new):
     removed_apk_set = old_apk_set - new_apk_set
     if len(added_apk_set) > 0 or len(removed_apk_set) > 0:
         Log.out("[Logging...] {}".format("资源对比结果+++++++++++++++++++++++++"))
-        Log.out("[Logging...] {}".format("增加的条目"))
+        Log.out("[Logging...] {}".format("增加的条目 : [{}]".format(len(added_apk_set))))
         for item in added_apk_set:
             Log.out("[Logging...] {} -> {}".format(new_apk_map.get(item), item))
-        Log.out("[Logging...] {}".format("减少的条目"))
+        Log.out("[Logging...] {}".format("移除的条目 : [{}]".format(len(removed_apk_set))))
         for item in removed_apk_set:
             Log.out("[Logging...] {} -> {}".format(old_apk_map.get(item), item))
         Log.out("")
@@ -265,11 +265,11 @@ def compare_public(decompiled_dir_old, decompiled_dir_new):
     removed_apk_set = old_apk_set - new_apk_set
     if len(added_apk_set) > 0 or len(removed_apk_set) > 0:
         Log.out("[Logging...] {}".format("资源对比结果+++++++++++++++++++++++++"))
-        Log.out("[Logging...] {}".format("增加的条目"))
+        Log.out("[Logging...] {}".format("增加的条目 : [{}]".format(len(added_apk_set))))
         for item in added_apk_set:
             item_array = item.split('#')
             Log.out("[Logging...] {} -> {}".format(item_array[0], item_array[1]))
-        Log.out("\n[Logging...] {}".format("减少的条目"))
+        Log.out("[Logging...] {}".format("移除的条目 : [{}]".format(len(removed_apk_set))))
         for item in removed_apk_set:
             item_array = item.split('#')
             Log.out("[Logging...] {} -> {}".format(item_array[0], item_array[1]))
