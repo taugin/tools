@@ -124,7 +124,7 @@ def analize_keywords(decompiled_apk_dir):
                     relative_file = os.path.join(root, file)
                     abs_file = os.path.abspath(relative_file)
                     if os.path.exists(abs_file):
-                        with open(abs_file, "r") as f:
+                        with open(abs_file, "r", encoding='UTF-8') as f:
                             content = f.read()
                             for word in keywords:
                                 if word in content:
