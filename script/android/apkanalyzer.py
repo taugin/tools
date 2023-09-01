@@ -38,7 +38,7 @@ def decompiled_apk(apk_file, out_dir):
     else:
         return False
 
-def analytics_ad_platform(decompiled_apk_dir):
+def analytics_ad_platform(manifest_root):
     '''分析接入的广告平台'''
     script_file = os.path.normpath(sys.argv[0])
     script_dir = os.path.dirname(script_file)
@@ -50,10 +50,7 @@ def analytics_ad_platform(decompiled_apk_dir):
     #Log.out("ad_info_json : {}".format(ad_info_json))
 
     ad_platform_set = set()
-    manifest_file = os.path.join(decompiled_apk_dir, "AndroidManifest.xml")
-    manifest_et = ET.parse(manifest_file)
-    root = manifest_et.getroot()
-    for elem in root.iter():
+    for elem in manifest_root.iter():
         if elem.tag == "activity":
             element_name = elem.attrib["{%s}name" % Common.XML_NAMESPACE]
             for jitem in ad_info_json:
@@ -66,13 +63,10 @@ def analytics_ad_platform(decompiled_apk_dir):
     if ad_platform_set != None and len(ad_platform_set) > 0:
         Log.out("[Logging...] 已接广告平台 : {}".format(ad_platform_set))
 
-def analyze_self_active(decompiled_apk_dir):
+def analyze_self_active(manifest_root):
     '''分析自激活'''
     contains_self_active = False
-    manifest_file = os.path.join(decompiled_apk_dir, "AndroidManifest.xml")
-    manifest_et = ET.parse(manifest_file)
-    root = manifest_et.getroot()
-    for elem in root.iter():
+    for elem in manifest_root.iter():
         if elem.tag == 'provider':
             sync_value = elem.attrib.get("{%s}syncable" % Common.XML_NAMESPACE)
             if sync_value == 'true':
@@ -85,25 +79,19 @@ def analyze_self_active(decompiled_apk_dir):
                         break
     Log.out("[Logging...] 是否有自激活 : {}".format("有" if contains_self_active else "无"))
 
-def analyze_instrumentation(decompiled_apk_dir):
+def analyze_instrumentation(manifest_root):
     '''分析是否包含instrumentation, 疑似保活'''
-    manifest_file = os.path.join(decompiled_apk_dir, "AndroidManifest.xml")
-    manifest_et = ET.parse(manifest_file)
-    root = manifest_et.getroot()
     ins_name = None
-    for elem in root.iter():
+    for elem in manifest_root.iter():
         if elem.tag == 'instrumentation':
             ins_name = elem.attrib.get("{%s}name" % Common.XML_NAMESPACE)
     output = "有 : {}".format(ins_name) if ins_name != None else "无"
     Log.out("[Logging...] 有无保活组件 : {}".format(output))
 
-def analyze_fullscreen_intent(decompiled_apk_dir):
+def analyze_fullscreen_intent(manifest_root):
     '''分析是否包含instrumentation, 疑似保活'''
-    manifest_file = os.path.join(decompiled_apk_dir, "AndroidManifest.xml")
-    manifest_et = ET.parse(manifest_file)
-    root = manifest_et.getroot()
     has_fullscreen_intent = None
-    for elem in root.iter():
+    for elem in manifest_root.iter():
         if elem.tag == 'uses-permission':
             permission = elem.attrib.get("{%s}name" % Common.XML_NAMESPACE)
             has_fullscreen_intent = permission == "android.permission.USE_FULL_SCREEN_INTENT"
@@ -112,13 +100,10 @@ def analyze_fullscreen_intent(decompiled_apk_dir):
     output = "有" if has_fullscreen_intent else "无"
     Log.out("[Logging...] 全屏通知权限 : {}".format(output))
 
-def analyze_account_sync(decompiled_apk_dir):
+def analyze_account_sync(manifest_root):
     '''分析是否包含instrumentation, 疑似保活'''
-    manifest_file = os.path.join(decompiled_apk_dir, "AndroidManifest.xml")
-    manifest_et = ET.parse(manifest_file)
-    root = manifest_et.getroot()
-    sync_adapter = root.find(".//service/meta-data[@{%s}name='android.content.SyncAdapter']" % Common.XML_NAMESPACE)
-    account_authenticator = root.find(".//service/meta-data[@{%s}name='android.accounts.AccountAuthenticator']" % Common.XML_NAMESPACE)
+    sync_adapter = manifest_root.find(".//service/meta-data[@{%s}name='android.content.SyncAdapter']" % Common.XML_NAMESPACE)
+    account_authenticator = manifest_root.find(".//service/meta-data[@{%s}name='android.accounts.AccountAuthenticator']" % Common.XML_NAMESPACE)
     has_account_sync = (sync_adapter != None) and (account_authenticator != None)
     output = "有" if has_account_sync else "无"
     Log.out("[Logging...] 有无账户同步 : {}".format(output))
@@ -312,17 +297,56 @@ def compare_apk(intermediates_old_dir, intermediates_new_dir):
     compare_string(intermediates_old_dir, intermediates_new_dir)
     compare_public(intermediates_old_dir, intermediates_new_dir)
 
-def analyze_apk(intermediates_dir, apk_file):
+def analyze_apk_manifest(intermediates_dir, apk_file):
     Log.out("\n[Logging...] {}".format("安卓整体分析+++++++++++++++++++++++++"))
     Log.out("[Logging...] {}".format("安卓文件路径 : {}".format(os.path.realpath(apk_file))))
-    analytics_ad_platform(intermediates_dir)
-    analyze_self_active(intermediates_dir)
-    analyze_instrumentation(intermediates_dir)
-    analyze_fullscreen_intent(intermediates_dir)
-    analyze_account_sync(intermediates_dir)
+    if intermediates_dir == None:
+        Log.out("[Logging...] {}".format("解析压缩文件 : {}".format(os.path.abspath(apk_file))))
+        manifest_content = decode_manifest(apk_file)
+        if manifest_content != None and len(manifest_content) > 0:
+            manifest_root = ET.fromstring(manifest_content)
+    else:
+        manifest_file = os.path.join(intermediates_dir, "AndroidManifest.xml")
+        Log.out("[Logging...] {}".format("解析配置文件 : {}".format(manifest_file)))
+        manifest_et = ET.parse(manifest_file)
+        manifest_root = manifest_et.getroot()
+
+    analytics_ad_platform(manifest_root)
+    analyze_self_active(manifest_root)
+    analyze_instrumentation(manifest_root)
+    analyze_fullscreen_intent(manifest_root)
+    analyze_account_sync(manifest_root)
+
+def decode_manifest(apk_file):
+    manifest_content = None
+    zf = zipfile.ZipFile(os.path.abspath(apk_file), "r")
+    manifest = None
+    for file in zf.namelist():
+        if (file == "AndroidManifest.xml"):
+            manifest = file
+            break
+    if (manifest != None and manifest != ""):
+        tmpfile = os.path.basename(manifest)
+        f = open(tmpfile, "wb")
+        f.write(zf.read(manifest))
+        f.close()
+        cmd = [Common.JAVA, "-jar", Common.AXMLPRINTER_JAR, tmpfile]
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+        alllines = process.stdout.readlines()
+        if alllines != None and len(alllines) > 0:
+            content_line = []
+            for line in alllines:
+                line = Utils.parseString(line)
+                content_line.append(line)
+            if content_line != None and len(content_line) > 0:
+                manifest_content = "".join(content_line)
+        os.remove(tmpfile)
+    zf.close()
+    return manifest_content
+
+def analyze_source_code(intermediates_dir):
     if SEARCH_KEYWORDS_IN_CODE:
         analize_keywords(intermediates_dir)
-
 
 if __name__ == "__main__":
     try:
@@ -353,10 +377,13 @@ if __name__ == "__main__":
             sys.exit(0)
         intermediates_old_dir, intermediates_new_dir = decompile_input_apk(apk_old, apk_new)
         compare_apk(intermediates_old_dir, intermediates_new_dir)
-        analyze_apk(intermediates_new_dir, apk_new)
+        analyze_apk_manifest(intermediates_new_dir, apk_new)
+        analyze_source_code(intermediates_new_dir)
     else:
         for item in args:
             apk_file = item
             if os.path.exists(apk_file):
-                intermediates_old_dir, intermediates_new_dir = decompile_input_apk(None, apk_file)
-                analyze_apk(intermediates_new_dir, apk_file)
+                if SEARCH_KEYWORDS_IN_CODE:
+                    intermediates_old_dir, intermediates_new_dir = decompile_input_apk(None, apk_file)
+                analyze_apk_manifest(intermediates_new_dir, apk_file)
+                analyze_source_code(intermediates_new_dir)
