@@ -77,7 +77,7 @@ def analyze_self_active(manifest_root):
                     if meta_name == 'android.content.ContactDirectory' and meta_value == 'true':
                         contains_self_active = True
                         break
-    Log.out("[Logging...] 是否有自激活 : {}".format("有" if contains_self_active else "无"))
+    Log.out("[Logging...] 是否有自激活 : {}".format("有 : [syncable=true]" if contains_self_active else "无"))
 
 def analyze_instrumentation(manifest_root):
     '''分析是否包含instrumentation, 疑似保活'''
@@ -85,7 +85,7 @@ def analyze_instrumentation(manifest_root):
     for elem in manifest_root.iter():
         if elem.tag == 'instrumentation':
             ins_name = elem.attrib.get("{%s}name" % Common.XML_NAMESPACE)
-    output = "有 : {}".format(ins_name) if ins_name != None else "无"
+    output = "有 : [{}]".format(ins_name) if ins_name != None else "无"
     Log.out("[Logging...] 有无保活组件 : {}".format(output))
 
 def analyze_fullscreen_intent(manifest_root):
@@ -97,7 +97,7 @@ def analyze_fullscreen_intent(manifest_root):
             has_fullscreen_intent = permission == "android.permission.USE_FULL_SCREEN_INTENT"
             if has_fullscreen_intent:
                 break
-    output = "有" if has_fullscreen_intent else "无"
+    output = "有 : [android.permission.USE_FULL_SCREEN_INTENT]" if has_fullscreen_intent else "无"
     Log.out("[Logging...] 全屏通知权限 : {}".format(output))
 
 def analyze_account_sync(manifest_root):
@@ -105,7 +105,7 @@ def analyze_account_sync(manifest_root):
     sync_adapter = manifest_root.find(".//service/meta-data[@{%s}name='android.content.SyncAdapter']" % Common.XML_NAMESPACE)
     account_authenticator = manifest_root.find(".//service/meta-data[@{%s}name='android.accounts.AccountAuthenticator']" % Common.XML_NAMESPACE)
     has_account_sync = (sync_adapter != None) and (account_authenticator != None)
-    output = "有" if has_account_sync else "无"
+    output = "有 : [android.content.SyncAdapter | android.accounts.AccountAuthenticator]" if has_account_sync else "无"
     Log.out("[Logging...] 有无账户同步 : {}".format(output))
 
 
@@ -301,13 +301,13 @@ def analyze_apk_manifest(intermediates_dir, apk_file):
     Log.out("\n[Logging...] {}".format("安卓整体分析+++++++++++++++++++++++++"))
     Log.out("[Logging...] {}".format("安卓文件路径 : {}".format(os.path.realpath(apk_file))))
     if intermediates_dir == None:
-        Log.out("[Logging...] {}".format("解析压缩文件 : {}".format(os.path.abspath(apk_file))))
+        Log.out("[Logging...] {}".format("AXML文件解析 : {}".format(os.path.abspath(apk_file))))
         manifest_content = decode_manifest(apk_file)
         if manifest_content != None and len(manifest_content) > 0:
             manifest_root = ET.fromstring(manifest_content)
     else:
         manifest_file = os.path.join(intermediates_dir, "AndroidManifest.xml")
-        Log.out("[Logging...] {}".format("解析配置文件 : {}".format(manifest_file)))
+        Log.out("[Logging...] {}".format("AXML配置文件 : {}".format(manifest_file)))
         manifest_et = ET.parse(manifest_file)
         manifest_root = manifest_et.getroot()
 
