@@ -38,7 +38,7 @@ def decompiled_apk(apk_file, out_dir):
     else:
         return False
 
-def analytics_ad_platform(manifest_root):
+def analyze_ad_platform(manifest_root):
     '''分析接入的广告平台'''
     script_file = os.path.normpath(sys.argv[0])
     script_dir = os.path.dirname(script_file)
@@ -311,7 +311,7 @@ def analyze_apk_manifest(intermediates_dir, apk_file):
         manifest_et = ET.parse(manifest_file)
         manifest_root = manifest_et.getroot()
 
-    analytics_ad_platform(manifest_root)
+    analyze_ad_platform(manifest_root)
     analyze_self_active(manifest_root)
     analyze_instrumentation(manifest_root)
     analyze_fullscreen_intent(manifest_root)
