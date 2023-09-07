@@ -170,7 +170,7 @@ if __name__ == "__main__":
         Log.out("[Logging...] {} 不是.apks或者.xpak文件")
         sys.exit(0)
     work_dir = os.path.dirname(apks_file)
-    intermediates_dir = os.path.join(work_dir, 'intermediates')
+    intermediates_dir = os.path.abspath(os.path.join(work_dir, 'intermediates'))
     if not os.path.exists(intermediates_dir):
         os.mkdir(intermediates_dir)
     apks_name, ext = os.path.splitext(os.path.basename(apks_file))
@@ -197,3 +197,9 @@ if __name__ == "__main__":
     Utils.deleteFile(recompile_apk_file)
     Log.out("[Logging...] 清除临时文件 : {}".format(apks_dir))
     Utils.deletedir(apks_dir)
+    if intermediates_dir != None and os.path.exists(intermediates_dir):
+        dir_size = len(os.listdir(intermediates_dir))
+        Log.out("[Logging...] 临时目录大小 : {}".format(dir_size))
+        if (dir_size <= 0):
+            Log.out("[Logging...] 清除临时目录 : {}".format(intermediates_dir))
+            Utils.deletedir(intermediates_dir)
