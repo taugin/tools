@@ -2,6 +2,7 @@
 # coding: UTF-8
 import sys
 import os
+import zipfile
 # 引入别的文件夹的模块
 DIR = os.path.dirname(sys.argv[0])
 COM_DIR = os.path.join(DIR, "..", "common")
@@ -189,6 +190,7 @@ def pullspecapk(apkfile, package, to_dir):
             os.remove(newFile)
         Log.out("[Logging...] 获取APK成功 : [%s]" % newFile)
         os.rename(tempFile, newFile)
+        return newFileName
 
 def get_app_info(apkFile):
     '''输出apk的包信息'''
@@ -308,8 +310,22 @@ def pullapk():
             apkfiles = getapkfile(package)
             if len(apkfiles) > 0:
                 to_dir = len(apkfiles) > 1
+                newFileName = None
                 for apkfile in apkfiles:
-                    pullspecapk(apkfile, package, to_dir)
+                    tmpName = pullspecapk(apkfile, package, to_dir)
+                    if apkfile.endswith("base.apk"):
+                        newFileName = tmpName
+                if to_dir:
+                    newFilePath = os.path.join(os.getcwd(), "{}.apks".format(newFileName))
+                    Log.out("[Logging...] 拉取APK名称 : [{}]".format(newFilePath))
+                    all_apks = os.listdir(os.path.join(os.getcwd(), package))
+                    xapk_zip = zipfile.ZipFile(newFilePath, "w")
+                    for apk in all_apks:
+                        apk_file = os.path.join(os.getcwd(), package, apk)
+                        apk = apk.strip()
+                        xapk_zip.write(apk_file, apk)
+                    xapk_zip.close()
+                    Utils.deletedir(os.path.join(os.getcwd(), package))
                 time.sleep(3)
         elif (cmd == "u" and confirmUninstall()):
             uninstallApk(package)
