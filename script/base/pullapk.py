@@ -316,7 +316,7 @@ def pullapk():
                     if apkfile.endswith("base.apk"):
                         newFileName = tmpName
                 if to_dir:
-                    newFilePath = os.path.join(os.getcwd(), "{}.apks".format(newFileName))
+                    newFilePath = os.path.join(os.getcwd(), "{}.xapk".format(newFileName))
                     Log.out("[Logging...] 拉取APK名称 : [{}]".format(newFilePath))
                     all_apks = os.listdir(os.path.join(os.getcwd(), package))
                     xapk_zip = zipfile.ZipFile(newFilePath, "w")
