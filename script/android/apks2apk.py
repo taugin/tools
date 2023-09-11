@@ -45,12 +45,13 @@ def recompiled_apk(apk_dir, apk_file):
     if not '-s' in cmdlist and not '--no-src' in cmdlist:
         cmdlist += ["--only-main-classes"]
     cmdlist += ["--use-aapt2"]
+    cmdlist += ["--no-crunch"]
     showlist = []
     for cmd in cmdlist:
         showlist += [os.path.basename(cmd)]
     Log.out("[Logging...] 执行命令详情 : [%s]" % " ".join(showlist))
     ret = subprocess.call(cmdlist, stdout=subprocess.PIPE)
-    Log.out("[Logging...] 反编文件完成")
+    Log.out("[Logging...] 回编文件完成")
     Log.out("")
     if (ret == 0) :
         return True
