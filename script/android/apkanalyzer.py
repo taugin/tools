@@ -360,8 +360,10 @@ if __name__ == "__main__":
         Log.out(err)
         sys.exit()
 
-    if len(args) < 0:
-        Log.out("[Logging...] 缺少apk参数: {} <apk>".format(os.path.basename(sys.argv[0])))
+    if len(args) <= 0:
+        Log.out("[Logging...] 缺少参数 : {} <apk>".format(os.path.basename(sys.argv[0])))
+        Log.out("[Logging...] 参数选项 : -s 搜索代码中的关键字")
+        Log.out("[Logging...] 参数选项 : -c 比较两个apk文件")
         sys.exit(0)
 
     intermediates_old_dir = None
