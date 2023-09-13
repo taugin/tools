@@ -61,7 +61,25 @@ def analyze_ad_platform(manifest_root):
                         if element_name.startswith(prefix):
                             ad_platform_set.add(platform)
     if ad_platform_set != None and len(ad_platform_set) > 0:
-        Log.out("[Logging...] 已接广告平台 : {}".format(ad_platform_set))
+        ad_platform_string = ""
+        for item in ad_platform_set:
+            ad_platform_string += item
+            ad_platform_string += "| "
+        ad_platform_string = ad_platform_string[:-2]
+        Log.out("[Logging...] 已接广告平台 : {}".format(ad_platform_string))
+
+def analyze_basic_info(manifest_root):
+    Log.out("[Logging...] 应用基础信息+++++++++++++++++++++++++")
+    package_name = manifest_root.get("package")
+    Log.out("[Logging...] 应用程序包名 : {}".format(package_name))
+    app_version_name = manifest_root.get("{%s}versionName" % Common.XML_NAMESPACE)
+    app_version_code = manifest_root.get("{%s}versionCode" % Common.XML_NAMESPACE)
+    Log.out("[Logging...] 应用程序版本 : {}({})".format(app_version_name, app_version_code))
+    compileSdkVersion = manifest_root.get("{%s}compileSdkVersion" % Common.XML_NAMESPACE)
+    Log.out("[Logging...] 应用编译版本 : {}".format(compileSdkVersion))
+    sdk_version = manifest_root.find("uses-sdk")
+    Log.out("[Logging...] 最小编译版本 : {}".format(sdk_version.get("{%s}minSdkVersion" % Common.XML_NAMESPACE)))
+    Log.out("[Logging...] 目标编译版本 : {}".format(sdk_version.get("{%s}targetSdkVersion" % Common.XML_NAMESPACE)))
 
 def analyze_self_active(manifest_root):
     '''分析自激活'''
@@ -297,21 +315,17 @@ def compare_apk(intermediates_old_dir, intermediates_new_dir):
     compare_string(intermediates_old_dir, intermediates_new_dir)
     compare_public(intermediates_old_dir, intermediates_new_dir)
 
-def analyze_apk_manifest(intermediates_dir, apk_file):
+def analyze_apk_manifest(apk_file):
     Log.out("\n[Logging...] {}".format("安卓整体分析+++++++++++++++++++++++++"))
     Log.out("[Logging...] {}".format("安卓文件路径 : {}".format(os.path.realpath(apk_file))))
-    if intermediates_dir == None:
-        Log.out("[Logging...] {}".format("AXML文件解析 : {}".format(os.path.abspath(apk_file))))
-        manifest_content = decode_manifest(apk_file)
-        if manifest_content != None and len(manifest_content) > 0:
-            manifest_root = ET.fromstring(manifest_content)
-    else:
-        manifest_file = os.path.join(intermediates_dir, "AndroidManifest.xml")
-        Log.out("[Logging...] {}".format("AXML配置文件 : {}".format(manifest_file)))
-        manifest_et = ET.parse(manifest_file)
-        manifest_root = manifest_et.getroot()
+    Log.out("[Logging...] {}".format("AXML文件解析 : {}".format(os.path.abspath(apk_file))))
+    manifest_content = decode_manifest(apk_file)
+    if manifest_content != None and len(manifest_content) > 0:
+        manifest_root = ET.fromstring(manifest_content)
 
     analyze_ad_platform(manifest_root)
+    analyze_basic_info(manifest_root)
+    Log.out("[Logging...] 应用关键信息+++++++++++++++++++++++++")
     analyze_self_active(manifest_root)
     analyze_instrumentation(manifest_root)
     analyze_fullscreen_intent(manifest_root)
@@ -379,7 +393,7 @@ if __name__ == "__main__":
             sys.exit(0)
         intermediates_old_dir, intermediates_new_dir = decompile_input_apk(apk_old, apk_new)
         compare_apk(intermediates_old_dir, intermediates_new_dir)
-        analyze_apk_manifest(intermediates_new_dir, apk_new)
+        analyze_apk_manifest(apk_new)
         analyze_source_code(intermediates_new_dir)
     else:
         for item in args:
@@ -387,5 +401,5 @@ if __name__ == "__main__":
             if os.path.exists(apk_file):
                 if SEARCH_KEYWORDS_IN_CODE:
                     intermediates_old_dir, intermediates_new_dir = decompile_input_apk(None, apk_file)
-                analyze_apk_manifest(intermediates_new_dir, apk_file)
+                analyze_apk_manifest(apk_file)
                 analyze_source_code(intermediates_new_dir)
