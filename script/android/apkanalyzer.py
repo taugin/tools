@@ -78,8 +78,8 @@ def analyze_basic_info(manifest_root):
     compileSdkVersion = manifest_root.get("{%s}compileSdkVersion" % Common.XML_NAMESPACE)
     Log.out("[Logging...] 应用编译版本 : {}".format(compileSdkVersion))
     sdk_version = manifest_root.find("uses-sdk")
-    Log.out("[Logging...] 最小编译版本 : {}".format(sdk_version.get("{%s}minSdkVersion" % Common.XML_NAMESPACE)))
-    Log.out("[Logging...] 目标编译版本 : {}".format(sdk_version.get("{%s}targetSdkVersion" % Common.XML_NAMESPACE)))
+    Log.out("[Logging...] 最小开发版本 : {}".format(sdk_version.get("{%s}minSdkVersion" % Common.XML_NAMESPACE)))
+    Log.out("[Logging...] 目标开发版本 : {}".format(sdk_version.get("{%s}targetSdkVersion" % Common.XML_NAMESPACE)))
 
 def analyze_self_active(manifest_root):
     '''分析自激活'''
