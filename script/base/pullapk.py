@@ -137,13 +137,14 @@ def pullspecapk(apkfile, package, to_dir):
         Log.out("[Logging...] 获取APK文件 : [%s]" % apkfile)
         basename = os.path.basename(apkfile)
         basename, ext = os.path.splitext(basename)
-        tempFile = "%s_%ld.apk" % (package, (time.time() * 1000))
         if (to_dir):
+            tempFile = "%s.apk" % (package if basename == "base" else basename)
             tempDir = os.path.join(os.getcwd(), package)
             if (not os.path.exists(tempDir)):
                 os.mkdir(tempDir)
             tempFile = os.path.join(tempDir, tempFile)
         else:
+            tempFile = "%s_%ld.apk" % (package, (time.time() * 1000))
             tempFile = os.path.join(os.getcwd(), tempFile)
         tempFile = os.path.normpath(tempFile)
         f = open(tempFile, "wb")
@@ -185,11 +186,12 @@ def pullspecapk(apkfile, package, to_dir):
                 newFileName += tarver
         if (basename != "base"):
             newFileName += basename
-        newFile = os.path.join(dirpath, newFileName + ".apk")
-        if (os.path.exists(newFile)):
-            os.remove(newFile)
-        Log.out("[Logging...] 获取APK成功 : [%s]" % newFile)
-        os.rename(tempFile, newFile)
+        if not to_dir:
+            newFile = os.path.join(dirpath, newFileName + ".apk")
+            if (os.path.exists(newFile)):
+                os.remove(newFile)
+            os.rename(tempFile, newFile)
+            Log.out("[Logging...] 获取APK成功 : [%s]" % newFile)
         return newFileName
 
 def get_app_info(apkFile):
