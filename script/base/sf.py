@@ -583,11 +583,15 @@ def print_xml(args):
 
 
 def readpkgnamefromxapk(xapk_path):
-    zf = zipfile.ZipFile(xapk_path, "r")
-    content = zf.read("manifest.json")
-    zf.close()
-    import json
-    return json.loads(content)
+    try:
+        zf = zipfile.ZipFile(xapk_path, "r")
+        content = zf.read("manifest.json")
+        zf.close()
+        import json
+        return json.loads(content)
+    except:
+        pass
+    return {}
 
 
 def get_package_name(args):
