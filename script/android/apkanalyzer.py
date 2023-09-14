@@ -315,14 +315,32 @@ def compare_apk(intermediates_old_dir, intermediates_new_dir):
     compare_string(intermediates_old_dir, intermediates_new_dir)
     compare_public(intermediates_old_dir, intermediates_new_dir)
 
-def analyze_apk_manifest(apk_file):
+def analyze_apk_manifest(apk_xapk_apks_file):
     Log.out("\n[Logging...] {}".format("安卓整体分析+++++++++++++++++++++++++"))
-    Log.out("[Logging...] {}".format("安卓文件路径 : {}".format(os.path.realpath(apk_file))))
-    Log.out("[Logging...] {}".format("AXML文件解析 : {}".format(os.path.abspath(apk_file))))
-    manifest_content = decode_manifest(apk_file)
-    if manifest_content != None and len(manifest_content) > 0:
-        manifest_root = ET.fromstring(manifest_content)
-
+    Log.out("[Logging...] {}".format("安卓文件路径 : {}".format(os.path.realpath(apk_xapk_apks_file))))
+    Log.out("[Logging...] {}".format("AXML文件解析 : {}".format(os.path.abspath(apk_xapk_apks_file))))
+    manifest_root = None
+    if apk_xapk_apks_file.endswith(".apk"):
+        manifest_content = decode_manifest_from_apk(apk_xapk_apks_file)
+        if manifest_content != None and len(manifest_content) > 0:
+            manifest_root = ET.fromstring(manifest_content)
+    elif apk_xapk_apks_file.endswith(".xapk"):
+        apk_file = find_main_apk_from_xapk(apk_xapk_apks_file)
+        if os.path.exists(apk_file):
+            manifest_content = decode_manifest_from_apk(apk_file)
+            if manifest_content != None and len(manifest_content) > 0:
+                manifest_root = ET.fromstring(manifest_content)
+            os.remove(apk_file)
+    elif apk_xapk_apks_file.endswith(".apks"):
+        apk_file = find_main_apk_from_apks(apk_xapk_apks_file)
+        if os.path.exists(apk_file):
+            manifest_content = decode_manifest_from_apk(apk_file)
+            if manifest_content != None and len(manifest_content) > 0:
+                manifest_root = ET.fromstring(manifest_content)
+            os.remove(apk_file)
+    if manifest_root == None:
+        Log.out("[Logging...] {}".format("AXML文件缺失"))
+        sys.exit(0)
     analyze_ad_platform(manifest_root)
     analyze_basic_info(manifest_root)
     Log.out("[Logging...] 应用关键信息+++++++++++++++++++++++++")
@@ -331,7 +349,7 @@ def analyze_apk_manifest(apk_file):
     analyze_fullscreen_intent(manifest_root)
     analyze_account_sync(manifest_root)
 
-def decode_manifest(apk_file):
+def decode_manifest_from_apk(apk_file):
     manifest_content = None
     zf = zipfile.ZipFile(os.path.abspath(apk_file), "r")
     manifest = None
@@ -358,6 +376,35 @@ def decode_manifest(apk_file):
     zf.close()
     return manifest_content
 
+def find_main_apk_from_xapk(xapk_file):
+    zf = zipfile.ZipFile(os.path.abspath(xapk_file), "r")
+    apk_file = None
+    for file in zf.namelist():
+        basefile = os.path.basename(file)
+        if basefile.endswith(".apk") and not basefile.startswith("config."):
+            apk_file = file
+            break;
+    Log.out("[Logging...] {}".format("安卓文件名称 : {}".format(apk_file)))
+    tmpfile = os.path.basename(apk_file)
+    f = open(tmpfile, "wb")
+    f.write(zf.read(apk_file))
+    f.close()
+    return tmpfile
+
+def find_main_apk_from_apks(apks_file):
+    zf = zipfile.ZipFile(os.path.abspath(apks_file), "r")
+    apk_file = None
+    for file in zf.namelist():
+        basefile = os.path.basename(file)
+        if basefile == "base-master.apk":
+            apk_file = file
+            break;
+    Log.out("[Logging...] {}".format("安卓文件名称 : {}".format(apk_file)))
+    tmpfile = os.path.basename(apk_file)
+    f = open(tmpfile, "wb")
+    f.write(zf.read(apk_file))
+    f.close()
+    return tmpfile
 def analyze_source_code(intermediates_dir):
     if SEARCH_KEYWORDS_IN_CODE:
         analize_keywords(intermediates_dir)
@@ -375,7 +422,7 @@ if __name__ == "__main__":
         sys.exit()
 
     if len(args) <= 0:
-        Log.out("[Logging...] 缺少参数 : {} <apk>".format(os.path.basename(sys.argv[0])))
+        Log.out("[Logging...] 缺少参数 : {} <apk>/<xapk>".format(os.path.basename(sys.argv[0])))
         Log.out("[Logging...] 参数选项 : -s 搜索代码中的关键字")
         Log.out("[Logging...] 参数选项 : -c 比较两个apk文件")
         sys.exit(0)
@@ -385,10 +432,10 @@ if __name__ == "__main__":
     if len(args) >=2 and COMPARE_APK_FILE:
         apk_old = args[0]
         apk_new = args[1]
-        if not os.path.exists(apk_old):
+        if not os.path.exists(apk_old) or (not apk_old.endswith(".apk") and not apk_old.endswith(".xapk") and not apk_old.endswith(".apks")):
             Log.out("[Logging...] apk文件不存在: {}".format(apk_old))
             sys.exit(0)
-        if not os.path.exists(apk_new):
+        if not os.path.exists(apk_new) or (not apk_old.endswith(".apk") and not apk_old.endswith(".xapk") and not apk_old.endswith(".apks")):
             Log.out("[Logging...] apk文件不存在: {}".format(apk_new))
             sys.exit(0)
         intermediates_old_dir, intermediates_new_dir = decompile_input_apk(apk_old, apk_new)
@@ -398,7 +445,7 @@ if __name__ == "__main__":
     else:
         for item in args:
             apk_file = item
-            if os.path.exists(apk_file):
+            if os.path.exists(apk_file) or (not apk_file.endswith(".apk") and not apk_file.endswith(".xapk") and not apk_file.endswith(".apks")):
                 if SEARCH_KEYWORDS_IN_CODE:
                     intermediates_old_dir, intermediates_new_dir = decompile_input_apk(None, apk_file)
                 analyze_apk_manifest(apk_file)
