@@ -1,4 +1,4 @@
-echo "********* args count : [$#], args : [$*]"
+echo "********* args count : [$#], 执行脚本参数 ：[$*]"
 if [ $# -le 0 ];then
     args="hauyu simple rabbit ch"
 else

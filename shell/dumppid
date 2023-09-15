@@ -1,4 +1,4 @@
-echo [Logging...] ARGS : [$*]
+echo [Logging...] 执行脚本参数 ：[$*]
 
 LOOP="false"
 
