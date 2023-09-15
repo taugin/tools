@@ -1,5 +1,5 @@
 echo [Logging...] 执行脚本参数 ：[$*]
-echo [Logging...] 等待设备连接...
+echo [Logging...] 等待设备连接 : [...]
 adb wait-for-device
 if [ $# -le 0 ];then
 	#获取顶层Activity包名

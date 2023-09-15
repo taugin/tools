@@ -423,11 +423,11 @@ def check_arg(args):
     if (len(args) > 0):
         for arg in args:
             if (os.path.isfile(arg) == False and os.path.isdir(arg) == False):
-                Log.out("[Logging...] " + os.path.abspath(arg) + " 不是目录或文件")
+                Log.out("[Logging...] 此文件不存在 : {}".format(os.path.abspath(arg)))
                 args.remove(arg)
     Log.out("")
     if (len(args) <= 0):
-        Log.out("[Logging...] 缺少文件")
+        Log.out("[Logging...] 缺少必要文件")
         sys.exit()
 
 

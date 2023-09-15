@@ -302,13 +302,13 @@ def apk2aab(apk_file):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        Log.out("[Logging...] 缺少apk参数")
+        Log.out("[Logging...] 缺少脚本参数 : {} <apk file>".format(os.path.basename(sys.argv[0])))
         exit(0)
     apk_file = os.path.join(os.getcwd(), sys.argv[1])
     if apk_file == None or not os.path.exists(apk_file):
-        Log.out("[Logging...] apk文件不存在 : %s" % apk_file)
+        Log.out("[Logging...] APK文件不存在 : %s" % apk_file)
         exit(0)
     if not apk_file.endswith(".apk"):
-        Log.out("[Logging...] 不是apk文件 : %s" % apk_file)
+        Log.out("[Logging...] 不是APK文件 : %s" % apk_file)
         exit(0)
     apk2aab(apk_file)

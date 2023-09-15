@@ -1,5 +1,5 @@
 echo [Logging...] 执行脚本参数 ：[$*]
-echo [Logging...] 等待设备连接...
+echo [Logging...] 等待设备连接 : [...]
 adb wait-for-device
 pythonpath=$(which python)
 #echo $pythonpath
