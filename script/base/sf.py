@@ -218,7 +218,7 @@ def get_app_info(apkFile):
     apkname, ext = os.path.splitext(apkFile)
     if ext == ".apk":
         cmdlist = [Common.AAPT2_BIN, "d", "badging", apkFile]
-        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
         tmppkg = ""
         tmp = ""
         alllines = process.stdout.readlines()
@@ -612,12 +612,12 @@ def get_package_name(args):
         output = "[Logging...] 当前应用路径 : [%s]" % apk_path
         Log.out(output)
         get_app_info(apk_path)
-        pkgname = apk_info["pkgname"]
+        pkgname = apk_info.get("pkgname")
     elif (xapk_path != None and len(xapk_path) > 0):
         output = "[Logging...] 当前应用路径 : [%s]" % xapk_path
         Log.out(output)
         xapkobj = readpkgnamefromxapk(xapk_path)
-        pkgname = xapkobj["package_name"]
+        pkgname = xapkobj.get("package_name")
     output = "[Logging...] 当前应用包名 : [%s]" % pkgname
     Log.out(output)
     return pkgname
@@ -638,29 +638,30 @@ def check_apk_process(args):
     if device != None and len(device) > 0:
         user_id = None
         pkgname = get_package_name(args)
-        cmd = [Common.ADB, "-s", device, "shell", "ps"]
-        result = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
-        execret = result.stdout.readlines()
-        for item in execret:
-            item = str(item, "utf-8")
-            item_list = item.split()
-            if pkgname in item_list:
-                user_id = item_list[0]
-        if user_id != None and user_id.strip() != "":
-            global dump_process
-            dump_process = True
-            print()
-            thread = Thread(target=start_process_check, args=(device, user_id))
-            thread.daemon = True
-            thread.start()
-            while True:
-                exit_flag = input()
-                if exit_flag == 'e' or exit_flag == "E":
-                    dump_process = False
-                    break;
-            thread.join()
-        else:
-            Log.out("[Logging...] 应用包未执行")
+        if pkgname != None:
+            cmd = [Common.ADB, "-s", device, "shell", "ps"]
+            result = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
+            execret = result.stdout.readlines()
+            for item in execret:
+                item = str(item, "utf-8")
+                item_list = item.split()
+                if pkgname in item_list:
+                    user_id = item_list[0]
+            if user_id != None and user_id.strip() != "":
+                global dump_process
+                dump_process = True
+                print()
+                thread = Thread(target=start_process_check, args=(device, user_id))
+                thread.daemon = True
+                thread.start()
+                while True:
+                    exit_flag = input()
+                    if exit_flag == 'e' or exit_flag == "E":
+                        dump_process = False
+                        break;
+                thread.join()
+            else:
+                Log.out("[Logging...] 应用包未执行")
     elif device == None:
         Log.out("[Logging...] 没有发现设备")
         time.sleep(2)
@@ -764,6 +765,14 @@ def print_apkinfo():
 if (len(sys.argv) < 2):
     Log.out("[Logging...] 脚本缺少参数 : %s <src_apk> 输出APK文件信息" %
             os.path.basename(sys.argv[0]), True)
+    Log.out("                          : -m <file> 输出文件的MD5值")
+    Log.out("                          : -s <string> 输出字符串的MD5值")
+    Log.out("                          : -p <apk file> 输出APK详细信息")
+    Log.out("                          : -i <apk file> 安装APK文件")
+    Log.out("                          : -x <xapk file> 安装XAPK文件")
+    Log.out("                          : -a <apk file> 输出APK AndroidManifest信息")
+    Log.out("                          : -g <apk file> 打开APK的GP详情")
+    Log.out("                          : -u <apk file> 检测APK的运行进程")
     sys.exit()
 
 try:
