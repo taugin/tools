@@ -1,0 +1,17 @@
+echo [Logging...] ARGS : [$*]
+echo [Logging...] 等待设备连接...
+adb wait-for-device
+pythonpath=$(which python)
+#echo $pythonpath
+
+pythonversion=$($pythonpath --version)
+
+pythoncode=script/merger/mergeapk.py
+curdir=$(dirname $0)
+fullpypath=$curdir/../$pythoncode
+#echo $fullpypath
+
+echo [Logging...] 脚本文件路径 : [$pythonpath]
+echo [Logging...] 脚本文件版本 : [$pythonversion]
+echo [Logging...] 脚本代码路径 : [$pythoncode]
+$pythonpath $fullpypath $*
