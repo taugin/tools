@@ -69,7 +69,7 @@ def analyze_ad_platform(manifest_root):
         Log.out("[Logging...] 已接广告平台 : {}".format(ad_platform_string))
 
 def analyze_basic_info(manifest_root):
-    Log.out("[Logging...] 应用基础信息+++++++++++++++++++++++++")
+    Log.out("[Logging...] 应用基础信息 : +++++++++++++++++++++++++")
     package_name = manifest_root.get("package")
     Log.out("[Logging...] 应用程序包名 : {}".format(package_name))
     app_version_name = manifest_root.get("{%s}versionName" % Common.XML_NAMESPACE)
@@ -95,7 +95,16 @@ def analyze_self_active(manifest_root):
                     if meta_name == 'android.content.ContactDirectory' and meta_value == 'true':
                         contains_self_active = True
                         break
-    Log.out("[Logging...] 是否有自激活 : {}".format("有 : [syncable=true]" if contains_self_active else "无"))
+    Log.out("[Logging...] 是否有自激活 : {}".format("[syncable=true|android.content.ContactDirectory]" if contains_self_active else "无"))
+
+def analyze_mutiple_entry(manifest_root):
+    '''分析自激活'''
+    category_list = manifest_root.findall(Common.MAIN_ACTIVITY_XPATH)
+    if category_list != None and len(category_list) >= 1:
+        for item in category_list:
+            activity_name = item.attrib.get("{%s}name" % Common.XML_NAMESPACE)
+            enabled = item.attrib.get("{%s}enabled" % Common.XML_NAMESPACE) or "true"
+            Log.out("[Logging...] 应用程序入口 : [{} | {}]".format(activity_name, enabled))
 
 def analyze_instrumentation(manifest_root):
     '''分析是否包含instrumentation, 疑似保活'''
@@ -103,7 +112,7 @@ def analyze_instrumentation(manifest_root):
     for elem in manifest_root.iter():
         if elem.tag == 'instrumentation':
             ins_name = elem.attrib.get("{%s}name" % Common.XML_NAMESPACE)
-    output = "有 : [{}]".format(ins_name) if ins_name != None else "无"
+    output = "[{}]".format(ins_name) if ins_name != None else "无"
     Log.out("[Logging...] 有无保活组件 : {}".format(output))
 
 def analyze_fullscreen_intent(manifest_root):
@@ -115,7 +124,7 @@ def analyze_fullscreen_intent(manifest_root):
             has_fullscreen_intent = permission == "android.permission.USE_FULL_SCREEN_INTENT"
             if has_fullscreen_intent:
                 break
-    output = "有 : [android.permission.USE_FULL_SCREEN_INTENT]" if has_fullscreen_intent else "无"
+    output = "[android.permission.USE_FULL_SCREEN_INTENT]" if has_fullscreen_intent else "无"
     Log.out("[Logging...] 全屏通知权限 : {}".format(output))
 
 def analyze_account_sync(manifest_root):
@@ -123,13 +132,13 @@ def analyze_account_sync(manifest_root):
     sync_adapter = manifest_root.find(".//service/meta-data[@{%s}name='android.content.SyncAdapter']" % Common.XML_NAMESPACE)
     account_authenticator = manifest_root.find(".//service/meta-data[@{%s}name='android.accounts.AccountAuthenticator']" % Common.XML_NAMESPACE)
     has_account_sync = (sync_adapter != None) and (account_authenticator != None)
-    output = "有 : [android.content.SyncAdapter | android.accounts.AccountAuthenticator]" if has_account_sync else "无"
+    output = "[android.content.SyncAdapter | android.accounts.AccountAuthenticator]" if has_account_sync else "无"
     Log.out("[Logging...] 有无账户同步 : {}".format(output))
 
 
 def analize_keywords(decompiled_apk_dir):
     keywords = ["makePathElements", "makeDexElements", "pathList", "dexElements", "createVirtualDisplay"]
-    Log.out("\n[Logging...] 关键字段搜索+++++++++++++++++++++++++")
+    Log.out("\n[Logging...] 关键字段搜索 : +++++++++++++++++++++++++")
     Log.out("[Logging...] 关键字搜索中 : {}".format(keywords))
     smalidirs = ["smali", "smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6", "smali_classes7", "smali_classes8", "smali_classes9", "smali_classes10"]
     search_result_set = set()
@@ -189,7 +198,7 @@ def compare_manifest_element(old_root, new_root, tag):
             readable_compare_name = "提供者对比结果"
         elif tag == "meta-data":
             readable_compare_name = "元数据对比结果"
-        Log.out("[Logging...] {}{}".format(readable_compare_name, "+++++++++++++++++++++++++"))
+        Log.out("[Logging...] {}{}".format(readable_compare_name, " : +++++++++++++++++++++++++"))
         if len(added_apk_set) > 0:
             Log.out("[Logging...] {}".format("增加的条目 : [{}]".format(len(added_apk_set))))
             for item in added_apk_set:
@@ -247,7 +256,7 @@ def compare_string(decompiled_dir_old, decompiled_dir_new):
     added_apk_set = new_apk_set - old_apk_set
     removed_apk_set = old_apk_set - new_apk_set
     if len(added_apk_set) > 0 or len(removed_apk_set) > 0:
-        Log.out("[Logging...] {}".format("资源对比结果+++++++++++++++++++++++++"))
+        Log.out("[Logging...] {}".format("资源对比结果 : +++++++++++++++++++++++++"))
         Log.out("[Logging...] {}".format("增加的条目 : [{}]".format(len(added_apk_set))))
         for item in added_apk_set:
             Log.out("[Logging...] {} -> {}".format(new_apk_map.get(item), item))
@@ -282,7 +291,7 @@ def compare_public(decompiled_dir_old, decompiled_dir_new):
     added_apk_set = new_apk_set - old_apk_set
     removed_apk_set = old_apk_set - new_apk_set
     if len(added_apk_set) > 0 or len(removed_apk_set) > 0:
-        Log.out("[Logging...] {}".format("资源对比结果+++++++++++++++++++++++++"))
+        Log.out("[Logging...] {}".format("资源对比结果 : +++++++++++++++++++++++++"))
         Log.out("[Logging...] {}".format("增加的条目 : [{}]".format(len(added_apk_set))))
         for item in added_apk_set:
             item_array = item.split('#')
@@ -316,7 +325,7 @@ def compare_apk(intermediates_old_dir, intermediates_new_dir):
     compare_public(intermediates_old_dir, intermediates_new_dir)
 
 def analyze_apk_manifest(apk_xapk_apks_file):
-    Log.out("\n[Logging...] {}".format("安卓整体分析+++++++++++++++++++++++++"))
+    Log.out("\n[Logging...] {}".format("安卓整体分析 : +++++++++++++++++++++++++"))
     Log.out("[Logging...] {}".format("安卓文件路径 : {}".format(os.path.realpath(apk_xapk_apks_file))))
     Log.out("[Logging...] {}".format("AXML文件解析 : {}".format(os.path.abspath(apk_xapk_apks_file))))
     manifest_root = None
@@ -343,8 +352,9 @@ def analyze_apk_manifest(apk_xapk_apks_file):
         sys.exit(0)
     analyze_ad_platform(manifest_root)
     analyze_basic_info(manifest_root)
-    Log.out("[Logging...] 应用关键信息+++++++++++++++++++++++++")
+    Log.out("[Logging...] 应用关键信息 : +++++++++++++++++++++++++")
     analyze_self_active(manifest_root)
+    analyze_mutiple_entry(manifest_root)
     analyze_instrumentation(manifest_root)
     analyze_fullscreen_intent(manifest_root)
     analyze_account_sync(manifest_root)
@@ -427,6 +437,7 @@ if __name__ == "__main__":
         Log.out("[Logging...] 参数选项 : -c 比较两个apk文件")
         sys.exit(0)
 
+    ET.register_namespace('android', Common.XML_NAMESPACE)
     intermediates_old_dir = None
     intermediates_new_dir = None
     if len(args) >=2 and COMPARE_APK_FILE:

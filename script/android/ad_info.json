@@ -135,5 +135,12 @@
       "com.anythink.expressad",
       "com.anythink.core"
     ]
+  },
+  {
+    "ad_platform": "Amazon",
+    "ad_prefix": [
+      "com.amazon.aps.ads.activity.ApsInterstitialActivity",
+      "com.amazon.device.ads.DTBInterstitialActivity"
+    ]
   }
 ]
