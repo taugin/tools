@@ -84,9 +84,11 @@ def analyze_basic_info(manifest_root):
 def analyze_self_active(manifest_root):
     '''分析自激活'''
     contains_self_active = False
+    sync_enabled = "false"
     for elem in manifest_root.iter():
         if elem.tag == 'provider':
             sync_value = elem.attrib.get("{%s}syncable" % Common.XML_NAMESPACE)
+            sync_enabled = elem.attrib.get("{%s}enabled" % Common.XML_NAMESPACE)
             if sync_value == 'true':
                 meta_data = elem.find("meta-data")
                 if meta_data != None:
@@ -95,7 +97,7 @@ def analyze_self_active(manifest_root):
                     if meta_name == 'android.content.ContactDirectory' and meta_value == 'true':
                         contains_self_active = True
                         break
-    Log.out("[Logging...] 是否有自激活 : {}".format("[syncable=true|android.content.ContactDirectory]" if contains_self_active else "无"))
+    Log.out("[Logging...] 是否有自激活 : {}".format("[syncable=true|android.content.ContactDirectory|{}]".format(sync_enabled) if contains_self_active else "无"))
 
 def analyze_mutiple_entry(manifest_root):
     '''分析自激活'''
@@ -104,7 +106,7 @@ def analyze_mutiple_entry(manifest_root):
         for item in category_list:
             activity_name = item.attrib.get("{%s}name" % Common.XML_NAMESPACE)
             enabled = item.attrib.get("{%s}enabled" % Common.XML_NAMESPACE) or "true"
-            Log.out("[Logging...] 应用程序入口 : [{} | {}]".format(activity_name, enabled))
+            Log.out("[Logging...] 应用程序入口 : [{}|{}]".format(activity_name, enabled))
 
 def analyze_instrumentation(manifest_root):
     '''分析是否包含instrumentation, 疑似保活'''
