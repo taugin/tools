@@ -131,10 +131,12 @@ def analyze_fullscreen_intent(manifest_root):
 
 def analyze_account_sync(manifest_root):
     '''分析是否包含instrumentation, 疑似保活'''
-    sync_adapter = manifest_root.find(".//service/meta-data[@{%s}name='android.content.SyncAdapter']" % Common.XML_NAMESPACE)
-    account_authenticator = manifest_root.find(".//service/meta-data[@{%s}name='android.accounts.AccountAuthenticator']" % Common.XML_NAMESPACE)
+    sync_adapter_meta = 'android.content.SyncAdapter'
+    account_authenticator_meta = 'android.accounts.AccountAuthenticator'
+    sync_adapter = manifest_root.find(".//service/meta-data[@{%s}name='%s']" % (Common.XML_NAMESPACE, sync_adapter_meta))
+    account_authenticator = manifest_root.find(".//service/meta-data[@{%s}name='%s']" % (Common.XML_NAMESPACE, account_authenticator_meta))
     has_account_sync = (sync_adapter != None) and (account_authenticator != None)
-    output = "[android.content.SyncAdapter | android.accounts.AccountAuthenticator]" if has_account_sync else "无"
+    output = "[{}|{}]".format(sync_adapter_meta, account_authenticator_meta) if has_account_sync else "无"
     Log.out("[Logging...] 有无账户同步 : {}".format(output))
 
 
