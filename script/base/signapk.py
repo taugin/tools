@@ -310,9 +310,9 @@ def readkeystore(src_apk, filedir):
     if Common.KEYTOOL == None or len(Common.KEYTOOL) <= 0 or not os.path.exists(Common.KEYTOOL):
         Log.out("[Logging...] 验签失败 : 无法找到签名文件 [keytool]")
     else:
-        retcode = subprocess.call([Common.KEYTOOL, "-list", "-keystore", keystorepath, "-storepass", keystorepass], stdout=subprocess.PIPE)
-        if (retcode != 0):
-            Log.out("[Logging...] 签名文件不正确", True)
+        retcode = subprocess.Popen([Common.KEYTOOL, "-list", "-keystore", keystorepath, "-storepass", keystorepass], stdout=subprocess.PIPE)
+        if (retcode.returncode != 0):
+            Log.out("[Logging...] 签名错误 : {}".format(Utils.parseString(retcode.stdout.read())), True)
             pause()
             sys.exit()
     keystoreinfo = []

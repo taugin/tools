@@ -118,7 +118,7 @@ def deleteFile(file):
 
 def parseString(line):
     format_code = ["utf8", "gbk", "gb2312"]
-    result = "";
+    result = ""
     for f in format_code:
         try:
             result = line.decode(f, "ignore")
