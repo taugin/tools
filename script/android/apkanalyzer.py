@@ -106,7 +106,8 @@ def analyze_mutiple_entry(manifest_root):
         for item in category_list:
             activity_name = item.attrib.get("{%s}name" % Common.XML_NAMESPACE)
             enabled = item.attrib.get("{%s}enabled" % Common.XML_NAMESPACE) or "true"
-            Log.out("[Logging...] 应用程序入口 : [{}|enabled={}]".format(activity_name, enabled))
+            if activity_name != None:
+                Log.out("[Logging...] 应用程序入口 : [{}|enabled={}]".format(activity_name, enabled))
 
 def analyze_instrumentation(manifest_root):
     '''分析是否包含instrumentation, 疑似保活'''
