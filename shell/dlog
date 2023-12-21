@@ -1,6 +1,6 @@
 echo "********* args count : [$#], 执行脚本参数 ：[$*]"
 if [ $# -le 0 ];then
-    args="hauyu simple rabbit ch"
+    args="hauyu simple humob komob"
 else
     args="$*"
 fi
