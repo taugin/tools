@@ -80,6 +80,18 @@ def readkeystore(src_file):
             storefiles.append(file)
             storeindex+=1
         index+=1
+    # 在工程目录下的keystore文件夹中寻找签名文件
+    if (len(storefiles) <= 0):
+        keystoredir = os.path.normpath(os.path.join(filedir, "..", "..", "..", "..", "..", "keystore"))
+        if os.path.exists(keystoredir):
+            listfile = os.listdir(keystoredir)
+            index = 0
+            storeindex = 0
+            for file in listfile:
+                if(file.rfind(".keystore") != -1 or file.rfind(".jks") != -1):
+                    storefiles.append(os.path.join(keystoredir, file))
+                    storeindex+=1
+                index+=1
     ##############################################
     if (len(storefiles) <= 0):
         packagename = getaabpackagename(src_file)
