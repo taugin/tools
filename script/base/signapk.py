@@ -293,6 +293,7 @@ def readkeystore(src_apk, filedir):
     splits = filename.split("_")
     if (len(splits) < 3):
         Log.out("[Logging...] 无法获取签名文件信息,请重命名签名文件格式 <[alias]_[storepass]_[aliaspass].keystore/jks>", True)
+        Common.pause()
         sys.exit()
     keystorealias = splits[0]
     if (splits[1] != "pwd"):
