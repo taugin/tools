@@ -5,6 +5,8 @@ import subprocess
 import sys
 import os
 
+import urllib.parse
+
 OPEN_FOLDER = False
 OPEN_GOOGLE_PLAY = False
 
@@ -20,10 +22,11 @@ def open_folder(args):
 def open_google_play(args):
     if len(args) > 0:
         package_name = args[0]
-        install_referrer="https://play.google.com/store/apps/details?id={}&referrer=utm_source%3Dgoogle%26utm_medium%3Dcpc%26utm_term%3Dshoes%26utm_content%3Dlogolink%26utm_campaign%3Dspring_sale%26gclid%3Dadegadetwd3aer".format(package_name)
-        #install_referrer="https://play.google.com/store/apps/details?id=com.simple.file.tool.browser&referrer=utm_source%3Dgoogle%26utm_medium%3Dcpc%26utm_term%3Daaaaaa%26anid%3Dadmob"
-        print("[Logging...] 安装引荐网址 : {}".format(install_referrer))
-        cmdlist = ['adb','shell','am', 'start','-a', 'android.intent.action.VIEW', '-d', install_referrer]
+        referrer = "referrer=utm_source%3Dgoogle%26utm_medium%3Dcpc%26utm_term%3Dshoes%26utm_content%3Dlogolink%26utm_campaign%3Dspring_sale%26gclid%3Dadegadetwd3aer"
+        referrer = urllib.parse.quote(referrer)
+        url="https://play.app.goo.gl/?link=https://play.google.com/store/apps/details?id={}%26{}".format(package_name, referrer)
+        print("[Logging...] 安装引荐网址 : {}".format(url))
+        cmdlist = ['adb','shell','am', 'start','-a', 'android.intent.action.VIEW', '-d', url]
         subprocess.call(cmdlist)
     else:
         print("[Logging...] 缺少包名信息")
