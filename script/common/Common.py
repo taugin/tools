@@ -52,7 +52,7 @@ SEPERATER = os.path.sep
 
 #########################jar包文件路径定义#################################
 #APKTOOL的jar包
-APKTOO_JAR_VERSION = "2.8.1"
+APKTOO_JAR_VERSION = "2.9.3"
 APKTOOL_JAR = os.path.join(LIB_DIR, "apktool_%s.jar" % APKTOO_JAR_VERSION)
 
 #签名jar
