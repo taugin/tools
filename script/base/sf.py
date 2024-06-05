@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # coding: UTF-8
+import platform
 from threading import Thread
 import time
 import re
@@ -123,11 +124,14 @@ def md5_classes(apkFile):
 def printsign_md5_with_jarsigner(apkFile):
     '''输出签名文件的MD5'''
     global apk_info
-    if Common.KEYTOOL == None or len(Common.KEYTOOL) <= 0 or not os.path.exists(Common.KEYTOOL):
+    keytool = Common.find_keytool_version_180(process)
+    if keytool == None or len(keytool) <= 0:
+        keytool = Common.KEYTOOL
+    if keytool == None or len(keytool) <= 0 or not os.path.exists(keytool):
         Log.out("[Logging...] 签名程序路径 : 无法找到签名文件 [keytool]")
         return
     if apkFile != None and os.path.exists(apkFile):
-        cmdlist = [Common.KEYTOOL, "-printcert", "-jarfile", apkFile]
+        cmdlist = [keytool, "-printcert", "-jarfile", apkFile]
         Utils.printExecCmdString(cmdlist)
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
         process.wait()
