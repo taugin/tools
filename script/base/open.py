@@ -10,6 +10,7 @@ import urllib.parse
 OPEN_FOLDER = False
 OPEN_GOOGLE_PLAY = False
 OPEN_NON_ORGANIC = False
+OPEN_MARKET = False
 
 def open_folder(args):
     path = None
@@ -41,8 +42,18 @@ def open_google_play(args):
     else:
         print("[Logging...] 缺少包名信息")
 
+def open_market(args):
+    if len(args) > 0:
+        package_name = args[0]
+        url="market://details?id={}".format(package_name)
+        print("[Logging...] 安装引荐网址 : {}".format(url))
+        cmdlist = ['adb','shell','am', 'start','-a', 'android.intent.action.VIEW', '-d', url]
+        subprocess.call(cmdlist)
+    else:
+        print("[Logging...] 缺少包名信息")
+
 if __name__ == "__main__":
-    opts, args = getopt.getopt(sys.argv[1:], "fgn")
+    opts, args = getopt.getopt(sys.argv[1:], "fgnm")
     for op, value in opts:
         if (op == "-f"):
             OPEN_FOLDER = True
@@ -50,9 +61,13 @@ if __name__ == "__main__":
             OPEN_GOOGLE_PLAY = True
         elif (op == '-n'):
             OPEN_NON_ORGANIC = True
+        elif (op == '-m'):
+            OPEN_MARKET = True
         else:
             OPEN_FOLDER = True
     if OPEN_FOLDER:
         open_folder(args)
+    elif OPEN_MARKET:
+        open_market(args)
     elif OPEN_GOOGLE_PLAY:
         open_google_play(args)
