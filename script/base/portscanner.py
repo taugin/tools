@@ -42,6 +42,12 @@ def usage():
     log(usagestr_title + usagestr_uses + usagestr_args)
     sys.exit()
 
+def get_local_ip():
+    hostname = socket.gethostname()
+    local_ip = socket.gethostbyname(hostname)
+    localhost = socket.gethostbyaddr("172.16.170.172")
+    print(f"local ip : {hostname} : {local_ip} : {localhost}")
+
 def test_port(dst, port):
     sys.stdout.write(SCANNING_STATUS % (dst, str(port)) + '\r')
     sys.stdout.flush()

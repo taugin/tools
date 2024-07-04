@@ -1,0 +1,15 @@
+echo [Logging...] 执行脚本参数 ：[$*]
+pythonpath=$(which python)
+#echo $pythonpath
+
+pythonversion=$($pythonpath --version)
+
+pythoncode=script/base/portscanner.py
+curdir=$(dirname $0)
+fullpypath=$curdir/../$pythoncode
+#echo $fullpypath
+
+echo [Logging...] 脚本文件路径 : [$pythonpath]
+echo [Logging...] 脚本文件版本 : [$pythonversion]
+echo [Logging...] 脚本代码路径 : [$pythoncode]
+$pythonpath $fullpypath $*
