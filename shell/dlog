@@ -1,8 +1,14 @@
-echo "********* args count : [$#], 执行脚本参数 ：[$*]"
+echo "********* 执行脚本参数 : [$*]"
 if [ $# -le 0 ];then
-    args="hauyu simple humob komob"
+    args="hauyu simple humob komob mobsdk"
 else
     args="$*"
+fi
+if [ "$1" == "-c" ];then
+    adb.exe wait-for-device
+    adb logcat -c
+    echo "********* 清空日志缓存"
+    exit
 fi
 while true
 do
