@@ -13,3 +13,4 @@ packer/sdks/plugins/
 bin/jd-gui.cfg
 extra/winreg/out.reg
 .vscode/settings.json
+bin/jadx
