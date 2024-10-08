@@ -1,6 +1,7 @@
 ﻿import os
 import platform
 import subprocess
+import sys
 import Log
 ##############################通用函数###########################
 __all__ = []
@@ -133,6 +134,19 @@ def find_jarsigner_version_180():
         exec_path_180 = all_exec_path[0]
     return exec_path_180
 
+def find_java():
+    java_path = []
+    if (platform.system().lower() == "windows"):
+        process = subprocess.Popen(["where", "java"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    else:
+        process = subprocess.Popen(["which", "java"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    alllines = process.stdout.readlines()
+    for item in alllines:
+        exec_path = parseString(item).strip()
+        java_path.append(exec_path)
+    if java_path != None and len(java_path) > 0:
+        return True
+    return False
 #keytool可执行文件
 KEYTOOL = "keytool"
 #jarsigner可执行文件
@@ -142,7 +156,16 @@ JARSIGNER = "jarsigner"
 ADB = os.path.join(BIN_DIR, "adb%s" % BIN_SUFFIX);
 
 #java
-JAVA = "java"
+if (find_java()):
+    JAVA_CMD = "java"
+else:
+    JAVA_CMD = None
+def JAVA():
+    if JAVA_CMD == None:
+        print(f"[Logging...] 无法找到命令 : [java]")
+        pause()
+        sys.exit(-1)
+    return JAVA_CMD
 
 #apk对齐工具
 ZIPALIGN = os.path.join(BIN_DIR, "zipalign%s" % BIN_SUFFIX)

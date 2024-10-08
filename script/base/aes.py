@@ -34,7 +34,7 @@ def encrypt_file(key, input_file, output_file):
         key = "123456789"
     Log.out("\n[Logging...] 加密文件 key : [%s], binary : [%s], input : [%s], output : [%s]\n" % (key, BINARY, input_file, output_file))
     cmdlist = []
-    cmdlist.append(Common.JAVA)
+    cmdlist.append(Common.JAVA())
     cmdlist.append("-jar")
     cmdlist.append(Common.AES_JAR)
     cmdlist.append("-e")
@@ -65,7 +65,7 @@ def decrypt_file(key, input_file, output_file):
         key = "123456789"
     Log.out("\n[Logging] 解密文件 key : [%s], binary : [%s], input : [%s], output : [%s]\n" % (key, BINARY, input_file, output_file))
     cmdlist = []
-    cmdlist.append(Common.JAVA)
+    cmdlist.append(Common.JAVA())
     cmdlist.append("-jar")
     cmdlist.append(Common.AES_JAR)
     cmdlist.append("-d")
@@ -86,7 +86,7 @@ def encrypt_string(key, input_string):
     if key == None or len(key) <= 0:
         key = "123456"
     Log.out("\n[Logging...] 加密字符串 key : [%s], input : [%s]\n" % (key, input_string))
-    cmdlist = [Common.JAVA, "-jar", Common.AES_JAR, "-e", "-k", key, "-s", input_string]
+    cmdlist = [Common.JAVA(), "-jar", Common.AES_JAR, "-e", "-k", key, "-s", input_string]
     subprocess.call(cmdlist)
     Log.out("")
 
@@ -97,7 +97,7 @@ def decrypt_string(key, input_string):
     if key == None or len(key) <= 0:
         key = "123456"
     Log.out("\n[Logging] 解密字符串 key : [%s], input : [%s]\n" % (key, input_string))
-    cmdlist = [Common.JAVA, "-jar", Common.AES_JAR, "-d", "-k", key, "-s", input_string]
+    cmdlist = [Common.JAVA(), "-jar", Common.AES_JAR, "-d", "-k", key, "-s", input_string]
     subprocess.call(cmdlist)
     Log.out("")
 # start ============================================================================================

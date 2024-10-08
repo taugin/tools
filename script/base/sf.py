@@ -158,7 +158,7 @@ def printsign_md5_with_jarsigner(apkFile):
         apk_info["sign_sha1"] = sign_sha1
 
 def printsign_md5_with_apksigner(apkFile):
-    cmdlist = [Common.JAVA, "-jar", Common.APKSIGNER, "verify", "-print-certs", apkFile]
+    cmdlist = [Common.JAVA(), "-jar", Common.APKSIGNER, "verify", "-print-certs", apkFile]
     Utils.printExecCmdString(cmdlist)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
     #process.wait()
@@ -280,23 +280,23 @@ def get_app_info(apkFile):
         apk_info["min_version"] = jobj["min_sdk_version"] if "min_sdk_version" in jobj else None
         apk_info["target_version"] = jobj["target_sdk_version"] if "target_sdk_version" in jobj else None
     elif ext == ".aab":
-        cmdlist = [Common.JAVA, "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@package"]
+        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@package"]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
         process.wait()
         apk_info["pkgname"] = Utils.parseString(process.stdout.readline()).strip()
-        cmdlist = [Common.JAVA, "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@android:versionCode"]
+        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@android:versionCode"]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
         process.wait()
         apk_info["vercode"] = Utils.parseString(process.stdout.readline()).strip()
-        cmdlist = [Common.JAVA, "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@android:versionName"]
+        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@android:versionName"]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
         process.wait()
         apk_info["vername"] = Utils.parseString(process.stdout.readline()).strip()
-        cmdlist = [Common.JAVA, "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/uses-sdk/@android:minSdkVersion"]
+        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/uses-sdk/@android:minSdkVersion"]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
         process.wait()
         apk_info["min_version"] = Utils.parseString(process.stdout.readline()).strip()
-        cmdlist = [Common.JAVA, "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/uses-sdk/@android:targetSdkVersion"]
+        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/uses-sdk/@android:targetSdkVersion"]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
         process.wait()
         apk_info["target_version"] = Utils.parseString(process.stdout.readline()).strip()
@@ -580,7 +580,7 @@ def print_xml(args):
                 f = open(tmpfile, "wb")
                 f.write(zf.read(manifest))
                 f.close()
-                cmd = [Common.JAVA, "-jar", Common.AXMLPRINTER_JAR, tmpfile]
+                cmd = [Common.JAVA(), "-jar", Common.AXMLPRINTER_JAR, tmpfile]
                 subprocess.call(cmd)
                 os.remove(tmpfile)
             zf.close()

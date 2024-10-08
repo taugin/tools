@@ -20,7 +20,7 @@ COMPARE_APK_FILE = False
 
 def decompiled_apk(apk_file, out_dir):
     Log.out("[Logging...] {}".format("反编译文件中"))
-    cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, 'd', apk_file, '-o', out_dir]
+    cmdlist = [Common.JAVA(), "-jar", Common.APKTOOL_JAR, 'd', apk_file, '-o', out_dir]
     if not SEARCH_KEYWORDS_IN_CODE:
         cmdlist += ["-s"]
     if not '-s' in cmdlist and not '--no-src' in cmdlist:
@@ -377,7 +377,7 @@ def decode_manifest_from_apk(apk_file):
         f = open(tmpfile, "wb")
         f.write(zf.read(manifest))
         f.close()
-        cmd = [Common.JAVA, "-jar", Common.AXMLPRINTER_JAR, tmpfile]
+        cmd = [Common.JAVA(), "-jar", Common.AXMLPRINTER_JAR, tmpfile]
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
         alllines = process.stdout.readlines()
         if alllines != None and len(alllines) > 0:

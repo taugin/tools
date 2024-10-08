@@ -78,7 +78,7 @@ def getApkInfo(apkFile):
     return pkgname, vercode, vername, apklabel, targetSdkVersion, minSdkVersion
 
 def apktool_cmd():
-    cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR]
+    cmdlist = [Common.JAVA(), "-jar", Common.APKTOOL_JAR]
     cmdlist += sys.argv[1:]
     if not '-s' in cmdlist and not '--no-src' in cmdlist:
         cmdlist += ["--only-main-classes"]

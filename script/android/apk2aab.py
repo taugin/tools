@@ -20,7 +20,7 @@ def decode_apk_resource(apk_file, decode_apk_dir):
     if os.path.exists(decode_apk_dir):
         Log.out("[Logging...] 反编文件成功\n")
         return True
-    cmdlist = [Common.JAVA, '-jar', Common.APKTOOL_JAR, 'd', apk_file, '--no-src', '-f', '-o', decode_apk_dir]
+    cmdlist = [Common.JAVA(), '-jar', Common.APKTOOL_JAR, 'd', apk_file, '--no-src', '-f', '-o', decode_apk_dir]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
@@ -219,7 +219,7 @@ def bundle_aab(base_zip, base_aab):
     Log.out("[Logging...] 生成AAB 文件")
     if os.path.exists(base_aab):
         os.remove(base_aab)
-    cmdlist = [Common.JAVA, '-jar', Common.BUNDLE_TOOL, 'build-bundle', '--modules=%s' % base_zip, '--output=%s' % base_aab]
+    cmdlist = [Common.JAVA(), '-jar', Common.BUNDLE_TOOL, 'build-bundle', '--modules=%s' % base_zip, '--output=%s' % base_aab]
     process = subprocess.Popen(cmdlist)
     ret = process.wait()
     if (ret != 0):

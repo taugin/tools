@@ -48,7 +48,7 @@ def clear_dup_smali(masterfolder):
 
 def jar2dex(jarfile, dexfile):
     Log.out("[Logging...] Jar转换为DEX : [%s -> %s]" % (jarfile, dexfile), True)
-    cmdlist = [Common.JAVA, "-jar", Common.DX_JAR, "--dex", "--output=%s" % dexfile, jarfile]
+    cmdlist = [Common.JAVA(), "-jar", Common.DX_JAR, "--dex", "--output=%s" % dexfile, jarfile]
     subprocess.call(cmdlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     Log.out("[Logging...] Jar转换完成 ", True)
 
@@ -57,7 +57,7 @@ def smali2dex(smalidir, dexfile):
     smalidir = os.path.normpath(smalidir)
     dexfile = os.path.normpath(dexfile)
     Log.out("[Logging...] 开始转换文件 : [%s] --> [%s]" % (smalidir, dexfile))
-    cmdlist = [Common.JAVA, "-jar", Common.SMALI_JAR, "a", "-o", dexfile, smalidir]
+    cmdlist = [Common.JAVA(), "-jar", Common.SMALI_JAR, "a", "-o", dexfile, smalidir]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     if (ret != 0):
@@ -75,7 +75,7 @@ def baksmali(dexfile, outdir):
     tmpdir = os.path.join(os.getcwd(), "tmp%s" % random.randint(0, 1000))
     if not os.path.exists(tmpdir):
         os.mkdir(tmpdir)
-    cmdlist = [Common.JAVA, "-jar", Common.BAKSMALI_JAR, "d", "-o", tmpdir, dexfile]
+    cmdlist = [Common.JAVA(), "-jar", Common.BAKSMALI_JAR, "d", "-o", tmpdir, dexfile]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
     Utils.copydir(tmpdir, outdir, False)

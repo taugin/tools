@@ -60,7 +60,7 @@ def pause():
 
 #反编译apk
 def apk_decompile(apkfile):
-    cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "d", "-s", "-f" , apkfile, "-o", TMP_DECOMPILE_FOLDER]
+    cmdlist = [Common.JAVA(), "-jar", Common.APKTOOL_JAR, "d", "-s", "-f" , apkfile, "-o", TMP_DECOMPILE_FOLDER]
     Log.out("[Logging...] 反编译中 %s" % apkfile)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
@@ -76,7 +76,7 @@ def apk_decompile(apkfile):
 #回编译apk
 def apk_compile():
     thisdir = os.path.dirname(sys.argv[0])
-    cmdlist = [Common.JAVA, "-jar", Common.APKTOOL_JAR, "b", TMP_DECOMPILE_FOLDER, "-o", TMP_DECOMPILE_APKFILE]
+    cmdlist = [Common.JAVA(), "-jar", Common.APKTOOL_JAR, "b", TMP_DECOMPILE_FOLDER, "-o", TMP_DECOMPILE_APKFILE]
     Log.out("[Logging...] 回编译中 %s" % TMP_DECOMPILE_APKFILE)
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
@@ -245,7 +245,7 @@ def addDebuggable(srcapk, dstapk):
     szf.close()
     f.close()
     #添加debuggable属性
-    cmdlist = [Common.JAVA, "-jar", Common.AXML_EDITOR, "-attr", "-i", "application", "package", "debuggable", "true", srcXml, dstXml]
+    cmdlist = [Common.JAVA(), "-jar", Common.AXML_EDITOR, "-attr", "-i", "application", "package", "debuggable", "true", srcXml, dstXml]
     subprocess.call(cmdlist)
     if (dstXml != None and os.path.exists(dstXml)):
         #生成新的apk
