@@ -271,6 +271,9 @@ def get_app_info(apkFile):
                     apk_info["min_version"] = min_version
                 except:
                     pass
+        cmdlist = [Common.AAPT_BIN, "d", "xmltree", apkFile, "AndroidManifest.xml"]
+        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
+        apk_info["apk_network"] = check_ad_network(Utils.parseString(process.stdout.read()).strip())
     elif ext == ".xapk":
         jobj = readpkgnamefromxapk(apkFile)
         apk_info["apklabel"] = jobj["name"] if "name" in jobj else None
@@ -282,25 +285,48 @@ def get_app_info(apkFile):
     elif ext == ".aab":
         cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@package"]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
-        process.wait()
         apk_info["pkgname"] = Utils.parseString(process.stdout.readline()).strip()
         cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@android:versionCode"]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
-        process.wait()
         apk_info["vercode"] = Utils.parseString(process.stdout.readline()).strip()
         cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@android:versionName"]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
-        process.wait()
         apk_info["vername"] = Utils.parseString(process.stdout.readline()).strip()
         cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/uses-sdk/@android:minSdkVersion"]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
-        process.wait()
         apk_info["min_version"] = Utils.parseString(process.stdout.readline()).strip()
         cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/uses-sdk/@android:targetSdkVersion"]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
-        process.wait()
         apk_info["target_version"] = Utils.parseString(process.stdout.readline()).strip()
+        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/application/activity/@android:name"]
+        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+        apk_info["apk_network"] = check_ad_network(Utils.parseString(process.stdout.read()).strip())
 
+
+def check_ad_network(content):
+    try:
+        curdir = os.path.normpath(os.path.dirname(sys.argv[0]))
+        android_dir = os.path.join(curdir, "..", 'android')
+        ad_info_file = os.path.normpath(os.path.join(android_dir, "ad_info.json"))
+        ad_info_content = None
+        with open(ad_info_file, "r") as f:
+            ad_info_content = f.read()
+        if ad_info_content == None or len(ad_info_content) <= 0:
+            return None
+        ad_info_json = eval(ad_info_content)
+        all_network = []
+        for item in ad_info_json:
+            platform = item.get('ad_platform')
+            ad_prefix = item.get('ad_prefix')
+            if ad_prefix != None and len(ad_prefix) > 0:
+                for prefix in ad_prefix:
+                    if prefix in content:
+                        all_network.append(platform)
+                        break
+        return all_network
+    except Exception as e:
+        Log.out("[Logging...] 获取广告平台失败")
+    return None
 
 def readapkinfo(apkFile, function):
     function(apkFile)
@@ -725,6 +751,11 @@ def print_apkinfo():
     Log.out("-" * dash_len)
     output = " 文件大小 | %s " % apk_info["apk_size"]
     Log.out(output)
+
+    if "apk_network" in apk_info:
+        Log.out("-" * dash_len)
+        output = " 广告平台 | %s " % apk_info["apk_network"]
+        Log.out(output)
 
     Log.out("-" * dash_len)
     output = " 签名摘要 | %s" % apk_info["sign_md5"]
