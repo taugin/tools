@@ -124,7 +124,7 @@ def md5_classes(apkFile):
 def printsign_md5_with_jarsigner(apkFile):
     '''输出签名文件的MD5'''
     global apk_info
-    keytool = Common.find_keytool_version_180(process)
+    keytool = Common.find_keytool_version_180()
     if keytool == None or len(keytool) <= 0:
         keytool = Common.KEYTOOL
     if keytool == None or len(keytool) <= 0 or not os.path.exists(keytool):
