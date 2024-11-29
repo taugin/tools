@@ -1,5 +1,17 @@
 echo [Logging...] 执行脚本参数 ：[$*]
 
+FLAG=""
+if [ "$1" == "-d" ] || [ "$1" == "-e" ];then
+    FLAG=$1
+    shift
+fi
+
+devices=$(adb devices | grep -w "device" | awk '{print $1}')
+device_count=$(echo "$devices" | wc -l)
+if [ "$FLAG" == "" ] && [ $device_count -gt 1 ]; then
+	FLAG="-d"
+fi
+
 LOOP="false"
 
 optargs=$(getopt l "$@")
@@ -21,12 +33,12 @@ done
 PACKAGE_NAME="$1"
 echo [Logging...] PACKAGE_NAME : [$PACKAGE_NAME] LOOP : [$LOOP]
 echo [Logging...] 等待设备连接 : [...]
-adb wait-for-device
+adb $FLAG wait-for-device
 echo [Logging...] 设备已经连接...
 USER_NAME=""
 if [ "$PACKAGE_NAME" == "" ];then
     #获取顶层Activity包名
-    TOP_ACTIVITY=$(adb.exe shell dumpsys activity top | grep "ACTIVITY" | tail -1)
+    TOP_ACTIVITY=$(adb.exe $FLAG shell dumpsys activity top | grep "ACTIVITY" | tail -1)
     #echo $TOP_ACTIVITY
     COMPONENT_NAME=$(echo $TOP_ACTIVITY | awk -F" " {'print $2'})
     PACKAGE_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $1'})
@@ -34,13 +46,13 @@ if [ "$PACKAGE_NAME" == "" ];then
     ACTIVITY_NAME=$(echo $ACTIVITY_NAME | awk -F"}" {'print $1'})
     #echo $PACKAGE_NAME
     #获取顶层Activity用户名
-    USER_NAME_ARRAY=($(adb shell ps -A | grep $PACKAGE_NAME | awk {'print $1'}))
+    USER_NAME_ARRAY=($(adb $FLAG shell ps -A | grep $PACKAGE_NAME | awk {'print $1'}))
     USER_NAME=${USER_NAME_ARRAY[0]}
     #echo $USER_NAME
 	echo [Logging...] Top Package : [$PACKAGE_NAME]
     echo [Logging...] TopActivity : [$ACTIVITY_NAME]
 else
-    USER_NAME=$(adb shell ps -A | grep $PACKAGE_NAME | head -1 | awk {'print $1'})
+    USER_NAME=$(adb $FLAG shell ps -A | grep $PACKAGE_NAME | head -1 | awk {'print $1'})
 fi
 echo [Logging...] $USER_NAME      $PACKAGE_NAME
 echo
@@ -53,9 +65,9 @@ SHOW_TOP_ACTIVITY_ALWAYS=false
 
 while true
 do
-    adb.exe wait-for-device
+    adb.exe $FLAG wait-for-device
     if [ SHOW_TOP_ACTIVITY_ALWAYS == true ];then
-        TOP_ACTIVITY=$(adb shell dumpsys activity top | grep "ACTIVITY" | tail -1)
+        TOP_ACTIVITY=$(adb $FLAG shell dumpsys activity top | grep "ACTIVITY" | tail -1)
         COMPONENT_NAME=$(echo $TOP_ACTIVITY | awk -F" " {'print $2'})
         PACKAGE_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $1'})
         ACTIVITY_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $2'})
@@ -67,7 +79,7 @@ do
         echo "--------------------------------------------------------------"
     fi
     echo [Logging...]  $(date +"%Y:%m:%d %H:%M:%S")
-    adb shell ps -A | grep $USER_NAME
+    adb $FLAG shell ps -A | grep $USER_NAME
     if [ "$LOOP" != "true" ]; then
         break;
     else

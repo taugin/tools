@@ -1,9 +1,22 @@
 echo [Logging...] 执行脚本参数 ：[$*]
 echo [Logging...] 等待设备连接 : [...]
-adb wait-for-device
+
+FLAG=""
+if [ "$1" == "-d" ] || [ "$1" == "-e" ];then
+    FLAG=$1
+    shift
+fi
+
+devices=$(adb devices | grep -w "device" | awk '{print $1}')
+device_count=$(echo "$devices" | wc -l)
+if [ "$FLAG" == "" ] && [ $device_count -gt 1 ]; then
+	FLAG="-d"
+fi
+
+adb $FLAG wait-for-device
 if [ $# -le 0 ];then
 	#获取顶层Activity包名
-	TOP_ACTIVITY=$(adb shell dumpsys activity top | grep "ACTIVITY" | tail -1)
+	TOP_ACTIVITY=$(adb $FLAG shell dumpsys activity top | grep "ACTIVITY" | tail -1)
 	#echo $TOP_ACTIVITY
 	COMPONENT_NAME=$(echo $TOP_ACTIVITY | awk -F" " {'print $2'})
 	PACKAGE_NAME=$(echo $COMPONENT_NAME | awk -F"/" {'print $1'})
@@ -14,14 +27,16 @@ else
 fi
 #echo $PACKAGE_NAME
 #获取顶层Activity用户名
-USER_NAME_ARRAY=($(adb shell ps -A | grep $PACKAGE_NAME | awk {'print $1,$2'}))
+USER_NAME_ARRAY=($(adb $FLAG shell ps -A | grep $PACKAGE_NAME | awk {'print $1,$2'}))
 USER_NAME=${USER_NAME_ARRAY[0]}
 PID=${USER_NAME_ARRAY[1]}
 #echo "pid = " $PID
 if [ "$PID" != "" ];then
 	echo [Logging...] $USER_NAME    $PID      $PACKAGE_NAME
 	echo
-	adb logcat  --pid=$PID
+	cmd="adb $FLAG logcat  --pid=$PID"
+	echo [Logging...] [$cmd]
+	$cmd
 else
 	echo [Logging...] "进程未运行"
 fi
