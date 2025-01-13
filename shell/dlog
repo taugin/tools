@@ -6,12 +6,6 @@ if [ "$1" == "-d" ] || [ "$1" == "-e" ];then
     shift
 fi
 
-if [ $# -le 0 ];then
-    args="hauyu simple humob komob mobsdk"
-else
-    args="$*"
-fi
-
 if [ "$1" == "-c" ];then
     devices=$(adb devices | grep -w "device" | awk '{print $1}')
     device_count=$(echo "$devices" | wc -l)
@@ -21,8 +15,15 @@ if [ "$1" == "-c" ];then
     adb.exe $FLAG wait-for-device
     adb $FLAG logcat -c
     echo "********* 清空日志缓存"
-    exit
+    shift
 fi
+
+if [ $# -le 0 ];then
+    args="hauyu simple humob komob mobsdk"
+else
+    args="$*"
+fi
+
 while true
 do
     echo "********* wait for usb device connected ..."
