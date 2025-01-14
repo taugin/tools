@@ -19,7 +19,7 @@ if [ "$1" == "-c" ];then
 fi
 
 if [ $# -le 0 ];then
-    args="hauyu simple humob komob mobsdk"
+    args="hauyu humob komob mobsdk mipsdk pubsdk"
 else
     args="$*"
 fi
