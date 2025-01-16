@@ -1,0 +1,11 @@
+echo [Logging...] 执行脚本参数 ：[$*]
+pythonpath=$(which python)
+#echo $pythonpath
+
+pythonversion=$($pythonpath --version)
+ip=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1')
+
+echo [Logging...] 脚本文件路径 : [$pythonpath]
+echo [Logging...] 当前代码路径 : [$(pwd)]
+echo [Logging...] 当前网络路径 : [http://$ip:8000]
+$pythonpath -m http.server 8000 -b 0.0.0.0
