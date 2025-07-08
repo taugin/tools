@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # coding: UTF-8
+import base64
 import platform
 from threading import Thread
 import time
@@ -213,6 +214,16 @@ def md5_signfile(apkFile):
         printsign_md5_with_apksigner(apkFile)
     if apk_info["sign_md5"] == None or len(apk_info["sign_md5"]) <= 0:
         printsign_md5_with_jarsigner(apkFile)
+    if apk_info == None:
+        return
+    sign_sha1 = apk_info.get('sign_sha1')
+    if sign_sha1 == None:
+        return
+    try:
+        sign_sh1_str = sign_sha1.replace(':', '').strip()
+        key_hashing = base64.b64encode(bytes.fromhex(sign_sh1_str)).decode()
+        apk_info["key_hashing"] = key_hashing
+    except:pass
 
 
 def get_app_info(apkFile):
@@ -715,7 +726,6 @@ def calc_maxlen():
                 max_len = ilen
     return max_len
 
-
 def print_apkinfo():
     global apk_info
     max_len = calc_maxlen()
@@ -772,6 +782,12 @@ def print_apkinfo():
     Log.out("-" * dash_len)
     output = " 签名详情 | %s" % apk_info["sign_detail"]
     Log.out(output)
+
+    key_hashing = apk_info.get('key_hashing')
+    if key_hashing != None:
+        Log.out("-" * dash_len)
+        output = " 散列密钥 | %s" % key_hashing
+        Log.out(output)
 
     if apk_info["sign_file"] != None and len(apk_info["sign_file"]) > 0:
         Log.out("-" * dash_len)
