@@ -142,5 +142,11 @@
       "com.amazon.aps.ads.activity.ApsInterstitialActivity",
       "com.amazon.device.ads.DTBInterstitialActivity"
     ]
+  },
+  {
+    "ad_platform": "TaurusX",
+    "ad_prefix": [
+      "com.taurusx.tax"
+    ]
   }
 ]

@@ -331,7 +331,7 @@ def check_ad_network(content):
             ad_prefix = item.get('ad_prefix')
             if ad_prefix != None and len(ad_prefix) > 0:
                 for prefix in ad_prefix:
-                    if prefix in content:
+                    if prefix in content and not platform in all_network:
                         all_network.append(platform)
                         break
         return all_network
