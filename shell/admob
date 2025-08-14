@@ -10,17 +10,20 @@ declare -A disp_count
 # 保存广告格式
 declare -A ad_type
 
-last_key=""
+last_key="|"
 declare -A package_name
+
+print_header() {
+    # 取 last_key 对应的 Publisher
+    echo "AdMob Live Stats (Real-time):"
+    printf "%-30s %-15s %-15s %-10s %-10s %-15s %-10s\n" "Publisher" "Slot" "Type" "ReqCount" "DisplayCount" "Time" "PackageName"
+    echo "------------------------------------------------------------------------------------------------------------------"
+}
 
 # 打印表头函数
 print_table() {
     clear
-    echo "AdMob Live Stats (Real-time):"
-    printf "%-30s %-15s %-15s %-10s %-10s %-10s\n" "Publisher" "Slot" "Type" "ReqCount" "DisplayCount" "PackageName"
-    echo "--------------------------------------------------------------------------------------------------------"
-
-    # 取 last_key 对应的 Publisher
+    print_header
     last_pub="${last_key%%|*}"
 
     # 用关联数组收集 Publisher 分组
@@ -29,7 +32,7 @@ print_table() {
         pub="${key%%|*}"
         pub_groups["$pub"]=1
     done
-	echo "$pub_groups"
+    echo "$pub_groups"
     # 遍历 Publisher 分组，非 last_pub 先输出
     for pub in "${!pub_groups[@]}"; do
         if [ "$pub" != "$last_pub" ]; then
@@ -37,7 +40,8 @@ print_table() {
                 if [[ "$key" == "$pub|"* ]]; then
                     slot="${key#*|}"
                     type=${ad_type[$key]:-"N/A"}
-                    printf "%-25s %-15s %-20s %-10s %-10s %-10s\n" "$pub" "$slot" "$type" "${req_count[$key]}" "${disp_count[$key]:-0}" "${package_name[$pub]}"
+                    timestring=$(date +"%H:%M:%S.%3N")
+                    printf "%-25s %-15s %-20s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$type" "${req_count[$key]}" "${disp_count[$key]:-0}" "${timestring}" "${package_name[$pub]}"
                 fi
             done
         fi
@@ -48,14 +52,15 @@ print_table() {
         if [[ "$key" == "$last_pub|"* ]]; then
             slot="${key#*|}"
             type=${ad_type[$key]:-"N/A"}
-            printf "%-25s %-15s %-20s %-10s %-10s %-10s\n" "$last_pub" "$slot" "$type" "${req_count[$key]}" "${disp_count[$key]:-0}" "${package_name[$pub]}"
+            timestring=$(date +"%H:%M:%S.%3N")
+            printf "%-25s %-15s %-20s %-10s %-10s %-15s %-10s\n" "$last_pub" "$slot" "$type" "${req_count[$key]}" "${disp_count[$key]:-0}" "${timestring}" "${package_name[$last_pub]}"
         fi
     done
 }
 
 clear
-echo "AdMob Live Stats (Real-time):"
-adb logcat -c
+print_header
+#adb logcat -c
 # 监听 logcat
 adb logcat -s Ads | while read -r line; do
     # 匹配 URL 形式，提取广告格式
