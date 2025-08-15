@@ -7,10 +7,10 @@
 declare -A req_count
 declare -A disp_count
 declare -A act_count
-declare -A iaoa_flags
+declare -A type_flags
 
 # 保存广告格式
-declare -A ad_type
+declare -A ad_format
 
 last_key="|"
 declare -A package_name
@@ -19,8 +19,8 @@ declare -A timestamps
 print_header() {
     # 取 last_key 对应的 Publisher
     echo "AdMob Live Stats (Real-time):"
-    printf "%-30s %-15s %-15s %-10s %-10s %-10s %-15s %-10s\n" "Publisher" "Slot" "Type" "Iaoa" "ReqCount" "ShowCount" "Time" "PackageName"
-    echo -n "----------------------------------------------------------------------------------------------------------------------"
+    printf "%-27s %-15s %-18s %-15s %-10s %-10s %-15s %-10s\n" "Publisher" "Slot" "Format" "Type" "ReqCount" "ShowCount" "Time" "PackageName"
+    echo -n "--------------------------------------------------------------------------------------------------------------------------------"
 }
 
 # 打印表头函数
@@ -42,15 +42,15 @@ print_table() {
             for key in "${!req_count[@]}"; do
                 if [[ "$key" == "$pub|"* ]]; then
                     slot="${key#*|}"
-                    type=${ad_type[$key]:-"N/A"}
+                    format=${ad_format[$key]:-"N/A"}
                     display_count=${disp_count[$key]:-0}
                     pkgname=${package_name[$pub]}
-                    if [ "$type" == "interstitial_mb" ];then
+                    if [ "$format" == "interstitial_mb" ];then
                         display_count=${act_count[$pkgname]:-0}
                     else
                         display_count=${disp_count[$key]:-0}
                     fi
-                    printf "%-25s %-15s %-18s %-10s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$type" "${iaoa_flags[$key]}" "${req_count[$key]}" "$display_count" "${timestamps[$key]}" "$pkgname"
+                    printf "%-25s %-15s %-18s %-15s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$format" "${type_flags[$key]}" "${req_count[$key]}" "$display_count" "${timestamps[$key]}" "$pkgname"
                 fi
             done
         fi
@@ -61,15 +61,15 @@ print_table() {
     for key in "${!req_count[@]}"; do
         if [[ "$key" == "$pub|"* ]]; then
             slot="${key#*|}"
-            type=${ad_type[$key]:-"N/A"}
+            format=${ad_format[$key]:-"N/A"}
             display_count=${disp_count[$key]:-0}
             pkgname=${package_name[$pub]}
-            if [ "$type" == "interstitial_mb" ];then
+            if [ "$format" == "interstitial_mb" ];then
                 display_count=${act_count[$pkgname]:-0}
             else
                 display_count=${disp_count[$key]:-0}
             fi
-            printf "%-25s %-15s %-18s %-10s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$type" "${iaoa_flags[$key]}" "${req_count[$key]}" "$display_count" "${timestamps[$key]}" "$pkgname"
+            printf "%-25s %-15s %-18s %-15s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$format" "${type_flags[$key]}" "${req_count[$key]}" "$display_count" "${timestamps[$key]}" "$pkgname"
         fi
     done
 }
@@ -81,14 +81,27 @@ adb logcat -c
 adb logcat -s ActivityTaskManager Ads | while read -r line; do
     # 匹配 URL 形式，提取广告格式
     if [[ $line =~ .*format=([a-zA-Z0-9_]+).*msid=([^& ]+).*client=ca-app-pub-([0-9]+).*slotname=([0-9]+) ]]; then
-        type="${BASH_REMATCH[1]}"
+        format="${BASH_REMATCH[1]}"
         pkgname="${BASH_REMATCH[2]}"
         publisher="ca-app-pub-${BASH_REMATCH[3]}"
         slot="${BASH_REMATCH[4]}"
         key="$publisher|$slot"
         has_iaoa=$([[ $line == *"iaoa=true"* ]] && echo "true" || echo "false")
-        ad_type[$key]=$type
-        iaoa_flags[$key]=$has_iaoa
+        has_native_template=$([[ $line == *"native_templates="* ]] && echo "true" || echo "false")
+        ad_format[$key]=$format
+        if [ "$format" == "interstitial_mb" ];then
+            if [ "$has_iaoa" == "true" ];then
+                type_flags[$key]="splash"
+            else
+                type_flags[$key]="interstitial"
+            fi
+        else
+            if [ "$has_native_template" == "true" ];then
+                type_flags[$key]="native"
+            else
+                type_flags[$key]="banner"
+            fi
+        fi
         package_name[$publisher]=$pkgname
         timestamps[$key]=$(date +"%H:%M:%S.%3N")
         ((req_count[$key]++))
@@ -98,10 +111,10 @@ adb logcat -s ActivityTaskManager Ads | while read -r line; do
     elif [[ $line =~ Publisher:\ ([a-zA-Z0-9-]+),\ Slot:\ ([a-zA-Z0-9-]+),\ Type:\ ([a-zA-Z0-9_]+) ]]; then
         publisher="${BASH_REMATCH[1]}"
         slot="${BASH_REMATCH[2]}"
-        type="${BASH_REMATCH[3]}"
+        format="${BASH_REMATCH[3]}"
         [[ -z "$slot" ]] && slot="N/A"
         key="$publisher|$slot"
-        ad_type[$key]=$type
+        ad_format[$key]=$format
         timestamps[$key]=$(date +"%H:%M:%S.%3N")
         ((disp_count[$key]++))
         last_key="$key"
