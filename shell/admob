@@ -53,6 +53,7 @@ print_table() {
                     printf "%-25s %-15s %-18s %-15s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$format" "${type_flags[$key]}" "${req_count[$key]}" "$display_count" "${timestamps[$key]}" "$pkgname"
                 fi
             done
+            echo "----------"
         fi
     done
 
