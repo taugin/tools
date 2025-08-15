@@ -6,6 +6,7 @@
 # 统计数组
 declare -A req_count
 declare -A disp_count
+declare -A act_count
 
 # 保存广告格式
 declare -A ad_type
@@ -41,27 +42,42 @@ print_table() {
                 if [[ "$key" == "$pub|"* ]]; then
                     slot="${key#*|}"
                     type=${ad_type[$key]:-"N/A"}
-                    printf "%-25s %-15s %-20s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$type" "${req_count[$key]}" "${disp_count[$key]:-0}" "${timestamps[$key]}" "${package_name[$pub]}"
+                    display_count=${disp_count[$key]:-0}
+                    pkgname=${package_name[$pub]}
+                    if [ "$type" == "interstitial_mb" ];then
+                        display_count=${act_count[$pkgname]:-0}
+                    else
+                        display_count=${disp_count[$key]:-0}
+                    fi
+                    printf "%-25s %-15s %-20s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$type" "${req_count[$key]}" "$display_count" "${timestamps[$key]}" "$pkgname"
                 fi
             done
         fi
     done
 
     # 最后输出 last_pub 组
+    pub=$last_pub
     for key in "${!req_count[@]}"; do
-        if [[ "$key" == "$last_pub|"* ]]; then
+        if [[ "$key" == "$pub|"* ]]; then
             slot="${key#*|}"
             type=${ad_type[$key]:-"N/A"}
-            printf "%-25s %-15s %-20s %-10s %-10s %-15s %-10s\n" "$last_pub" "$slot" "$type" "${req_count[$key]}" "${disp_count[$key]:-0}" "${timestamps[$key]}" "${package_name[$last_pub]}"
+            display_count=${disp_count[$key]:-0}
+            pkgname=${package_name[$pub]}
+            if [ "$type" == "interstitial_mb" ];then
+                display_count=${act_count[$pkgname]:-0}
+            else
+                display_count=${disp_count[$key]:-0}
+            fi
+            printf "%-25s %-15s %-20s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$type" "${req_count[$key]}" "$display_count" "${timestamps[$key]}" "$pkgname"
         fi
     done
 }
 
 clear
 print_header
-#adb logcat -c
+adb logcat -c
 # 监听 logcat
-adb logcat -s Ads | while read -r line; do
+adb logcat -s ActivityTaskManager Ads | while read -r line; do
     # 匹配 URL 形式，提取广告格式
     if [[ $line =~ .*format=([a-zA-Z0-9_]+).*msid=([^& ]+).*client=ca-app-pub-([0-9]+).*slotname=([0-9]+) ]]; then
         type="${BASH_REMATCH[1]}"
@@ -86,6 +102,17 @@ adb logcat -s Ads | while read -r line; do
         timestamps[$key]=$(date +"%H:%M:%S.%3N")
         ((disp_count[$key]++))
         last_key="$key"
+        print_table
+    elif [[ $line =~ Displayed[[:space:]]+([a-zA-Z0-9._/-]+) ]]; then
+        pkg_class="${BASH_REMATCH[1]}"
+        # 分割包名和类名
+        pkg="${pkg_class%/*}"   # %/* 删除最后一个 / 及之后内容
+        cls="${pkg_class#*/}"   # #*/ 删除最前面的 / 及之前内容
+        # echo "Package: $pkg"
+        # echo "Class: $cls"
+        if [ "$cls" == "com.google.android.gms.ads.AdActivity" ];then
+            ((act_count[$pkg]++))
+        fi
         print_table
     fi
 done
