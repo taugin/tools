@@ -12,12 +12,13 @@ declare -A ad_type
 
 last_key="|"
 declare -A package_name
+declare -A timestamps
 
 print_header() {
     # 取 last_key 对应的 Publisher
     echo "AdMob Live Stats (Real-time):"
     printf "%-30s %-15s %-15s %-10s %-10s %-15s %-10s\n" "Publisher" "Slot" "Type" "ReqCount" "DisplayCount" "Time" "PackageName"
-    echo "------------------------------------------------------------------------------------------------------------------"
+    echo -n "------------------------------------------------------------------------------------------------------------------"
 }
 
 # 打印表头函数
@@ -40,8 +41,7 @@ print_table() {
                 if [[ "$key" == "$pub|"* ]]; then
                     slot="${key#*|}"
                     type=${ad_type[$key]:-"N/A"}
-                    timestring=$(date +"%H:%M:%S.%3N")
-                    printf "%-25s %-15s %-20s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$type" "${req_count[$key]}" "${disp_count[$key]:-0}" "${timestring}" "${package_name[$pub]}"
+                    printf "%-25s %-15s %-20s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$type" "${req_count[$key]}" "${disp_count[$key]:-0}" "${timestamps[$key]}" "${package_name[$pub]}"
                 fi
             done
         fi
@@ -52,8 +52,7 @@ print_table() {
         if [[ "$key" == "$last_pub|"* ]]; then
             slot="${key#*|}"
             type=${ad_type[$key]:-"N/A"}
-            timestring=$(date +"%H:%M:%S.%3N")
-            printf "%-25s %-15s %-20s %-10s %-10s %-15s %-10s\n" "$last_pub" "$slot" "$type" "${req_count[$key]}" "${disp_count[$key]:-0}" "${timestring}" "${package_name[$last_pub]}"
+            printf "%-25s %-15s %-20s %-10s %-10s %-15s %-10s\n" "$last_pub" "$slot" "$type" "${req_count[$key]}" "${disp_count[$key]:-0}" "${timestamps[$key]}" "${package_name[$last_pub]}"
         fi
     done
 }
@@ -66,14 +65,15 @@ adb logcat -s Ads | while read -r line; do
     # 匹配 URL 形式，提取广告格式
     if [[ $line =~ .*format=([a-zA-Z0-9_]+).*msid=([^& ]+).*client=ca-app-pub-([0-9]+).*slotname=([0-9]+) ]]; then
         type="${BASH_REMATCH[1]}"
-		pkgname="${BASH_REMATCH[2]}"
+        pkgname="${BASH_REMATCH[2]}"
         publisher="ca-app-pub-${BASH_REMATCH[3]}"
         slot="${BASH_REMATCH[4]}"
         key="$publisher|$slot"
         ad_type[$key]=$type
-		package_name[$publisher]=$pkgname
+        package_name[$publisher]=$pkgname
+        timestamps[$key]=$(date +"%H:%M:%S.%3N")
         ((req_count[$key]++))
-		last_key="$key"
+        last_key="$key"
         print_table
     # 匹配文本行形式 Publisher / Slot / Type
     elif [[ $line =~ Publisher:\ ([a-zA-Z0-9-]+),\ Slot:\ ([a-zA-Z0-9-]+),\ Type:\ ([a-zA-Z0-9_]+) ]]; then
@@ -83,8 +83,9 @@ adb logcat -s Ads | while read -r line; do
         [[ -z "$slot" ]] && slot="N/A"
         key="$publisher|$slot"
         ad_type[$key]=$type
+        timestamps[$key]=$(date +"%H:%M:%S.%3N")
         ((disp_count[$key]++))
-		last_key="$key"
+        last_key="$key"
         print_table
     fi
 done
