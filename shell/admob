@@ -7,6 +7,7 @@
 declare -A req_count
 declare -A disp_count
 declare -A act_count
+declare -A iaoa_flags
 
 # 保存广告格式
 declare -A ad_type
@@ -18,8 +19,8 @@ declare -A timestamps
 print_header() {
     # 取 last_key 对应的 Publisher
     echo "AdMob Live Stats (Real-time):"
-    printf "%-30s %-15s %-15s %-10s %-10s %-15s %-10s\n" "Publisher" "Slot" "Type" "ReqCount" "DisplayCount" "Time" "PackageName"
-    echo -n "------------------------------------------------------------------------------------------------------------------"
+    printf "%-30s %-15s %-15s %-10s %-10s %-10s %-15s %-10s\n" "Publisher" "Slot" "Type" "Iaoa" "ReqCount" "ShowCount" "Time" "PackageName"
+    echo -n "----------------------------------------------------------------------------------------------------------------------"
 }
 
 # 打印表头函数
@@ -49,7 +50,7 @@ print_table() {
                     else
                         display_count=${disp_count[$key]:-0}
                     fi
-                    printf "%-25s %-15s %-20s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$type" "${req_count[$key]}" "$display_count" "${timestamps[$key]}" "$pkgname"
+                    printf "%-25s %-15s %-18s %-10s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$type" "${iaoa_flags[$key]}" "${req_count[$key]}" "$display_count" "${timestamps[$key]}" "$pkgname"
                 fi
             done
         fi
@@ -68,7 +69,7 @@ print_table() {
             else
                 display_count=${disp_count[$key]:-0}
             fi
-            printf "%-25s %-15s %-20s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$type" "${req_count[$key]}" "$display_count" "${timestamps[$key]}" "$pkgname"
+            printf "%-25s %-15s %-18s %-10s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$type" "${iaoa_flags[$key]}" "${req_count[$key]}" "$display_count" "${timestamps[$key]}" "$pkgname"
         fi
     done
 }
@@ -85,7 +86,9 @@ adb logcat -s ActivityTaskManager Ads | while read -r line; do
         publisher="ca-app-pub-${BASH_REMATCH[3]}"
         slot="${BASH_REMATCH[4]}"
         key="$publisher|$slot"
+        has_iaoa=$([[ $line == *"iaoa=true"* ]] && echo "true" || echo "false")
         ad_type[$key]=$type
+        iaoa_flags[$key]=$has_iaoa
         package_name[$publisher]=$pkgname
         timestamps[$key]=$(date +"%H:%M:%S.%3N")
         ((req_count[$key]++))
