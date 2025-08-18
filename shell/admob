@@ -19,7 +19,7 @@ declare -A timestamps
 print_header() {
     # 取 last_key 对应的 Publisher
     echo "AdMob Live Stats (Real-time):"
-    printf "%-27s %-15s %-18s %-15s %-10s %-10s %-15s %-10s\n" "Publisher" "Slot" "Format" "Type" "ReqCount" "ShowCount" "Time" "PackageName"
+    printf "%-27s %-15s %-18s %-15s %-10s %-15s %-10s\n" "Publisher" "Slot" "Format" "Type" "ReqCount" "Time" "PackageName"
     echo -n "--------------------------------------------------------------------------------------------------------------------------------"
 }
 
@@ -50,7 +50,7 @@ print_table() {
                     else
                         display_count=${disp_count[$key]:-0}
                     fi
-                    printf "%-25s %-15s %-18s %-15s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$format" "${type_flags[$key]}" "${req_count[$key]}" "$display_count" "${timestamps[$key]}" "$pkgname"
+                    printf "%-25s %-15s %-18s %-15s %-10s %-15s %-10s\n" "$pub" "$slot" "$format" "${type_flags[$key]}" "${req_count[$key]}" "${timestamps[$key]}" "$pkgname"
                 fi
             done
             echo "----------"
@@ -70,7 +70,7 @@ print_table() {
             else
                 display_count=${disp_count[$key]:-0}
             fi
-            printf "%-25s %-15s %-18s %-15s %-10s %-10s %-15s %-10s\n" "$pub" "$slot" "$format" "${type_flags[$key]}" "${req_count[$key]}" "$display_count" "${timestamps[$key]}" "$pkgname"
+            printf "%-25s %-15s %-18s %-15s %-10s %-15s %-10s\n" "$pub" "$slot" "$format" "${type_flags[$key]}" "${req_count[$key]}" "${timestamps[$key]}" "$pkgname"
         fi
     done
 }
