@@ -168,7 +168,19 @@ def JAVA():
     return JAVA_CMD
 
 #apk对齐工具
-ZIPALIGN = os.path.join(BIN_DIR, "zipalign%s" % BIN_SUFFIX)
+def find_zipalign_path():
+    if (platform.system().lower() == "windows"):
+        process = subprocess.Popen(["where", "zipalign"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    else:
+        process = subprocess.Popen(["which", "zipalign"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    alllines = process.stdout.readlines()
+    for item in alllines:
+        exec_path = parseString(item).strip()
+    return exec_path
+
+#ZIPALIGN = os.path.join(BIN_DIR, "zipalign%s" % BIN_SUFFIX)
+ZIPALIGN = find_zipalign_path()
+print(f"[Logging...] 对齐文件命令 : [zipalign][{ZIPALIGN}]\n")
 
 PYTHON = "python"
 

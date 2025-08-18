@@ -8,11 +8,13 @@ import shutil
 import platform
 import Log
 
-def pause():
+def pause(str="[Logging...] 按任意键退出"):
     if (platform.system().lower() == "windows"):
         import msvcrt
-        print("操作完成，按任意键退出")
+        print(str)
         msvcrt.getch()
+    else:
+        input(str)
 
 def copydir(fromdir, todir, override = True):
     mylist = os.walk(fromdir, True)

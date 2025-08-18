@@ -113,7 +113,7 @@ def select_main_apk(all_apk_files):
     return all_apk_files_sorted[0], all_apk_files_sorted[1:]
 
 def decompile_all_apk(all_apk_files):
-    Log.out("[Logging...] 反编资源文件")
+    Log.out(f"[Logging...] 反编资源文件 : [{len(all_apk_files)}]\n")
     for item in all_apk_files:
         decompiled_dir = apk2dir(item)
         #Log.out("[Logging...] decompiled_dir : {}".format(decompiled_dir))
@@ -135,17 +135,57 @@ def merge_apk_resources(main_apk_dir, other_apks_dir):
                     if not os.path.exists(dstdir):
                         os.makedirs(dstdir)
                     shutil.copy2(srcfile, dstfile)
+    Log.out("[Logging...] 合并文件完成\n")
 
 def modify_axml_file(main_apk_dir):
     axml_file = os.path.join(main_apk_dir, "AndroidManifest.xml")
     ET.register_namespace('android', Common.XML_NAMESPACE)
     axml_tree = ET.parse(axml_file)
     axml_root = axml_tree.getroot()
-    application = axml_root.find('application')
-    extractNativeLibs = application.attrib.get("{%s}extractNativeLibs" % Common.XML_NAMESPACE)
-    if extractNativeLibs == "false":
-        application.attrib["{%s}extractNativeLibs" % Common.XML_NAMESPACE] = "true"
-        axml_tree.write(axml_file, encoding='utf-8', xml_declaration=True)
+
+    # ---------- 删除 manifest 上的 split 属性 ----------
+    for attr in ["isSplitRequired", "requiredSplitTypes", "splitTypes", "split"]:
+        full_key = "{%s}%s" % (Common.XML_NAMESPACE, attr)
+        if full_key in axml_root.attrib:
+            value = axml_root.attrib.get("{%s}%s" % (Common.XML_NAMESPACE, attr), "")
+            print(f"[Logging...] 删除资源属性 : [manifest]{attr} : {value}")
+            del axml_root.attrib[full_key]
+
+    # ---------- 删除 <uses-split> ----------
+    for uses_split in axml_root.findall("uses-split"):
+        axml_root.remove(uses_split)
+        print(f"[Logging...] 删除资源属性 : {uses_split}")
+
+    # ---------- 删除 <application> 下的 split 相关 meta-data ----------
+    application = axml_root.find("application")
+    if application is not None:
+        # 修改 extractNativeLibs
+        extractNativeLibs = application.attrib.get("{%s}extractNativeLibs" % Common.XML_NAMESPACE)
+        if extractNativeLibs == "false":
+            application.attrib["{%s}extractNativeLibs" % Common.XML_NAMESPACE] = "true"
+            print(f"[Logging...] 修改资源属性 : [application]extractNativeLibs=[false -> true]")
+
+        for provider in application.findall("provider"):
+            name = provider.attrib.get("{%s}name" % Common.XML_NAMESPACE, "")
+            if name == "com.pairip.licensecheck.LicenseContentProvider":
+                provider.attrib["{%s}enabled" % Common.XML_NAMESPACE]="false"
+                print(f"[Logging...] 删除资源属性 : [provider]name : {name}, enabled[true -> false]")
+
+        # 删除 meta-data 里和 split 相关的
+        for meta in application.findall("meta-data"):
+            name = meta.attrib.get("{%s}name" % Common.XML_NAMESPACE, "")
+            value = meta.attrib.get("{%s}value" % Common.XML_NAMESPACE, "")
+            resource = meta.attrib.get("{%s}resource" % Common.XML_NAMESPACE, "")
+            if name in ["com.android.vending.splits.required", "com.android.vending.splits", "com.android.vending.derived.apk.id", "com.android.stamp.source", "com.android.stamp.type"]:
+                application.remove(meta)
+                print(f"[Logging...] 删除资源属性 : [meta-data]name : {name}, value : {value}, resource : [{resource}]")
+            elif value == "@null" or resource == "@null":
+                application.remove(meta)
+                print(f"[Logging...] 删除资源属性 : [meta-data]name : {name}, value : {value}, resource : [{resource}]")
+
+    # ---------- 保存 ----------
+    axml_tree.write(axml_file, encoding="utf-8", xml_declaration=True)
+    Log.out("")
 
 
 def recompile_main_apk(main_apk_dir, final_main_apk):
@@ -165,8 +205,18 @@ if __name__ == "__main__":
     if len(sys.argv) <= 1:
         Log.out("[Logging...] 缺少参数: {} <apk>".format(os.path.basename(sys.argv[0])))
         sys.exit(0)
+    paused_before_compile = False
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "p")
+        for op, value in opts:
+            if (op == "-p"):
+                paused_before_compile = True
+    except getopt.GetoptError as err:
+        Log.out(err)
+        sys.exit()
 
-    apks_file = sys.argv[1]
+    apks_file = args[0]
+
     if apks_file == None or (not apks_file.endswith(".xapk") and not apks_file.endswith(".apks")):
         Log.out("[Logging...] {} 不是.apks或者.xpak文件")
         sys.exit(0)
@@ -190,6 +240,9 @@ if __name__ == "__main__":
     modify_axml_file(main_apk_dir)
     if os.path.exists(final_apk_file):
         Utils.deleteFile(final_apk_file)
+
+    if paused_before_compile:
+        Utils.pause("\n[Logging...] 临时暂停编译 : 手工修改资源文件\n")
 
     recompile_main_apk(main_apk_dir, recompile_apk_file)
 
