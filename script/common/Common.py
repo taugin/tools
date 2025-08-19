@@ -116,26 +116,38 @@ def find_keytool_version_180():
         exec_path_180 = all_exec_path[0]
     return exec_path_180
 
-def find_jarsigner_version_180():
+#keytool可执行文件
+def find_keytool_path():
     if (platform.system().lower() == "windows"):
-        process = subprocess.Popen(["where", "jarsigner"], stdout=subprocess.PIPE)
+        process = subprocess.Popen(["where", "keytool"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     else:
-        process = subprocess.Popen(["which", "jarsigner"], stdout=subprocess.PIPE)
-    all_exec_path = []
-    exec_path_180 = None
+        process = subprocess.Popen(["which", "keytool"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     alllines = process.stdout.readlines()
     for item in alllines:
         exec_path = parseString(item).strip()
-        all_exec_path.append(exec_path)
-        if '1.8.0' in exec_path:
-            exec_path_180 = exec_path
-            break;
-    if (exec_path_180 == None or len(exec_path_180) <= 0) and (all_exec_path != None and len(all_exec_path)) > 0:
-        exec_path_180 = all_exec_path[0]
-    return exec_path_180
+        break
+    return exec_path
+KEYTOOL = find_keytool_path()
+print(f"[Logging...] 签名文件命令 : [keytool][{KEYTOOL}]")
+#jarsigner可执行文件
+def find_jarsigner_path():
+    if (platform.system().lower() == "windows"):
+        process = subprocess.Popen(["where", "jarsigner"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    else:
+        process = subprocess.Popen(["which", "jarsigner"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    alllines = process.stdout.readlines()
+    for item in alllines:
+        exec_path = parseString(item).strip()
+        break
+    return exec_path
+JARSIGNER = find_jarsigner_path()
+print(f"[Logging...] 签名文件命令 : [jarsigner][{JARSIGNER}]")
 
-def find_java():
-    java_path = []
+#adb
+ADB = os.path.join(BIN_DIR, "adb%s" % BIN_SUFFIX);
+
+#java
+def find_java_path():
     if (platform.system().lower() == "windows"):
         process = subprocess.Popen(["where", "java"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     else:
@@ -143,23 +155,11 @@ def find_java():
     alllines = process.stdout.readlines()
     for item in alllines:
         exec_path = parseString(item).strip()
-        java_path.append(exec_path)
-    if java_path != None and len(java_path) > 0:
-        return True
-    return False
-#keytool可执行文件
-KEYTOOL = "keytool"
-#jarsigner可执行文件
-JARSIGNER = "jarsigner"
+        break
+    return exec_path
+JAVA_CMD = find_java_path()
+print(f"[Logging...] 编译文件命令 : [java][{JAVA_CMD}]")
 
-#adb
-ADB = os.path.join(BIN_DIR, "adb%s" % BIN_SUFFIX);
-
-#java
-if (find_java()):
-    JAVA_CMD = "java"
-else:
-    JAVA_CMD = None
 def JAVA():
     if JAVA_CMD == None:
         print(f"[Logging...] 无法找到命令 : [java]")
@@ -176,6 +176,7 @@ def find_zipalign_path():
     alllines = process.stdout.readlines()
     for item in alllines:
         exec_path = parseString(item).strip()
+        break
     return exec_path
 
 #ZIPALIGN = os.path.join(BIN_DIR, "zipalign%s" % BIN_SUFFIX)
