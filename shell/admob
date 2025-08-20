@@ -75,9 +75,10 @@ print_table() {
     done
 }
 
-clear
 print_header
 adb logcat -c
+adb shell setprop log.tag.Ads V
+adb shell setprop log.tag.ActivityTaskManager V
 # 监听 logcat
 adb logcat -s ActivityTaskManager Ads | while read -r line; do
     # 匹配 URL 形式，提取广告格式
