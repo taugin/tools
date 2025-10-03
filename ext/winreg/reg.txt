@@ -32,7 +32,7 @@ Windows Registry Editor Version 5.00
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\jadx.ico,0"
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\JADX-GUI\command]
-@="$TOOLS_ROOT\\bin\\jadx\\bin\\jadx-gui.bat \"%1\""
+@="$TOOLS_ROOT\\bin\\jadx-gui.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\查看应用进程]
 "Icon"="$CMD_PATH"
@@ -144,7 +144,7 @@ Windows Registry Editor Version 5.00
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\jadx.ico,0"
 
 [HKEY_CLASSES_ROOT\myjarfile\shell\JADX-GUI\command]
-@="$TOOLS_ROOT\\bin\\jadx\\bin\\jadx-gui.bat \"%1\""
+@="$TOOLS_ROOT\\bin\\jadx-gui.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\myjarfile\shell\JD-GUI]
 "Icon"="$TOOLS_ROOT\\bin\\jd-gui.exe"
@@ -247,13 +247,13 @@ Windows Registry Editor Version 5.00
 #"Icon"="$TOOLS_ROOT\\ext\\winreg\\jadx.ico,0"
 
 #[HKEY_CLASSES_ROOT\mydexfile\shell\open\command]
-#@="$TOOLS_ROOT\\bin\\jadx\\bin\\jadx-gui.bat \"%1\""
+#@="$TOOLS_ROOT\\bin\\jadx-gui.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\mydexfile\shell\JADX-GUI]
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\jadx.ico,0"
 
 [HKEY_CLASSES_ROOT\mydexfile\shell\JADX-GUI\command]
-@="$TOOLS_ROOT\\bin\\jadx\\bin\\jadx-gui.bat \"%1\""
+@="$TOOLS_ROOT\\bin\\jadx-gui.bat \"%1\""
 
 [HKEY_CLASSES_ROOT\mydexfile\shell\DEX2JAR]
 "Icon"="$CMD_PATH"
