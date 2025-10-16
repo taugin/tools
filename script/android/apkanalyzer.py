@@ -140,6 +140,71 @@ def analyze_account_sync(manifest_root):
     output = "[{}|{}]".format(sync_adapter_meta, account_authenticator_meta) if has_account_sync else "无"
     Log.out("[Logging...] 有无账户同步 : {}".format(output))
 
+SERVICE_TYPE_MAP = {
+    0x00000001: "dataSync",
+    0x00000002: "mediaPlayback",
+    0x00000004: "phoneCall",
+    0x00000008: "location",
+    0x00000010: "connectedDevice",
+    0x00000020: "mediaProjection",
+    0x00000040: "camera",
+    0x00000080: "microphone",
+    0x00000100: "health",
+    0x00000200: "remoteMessaging",
+}
+
+def decode_foreground_type(value):
+    """将0x00000009形式的前台服务类型转成可读字符串"""
+    if (value == '0x00000000'):
+        return ""
+    value = int(value, 16) if isinstance(value, str) and value.startswith("0x") else int(value)
+    result = [name for bit, name in SERVICE_TYPE_MAP.items() if value & bit]
+    return "|".join(result) if result else hex(value)
+
+def analyze_foreground_service(manifest_root):
+    foreground_service_type = {}
+    for service in manifest_root.findall(".//service"):
+        if f"{{{Common.XML_NAMESPACE}}}foregroundServiceType" in service.attrib:
+            className = service.get(f"{{{Common.XML_NAMESPACE}}}name")
+            serviceType = decode_foreground_type(service.attrib.get(f"{{{Common.XML_NAMESPACE}}}foregroundServiceType"))
+            foreground_service_type[className] = serviceType
+    if len(foreground_service_type) > 0:
+        Log.out("[Logging...] 前台服务信息 : >>>>")
+        for item in foreground_service_type:
+            Log.out(f"[Logging...] 前台服务信息 : [{item}][{foreground_service_type.get(item)}]")
+
+def calc_maxlen(all_permissions):
+    """计算每一行文字长度"""
+    max_len = 0
+    for key in all_permissions:
+        ilen = len(key)
+        if ilen > max_len:
+            max_len = ilen
+    return max_len
+
+def analyze_all_permission(manifest_root):
+    all_permissions = []
+    sys_permission_pattern = "android.permission."
+    for elem in manifest_root.iter():
+        if elem.tag == 'uses-permission':
+            permission = elem.attrib.get("{%s}name" % Common.XML_NAMESPACE)
+            if permission.startswith(sys_permission_pattern):
+                permission_core_string = permission.replace(sys_permission_pattern, "")
+                all_permissions.append(permission_core_string)
+    if all_permissions != None and len(all_permissions) > 0:
+        max_len = calc_maxlen(all_permissions) + 2
+        print("[Logging...] 系统应用权限 : >>>>")
+        print("[Logging...] 系统应用权限 : ", end="")
+        for i, s in enumerate(all_permissions, start=1):
+            print(f"{s:<{max_len}}", end="")  # 左对齐，占宽29
+            if i % 3 == 0:  # 每3个换行
+                print("\n[Logging...] 系统应用权限 : ", end="")
+        # 如果最后一行不足3个，可以手动换行：
+        if len(all_permissions) % 3 != 0:
+            print("\n[Logging...] 系统应用权限 : <<<<")
+        else:
+            print("<<<<")
+
 
 def analize_keywords(decompiled_apk_dir):
     keywords = ["makePathElements", "makeDexElements", "pathList", "dexElements", "createVirtualDisplay"]
@@ -363,6 +428,8 @@ def analyze_apk_manifest(apk_xapk_apks_file):
     analyze_instrumentation(manifest_root)
     analyze_fullscreen_intent(manifest_root)
     analyze_account_sync(manifest_root)
+    analyze_foreground_service(manifest_root)
+    analyze_all_permission(manifest_root)
 
 def decode_manifest_from_apk(apk_file):
     manifest_content = None
