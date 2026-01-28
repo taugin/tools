@@ -15,4 +15,9 @@ echo.
 @rem echo pythoncode=%pythoncode%
 @rem echo pythonpath=%pythonpath%
 @rem echo fullpypath=%fullpypath%
-%pythonpath% -m http.server -b 0.0.0.0
+for /f "tokens=2 delims=:" %%i in ('ipconfig ^| findstr "IPv4"') do (
+    for /f "tokens=* delims= " %%j in ("%%i") do (
+        echo [Logging...] 云字利大仇峽 : http://%%j:8000
+    )
+)
+%pythonpath% -m http.server -b 0.0.0.0 8000
