@@ -8,98 +8,85 @@
   {
     "ad_platform": "Applovin",
     "ad_prefix": [
-      "com.applovin.adview.AppLovinFullscreenActivity",
-      "com.applovin.adview.AppLovinFullscreenThemedActivity"
+      "com.applovin"
     ]
   },
   {
-    "ad_platform": "Vungle",
+    "ad_platform": "Vungle/Liftoff",
     "ad_prefix": [
-      "com.vungle.warren.ui.VungleActivity"
+      "com.vungle.ads"
     ]
   },
   {
     "ad_platform": "Facebook",
     "ad_prefix": [
-      "com.facebook.ads.AudienceNetworkActivity"
+      "com.facebook.ads"
     ]
   },
   {
     "ad_platform": "Bigo",
     "ad_prefix": [
-      "sg.bigo.ads.ad.splash.AdSplashActivity",
-      "sg.bigo.ads.ad.splash.LandscapeAdSplashActivity",
-      "sg.bigo.ads.api.AdActivity",
-      "sg.bigo.ads.core.mraid.MraidVideoActivity"
+      "sg.bigo.ads"
     ]
   },
   {
-    "ad_platform": "Chartboost",
+    "ad_platform": "Chartboost/Helium",
     "ad_prefix": [
-      "com.chartboost.sdk.view.CBImpressionActivity"
-    ]
-  },
-  {
-    "ad_platform": "Fyber",
-    "ad_prefix": [
-      "com.fyber.inneractive.sdk.activities"
+      "com.chartboost.sdk"
     ]
   },
   {
     "ad_platform": "Fyber",
     "ad_prefix": [
-      "com.fyber.inneractive.sdk.activities"
+      "com.fyber.inneractive"
     ]
   },
   {
     "ad_platform": "Inmobi",
     "ad_prefix": [
-      "com.inmobi.ads.rendering.InMobiAdActivity"
+      "com.inmobi.ads"
     ]
   },
   {
     "ad_platform": "Ironsource",
     "ad_prefix": [
-      "com.ironsource.sdk.controller.ControllerActivity",
-      "com.ironsource.sdk.controller.InterstitialActivity"
+      "com.ironsource.sdk"
     ]
   },
   {
     "ad_platform": "Mintegral",
     "ad_prefix": [
-      "com.mbridge.msdk.interstitial.view.MBInterstitialActivity",
-      "com.mbridge.msdk.reward.player.MBRewardVideoActivity"
+      "com.mbridge.msdk"
     ]
   },
   {
-    "ad_platform": "MyTarget",
+    "ad_platform": "MyTarget/VKAds",
     "ad_prefix": [
-      "com.my.target.common.MyTargetActivity"
+      "com.my.target"
     ]
   },
   {
     "ad_platform": "Pangle",
     "ad_prefix": [
-      "com.bytedance.sdk.openadsdk.activity"
+      "com.bytedance.sdk"
     ]
   },
   {
     "ad_platform": "Tapjoy",
     "ad_prefix": [
-      "com.tapjoy.TJAdUnitActivity"
+      "com.tapjoy"
     ]
   },
   {
     "ad_platform": "TradPlusAdx",
     "ad_prefix": [
-      "com.tp.adx.sdk.ui.InnerWebViewActivity",
-      "com.tp.adx.sdk.ui.InnerActivity"
+      "com.tp.adx.sdk"
     ]
   },
   {
     "ad_platform": "Unity3D",
     "ad_prefix": [
-      "com.unity3d.services.ads.adunit"
+      "com.unity3d.services.ads"
     ]
   },
   {
@@ -111,42 +98,139 @@
   {
     "ad_platform": "Yandex",
     "ad_prefix": [
-      "com.yandex.mobile.ads.common.AdActivity"
+      "com.yandex"
     ]
   },
   {
     "ad_platform": "AdColony",
     "ad_prefix": [
-      "com.adcolony.sdk.AdColonyInterstitialActivity",
-      "com.adcolony.sdk.AdColonyAdViewActivity"
-    ]
-  },
-  {
-    "ad_platform": "AdColony",
-    "ad_prefix": [
-      "com.adcolony.sdk.AdColonyInterstitialActivity",
-      "com.adcolony.sdk.AdColonyAdViewActivity"
+      "com.adcolony.sdk"
     ]
   },
   {
     "ad_platform": "ToponAdx",
     "ad_prefix": [
-      "com.anythink.basead",
-      "com.anythink.expressad",
-      "com.anythink.core"
+      "com.anythink"
+    ]
+  },
+  {
+    "ad_platform": "BidMachine",
+    "ad_prefix": [
+      "io.bidmachine"
+    ]
+  },
+  {
+    "ad_platform": "Smaato",
+    "ad_prefix": [
+      "com.smaato.sdk"
+    ]
+  },
+  {
+    "ad_platform": "PubNative/Verve",
+    "ad_prefix": [
+      "net.pubnative.lite"
+    ]
+  },
+  {
+    "ad_platform": "Yeahmobi",
+    "ad_prefix": [
+      "com.maticoo.sdk"
+    ]
+  },
+  {
+    "ad_platform": "Maio",
+    "ad_prefix": [
+      "jp.maio.sdk.android"
+    ]
+  },
+  {
+    "ad_platform": "Criteo",
+    "ad_prefix": [
+      "com.criteo.publisher"
+    ]
+  },
+  {
+    "ad_platform": "Ogury",
+    "ad_prefix": [
+      "com.ogury.ad"
+    ]
+  },
+  {
+    "ad_platform": "Appnext",
+    "ad_prefix": [
+      "com.appnext.ads"
+    ]
+  },
+  {
+    "ad_platform": "Huawei",
+    "ad_prefix": [
+      "com.huawei"
+    ]
+  },
+  {
+    "ad_platform": "Start.io",
+    "ad_prefix": [
+      "com.startapp"
+    ]
+  },
+  {
+    "ad_platform": "Superawesome",
+    "ad_prefix": [
+      "tv.superawesome.sdk"
+    ]
+  },
+  {
+    "ad_platform": "Kidoz",
+    "ad_prefix": [
+      "com.kidoz.sdk"
+    ]
+  },
+  {
+    "ad_platform": "zMaticoo",
+    "ad_prefix": [
+      "com.zmaticoo.sdk"
+    ]
+  },
+  {
+    "ad_platform": "AlgoriX",
+    "ad_prefix": [
+      "com.alxad"
     ]
   },
   {
     "ad_platform": "Amazon",
     "ad_prefix": [
-      "com.amazon.aps.ads.activity.ApsInterstitialActivity",
-      "com.amazon.device.ads.DTBInterstitialActivity"
+      "com.amazon"
     ]
   },
   {
     "ad_platform": "TaurusX",
     "ad_prefix": [
       "com.taurusx.tax"
+    ]
+  },
+  {
+    "ad_platform": "KwaiAds",
+    "ad_prefix": [
+      "com.kwai.network"
+    ]
+  },
+  {
+    "ad_platform": "BeesAds",
+    "ad_prefix": [
+      "org.wgt.ads"
+    ]
+  },
+  {
+    "ad_platform": "YSONetwork",
+    "ad_prefix": [
+      "com.ysocorp"
+    ]
+  },
+  {
+    "ad_platform": "Moloco",
+    "ad_prefix": [
+      "com.moloco.sdk"
     ]
   }
 ]
