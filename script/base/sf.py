@@ -34,6 +34,7 @@ CHECK_PROCESS = False
 apk_info = {}
 apk_info["apkfile"] = None
 apk_info["apklabel"] = None
+apk_info["apkentry"] = None
 apk_info["pkgname"] = None
 apk_info["vercode"] = None
 apk_info["vername"] = None
@@ -262,6 +263,10 @@ def get_app_info(apkFile):
                     apk_info["apklabel"] = label
                 except:
                     pass
+            elif tmp.startswith("launchable-activity"):
+                m = re.search(r"name='([^']+)'", tmp)
+                if m:
+                    apk_info["apkentry"] = m.group(1)
             elif (tmp.startswith("targetSdkVersion")):
                 try:
                     tmppkg = tmp
@@ -736,6 +741,10 @@ def print_apkinfo():
 
     Log.out("-" * dash_len)
     output = " 应用名称 | %s" % apk_info["apklabel"]
+    Log.out(output)
+
+    Log.out("-" * dash_len)
+    output = " 应用入口 | %s" % apk_info["apkentry"]
     Log.out(output)
 
     Log.out("-" * dash_len)
