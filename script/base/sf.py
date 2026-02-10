@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # coding: UTF-8
 import base64
+import json
 import platform
 from threading import Thread
 import time
@@ -289,7 +290,10 @@ def get_app_info(apkFile):
                     pass
         cmdlist = [Common.AAPT_BIN, "d", "xmltree", apkFile, "AndroidManifest.xml"]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
-        apk_info["apk_network"] = check_ad_network(Utils.parseString(process.stdout.read()).strip())
+        xmltree_lines = Utils.parseString(process.stdout.read()).strip()
+        # 先提取 Activity 名称
+        activities = parse_activities_from_xmltree(xmltree_lines)
+        apk_info["apk_network"] = check_ad_network(activities)
     elif ext == ".xapk":
         jobj = readpkgnamefromxapk(apkFile)
         apk_info["apklabel"] = jobj["name"] if "name" in jobj else None
@@ -316,33 +320,66 @@ def get_app_info(apkFile):
         apk_info["target_version"] = Utils.parseString(process.stdout.readline()).strip()
         cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/application/activity/@android:name"]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
-        apk_info["apk_network"] = check_ad_network(Utils.parseString(process.stdout.read()).strip())
+        content = Utils.parseString(process.stdout.read()).strip()
+        activities = content.split("\r\n") or []
+        apk_info["apk_network"] = check_ad_network(activities)
 
+def parse_activities_from_xmltree(xmltree_lines):
+    """
+    从 aapt dump xmltree 输出中提取所有 Activity 类名
+    xmltree_lines: List[str] 或 多行文本
+    返回 List[str]
+    """
+    activities = []
+    current_is_activity = False
 
-def check_ad_network(content):
+    if isinstance(xmltree_lines, str):
+        xmltree_lines = xmltree_lines.splitlines()
+
+    for line in xmltree_lines:
+        line = line.strip()
+        if line.startswith("E: activity") or line.startswith("E: activity-alias"):
+            current_is_activity = True
+        elif current_is_activity and line.startswith("A: android:name"):
+            match = re.search(r'"(.*?)"', line)
+            if match:
+                activities.append(match.group(1))
+            current_is_activity = False
+
+    return activities
+
+def check_ad_network(activities):
+    """
+    返回命中的广告平台列表
+    """
     try:
-        curdir = os.path.normpath(os.path.dirname(sys.argv[0]))
-        android_dir = os.path.join(curdir, "..", 'android')
-        ad_info_file = os.path.normpath(os.path.join(android_dir, "ad_info.json"))
-        ad_info_content = None
-        with open(ad_info_file, "r") as f:
-            ad_info_content = f.read()
-        if ad_info_content == None or len(ad_info_content) <= 0:
-            return None
-        ad_info_json = eval(ad_info_content)
-        all_network = []
-        for item in ad_info_json:
-            platform = item.get('ad_platform')
-            ad_prefix = item.get('ad_prefix')
-            if ad_prefix != None and len(ad_prefix) > 0:
-                for prefix in ad_prefix:
-                    if prefix in content and not platform in all_network:
-                        all_network.append(platform)
+        curdir = os.path.dirname(os.path.abspath(sys.argv[0]))
+        android_dir = os.path.normpath(os.path.join(curdir, "..", "android"))
+        ad_info_file = os.path.join(android_dir, "ad_info.json")
+
+        if not os.path.exists(ad_info_file):
+            return []
+
+        with open(ad_info_file, "r", encoding="utf-8") as f:
+            ad_info_json = json.load(f)
+
+        hit_platforms = set()
+        for activity in activities:
+            if not activity:
+                continue
+            for item in ad_info_json:
+                platform = item.get("ad_platform")
+                prefixes = item.get("ad_prefix", [])
+                for prefix in prefixes:
+                    if prefix in activity:  # 你要求的“前缀包含”规则
+                        hit_platforms.add(platform)
                         break
-        return all_network
+
+        return sorted(hit_platforms)
+
     except Exception as e:
-        Log.out("[Logging...] 获取广告平台失败")
-    return None
+        Log.out(f"[Logging...] 获取广告平台失败: {e}")
+        return []
 
 def readapkinfo(apkFile, function):
     function(apkFile)
