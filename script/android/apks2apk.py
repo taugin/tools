@@ -42,9 +42,6 @@ def recompiled_apk(apk_dir, apk_file):
     Log.out("[Logging...] {}".format("回编译文件中"))
     cmdlist = [Common.JAVA(), "-jar", Common.APKTOOL_JAR, 'b', apk_dir, '-o', apk_file]
     cmdlist += ["-s"]
-    if not '-s' in cmdlist and not '--no-src' in cmdlist:
-        cmdlist += ["--only-main-classes"]
-    cmdlist += ["--use-aapt2"]
     cmdlist += ["--no-crunch"]
     showlist = []
     for cmd in cmdlist:
@@ -62,9 +59,6 @@ def decompiled_apk(apk_file, out_dir):
     Log.out("[Logging...] {}".format("反编译文件中"))
     cmdlist = [Common.JAVA(), "-jar", Common.APKTOOL_JAR, 'd', apk_file, '-o', out_dir]
     cmdlist += ["-s"]
-    if not '-s' in cmdlist and not '--no-src' in cmdlist:
-        cmdlist += ["--only-main-classes"]
-    cmdlist += ["--use-aapt2"]
     showlist = []
     for cmd in cmdlist:
         showlist += [os.path.basename(cmd)]

@@ -80,9 +80,6 @@ def getApkInfo(apkFile):
 def apktool_cmd():
     cmdlist = [Common.JAVA(), "-jar", Common.APKTOOL_JAR]
     cmdlist += sys.argv[1:]
-    if not '-s' in cmdlist and not '--no-src' in cmdlist:
-        cmdlist += ["--only-main-classes"]
-    cmdlist += ["--use-aapt2"]
     showlist = []
     for cmd in cmdlist:
         showlist += [os.path.basename(cmd)]

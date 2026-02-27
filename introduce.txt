@@ -21,7 +21,7 @@ Dex合并 ：java -cp dx.jar com.android.dx.merge.DexMerger  outDex.dex  mergeDe
 
 apktool下载地址(旧) ：https://bitbucket.org/iBotPeaches/apktool/downloads/
 
-apktool下载地址(新) ：https://ibotpeaches.github.io/Apktool/build/
+apktool下载地址(新) ：https://github.com/iBotPeaches/Apktool
 
 Jd-Gui下载地址 ：http://java-decompiler.github.io/
 

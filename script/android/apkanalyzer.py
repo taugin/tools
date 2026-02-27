@@ -23,9 +23,6 @@ def decompiled_apk(apk_file, out_dir):
     cmdlist = [Common.JAVA(), "-jar", Common.APKTOOL_JAR, 'd', apk_file, '-o', out_dir]
     if not SEARCH_KEYWORDS_IN_CODE:
         cmdlist += ["-s"]
-    if not '-s' in cmdlist and not '--no-src' in cmdlist:
-        cmdlist += ["--only-main-classes"]
-    cmdlist += ["--use-aapt2"]
     showlist = []
     for cmd in cmdlist:
         showlist += [os.path.basename(cmd)]
