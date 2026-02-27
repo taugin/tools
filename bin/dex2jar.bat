@@ -1,7 +1,7 @@
 @echo off
 set  curdir=%~dp0
 set  filename=%~nx1
-set  dex2jar=%curdir%\dex-tools-2.1\d2j-dex2jar.bat
+set  dex2jar=%curdir%\dex-tools-v2.4\d2j-dex2jar.bat
 set  filedir=%filename:~0,-4%
 @rem echo curdir : %curdir%, filename : %filename% , dex2jar : %dex2jar%, cwd : %cd% , filedir : %filedir%
 echo [Logging...] 脚本文件路径 : [%dex2jar%]
