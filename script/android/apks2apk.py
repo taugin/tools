@@ -41,7 +41,7 @@ def calc_file_size(file_path):
 def recompiled_apk(apk_dir, apk_file):
     Log.out("[Logging...] {}".format("回编译文件中"))
     cmdlist = [Common.JAVA(), "-jar", Common.APKTOOL_JAR, 'b', apk_dir, '-o', apk_file]
-    cmdlist += ["-s"]
+    #cmdlist += ["-s"]
     cmdlist += ["--no-crunch"]
     showlist = []
     for cmd in cmdlist:
