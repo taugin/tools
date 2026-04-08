@@ -164,7 +164,7 @@
   {
     "ad_platform": "Huawei",
     "ad_prefix": [
-      "com.huawei"
+      "com.huawei.openalliance.ad"
     ]
   },
   {
