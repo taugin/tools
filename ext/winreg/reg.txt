@@ -42,7 +42,7 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\myapkfile\shell\APK处理]
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\android.ico,0"
-"SubCommands"="查看APK信息;打开GP详情;APK签名(ApkSigner);APK签名(JarSigner);反编译;反编译(仅源码);反编译(仅资源);APK转AAB;APK对齐"
+"SubCommands"="查看APK信息;模拟GP归因;打开GP详情;APK签名(ApkSigner);APK签名(JarSigner);反编译;反编译(仅源码);反编译(仅资源);APK转AAB;APK对齐"
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\APK签名(ApkSigner)]
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\qian.ico,0"
@@ -98,6 +98,11 @@ Windows Registry Editor Version 5.00
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\打开GP详情\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -g \"%1\""
 
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\模拟GP归因]
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\gp.ico,0"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\模拟GP归因\command]
+@="$TOOLS_ROOT\\bin\\sf.bat -n \"%1\""
 
 [HKEY_CLASSES_ROOT\.apk]
 @="myapkfile"
@@ -313,6 +318,11 @@ Windows Registry Editor Version 5.00
 [HKEY_CLASSES_ROOT\myxapkfile\shell\查看应用进程\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -u \"%1\""
 
+[HKEY_CLASSES_ROOT\myxapkfile\shell\模拟GP归因]
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\gp.ico,0"
+
+[HKEY_CLASSES_ROOT\myxapkfile\shell\模拟GP归因\command]
+@="$TOOLS_ROOT\\bin\\sf.bat -n \"%1\""
 #==========================================================
 #解析.aab文件
 [HKEY_CLASSES_ROOT\.aab]
@@ -347,7 +357,7 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\myaabfile\shell\AAB处理]
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\aab.ico,0"
-"SubCommands"="查看AAB信息;AAB转APKS;AAB转APKS(universal);AAB转APKS(local_testing);AAB签名(JarSigner)"
+"SubCommands"="查看AAB信息;模拟GP归因;AAB转APKS;AAB转APKS(universal);AAB转APKS(local_testing);AAB签名(JarSigner)"
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\AAB转APKS]
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\zhuan.ico,0"
@@ -378,6 +388,12 @@ Windows Registry Editor Version 5.00
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\查看AAB信息\command]
 @="$TOOLS_ROOT\\bin\\sf.bat -p \"%1\""
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\模拟GP归因]
+"Icon"="$TOOLS_ROOT\\ext\\winreg\\gp.ico,0"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\模拟GP归因\command]
+@="$TOOLS_ROOT\\bin\\sf.bat -n \"%1\""
 #==========================================================
 #解析.apks文件
 [HKEY_CLASSES_ROOT\.apks]

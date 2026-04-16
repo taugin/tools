@@ -32,6 +32,7 @@ INSTALL_XAPK = False
 AXMLPRINTER = False
 OPEN_IN_GP = False
 CHECK_PROCESS = False
+OPEN_NONORGANIC = False
 apk_info = {}
 apk_info["apkfile"] = None
 apk_info["apklabel"] = None
@@ -715,6 +716,21 @@ def openApkGPInBrowser(args):
     webbrowser.open(
         "https://play.google.com/store/apps/details?id=%s" % pkgname)
 
+def open_non_organic(args):
+    if (len(args) > 0):
+        global apk_info
+        get_app_info(args[0])
+        if "pkgname" in apk_info:
+            pkgname = apk_info.get("pkgname")
+            import open
+            Log.out(f"[Logging...] 安卓应用名称 : {apk_info.get('apklabel')}")
+            Log.out(f"[Logging...] 安卓应用包名 : {pkgname}")
+            Log.out(f"[Logging...] 安卓应用版本 : {apk_info.get('vername')}({apk_info.get('vercode')})")
+            open.open_google_play_adb(pkgname, True)
+        else:
+            Log.out("[Logging...] 不是APK/AAB/XAPK文件")
+    else:
+        Log.out("[Logging...] 缺少参数")
 
 def check_apk_process(args):
     device = get_select_devices()
@@ -873,7 +889,7 @@ if (len(sys.argv) < 2):
     sys.exit()
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "pmsiaxgu")
+    opts, args = getopt.getopt(sys.argv[1:], "pmsiaxgun")
     for op, value in opts:
         if (op == "-m"):
             FILE_MD5 = True
@@ -891,6 +907,8 @@ try:
             OPEN_IN_GP = True
         elif op == '-u':
             CHECK_PROCESS = True
+        elif op == '-n':
+            OPEN_NON_ORGANIC = True
 except getopt.GetoptError as err:
     Log.out(err)
     sys.exit()
@@ -955,4 +973,6 @@ elif OPEN_IN_GP == True:
     sys.exit(0)
 elif CHECK_PROCESS:
     check_apk_process(args)
+elif OPEN_NON_ORGANIC == True:
+    open_non_organic(args)
 Common.pause()

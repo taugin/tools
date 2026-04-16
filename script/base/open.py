@@ -18,25 +18,32 @@ def open_folder(args):
         path = os.path.abspath(args[0])
     else:
         path = os.getcwd()
-    print("[Logging...] 打开文件路径 : [{}]".format(path))
+    print(f"[Logging...] 打开文件路径 : [{path}]")
     os.startfile(path)
 
 def open_google_play(args):
     if len(args) > 0:
         package_name = args[0]
-        if OPEN_NON_ORGANIC:
+        open_google_play_adb(package_name, OPEN_NON_ORGANIC)
+    else:
+        print("[Logging...] 缺少包名信息")
+def open_google_play_adb(pkgname, nonOrganic):
+    if pkgname != None and len(pkgname) > 0:
+        if nonOrganic:
             utm_source = "google"
             utm_medium = "cpc"
             utm_term = "shoes"
             utm_content = "logolink"
             utm_campaign = "spring_sale"
-            gclid = "adegadetwd3aer"
-            referrer = "referrer=utm_source%3D{}%26utm_medium%3D{}%26utm_term%3D{}%26utm_content%3D{}%26utm_campaign%3D{}%26gclid%3D{}".format(utm_source, utm_medium, utm_term, utm_content, utm_campaign, gclid)
-            referrer = urllib.parse.quote(referrer)
-            url="https://play.app.goo.gl/?link=https://play.google.com/store/apps/details?id={}%26{}".format(package_name, referrer)
+            gclid = f"gclid_XcfYukmct3xyz"
+            referrer_source = f"referrer=utm_source%3D{utm_source}%26utm_medium%3D{utm_medium}%26utm_term%3D{utm_term}%26utm_content%3D{utm_content}%26utm_campaign%3D{utm_campaign}%26gclid%3D{gclid}"
+            referrer = urllib.parse.quote(referrer_source)
+            url=f"https://play.app.goo.gl/?link=https://play.google.com/store/apps/details?id={pkgname}%26{referrer}"
+            print(f"[Logging...] 安装引荐网址 : {url}")
+            print(f"[Logging...] 安装归因参数 : {urllib.parse.unquote(referrer_source)}")
         else:
-            url="https://play.google.com/store/apps/details?id={}".format(package_name)
-        print("[Logging...] 安装引荐网址 : {}".format(url))
+            url=f"https://play.google.com/store/apps/details?id={pkgname}"
+            print(f"[Logging...] 安装引荐网址 : {url}")
         cmdlist = ['adb','shell','am', 'start','-a', 'android.intent.action.VIEW', '-d', url]
         subprocess.call(cmdlist)
     else:
@@ -45,8 +52,8 @@ def open_google_play(args):
 def open_market(args):
     if len(args) > 0:
         package_name = args[0]
-        url="market://details?id={}".format(package_name)
-        print("[Logging...] 安装引荐网址 : {}".format(url))
+        url=f"market://details?id={package_name}"
+        print(f"[Logging...] 安装引荐网址 : {url}")
         cmdlist = ['adb','shell','am', 'start','-a', 'android.intent.action.VIEW', '-d', url]
         subprocess.call(cmdlist)
     else:
