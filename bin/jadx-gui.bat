@@ -1,4 +1,8 @@
 @echo off
+for /f "tokens=2 delims=:" %%a in ('chcp') do set CP=%%a
+if not "%CP%"=="65001" (
+    chcp 65001 >nul
+)
 
 set FILE1=%~dp0\jadx\bin\jadx-gui.bat
 set FILE2=%~dp0\jadx_1.5.0_green\jadx-gui-1.5.0.exe
@@ -10,21 +14,21 @@ if exist "%FILE3%" goto run3
 goto notFound
 
 :run1
-echo 正在执行 %FILE1%
+echo 姝ｅ湪鎵ц %FILE1%
 call "%FILE1%" %*
 goto end
 
 :run2
-echo 正在执行 %FILE2%
+echo 姝ｅ湪鎵ц %FILE2%
 call "%FILE2%" %*
 goto end
 
 :run3
-echo 正在执行 %FILE3%
+echo 姝ｅ湪鎵ц %FILE3%
 call "%FILE3%" %*
 goto end
 
 :notFound
-echo 没有找到任何可执行的 .bat 文件
+echo 娌℃湁鎵惧埌浠讳綍鍙墽琛岀殑 .bat 鏂囦欢
 
 :end

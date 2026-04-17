@@ -246,7 +246,7 @@ Windows Registry Editor Version 5.00
 "Icon"="$CMD_PATH"
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\命令提示符\command]
-@="cmd /k"
+@="$TOOLS_ROOT\\bin\\smart_shell.bat"
 
 #[HKEY_CLASSES_ROOT\mydexfile\shell\open]
 #"Icon"="$TOOLS_ROOT\\ext\\winreg\\jadx.ico,0"

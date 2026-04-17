@@ -1,24 +1,28 @@
 @echo off
+for /f "tokens=2 delims=:" %%a in ('chcp') do set CP=%%a
+if not "%CP%"=="65001" (
+    chcp 65001 >nul
+)
 set  curdir=%~dp0
 set  filename=%~nx1
 set  cmd7zfile=%curdir%7z.exe
 set  filedir=%filename:~0,-4%
 @rem echo curdir : %curdir%, filename : %filename% , 7zfile : %cmd7zfile%, cwd : %cd% , filedir : %filedir%
-echo [Logging...] 脚本文件路径 : [%cmd7zfile%]
-echo [Logging...] 脚本代码路径 : [%filename%]
+echo [Logging...] 鑴氭湰鏂囦欢璺緞 : [%cmd7zfile%]
+echo [Logging...] 鑴氭湰浠ｇ爜璺緞 : [%filename%]
 set command=%cmd7zfile% x -tzip -bd -y -o"%filedir%" "%filename%"
-echo [Logging...] 脚本命令详情 : [%command%]
+echo [Logging...] 鑴氭湰鍛戒护璇︽儏 : [%command%]
 SET TMPFOLDER=%TMP%
 SET temp_extract_result_file=%TMPFOLDER%\temp_extract_result_file.txt
-@rem echo [Logging...] 临时文件名称 : [%temp_extract_result_file%]
+@rem echo [Logging...] 涓存椂鏂囦欢鍚嶇О : [%temp_extract_result_file%]
 %command% > %temp_extract_result_file%
 if 0 == %ERRORLEVEL% (
     del %temp_extract_result_file%
-    ECHO [Logging...] 文件解压成功
+    ECHO [Logging...] 鏂囦欢瑙ｅ帇鎴愬姛
     echo [Logging...] Wait for 1 seconds to exit
     ping localhost -n 1 > nul
 ) else (
-    ECHO [Logging...] 文件解压失败
+    ECHO [Logging...] 鏂囦欢瑙ｅ帇澶辫触
     for /F "delims=" %%i in ('TYPE %temp_extract_result_file%') do (
         ECHO [Warning...] %%i
 	)
