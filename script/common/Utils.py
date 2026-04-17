@@ -127,7 +127,7 @@ def parseString(line):
             return result
         except:
             pass
-    return result
+    return result or ""
 
 def printExecCmdString(cmdlist):
     cmdlist_deepcopy = deepcopy(cmdlist)

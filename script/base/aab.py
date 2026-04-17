@@ -184,7 +184,7 @@ def get_select_devices(wait_devices):
         p.wait(5)
         allLines = p.stdout.readlines()
         for s in allLines:
-            s = str(s, "utf-8")
+            s = Utils.parseString(s)
             s = s.replace("\r", "")
             s = s.replace("\n", "")
             if (s.startswith("List") or len(s) == 0):

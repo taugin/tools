@@ -144,7 +144,7 @@ def printsign_md5_with_jarsigner(apkFile):
         sign_sha256 = None
         sign_sha1 = None
         for line in alllines:
-            tmp = str(line, "gbk")
+            tmp = Utils.parseString(line)
             if tmp != None and tmp.startswith("所有者:"):
                 apk_info["sign_detail"] = tmp.replace("所有者: ", "").replace("\n", "")
             tmp = tmp.strip().lower()
@@ -172,7 +172,7 @@ def printsign_md5_with_apksigner(apkFile):
     sign_sha1 = None
     sign_detail = None
     for line in alllines:
-        tmp = str(line, "gbk")
+        tmp = Utils.parseString(line)
         tmp = tmp.strip()
         if (tmp.startswith("Signer #1 certificate MD5 digest:")):
             tmp = tmp[len("Signer #1 certificate MD5 digest:") + 1:]
@@ -547,7 +547,7 @@ def get_select_devices():
         p.wait(5)
         allLines = p.stdout.readlines()
         for s in allLines:
-            s = str(s, "utf-8")
+            s = Utils.parseString(s)
             s = s.replace("\r", "")
             s = s.replace("\n", "")
             if (s.startswith("List") or len(s) == 0):
@@ -585,7 +585,7 @@ def install_apk(args):
         allret = ""
         success = False
         for s in execret:
-            s = str(s, "utf-8")
+            s = Utils.parseString(s)
             s = s.replace("\r", "")
             s = s.replace("\n", "")
             allret = allret + s + "\n"
@@ -618,7 +618,7 @@ def install_multiple_apks(xapk, apks):
         allret = ""
         success = False
         for s in execret:
-            s = str(s, "utf-8")
+            s = Utils.parseString(s)
             s = s.replace("\r", "")
             s = s.replace("\n", "")
             allret = allret + s + "\n"
@@ -742,7 +742,7 @@ def check_apk_process(args):
             result = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=False)
             execret = result.stdout.readlines()
             for item in execret:
-                item = str(item, "utf-8")
+                item = Utils.parseString(item)
                 item_list = item.split()
                 if pkgname in item_list:
                     user_id = item_list[0]

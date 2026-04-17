@@ -49,7 +49,7 @@ def get_select_devices():
         p.wait(5)
         allLines = p.stdout.readlines()
         for s in allLines:
-            s = str(s, "utf-8")
+            s = Utils.parseString(s)
             s = s.replace("\r", "")
             s = s.replace("\n", "")
             if (s.startswith("List") or len(s) == 0):
@@ -283,7 +283,7 @@ def show_apk_detail(package):
     str_list = []
     alllines = process.stdout.readlines()
     for line in alllines :
-        tmp = str(line, "utf-8")
+        tmp = Utils.parseString(line)
         tmp = tmp.replace("\r", "")
         tmp = tmp.replace("\n", "")
         tmp = tmp.strip()

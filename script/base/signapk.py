@@ -236,7 +236,7 @@ def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
         all_lines = p.stdout.readlines()
         last_line = None
         if len(all_lines) > 0:
-            last_line = str(all_lines[-1], "utf-8").strip()
+            last_line = (Utils.parseString(all_lines[-1]) or "").strip()
         Log.out("[Logging...] 对齐结果 : [%s]" % last_line)
         if "FAILED" in last_line:
             Common.pause()
@@ -354,7 +354,7 @@ def alignapk(unalignapk, finalapk):
         all_lines = p.stdout.readlines()
         last_line = None
         if len(all_lines) > 0:
-            last_line = str(all_lines[-1], "utf-8").strip()
+            last_line = Utils.parseString(all_lines[-1]).strip()
         Log.out("[Logging...] 对齐结果 : [%s]" % last_line)
         if "FAILED" in last_line:
             Common.pause()
