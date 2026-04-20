@@ -211,12 +211,198 @@ def printsign_md5_with_apksigner(apkFile):
     apk_info["sign_sha1"] = sign_sha1
     apk_info["sign_detail"] = sign_detail
 
+def printsign_md5_with_meta_inf(apkFile):
+    global apk_info
+    sign_md5 = None
+    sign_sha256 = None
+    sign_sha1 = None
+    sign_detail = None
+
+    def read_length(data, offset):
+        first = data[offset]
+        offset += 1
+        if first < 0x80:
+            return first, offset
+        size = first & 0x7F
+        if size <= 0:
+            raise ValueError("invalid asn1 length")
+        length = int.from_bytes(data[offset:offset + size], byteorder="big")
+        return length, offset + size
+
+    def read_tlv(data, offset):
+        start = offset
+        tag = data[offset]
+        offset += 1
+        length, offset = read_length(data, offset)
+        end = offset + length
+        return tag, start, offset, end
+
+    def iter_children(data, start, end):
+        offset = start
+        while offset < end:
+            tag, item_start, value_start, item_end = read_tlv(data, offset)
+            yield tag, item_start, value_start, item_end
+            offset = item_end
+
+    def decode_oid(oid_bytes):
+        if oid_bytes == None or len(oid_bytes) <= 0:
+            return None
+        values = []
+        first = oid_bytes[0]
+        values.append(str(first // 40))
+        values.append(str(first % 40))
+        value = 0
+        for item in oid_bytes[1:]:
+            value = (value << 7) | (item & 0x7F)
+            if (item & 0x80) == 0:
+                values.append(str(value))
+                value = 0
+        return ".".join(values)
+
+    def decode_string(tag, value_bytes):
+        try:
+            if tag in (0x0C, 0x13, 0x16, 0x14, 0x1A):
+                return value_bytes.decode("utf-8", "ignore")
+            if tag == 0x1E:
+                return value_bytes.decode("utf-16-be", "ignore")
+            if tag == 0x1C:
+                return value_bytes.decode("utf-32-be", "ignore")
+            if tag == 0x12:
+                return value_bytes.decode("ascii", "ignore")
+            return value_bytes.decode("utf-8", "ignore")
+        except:
+            return None
+
+    def extract_subject_string(cert_bytes):
+        oid_name_map = {
+            "2.5.4.3": "CN",
+            "2.5.4.6": "C",
+            "2.5.4.7": "L",
+            "2.5.4.8": "ST",
+            "2.5.4.10": "O",
+            "2.5.4.11": "OU",
+            "1.2.840.113549.1.9.1": "EMAILADDRESS",
+        }
+        cert_tag, _, cert_value_start, cert_end = read_tlv(cert_bytes, 0)
+        if cert_tag != 0x30:
+            return None
+        cert_items = list(iter_children(cert_bytes, cert_value_start, cert_end))
+        if len(cert_items) < 1:
+            return None
+        tbs_tag, _, tbs_value_start, tbs_end = cert_items[0]
+        if tbs_tag != 0x30:
+            return None
+
+        tbs_items = list(iter_children(cert_bytes, tbs_value_start, tbs_end))
+        index = 0
+        if len(tbs_items) > 0 and tbs_items[0][0] == 0xA0:
+            index += 1
+        index += 1  # serialNumber
+        index += 1  # signature
+        index += 1  # issuer
+        index += 1  # validity
+        if len(tbs_items) <= index:
+            return None
+
+        subject_tag, _, subject_value_start, subject_end = tbs_items[index]
+        if subject_tag != 0x30:
+            return None
+
+        subject_parts = []
+        for set_tag, _, set_value_start, set_end in iter_children(cert_bytes, subject_value_start, subject_end):
+            if set_tag != 0x31:
+                continue
+            for seq_tag, _, seq_value_start, seq_end in iter_children(cert_bytes, set_value_start, set_end):
+                if seq_tag != 0x30:
+                    continue
+                seq_items = list(iter_children(cert_bytes, seq_value_start, seq_end))
+                if len(seq_items) < 2:
+                    continue
+                oid_tag, _, oid_value_start, oid_end = seq_items[0]
+                value_tag, _, value_start, value_end = seq_items[1]
+                if oid_tag != 0x06:
+                    continue
+                oid_value = decode_oid(cert_bytes[oid_value_start:oid_end])
+                attr_name = oid_name_map.get(oid_value, oid_value)
+                attr_value = decode_string(value_tag, cert_bytes[value_start:value_end])
+                if attr_name != None and attr_value != None and attr_value != "":
+                    subject_parts.append("%s=%s" % (attr_name, attr_value))
+        if len(subject_parts) <= 0:
+            return None
+        return ", ".join(subject_parts)
+
+    def extract_first_certificate(sign_block_bytes):
+        content_tag, _, content_value_start, content_end = read_tlv(sign_block_bytes, 0)
+        if content_tag != 0x30:
+            return None
+        content_items = list(iter_children(sign_block_bytes, content_value_start, content_end))
+        if len(content_items) < 2:
+            return None
+        oid_tag, _, oid_value_start, oid_end = content_items[0]
+        if oid_tag != 0x06:
+            return None
+        oid_value = decode_oid(sign_block_bytes[oid_value_start:oid_end])
+        if oid_value != "1.2.840.113549.1.7.2":
+            return None
+        signed_data_tag, _, signed_data_value_start, _ = content_items[1]
+        if signed_data_tag != 0xA0:
+            return None
+        seq_tag, _, seq_value_start, seq_end = read_tlv(sign_block_bytes, signed_data_value_start)
+        if seq_tag != 0x30:
+            return None
+
+        for item_tag, _, item_value_start, item_end in iter_children(sign_block_bytes, seq_value_start, seq_end):
+            if item_tag != 0xA0:
+                continue
+            cert_offset = item_value_start
+            while cert_offset < item_end:
+                cert_tag, cert_start, _, cert_end = read_tlv(sign_block_bytes, cert_offset)
+                if cert_tag == 0x30:
+                    return sign_block_bytes[cert_start:cert_end]
+                cert_offset = cert_end
+        return None
+
+    if apkFile == None or not os.path.exists(apkFile):
+        return
+
+    cert_bytes = None
+    try:
+        with zipfile.ZipFile(apkFile, "r") as zf:
+            sign_files = []
+            for file_name in zf.namelist():
+                upper_name = file_name.upper()
+                if upper_name.startswith("META-INF/") and (
+                    upper_name.endswith(".RSA") or upper_name.endswith(".DSA") or upper_name.endswith(".EC")
+                ):
+                    sign_files.append(file_name)
+            for sign_file in sign_files:
+                try:
+                    cert_bytes = extract_first_certificate(zf.read(sign_file))
+                    if cert_bytes != None:
+                        apk_info["sign_file"] = sign_file
+                        break
+                except:
+                    continue
+    except:
+        cert_bytes = None
+
+    if cert_bytes != None:
+        sign_md5 = addColonForString(hashlib.md5(cert_bytes).hexdigest().upper())
+        sign_sha1 = addColonForString(hashlib.sha1(cert_bytes).hexdigest().upper())
+        sign_sha256 = addColonForString(hashlib.sha256(cert_bytes).hexdigest().upper())
+        sign_detail = extract_subject_string(cert_bytes)
+
+    apk_info["sign_md5"] = sign_md5
+    apk_info["sign_sha256"] = sign_sha256
+    apk_info["sign_sha1"] = sign_sha1
+    apk_info["sign_detail"] = sign_detail
+
 def md5_signfile(apkFile):
     '''输出一般文件的MD5'''
     if apkFile != None and apkFile.endswith(".apk"):
         printsign_md5_with_apksigner(apkFile)
     if apk_info["sign_md5"] == None or len(apk_info["sign_md5"]) <= 0:
-        printsign_md5_with_jarsigner(apkFile)
+        printsign_md5_with_meta_inf(apkFile)
     if apk_info == None:
         return
     sign_sha1 = apk_info.get('sign_sha1')
