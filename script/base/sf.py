@@ -13,6 +13,7 @@ import getopt
 import io
 import sys
 import os
+import xml.etree.ElementTree as ET
 # 引入别的文件夹的模块
 DIR = os.path.dirname(sys.argv[0])
 COM_DIR = os.path.join(DIR, "..", "common")
@@ -492,31 +493,159 @@ def get_app_info(apkFile):
         apk_info["min_version"] = jobj["min_sdk_version"] if "min_sdk_version" in jobj else None
         apk_info["target_version"] = jobj["target_sdk_version"] if "target_sdk_version" in jobj else None
     elif ext == ".aab":
-        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@package"]
+        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile]
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
-        apk_info["pkgname"] = Utils.parseString(process.stdout.readline()).strip()
-        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@android:versionCode"]
-        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
-        apk_info["vercode"] = Utils.parseString(process.stdout.readline()).strip()
-        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/@android:versionName"]
-        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
-        apk_info["vername"] = Utils.parseString(process.stdout.readline()).strip()
-        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/uses-sdk/@android:minSdkVersion"]
-        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
-        apk_info["min_version"] = Utils.parseString(process.stdout.readline()).strip()
-        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/uses-sdk/@android:targetSdkVersion"]
-        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
-        apk_info["target_version"] = Utils.parseString(process.stdout.readline()).strip()
-        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/application/activity/@android:name"]
-        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
-        content = Utils.parseString(process.stdout.read()).strip()
-        activities = content.split("\r\n") or []
-        apk_info["apk_network"] = check_ad_network(activities)
-        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/uses-permission/@android:name"]
-        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
-        content = Utils.parseString(process.stdout.read()).strip()
-        activities = content.split("\r\n") or []
-        apk_info["dangerous_permissions"] = check_dangerous_permissions(activities)
+        manifest_content = Utils.parseString(process.stdout.read()).strip()
+        if manifest_content:
+            manifest_root = ET.fromstring(manifest_content)
+            android_ns = "{http://schemas.android.com/apk/res/android}"
+
+            def get_android_attr(node, attr_name):
+                return node.get(android_ns + attr_name)
+
+            resource_dump_cache = {}
+
+            def dump_resource_values(resource_name):
+                if resource_name in resource_dump_cache:
+                    return resource_dump_cache[resource_name]
+
+                cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "resources", "--bundle", apkFile, "--resource", resource_name, "--values"]
+                process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+                resource_output = Utils.parseString(process.stdout.read()).strip()
+                resource_dump_cache[resource_name] = resource_output
+                return resource_output
+
+            def parse_resource_values(resource_output):
+                if resource_output is None or len(resource_output) <= 0:
+                    return []
+
+                candidates = []
+                preferred_candidates = []
+                lines = resource_output.splitlines()
+
+                def add_candidate(value, preferred=False):
+                    if value is None:
+                        return
+                    value = value.strip()
+                    if len(value) <= 0:
+                        return
+                    if preferred:
+                        if value not in preferred_candidates:
+                            preferred_candidates.append(value)
+                    elif value not in candidates:
+                        candidates.append(value)
+
+                for line in lines:
+                    stripped_line = line.strip()
+                    if len(stripped_line) <= 0:
+                        continue
+
+                    ref_match = re.search(r'\[REF\]\s*(@[^\s]+)', stripped_line)
+                    if ref_match:
+                        add_candidate(ref_match.group(1), "(default)" in stripped_line)
+
+                    quoted_values = re.findall(r'"([^"]+)"', stripped_line)
+                    for quoted_value in quoted_values:
+                        add_candidate(quoted_value, "(default)" in stripped_line)
+
+                    value_match = re.search(r'value\s*[:=]\s*(.+)$', stripped_line)
+                    if value_match:
+                        raw_value = value_match.group(1).strip().strip('"')
+                        add_candidate(raw_value, "(default)" in stripped_line)
+
+                ordered_candidates = []
+                for candidate in preferred_candidates + candidates:
+                    if candidate not in ordered_candidates:
+                        ordered_candidates.append(candidate)
+                return ordered_candidates
+
+            def resolve_label_value(label_value, visited=None, depth=0):
+                if label_value is None or len(label_value) <= 0:
+                    return label_value
+                if not label_value.startswith("@"):
+                    return label_value
+                if depth >= 10:
+                    return label_value
+
+                if visited is None:
+                    visited = set()
+
+                resource_name = label_value[1:]
+                if ":" in resource_name:
+                    resource_name = resource_name.split(":", 1)[1]
+                if resource_name in visited:
+                    return label_value
+
+                visited.add(resource_name)
+                resource_output = dump_resource_values(resource_name)
+                candidate_values = parse_resource_values(resource_output)
+                if len(candidate_values) <= 0:
+                    return label_value
+
+                for candidate in candidate_values:
+                    if candidate.startswith("@"):
+                        resolved_value = resolve_label_value(candidate, visited, depth + 1)
+                        if resolved_value is not None and len(resolved_value) > 0 and not resolved_value.startswith("@"):
+                            return resolved_value
+
+                for candidate in reversed(candidate_values):
+                    if candidate.startswith("@"):
+                        continue
+                    if "/" in candidate and " " not in candidate:
+                        continue
+                    if candidate.startswith("string/") or candidate.startswith("drawable/") or candidate.startswith("mipmap/") or candidate.startswith("color/"):
+                        continue
+                    return candidate
+
+                return label_value
+
+            def is_launcher_component(node):
+                for intent_filter in node.findall("intent-filter"):
+                    has_main_action = False
+                    has_launcher_category = False
+                    for action in intent_filter.findall("action"):
+                        if get_android_attr(action, "name") == "android.intent.action.MAIN":
+                            has_main_action = True
+                            break
+                    for category in intent_filter.findall("category"):
+                        if get_android_attr(category, "name") == "android.intent.category.LAUNCHER":
+                            has_launcher_category = True
+                            break
+                    if has_main_action and has_launcher_category:
+                        return True
+                return False
+
+            apk_info["pkgname"] = manifest_root.get("package")
+            apk_info["vercode"] = get_android_attr(manifest_root, "versionCode")
+            apk_info["vername"] = get_android_attr(manifest_root, "versionName")
+
+            uses_sdk = manifest_root.find("uses-sdk")
+            if uses_sdk is not None:
+                apk_info["min_version"] = get_android_attr(uses_sdk, "minSdkVersion")
+                apk_info["target_version"] = get_android_attr(uses_sdk, "targetSdkVersion")
+
+            activities = []
+            application = manifest_root.find("application")
+            if application is not None:
+                apk_info["apklabel"] = resolve_label_value(get_android_attr(application, "label"))
+                for node in application.findall("activity"):
+                    activity_name = get_android_attr(node, "name")
+                    if activity_name:
+                        activities.append(activity_name)
+                        if apk_info["apkentry"] is None and is_launcher_component(node):
+                            apk_info["apkentry"] = activity_name
+                for node in application.findall("activity-alias"):
+                    target_activity = get_android_attr(node, "targetActivity")
+                    if target_activity and apk_info["apkentry"] is None and is_launcher_component(node):
+                        apk_info["apkentry"] = target_activity
+            apk_info["apk_network"] = check_ad_network(activities)
+
+            permissions = []
+            for node in manifest_root.findall("uses-permission"):
+                permission_name = get_android_attr(node, "name")
+                if permission_name:
+                    permissions.append(permission_name)
+            apk_info["dangerous_permissions"] = check_dangerous_permissions(permissions)
 
 def parse_activities_from_xmltree(xmltree_lines):
     """
