@@ -52,6 +52,7 @@ apk_info["apk_size"] = None
 apk_info["target_version"] = None
 apk_info["min_version"] = None
 apk_info["sign_detail"] = None
+apk_info["dangerous_permissions"] = None
 
 
 def addColonForString(ori_string):
@@ -479,8 +480,9 @@ def get_app_info(apkFile):
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
         xmltree_lines = Utils.parseString(process.stdout.read()).strip()
         # 先提取 Activity 名称
-        activities = parse_activities_from_xmltree(xmltree_lines)
+        activities, system_permissions = parse_activities_from_xmltree(xmltree_lines)
         apk_info["apk_network"] = check_ad_network(activities)
+        apk_info["dangerous_permissions"] = check_dangerous_permissions(system_permissions)
     elif ext == ".xapk":
         jobj = readpkgnamefromxapk(apkFile)
         apk_info["apklabel"] = jobj["name"] if "name" in jobj else None
@@ -510,6 +512,11 @@ def get_app_info(apkFile):
         content = Utils.parseString(process.stdout.read()).strip()
         activities = content.split("\r\n") or []
         apk_info["apk_network"] = check_ad_network(activities)
+        cmdlist = [Common.JAVA(), "-jar", Common.BUNDLE_TOOL, "dump", "manifest", "--bundle", apkFile, "--xpath", "/manifest/uses-permission/@android:name"]
+        process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=True)
+        content = Utils.parseString(process.stdout.read()).strip()
+        activities = content.split("\r\n") or []
+        apk_info["dangerous_permissions"] = check_dangerous_permissions(activities)
 
 def parse_activities_from_xmltree(xmltree_lines):
     """
@@ -518,7 +525,9 @@ def parse_activities_from_xmltree(xmltree_lines):
     返回 List[str]
     """
     activities = []
+    system_permissions = []
     current_is_activity = False
+    current_is_permission = False
 
     if isinstance(xmltree_lines, str):
         xmltree_lines = xmltree_lines.splitlines()
@@ -527,13 +536,22 @@ def parse_activities_from_xmltree(xmltree_lines):
         line = line.strip()
         if line.startswith("E: activity") or line.startswith("E: activity-alias"):
             current_is_activity = True
+            current_is_permission = False
+        elif line.startswith("E: uses-permission") or line.startswith("E: uses-permission-sdk-23"):
+            current_is_permission = True
+            current_is_activity = False
         elif current_is_activity and line.startswith("A: android:name"):
             match = re.search(r'"(.*?)"', line)
             if match:
                 activities.append(match.group(1))
             current_is_activity = False
+        elif current_is_permission and line.startswith("A: android:name"):
+            match = re.search(r'"(.*?)"', line)
+            if match:
+                system_permissions.append(match.group(1))
+            current_is_permission = False
 
-    return activities
+    return activities, system_permissions
 
 def check_ad_network(activities):
     """
@@ -567,6 +585,31 @@ def check_ad_network(activities):
     except Exception as e:
         Log.out(f"[Logging...] 获取广告平台失败: {e}")
         return []
+
+def check_dangerous_permissions(permissions):
+    if not permissions: return []
+    highRiskPermissionSet = [
+            "android.permission.QUERY_ALL_PACKAGES",
+            "android.permission.SYSTEM_ALERT_WINDOW",
+            "android.permission.REQUEST_INSTALL_PACKAGES",
+            "android.permission.MANAGE_EXTERNAL_STORAGE",
+            "android.permission.READ_PHONE_STATE",
+            "android.permission.READ_PHONE_NUMBERS",
+            "android.permission.ACCESS_FINE_LOCATION",
+            "android.permission.ACCESS_COARSE_LOCATION",
+            "android.permission.POST_NOTIFICATIONS",
+            "android.permission.RECORD_AUDIO",
+            "android.permission.CAMERA",
+            "android.permission.READ_CONTACTS",
+            "android.permission.WRITE_CONTACTS",
+            "android.permission.READ_CALENDAR",
+            "android.permission.WRITE_CALENDAR",
+    ]
+    dangerous_permission = []
+    for permission in permissions:
+        if permission in highRiskPermissionSet:
+            dangerous_permission.append(permission.replace("android.permission.", ""))
+    return dangerous_permission
 
 def readapkinfo(apkFile, function):
     function(apkFile)
@@ -1010,9 +1053,14 @@ def print_apkinfo():
     output = " 文件大小 | %s " % apk_info["apk_size"]
     Log.out(output)
 
+    if "dangerous_permissions" in apk_info:
+        Log.out("-" * dash_len)
+        output = " 敏感权限 | [\u001B[31m%s\u001B[0m] " % ",".join(apk_info["dangerous_permissions"])
+        Log.out(output)
+
     if "apk_network" in apk_info:
         Log.out("-" * dash_len)
-        output = " 广告平台 | %s " % apk_info["apk_network"]
+        output = " 广告平台 | [%s] " % ",".join(apk_info["apk_network"])
         Log.out(output)
 
     Log.out("-" * dash_len)
