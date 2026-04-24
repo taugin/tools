@@ -76,6 +76,8 @@ DX_JAR = os.path.join(LIB_DIR, "dx-%s.jar" % DX_JAR_VERSION)
 
 AES_JAR = os.path.join(LIB_DIR, "aes.jar")
 
+AES_JAR_OLD = os.path.join(LIB_DIR, "aes_old.jar")
+
 AXML_EDITOR = os.path.join(LIB_DIR, "AXMLEditor.jar")
 
 BUNDLE_VERSION = "1.15.1"
