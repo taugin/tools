@@ -726,6 +726,7 @@ def check_dangerous_permissions(permissions):
             "android.permission.READ_PHONE_NUMBERS",
             "android.permission.ACCESS_FINE_LOCATION",
             "android.permission.ACCESS_COARSE_LOCATION",
+            "android.permission.ACCESS_BACKGROUND_LOCATION",
             "android.permission.POST_NOTIFICATIONS",
             "android.permission.RECORD_AUDIO",
             "android.permission.CAMERA",
@@ -733,6 +734,18 @@ def check_dangerous_permissions(permissions):
             "android.permission.WRITE_CONTACTS",
             "android.permission.READ_CALENDAR",
             "android.permission.WRITE_CALENDAR",
+            "android.permission.FOREGROUND_SERVICE",
+            "android.permission.SCHEDULE_EXACT_ALARM",
+            "android.permission.USE_FULL_SCREEN_INTENT",
+            "android.permission.READ_SMS",
+            "android.permission.SEND_SMS",
+            "android.permission.RECEIVE_SMS",
+            "android.permission.READ_CALL_LOG",
+            "android.permission.WRITE_CALL_LOG",
+            "android.permission.BODY_SENSORS",
+            "android.permission.ACTIVITY_RECOGNITION",
+            "android.permission.USE_BIOMETRIC",
+            "android.permission.USE_FINGERPRINT",
     ]
     dangerous_permission = []
     for permission in permissions:
