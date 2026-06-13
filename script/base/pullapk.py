@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # coding: UTF-8
+import platform
 import sys
 import os
 import zipfile
@@ -70,10 +71,17 @@ def get_select_devices():
     return None
 
 def getpackage():
+    is_windows = platform.system().lower() == "windows"
     if (SELECT_DEVICE != None and len(SELECT_DEVICE) > 0) :
-        cmdlist = [Common.ADB, "-s", SELECT_DEVICE, "shell", "dumpsys", "activity", "top"]
+        if is_windows:
+            cmdlist = [Common.ADB, "-s", SELECT_DEVICE, "shell", "dumpsys", "activity", "activities"]
+        else:
+            cmdlist = [Common.ADB, "-s", SELECT_DEVICE, "shell", "dumpsys", "activity", "top"]
     else:
-        cmdlist = [Common.ADB, "-d", "shell", "dumpsys", "activity", "top"]
+        if is_windows:
+            cmdlist = [Common.ADB, "-s", SELECT_DEVICE, "shell", "dumpsys", "activity", "activities"]
+        else:
+            cmdlist = [Common.ADB, "-d", "shell", "dumpsys", "activity", "top"]
     p = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     # p.wait()
     pkglist = []
@@ -82,13 +90,22 @@ def getpackage():
         for line in p.stdout.readlines():
             string = line.decode().replace("\n", "")
             string = string.lstrip()
-            if (string.startswith("ACTIVITY")):
+            if is_windows:
+                contain_activity = "mFocusedWindow" in string
+            else:
+                contain_activity = string.startswith("ACTIVITY")
+            if (contain_activity):
                 str_list = string.split(" ")
                 if (str_list != None and len(str_list) > 1):
-                    str_list = str_list[1].split("/")
-                    if (str_list != None and len(str_list) > 1):
-                        pkglist += [str_list[0]]
-                        actlist += [str_list[1]]
+                    component_name = None
+                    for item in str_list:
+                        if "/" in item:
+                            component_name = item
+                    if component_name != None:
+                        component_split = component_name.split("/")
+                        if (component_split != None and len(component_split) > 1):
+                            pkglist += [component_split[0]]
+                            actlist += [component_split[1]]
     package = pkglist[-1] if len(pkglist) > 0 else None
     activity = actlist[-1] if len(actlist) > 0 else None
     Log.out("[Logging...] 顶层APK包名 : [%s]" % (package if package != None else "Can not find top package"))
