@@ -1197,12 +1197,12 @@ def print_apkinfo():
 
     if "dangerous_permissions" in apk_info:
         Log.out("-" * dash_len)
-        output = " 敏感权限 | [\u001B[31m%s\u001B[0m] " % ",".join(apk_info["dangerous_permissions"])
+        output = " 敏感权限 | [\u001B[31m%s\u001B[0m] " % ",".join(apk_info["dangerous_permissions"] or [])
         Log.out(output)
 
     if "apk_network" in apk_info:
         Log.out("-" * dash_len)
-        output = " 广告平台 | [%s] " % ",".join(apk_info["apk_network"])
+        output = " 广告平台 | [%s] " % ",".join(apk_info["apk_network"] or [])
         Log.out(output)
 
     Log.out("-" * dash_len)
