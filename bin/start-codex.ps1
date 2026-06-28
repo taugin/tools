@@ -1,0 +1,1 @@
+$env:ALL_PROXY="socks5h://127.0.0.1:10808"; codex @args
