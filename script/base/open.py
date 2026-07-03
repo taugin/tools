@@ -30,13 +30,12 @@ def open_google_play(args):
 def open_google_play_adb(pkgname, nonOrganic):
     if pkgname != None and len(pkgname) > 0:
         if nonOrganic:
-            utm_source = "google"
+            utm_source = "local"
             utm_medium = "cpc"
             utm_term = "shoes"
             utm_content = "logolink"
             utm_campaign = "spring_sale"
-            gclid = f"gclid_XcfYukmct3xyz"
-            referrer_source = f"referrer=utm_source%3D{utm_source}%26utm_medium%3D{utm_medium}%26utm_term%3D{utm_term}%26utm_content%3D{utm_content}%26utm_campaign%3D{utm_campaign}%26gclid%3D{gclid}"
+            referrer_source = f"referrer=utm_source%3D{utm_source}%26utm_medium%3D{utm_medium}%26utm_term%3D{utm_term}%26utm_content%3D{utm_content}%26utm_campaign%3D{utm_campaign}%26"
             referrer = urllib.parse.quote(referrer_source)
             url=f"https://play.app.goo.gl/?link=https://play.google.com/store/apps/details?id={pkgname}%26{referrer}"
             print(f"[Logging...] 安装引荐网址 : {url}")
