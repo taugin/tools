@@ -1262,6 +1262,7 @@ if (len(sys.argv) < 2):
     Log.out("                          : -a <apk file> 输出APK AndroidManifest信息")
     Log.out("                          : -g <apk file> 打开APK的GP详情")
     Log.out("                          : -u <apk file> 检测APK的运行进程")
+    Log.out("                          : -n <apk file> 模拟APK归因")
     sys.exit()
 
 try:

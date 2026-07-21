@@ -120,6 +120,7 @@ def find_keytool_version_180():
 
 #keytool可执行文件
 def find_keytool_path():
+    exec_path = None
     if (platform.system().lower() == "windows"):
         process = subprocess.Popen(["where", "keytool"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     else:
@@ -133,6 +134,7 @@ KEYTOOL = find_keytool_path()
 print(f"[Logging...] 签名文件命令 : [keytool][{KEYTOOL}]")
 #jarsigner可执行文件
 def find_jarsigner_path():
+    exec_path = None
     if (platform.system().lower() == "windows"):
         process = subprocess.Popen(["where", "jarsigner"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     else:
@@ -150,6 +152,7 @@ ADB = os.path.join(BIN_DIR, "adb%s" % BIN_SUFFIX);
 
 #java
 def find_java_path():
+    exec_path = None
     if (platform.system().lower() == "windows"):
         process = subprocess.Popen(["where", "java"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     else:
@@ -171,6 +174,7 @@ def JAVA():
 
 #apk对齐工具
 def find_zipalign_path():
+    exec_path = None
     if (platform.system().lower() == "windows"):
         process = subprocess.Popen(["where", "zipalign"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     else:
