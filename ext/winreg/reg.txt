@@ -170,7 +170,7 @@ Windows Registry Editor Version 5.00
 "Icon"="$CMD_PATH"
 
 [HKEY_CLASSES_ROOT\Directory\shell\命令提示符\command]
-@="cmd /k cd %1"
+@="$TOOLS_ROOT\\bin\\smart_shell.bat %1"
 
 [HKEY_CLASSES_ROOT\Directory\shell\编译APK]
 "Icon"="$TOOLS_ROOT\\ext\\winreg\\hui.ico,0"
