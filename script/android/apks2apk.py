@@ -197,7 +197,8 @@ def signapk(srcapk, dstapk):
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
-        Log.out("[Logging...] 缺少参数: {} <apk>".format(os.path.basename(sys.argv[0])))
+        Log.out("[Logging...] 缺少参数 : {} <apk>".format(os.path.basename(sys.argv[0])))
+        Log.out("[Logging...] 参数选项 : -p 编译前暂停，等待用户手动修改")
         sys.exit(0)
     paused_before_compile = False
     try:
