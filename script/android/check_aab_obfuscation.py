@@ -16,7 +16,7 @@ import sys
 import unicodedata
 import zipfile
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 
@@ -27,6 +27,7 @@ JAVA_KEYWORDS = {
 }
 R8_JSON_PATH = "BUNDLE-METADATA/com.android.tools/r8.json"
 MAPPING_PATH = "BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map"
+CHINA_TIMEZONE = timezone(timedelta(hours=8))
 
 
 def read_u8(data, offset):
@@ -473,7 +474,7 @@ def main():
 
     report = {
         "input": str(args.aab.resolve()),
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(CHINA_TIMEZONE).isoformat(),
         "threshold_percentage": args.threshold,
         "source": source,
         "r8_metadata_error": None if valid_r8_stats or not metadata_stats else metadata_stats.get("error"),
