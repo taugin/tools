@@ -2,7 +2,8 @@
   {
     "ad_platform": "Google",
     "ad_prefix": [
-      "com.google.android.gms.ads.AdActivity"
+      "com.google.android.gms.ads.AdActivity",
+      "com.google.android.libraries"
     ]
   },
   {
@@ -86,7 +87,8 @@
   {
     "ad_platform": "Unity3D",
     "ad_prefix": [
-      "com.unity3d.services.ads"
+      "com.unity3d.services.ads",
+      "com.unity3d.ads"
     ]
   },
   {
