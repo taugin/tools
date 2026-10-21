@@ -58,7 +58,7 @@ def recompiled_apk(apk_dir, apk_file):
 def decompiled_apk(apk_file, out_dir):
     Log.out("[Logging...] {}".format("反编译文件中"))
     cmdlist = [Common.JAVA(), "-jar", Common.APKTOOL_JAR, 'd', apk_file, '-o', out_dir]
-    cmdlist += ["-s"]
+    # 需要反编译代码，供后续修改 Smali 调用。cmdlist += ["-s"]
     showlist = []
     for cmd in cmdlist:
         showlist += [os.path.basename(cmd)]
@@ -181,6 +181,40 @@ def modify_axml_file(main_apk_dir):
     axml_tree.write(axml_file, encoding="utf-8", xml_declaration=True)
     Log.out("")
 
+def remove_check_licence(main_apk_dir):
+    Log.out("[Logging...] 注释许可检查")
+    call_pattern = re.compile(
+        r"^(\s*)invoke-static(?:/range)?\s+\{[^}]*\},\s*"
+        r"Lcom/pairip/licensecheck/LicenseClient;->checkLicense\(Landroid/content/Context;\)V"
+        r"\s*(?:#.*)?$"
+    )
+    modified_count = 0
+    for directory in os.listdir(main_apk_dir):
+        smali_dir = os.path.join(main_apk_dir, directory)
+        if not directory.startswith("smali") or not os.path.isdir(smali_dir):
+            continue
+        for root, dirs, files in os.walk(smali_dir):
+            for filename in files:
+                if not filename.endswith(".smali"):
+                    continue
+                file_path = os.path.join(root, filename)
+                with open(file_path, "r", encoding="utf-8", newline="") as smali_file:
+                    lines = smali_file.readlines()
+                file_count = 0
+                for index, line in enumerate(lines):
+                    match = call_pattern.fullmatch(line.rstrip("\r\n"))
+                    if match is not None:
+                        # 保留缩进、原始指令和换行，已注释的调用不会重复处理。
+                        indent = match.group(1)
+                        lines[index] = indent + "# " + line[len(indent):]
+                        file_count += 1
+                if file_count:
+                    with open(file_path, "w", encoding="utf-8", newline="") as smali_file:
+                        smali_file.writelines(lines)
+                    modified_count += file_count
+                    Log.out(f"[Logging...] 注释许可调用 : [{file_path}] : {file_count}")
+    Log.out(f"[Logging...] 注释调用次数 : {modified_count}\n")
+
 
 def recompile_main_apk(main_apk_dir, final_main_apk):
     Log.out("[Logging...] 编译安卓文件 : {}".format(final_main_apk))
@@ -233,6 +267,7 @@ if __name__ == "__main__":
     recompile_apk_file = os.path.join(intermediates_dir, apks_name + "-unsigned.apk")
     final_apk_file = os.path.join(work_dir, apks_name + "-final.apk")
     modify_axml_file(main_apk_dir)
+    remove_check_licence(main_apk_dir)
     if os.path.exists(final_apk_file):
         Utils.deleteFile(final_apk_file)
 
