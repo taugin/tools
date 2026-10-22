@@ -57,7 +57,7 @@ def recompiled_apk(apk_dir, apk_file):
 
 def decompiled_apk(apk_file, out_dir):
     Log.out("[Logging...] {}".format("反编译文件中"))
-    cmdlist = [Common.JAVA(), "-jar", Common.APKTOOL_JAR, 'd', apk_file, '-o', out_dir]
+    cmdlist = [Common.JAVA(), "-jar", Common.APKTOOL_JAR, 'd', apk_file, '-o', out_dir, '--res-resolve-mode', 'lazy', '-q']
     # 需要反编译代码，供后续修改 Smali 调用。cmdlist += ["-s"]
     showlist = []
     for cmd in cmdlist:
