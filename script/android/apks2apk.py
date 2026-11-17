@@ -182,6 +182,14 @@ def modify_axml_file(main_apk_dir):
     Log.out("")
 
 def remove_check_licence(main_apk_dir):
+    # Windows 长路径需要扩展路径前缀，目录遍历和文件读写使用同一路径。
+    if os.name == "nt":
+        main_apk_dir = os.path.abspath(main_apk_dir)
+        if not main_apk_dir.startswith("\\\\?\\"):
+            if main_apk_dir.startswith("\\\\"):
+                main_apk_dir = "\\\\?\\UNC\\" + main_apk_dir[2:]
+            else:
+                main_apk_dir = "\\\\?\\" + main_apk_dir
     Log.out("[Logging...] 注释许可检查")
     call_pattern = re.compile(
         r"^(\s*)invoke-static(?:/range)?\s+\{[^}]*\},\s*"
