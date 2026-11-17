@@ -9,6 +9,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Common
 import Log
 
@@ -50,29 +51,29 @@ def remove_dup_permission(masterroot):
 
 def merge_xml_change_pkg(masterfolder, slavefolder, newpkgname = None):
     Log.out("[Logging...] 正在合并文件 : [AndroidManifest.xml]", True)
-    if (os.path.exists(masterfolder) == False):
+    if (os.path.exists(PathCompat.fsPath(masterfolder)) == False):
         Log.out("[Logging...] 无法定位文件夹 %s" % masterfolder, True)
         sys.exit(0)
-    if (os.path.exists(slavefolder) == False):
+    if (os.path.exists(PathCompat.fsPath(slavefolder)) == False):
         Log.out("[Logging...] 无法定位文件夹 %s" % slavefolder, True)
         sys.exit(0)
     mastermanifest = "%s/AndroidManifest.xml" % masterfolder;
     slavemanifest = "%s/AndroidManifest.xml" % slavefolder;
     ET.register_namespace('android', Common.XML_NAMESPACE)
 
-    mastertree = ET.parse(mastermanifest)
+    mastertree = ET.parse(PathCompat.fsPath(mastermanifest))
     masterroot = mastertree.getroot()
     masterapplication = masterroot.find("application")
 
-    slavetree = ET.parse(slavemanifest)
+    slavetree = ET.parse(PathCompat.fsPath(slavemanifest))
     slaveroot = slavetree.getroot()
     slaveapplication = slaveroot.find("application")
 
-    for item in slaveroot.getchildren():
+    for item in list(slaveroot):
         if (item.tag != "application"):
             masterroot.append(item)
 
-    for item in slaveapplication.getchildren():
+    for item in list(slaveapplication):
         exclude = item.find("meta-data/[@{%s}name='exclude']" % Common.XML_NAMESPACE)
         if (exclude == None):
             masterapplication.append(item)
@@ -81,7 +82,7 @@ def merge_xml_change_pkg(masterfolder, slavefolder, newpkgname = None):
     remove_dup_permission(masterroot)
 
     indent(masterroot)
-    mastertree.write(mastermanifest, encoding='utf-8', xml_declaration=True)
+    mastertree.write(PathCompat.fsPath(mastermanifest), encoding='utf-8', xml_declaration=True)
 
     Log.out("[Logging...] 文件合并完成\n", True)
     return True

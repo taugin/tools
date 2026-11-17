@@ -16,6 +16,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Common
 import Log
 import re
@@ -23,7 +24,7 @@ import xml.etree.ElementTree as ET
 DEBUG_MODE = False
 
 def read_idlist(publicfile):
-    tree = ET.parse(publicfile)
+    tree = ET.parse(PathCompat.fsPath(publicfile))
     root = tree.getroot();
     list = []
     for child in root:
@@ -38,10 +39,10 @@ def exist_in(text, list):
 def check_public(masterfolder, slavefolder, dup_list):
     masterpublic = "%s/res/values/public.xml" % masterfolder;
     slavepublic = "%s/res/values/public.xml" % slavefolder;
-    if (os.path.exists(masterpublic) == False):
+    if (os.path.exists(PathCompat.fsPath(masterpublic)) == False):
         Log.out("[Warning...] 无法定位文件 %s" % masterpublic, True)
         return False
-    if (os.path.exists(slavepublic) == False):
+    if (os.path.exists(PathCompat.fsPath(slavepublic)) == False):
         Log.out("[Warning...] 无法定位文件 %s" % slavepublic, True)
         return False
     masteridlist = read_idlist(masterpublic)
@@ -58,22 +59,22 @@ def check_public(masterfolder, slavefolder, dup_list):
 def check_lib_assets(masterfolder, slavefolder, dup_list):
     exist = False
     checkpath = os.path.join(masterfolder, "lib")
-    rlist = os.walk(checkpath, True)
+    rlist = PathCompat.walk(checkpath, True)
     for root, dirs, files in rlist:
         for file in files:
             filedir = os.path.join(root, file)
             slavefile = filedir.replace(masterfolder, slavefolder)
-            if (os.path.exists(slavefile) == True):
+            if (os.path.exists(PathCompat.fsPath(slavefile)) == True):
                 dup_list.append(filedir + "\n")
                 exist = True
 
     checkpath = os.path.join(masterfolder, "assets")
-    rlist = os.walk(checkpath, True)
+    rlist = PathCompat.walk(checkpath, True)
     for root, dirs, files in rlist:
         for file in files:
             filedir = os.path.join(root, file)
             slavefile = filedir.replace(masterfolder, slavefolder)
-            if (os.path.exists(slavefile) == True):
+            if (os.path.exists(PathCompat.fsPath(slavefile)) == True):
                 dup_list.append(filedir + "\n")
                 exist = True
     return exist;
@@ -81,10 +82,10 @@ def check_lib_assets(masterfolder, slavefolder, dup_list):
 def check_resdup(masterfolder, slavefolder):
     '''    此方法用来检测重复的资源    '''
     dup_list = []
-    if (os.path.exists(masterfolder) == False):
+    if (os.path.exists(PathCompat.fsPath(masterfolder)) == False):
         Log.out("[Logging...] 无法定位文件夹 %s" % masterfolder, True)
         sys.exit(0)
-    if (os.path.exists(slavefolder) == False):
+    if (os.path.exists(PathCompat.fsPath(slavefolder)) == False):
         Log.out("[Logging...] 无法定位文件夹 %s" % slavefolder, True)
         sys.exit(0)
     Log.out("[Logging...] 检查重复资源", True)
@@ -102,17 +103,17 @@ def check_resdup(masterfolder, slavefolder):
         '''
         return True
     else:
-        if (os.path.exists("dup.txt")):
-            os.remove("dup.txt")
+        if (os.path.exists(PathCompat.fsPath("dup.txt"))):
+            os.remove(PathCompat.fsPath("dup.txt"))
         Log.out("[Logging...] 没有重复资源 \n", True)
         return True
 
 ###############################################################################
 def find_rfolder(smali_folder):
     rtmp = []
-    file_list = os.walk(smali_folder, True)
+    file_list = PathCompat.walk(smali_folder, True)
     for root, filedir, files in file_list:
-        tmplist = os.listdir(root)
+        tmplist = os.listdir(PathCompat.fsPath(root))
         if (tmplist != None and len(tmplist) > 0):
             filetmps = []
             for index in range(len(tmplist)):
@@ -133,7 +134,7 @@ def find_all_rfolders(masterfolder):
     all_smali_folder = ["smali", "smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6", "smali_classes7", "smali_classes8", "smali_classes9", "smali_classes10"]
     for tmp_folder in all_smali_folder:
         smali_folder = os.path.join(masterfolder, tmp_folder)
-        if (os.path.exists(smali_folder)):
+        if (os.path.exists(PathCompat.fsPath(smali_folder))):
             folder = find_rfolder(smali_folder)
             if (folder != None):
                 rfolders += folder
@@ -145,7 +146,7 @@ def find_all_rfolders(masterfolder):
 def find_rfiles(rfolder):
     '''查找一个文件夹下面所有的R$开头的文件'''
     rfiles = []
-    mylist = os.listdir(rfolder)
+    mylist = os.listdir(PathCompat.fsPath(rfolder))
     for file in mylist:
         if (file.startswith("R$")):
             rfiles += [os.path.join(rfolder, file)]
@@ -166,7 +167,7 @@ def update_one_rfile(pubdict, rfile, rfolder, idlist):
     '''更新R文件的ID'''
     #Log.out("update rfile : %s" % rfile)
     conlist = []
-    f = open(rfile, "r");
+    f = open(PathCompat.fsPath(rfile), "r");
     allcontent = f.readlines()
     for c in allcontent:
         conlist.append(c.replace("\n", ""))
@@ -207,7 +208,7 @@ def update_one_rfile(pubdict, rfile, rfolder, idlist):
     #TODO : for test
     if (modify) :
         newcontent = "\n".join(conlist)
-        f = open(rfile, "w")
+        f = open(PathCompat.fsPath(rfile), "w")
         f.write(newcontent)
         f.close()
 
@@ -220,12 +221,12 @@ def update_rstyleable_file(idlist, rfolder):
     '''
     if (idlist == None or len(idlist) <= 0):
         return
-    if (rfolder == None or not os.path.exists(rfolder)):
+    if (rfolder == None or not os.path.exists(PathCompat.fsPath(rfolder))):
         return
     styleable_file = os.path.join(rfolder, "R$styleable.smali")
-    if (not os.path.exists(styleable_file)):
+    if (not os.path.exists(PathCompat.fsPath(styleable_file))):
         return
-    f = open(styleable_file, "r");
+    f = open(PathCompat.fsPath(styleable_file), "r");
     alllines = f.readlines()
     f.close()
     newlines = alllines[:]
@@ -240,7 +241,7 @@ def update_rstyleable_file(idlist, rfolder):
                 #Log.out("pubkey : %s , oid : %s , nid : %s , index : %s" % (pubkey, oid, nid, index))
 
     newcontent = "".join(newlines)
-    f = open(styleable_file, "w")
+    f = open(PathCompat.fsPath(styleable_file), "w")
     f.write(newcontent)
     f.close()
 
@@ -266,14 +267,14 @@ def update_one_rfolder(pubdict, rfolder):
 def prepare_public(masterfolder):
     pubdict = {}
     publicxml = os.path.join(masterfolder, "res", "values", "public.xml");
-    if (os.path.exists(publicxml)):
-        tree = ET.parse(publicxml)
+    if (os.path.exists(PathCompat.fsPath(publicxml))):
+        tree = ET.parse(PathCompat.fsPath(publicxml))
         if (tree == None):
             return None
         root = tree.getroot()
         if (root == None):
             return None
-        items = root.getchildren()
+        items = list(root)
         for item in items:
             resname = item.get("name")
             restype = item.get("type")

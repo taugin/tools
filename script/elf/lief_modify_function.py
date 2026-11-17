@@ -1,3 +1,7 @@
+import sys as _pathSys
+from pathlib import Path as _Path
+_pathSys.path.append(str(_Path(__file__).resolve().parents[1] / "common"))
+import PathCompat
 import getopt
 import sys
 import lief
@@ -70,6 +74,6 @@ if __name__ == '__main__':
         sys.exit()
 
     print("modify : {}, from string : {}, to string : {}, file : {}".format(modify, from_string, to_string, from_file))
-    if from_file == None or to_string == None or (from_file == None or not os.path.exists(from_file)):
+    if from_file == None or to_string == None or (from_file == None or not os.path.exists(PathCompat.fsPath(from_file))):
         sys.exit()
     modify_elf_so(from_string, to_string, from_file, modify)

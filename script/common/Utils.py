@@ -6,6 +6,7 @@ import os
 import sys
 import shutil
 import platform
+import PathCompat
 import Log
 
 def pause(str="[Logging...] 按任意键退出"):
@@ -17,50 +18,53 @@ def pause(str="[Logging...] 按任意键退出"):
         input(str)
 
 def copydir(fromdir, todir, override = True):
-    mylist = os.walk(fromdir, True)
+    mylist = PathCompat.walk(fromdir, True)
     for root, filedir, files in mylist:
         for file in files:
-            todirname = root.replace(fromdir, todir)
-            if (os.path.exists(todirname) == False):
-                os.makedirs(todirname)
+            todirname = os.path.join(todir, os.path.relpath(root, fromdir))
+            if (os.path.exists(PathCompat.fsPath(todirname)) == False):
+                os.makedirs(PathCompat.fsPath(todirname))
             #sdk文件夹内的文件
             fromdirfile = os.path.join(root, file)
-            todirfile = fromdirfile.replace(fromdir, todir)
+            todirfile = os.path.join(todirname, file)
             copyfile(fromdirfile, todirfile, override)
 
 def copyfile(fromfile, tofile, override = True):
     try:
-        dirname = os.path.dirname(tofile)
-        if (not os.path.exists(dirname)):
-            os.makedirs(dirname)
+        dirname = os.path.dirname(tofile) or os.curdir
+        if (not os.path.exists(PathCompat.fsPath(dirname))):
+            os.makedirs(PathCompat.fsPath(dirname))
         if override == False:
-            if (os.path.exists(tofile)):
+            if (os.path.exists(PathCompat.fsPath(tofile))):
                 return
-        shutil.copy2(fromfile, tofile)
-    except:
-        pass
+        shutil.copy2(PathCompat.fsPath(fromfile), PathCompat.fsPath(tofile))
+    except Exception as e:
+        print("Exception : copyfile %s -> %s : %s" % (fromfile, tofile, e))
 
 def deletedir(path):
     try:
+        path = PathCompat.fsPath(path)
+        if not os.path.lexists(path):
+            return
         shutil.rmtree(path)
     except Exception as e:
         print("Exception : %s" % e)
 
 def movefile(fromfile, tofile):
     try:
-        dirname = os.path.dirname(tofile)
-        if (not os.path.exists(dirname)):
-            os.makedirs(dirname)
-        shutil.move(fromfile, tofile)
+        dirname = os.path.dirname(tofile) or os.curdir
+        if (not os.path.exists(PathCompat.fsPath(dirname))):
+            os.makedirs(PathCompat.fsPath(dirname))
+        shutil.move(PathCompat.fsPath(fromfile), PathCompat.fsPath(tofile))
         deleteEmptyDir(fromfile)
-    except:
-        pass
+    except Exception as e:
+        print("Exception : movefile %s -> %s : %s" % (fromfile, tofile, e))
 
 def deleteEmptyDir(path):
     try:
         while True:
             dirname = os.path.dirname(path)
-            os.rmdir(dirname)
+            os.rmdir(PathCompat.fsPath(dirname))
             path = dirname
     except:
         pass
@@ -108,15 +112,15 @@ def isEmpty(string):
 
 def list_files(dirname):
     allFiles = []
-    mylist = os.walk(dirname, True)
+    mylist = PathCompat.walk(dirname, True)
     for root, filedir, files in mylist:
         for file in files:
             allFiles.append(os.path.normpath(os.path.join(root, file)))
     return allFiles
 
 def deleteFile(file):
-    if (os.path.exists(file)):
-        os.remove(file)
+    if (os.path.exists(PathCompat.fsPath(file))):
+        os.remove(PathCompat.fsPath(file))
 
 def parseString(line):
     format_code = ["utf8", "gbk", "gb2312"]

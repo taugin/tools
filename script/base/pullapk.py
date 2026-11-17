@@ -10,6 +10,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR) 
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Common
 import Log
 import Utils
@@ -157,21 +158,21 @@ def pullspecapk(apkfile, package, to_dir):
         if (to_dir):
             tempFile = "%s.apk" % (package if basename == "base" else basename)
             tempDir = os.path.join(os.getcwd(), package)
-            if (not os.path.exists(tempDir)):
-                os.mkdir(tempDir)
+            if (not os.path.exists(PathCompat.fsPath(tempDir))):
+                os.mkdir(PathCompat.fsPath(tempDir))
             tempFile = os.path.join(tempDir, tempFile)
         else:
             tempFile = "%s_%ld.apk" % (package, (time.time() * 1000))
             tempFile = os.path.join(os.getcwd(), tempFile)
         tempFile = os.path.normpath(tempFile)
-        f = open(tempFile, "wb")
+        f = open(PathCompat.fsPath(tempFile), "wb")
         f.close()
         if (SELECT_DEVICE != None and len(SELECT_DEVICE) > 0) :
             cmdlist = [Common.ADB, "-s", SELECT_DEVICE, "pull", apkfile, tempFile]
         else:
             cmdlist = [Common.ADB, "-d", "pull", apkfile, tempFile]
         subprocess.call(cmdlist, stdout=subprocess.PIPE)
-        if not os.path.exists(tempFile):
+        if not os.path.exists(PathCompat.fsPath(tempFile)):
             return
         dirpath = os.path.dirname(tempFile)
         newFileName = ""
@@ -205,9 +206,9 @@ def pullspecapk(apkfile, package, to_dir):
             newFileName += basename
         if not to_dir:
             newFile = os.path.join(dirpath, newFileName + ".apk")
-            if (os.path.exists(newFile)):
-                os.remove(newFile)
-            os.rename(tempFile, newFile)
+            if (os.path.exists(PathCompat.fsPath(newFile))):
+                os.remove(PathCompat.fsPath(newFile))
+            os.rename(PathCompat.fsPath(tempFile), PathCompat.fsPath(newFile))
             Log.out("[Logging...] 获取APK成功 : [%s]" % newFile)
         return newFileName
 
@@ -337,12 +338,12 @@ def pullapk():
                 if to_dir:
                     newFilePath = os.path.join(os.getcwd(), "{}.xapk".format(newFileName))
                     Log.out("[Logging...] 拉取APK名称 : [{}]".format(newFilePath))
-                    all_apks = os.listdir(os.path.join(os.getcwd(), package))
-                    xapk_zip = zipfile.ZipFile(newFilePath, "w")
+                    all_apks = os.listdir(PathCompat.fsPath(os.path.join(os.getcwd(), package)))
+                    xapk_zip = zipfile.ZipFile(PathCompat.fsPath(newFilePath), "w")
                     for apk in all_apks:
                         apk_file = os.path.join(os.getcwd(), package, apk)
                         apk = apk.strip()
-                        xapk_zip.write(apk_file, apk)
+                        xapk_zip.write(PathCompat.fsPath(apk_file), apk)
                     xapk_zip.close()
                     Utils.deletedir(os.path.join(os.getcwd(), package))
                 time.sleep(3)

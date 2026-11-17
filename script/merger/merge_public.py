@@ -14,6 +14,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Common
 import Log
 
@@ -26,7 +27,7 @@ ATTR_TYPE_NAME = "attr_type_name"
 
 #获取所有的ID
 def get_all_ids(publicfile):
-    tree = ET.parse(publicfile)
+    tree = ET.parse(PathCompat.fsPath(publicfile))
     root = tree.getroot()
     pubdict = {}
     for child in root:
@@ -113,7 +114,7 @@ def get_next_id(restype, iddict, maxids):
 #生成空的public.xml文件
 def generate_xml(public_xml):
     xmldir = os.path.dirname(public_xml)
-    os.makedirs(xmldir)
+    os.makedirs(PathCompat.fsPath(xmldir))
     doc = Document()  #创建DOM文档对象
     root = doc.createElement('resources') #创建根元素
     doc.appendChild(root)
@@ -123,34 +124,34 @@ def generate_xml(public_xml):
     #element.setAttribute("type", "undefine")
     #root.appendChild(element)
 
-    f = open(public_xml,'wb')
+    f = open(PathCompat.fsPath(public_xml),'wb')
     f.write(doc.toxml(encoding = "utf-8"))
     f.close()
-    tree = ET.parse(public_xml)
+    tree = ET.parse(PathCompat.fsPath(public_xml))
     indent(tree.getroot())
-    tree.write(public_xml, encoding="utf-8", xml_declaration=True)
+    tree.write(PathCompat.fsPath(public_xml), encoding="utf-8", xml_declaration=True)
 
 def rebuild_ids(masterfolder, slavefolder):
-    if (os.path.exists(masterfolder) == False):
+    if (os.path.exists(PathCompat.fsPath(masterfolder)) == False):
         Log.out("[Warning...] 无法定位文件夹 %s" % masterfolder, True)
         sys.exit(0)
-    if (os.path.exists(slavefolder) == False):
+    if (os.path.exists(PathCompat.fsPath(slavefolder)) == False):
         Log.out("[Warning...] 无法定位文件夹 %s" % slavefolder, True)
         sys.exit(0)
     Log.out("[Logging...] 合并资源编号", True)
     masterpublic = "%s/res/values/public.xml" % masterfolder;
     slavepublic = "%s/res/values/public.xml" % slavefolder;
-    if (os.path.exists(masterpublic) == False):
+    if (os.path.exists(PathCompat.fsPath(masterpublic)) == False):
         Log.out("[Warning...] 无法定位文件 %s\n" % masterpublic, True)
         generate_xml(masterpublic)
 
-    if (os.path.exists(slavepublic) == False):
+    if (os.path.exists(PathCompat.fsPath(slavepublic)) == False):
         Log.out("[Warning...] 无法定位文件 %s\n" % slavepublic, True)
         generate_xml(slavepublic)
 
     publicdict = get_all_ids(masterpublic)
 
-    tree = ET.parse(slavepublic)
+    tree = ET.parse(PathCompat.fsPath(slavepublic))
     root = tree.getroot();
     maxids = {}
     for restype in publicdict:
@@ -160,7 +161,7 @@ def rebuild_ids(masterfolder, slavefolder):
         if (maxid != "unknown"):
             maxids[restype] = maxid
 
-    mastertree = ET.parse(masterpublic)
+    mastertree = ET.parse(PathCompat.fsPath(masterpublic))
     masterroot = mastertree.getroot()
 
     for child in root:
@@ -175,7 +176,7 @@ def rebuild_ids(masterfolder, slavefolder):
             element.attrib["id"] = hexid
             masterroot.append(element)
     indent(masterroot)
-    mastertree.write(masterpublic, encoding="utf-8", xml_declaration=True)
+    mastertree.write(PathCompat.fsPath(masterpublic), encoding="utf-8", xml_declaration=True)
     Log.out("[Logging...] 重建资源完成\n", True)
     return True
 

@@ -1,6 +1,10 @@
 # coding: UTF-8
 # 引入别的文件夹的模块
 
+import sys as _pathSys
+from pathlib import Path as _Path
+_pathSys.path.append(str(_Path(__file__).resolve().parents[1] / "common"))
+import PathCompat
 from commoncfg import logger
 import urlmanager
 import threading
@@ -30,17 +34,17 @@ htmlProcesser = processer.createProcesser()
 def writeLastGrabUrl(url):
     tmpdir = tempfile.gettempdir()
     cfgfile = os.path.join(tmpdir, "crawler.cfg")
-    with open(cfgfile, "w", encoding="utf-8") as file:
+    with open(PathCompat.fsPath(cfgfile), "w", encoding="utf-8") as file:
         file.write(url)
 
 def readLastGrabUrl():
     tmpdir = tempfile.gettempdir()
     cfgfile = os.path.join(tmpdir, "crawler.cfg")
-    if (os.path.exists(cfgfile) is False):
+    if (os.path.exists(PathCompat.fsPath(cfgfile)) is False):
         return None
-    with open(cfgfile, "r", encoding="utf-8") as file:
+    with open(PathCompat.fsPath(cfgfile), "r", encoding="utf-8") as file:
         url = file.read()
-    os.remove(cfgfile)
+    os.remove(PathCompat.fsPath(cfgfile))
     return url
 
 def initGrabUrl():
@@ -88,7 +92,7 @@ def processContent(data):
     htmlProcesser.process(data)
 
 def writeToFile(name, content):
-    f = open(name, mode="w", encoding="utf-8")
+    f = open(PathCompat.fsPath(name), mode="w", encoding="utf-8")
     f.write(content)
     f.close()
 

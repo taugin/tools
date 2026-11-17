@@ -3,6 +3,10 @@ Created on 2019-8-16
 
 @author: Administrator
 '''
+import sys as _pathSys
+from pathlib import Path as _Path
+_pathSys.path.append(str(_Path(__file__).resolve().parents[1] / "common"))
+import PathCompat
 from translators_api.google import *
 from translators_api.config import *
 from collections import OrderedDict
@@ -127,15 +131,15 @@ def translate_xml(from_language, to_language, xmlfile):
     basename = os.path.basename(xmlfile)
     to_dir = "values-%s" % to_language
     dst_dir = os.path.join(filedir, to_dir)
-    if not os.path.exists(dst_dir):
-        os.mkdir(dst_dir)
+    if not os.path.exists(PathCompat.fsPath(dst_dir)):
+        os.mkdir(PathCompat.fsPath(dst_dir))
     dstfile = os.path.join(dst_dir, basename)
     toDoc = Document()  #创建DOM文档对象
     toRoot = toDoc.createElement('resources') #创建根元素
     toDoc.appendChild(toRoot)
     #创建目标文档 end
     try:
-        fromTree = ET.parse(xmlfile)
+        fromTree = ET.parse(PathCompat.fsPath(xmlfile))
     except:
         print("[Logging...] 文件解析错误[%s]" % xmlfile)
         return
@@ -176,15 +180,15 @@ def translate_xml(from_language, to_language, xmlfile):
     if not toRoot.hasChildNodes():
         return
     print("[Logging...] 正在写入文件 : [%s]" % dstfile)
-    if os.path.exists(dstfile):
-        os.remove(dstfile)
-    f = open(dstfile,'wb')
+    if os.path.exists(PathCompat.fsPath(dstfile)):
+        os.remove(PathCompat.fsPath(dstfile))
+    f = open(PathCompat.fsPath(dstfile),'wb')
     f.write(toDoc.toxml(encoding="utf-8"))
     f.close()
-    atree = ET.parse(dstfile)
+    atree = ET.parse(PathCompat.fsPath(dstfile))
     aroot = atree.getroot()
     indent(aroot)
-    atree.write(dstfile, encoding='utf-8', xml_declaration=True)
+    atree.write(PathCompat.fsPath(dstfile), encoding='utf-8', xml_declaration=True)
     print("[Logging...] 写入文件完成 : [%s]" % dstfile)
 
 if (__name__ == "__main__"):
@@ -193,7 +197,7 @@ if (__name__ == "__main__"):
         print("[Logging...] 脚本执行错误 : 缺少参数 %s <string.xml>" % os.path.basename(sys.argv[0]))
         sys.exit(0)
     xmlfile = sys.argv[1]
-if not os.path.exists(xmlfile):
+if not os.path.exists(PathCompat.fsPath(xmlfile)):
         print("%s 不存在" % xmlfile)
         sys.exit(0)
 show_all_support_language()

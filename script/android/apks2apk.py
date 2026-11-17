@@ -11,6 +11,7 @@ DIR = os.path.dirname(sys.argv[0])
 COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
+import PathCompat
 import Common
 import Log
 import Utils
@@ -29,8 +30,8 @@ def convert_bytes(byte_size):
 
 def get_file_size(file_path):
     # 获取文件大小
-    if os.path.isfile(file_path):
-        return os.path.getsize(file_path)
+    if os.path.isfile(PathCompat.fsPath(file_path)):
+        return os.path.getsize(PathCompat.fsPath(file_path))
     else:
         return 0
 
@@ -74,7 +75,7 @@ def decompiled_apk(apk_file, out_dir):
 def extract_apks_to_dir(apks_file, apks_dir):
     Log.out("[Logging...] 解压安卓文件")
     all_apk_files = []
-    with zipfile.ZipFile(apks_file, 'r') as apks_zip:
+    with zipfile.ZipFile(PathCompat.fsPath(apks_file), 'r') as apks_zip:
         for file_info in apks_zip.infolist():
             # 检查是否为APK文件
             if file_info.filename.endswith(".apk"):
@@ -82,9 +83,9 @@ def extract_apks_to_dir(apks_file, apks_dir):
                 base_name = os.path.basename(file_info.filename)
                 apk_filename = os.path.normpath(os.path.join(apks_dir, base_name))
                 all_apk_files.append(apk_filename)
-                if not os.path.exists(apk_filename):
+                if not os.path.exists(PathCompat.fsPath(apk_filename)):
                     apk_data = apks_zip.read(file_info.filename)
-                    with open(apk_filename, 'wb') as apk_file:
+                    with open(PathCompat.fsPath(apk_filename), 'wb') as apk_file:
                         apk_file.write(apk_data)
                     #print(f"Extracted {file_info.filename} to {apk_filename}")
     return all_apk_files
@@ -111,30 +112,30 @@ def decompile_all_apk(all_apk_files):
     for item in all_apk_files:
         decompiled_dir = apk2dir(item)
         #Log.out("[Logging...] decompiled_dir : {}".format(decompiled_dir))
-        if not os.path.exists(decompiled_dir):
+        if not os.path.exists(PathCompat.fsPath(decompiled_dir)):
             decompiled_apk(item, decompiled_dir)
     pass
 
 def merge_apk_resources(main_apk_dir, other_apks_dir):
     Log.out("[Logging...] 合并资源文件")
     for item in other_apks_dir:
-        all_files = os.walk(item, True)
+        all_files = PathCompat.walk(item, True)
         for root, dirs, files in all_files:
             for file in files:
                 srcfile = os.path.join(root, file)
                 relative_dir = srcfile.replace(item, "")
                 dstdir = root.replace(item, main_apk_dir)
                 dstfile = os.path.join(dstdir, file)
-                if not os.path.exists(dstfile) and (relative_dir.startswith("\lib") or relative_dir.startswith("/lib") or relative_dir.startswith("\\res") or relative_dir.startswith("/res")):
-                    if not os.path.exists(dstdir):
-                        os.makedirs(dstdir)
-                    shutil.copy2(srcfile, dstfile)
+                if not os.path.exists(PathCompat.fsPath(dstfile)) and (relative_dir.startswith("\lib") or relative_dir.startswith("/lib") or relative_dir.startswith("\\res") or relative_dir.startswith("/res")):
+                    if not os.path.exists(PathCompat.fsPath(dstdir)):
+                        os.makedirs(PathCompat.fsPath(dstdir))
+                    shutil.copy2(PathCompat.fsPath(srcfile), PathCompat.fsPath(dstfile))
     Log.out("[Logging...] 合并文件完成\n")
 
 def modify_axml_file(main_apk_dir):
     axml_file = os.path.join(main_apk_dir, "AndroidManifest.xml")
     ET.register_namespace('android', Common.XML_NAMESPACE)
-    axml_tree = ET.parse(axml_file)
+    axml_tree = ET.parse(PathCompat.fsPath(axml_file))
     axml_root = axml_tree.getroot()
 
     # ---------- 删除 manifest 上的 split 属性 ----------
@@ -178,7 +179,7 @@ def modify_axml_file(main_apk_dir):
                 print(f"[Logging...] 删除资源属性 : [meta-data]name : {name}, value : {value}, resource : [{resource}]")
 
     # ---------- 保存 ----------
-    axml_tree.write(axml_file, encoding="utf-8", xml_declaration=True)
+    axml_tree.write(PathCompat.fsPath(axml_file), encoding="utf-8", xml_declaration=True)
     Log.out("")
 
 def remove_check_licence(main_apk_dir):
@@ -197,16 +198,16 @@ def remove_check_licence(main_apk_dir):
         r"\s*(?:#.*)?$"
     )
     modified_count = 0
-    for directory in os.listdir(main_apk_dir):
+    for directory in os.listdir(PathCompat.fsPath(main_apk_dir)):
         smali_dir = os.path.join(main_apk_dir, directory)
-        if not directory.startswith("smali") or not os.path.isdir(smali_dir):
+        if not directory.startswith("smali") or not os.path.isdir(PathCompat.fsPath(smali_dir)):
             continue
-        for root, dirs, files in os.walk(smali_dir):
+        for root, dirs, files in PathCompat.walk(smali_dir):
             for filename in files:
                 if not filename.endswith(".smali"):
                     continue
                 file_path = os.path.join(root, filename)
-                with open(file_path, "r", encoding="utf-8", newline="") as smali_file:
+                with open(PathCompat.fsPath(file_path), "r", encoding="utf-8", newline="") as smali_file:
                     lines = smali_file.readlines()
                 file_count = 0
                 for index, line in enumerate(lines):
@@ -217,7 +218,7 @@ def remove_check_licence(main_apk_dir):
                         lines[index] = indent + "# " + line[len(indent):]
                         file_count += 1
                 if file_count:
-                    with open(file_path, "w", encoding="utf-8", newline="") as smali_file:
+                    with open(PathCompat.fsPath(file_path), "w", encoding="utf-8", newline="") as smali_file:
                         smali_file.writelines(lines)
                     modified_count += file_count
                     Log.out(f"[Logging...] 注释许可调用 : [{file_path}] : {file_count}")
@@ -259,12 +260,12 @@ if __name__ == "__main__":
         sys.exit(0)
     work_dir = os.path.dirname(apks_file)
     intermediates_dir = os.path.abspath(os.path.join(work_dir, 'intermediates'))
-    if not os.path.exists(intermediates_dir):
-        os.mkdir(intermediates_dir)
+    if not os.path.exists(PathCompat.fsPath(intermediates_dir)):
+        os.mkdir(PathCompat.fsPath(intermediates_dir))
     apks_name, ext = os.path.splitext(os.path.basename(apks_file))
     apks_dir = os.path.realpath(os.path.join(intermediates_dir, apks_name))
-    if not os.path.exists(apks_dir):
-        os.mkdir(apks_dir)
+    if not os.path.exists(PathCompat.fsPath(apks_dir)):
+        os.mkdir(PathCompat.fsPath(apks_dir))
     Log.out("[Logging...] 临时中间目录 : {} , ext : {}".format(apks_dir, ext))
     all_apk_files = extract_apks_to_dir(apks_file, apks_dir)
     main_apk_dir, other_apks_dir = select_main_apk(all_apk_files)
@@ -276,7 +277,7 @@ if __name__ == "__main__":
     final_apk_file = os.path.join(work_dir, apks_name + "-final.apk")
     modify_axml_file(main_apk_dir)
     remove_check_licence(main_apk_dir)
-    if os.path.exists(final_apk_file):
+    if os.path.exists(PathCompat.fsPath(final_apk_file)):
         Utils.deleteFile(final_apk_file)
 
     if paused_before_compile:
@@ -289,8 +290,8 @@ if __name__ == "__main__":
     Utils.deleteFile(recompile_apk_file)
     Log.out("[Logging...] 清除临时文件 : {}".format(apks_dir))
     Utils.deletedir(apks_dir)
-    if intermediates_dir != None and os.path.exists(intermediates_dir):
-        dir_size = len(os.listdir(intermediates_dir))
+    if intermediates_dir != None and os.path.exists(PathCompat.fsPath(intermediates_dir)):
+        dir_size = len(os.listdir(PathCompat.fsPath(intermediates_dir)))
         Log.out("[Logging...] 临时目录大小 : {}".format(dir_size))
         if (dir_size <= 0):
             Log.out("[Logging...] 清除临时目录 : {}".format(intermediates_dir))

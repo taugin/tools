@@ -8,6 +8,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR) 
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Common
 import getopt
 import Log
@@ -110,9 +111,9 @@ def alignapk(unalignapk, finalapk):
         subprocess.call(cmdlist, stdout=subprocess.PIPE)
         Log.out("[Logging...] 文件对齐成功\n")
     else:
-        if (os.path.exists(finalapk)):
-            os.remove(finalapk)
-        os.rename(unalignapk, finalapk)
+        if (os.path.exists(PathCompat.fsPath(finalapk))):
+            os.remove(PathCompat.fsPath(finalapk))
+        os.rename(PathCompat.fsPath(unalignapk), PathCompat.fsPath(finalapk))
     return True
 
 def needInstall():
@@ -161,11 +162,11 @@ if __name__ == "__main__":
             signedapk = tmpname + "-signed.apk"
             alignedapk = tmpname + "-final.apk"
             if (signapk(srcapk, signedapk) == True):
-                if (os.path.exists(srcapk)):
-                    os.remove(srcapk)
+                if (os.path.exists(PathCompat.fsPath(srcapk))):
+                    os.remove(PathCompat.fsPath(srcapk))
                 if (alignapk(signedapk, alignedapk) == True):
-                    if (os.path.exists(signedapk)):
-                        os.remove(signedapk)
+                    if (os.path.exists(PathCompat.fsPath(signedapk))):
+                        os.remove(PathCompat.fsPath(signedapk))
         if (needInstall()):
             installApk(alignedapk)
     else:

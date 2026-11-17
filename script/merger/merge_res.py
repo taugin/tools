@@ -9,6 +9,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR) 
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Log
 
 import shutil
@@ -33,13 +34,13 @@ def indent(elem, level=0):
 def merge_exist(masterfile, slavefile, override):
     #Log.out("[Logging...] 合并 %s -> %s" % (slavefile, masterfile))
     try:
-        mastertree = ET.parse(masterfile)
-        slavetree = ET.parse(slavefile)
+        mastertree = ET.parse(PathCompat.fsPath(masterfile))
+        slavetree = ET.parse(PathCompat.fsPath(slavefile))
         masterroot = mastertree.getroot();
         slaveroot = slavetree.getroot()
 
-        masterchildren = masterroot.getchildren()
-        slavechildren = slaveroot.getchildren()
+        masterchildren = list(masterroot)
+        slavechildren = list(slaveroot)
         if (len(slavechildren) <= 0):
             #如果资源内容为空，则不需要合并
             return True
@@ -69,32 +70,32 @@ def merge_exist(masterfile, slavefile, override):
                         masterroot.remove(value)
                         masterroot.append(item)
         indent(masterroot)
-        mastertree.write(masterfile, encoding='utf-8', xml_declaration=True)
+        mastertree.write(PathCompat.fsPath(masterfile), encoding='utf-8', xml_declaration=True)
     except Exception as e:
         Log.out("Exception : %s" % e)
 
 def merge_res(masterfolder, slavefolder, override = False):
     Log.out("[Logging...] 拷贝资源文件 : [res]", True)
-    if (os.path.exists(masterfolder) == False):
+    if (os.path.exists(PathCompat.fsPath(masterfolder)) == False):
         Log.out("[Logging...] 无法定位文件夹 %s" % masterfolder, True)
         sys.exit(0)
-    if (os.path.exists(slavefolder) == False):
+    if (os.path.exists(PathCompat.fsPath(slavefolder)) == False):
         Log.out("[Logging...] 无法定位文件夹 %s" % slavefolder, True)
         sys.exit(0)
     masterres = os.path.join(masterfolder, "res")
     slaveres = os.path.join(slavefolder, "res")
-    reslist = os.walk(slaveres, True)
+    reslist = PathCompat.walk(slaveres, True)
     for root, dirs, files in reslist:
         for file in files:
             masterdir = root.replace(slavefolder, masterfolder)
             slavefile = os.path.join(root, file)
-            if (os.path.exists(masterdir) == False):
-                os.makedirs(masterdir)
+            if (os.path.exists(PathCompat.fsPath(masterdir)) == False):
+                os.makedirs(PathCompat.fsPath(masterdir))
             #拷贝其他文件夹里面的内容
             if (os.path.basename(root).startswith("values") == False):
                 masterfile = slavefile.replace(slavefolder, masterfolder)
                 #Log.out("slavefile : %s , masterfile : %s " % (slavefile, masterfile))
-                shutil.copy2(slavefile, masterfile)
+                shutil.copy2(PathCompat.fsPath(slavefile), PathCompat.fsPath(masterfile))
             #拷贝values文件夹里面的内容
             else:
                 if (file == "public.xml"):
@@ -102,11 +103,11 @@ def merge_res(masterfolder, slavefolder, override = False):
                     continue
                 tmp = os.path.join(root, file)
                 masterfile = tmp.replace(slavefolder, masterfolder)
-                if (os.path.exists(masterfile)) :
+                if (os.path.exists(PathCompat.fsPath(masterfile))) :
                     merge_exist(masterfile, slavefile, override)
                 else:
                     #Log.out("slavefile : %s , masterfile : %s " % (slavefile, masterfile))
-                    shutil.copy2(slavefile, masterfile)
+                    shutil.copy2(PathCompat.fsPath(slavefile), PathCompat.fsPath(masterfile))
     Log.out("[Logging...] 拷贝资源完成\n", True)
     return True
 

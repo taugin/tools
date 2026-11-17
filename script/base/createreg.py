@@ -6,6 +6,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR) 
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Common
 import getopt
 import Log
@@ -15,7 +16,7 @@ THIS_FILE_DIR = os.path.dirname(sys.argv[0])
 TEMP_TOOLS_ROOT = os.path.normpath(os.path.join(THIS_FILE_DIR, "..", ".."))
 REG_TEMPLATE_FILE = os.path.join(TEMP_TOOLS_ROOT, "ext", "winreg", "reg.txt")
 REG_TEMPLATE = None
-with open(REG_TEMPLATE_FILE, "rb") as f:
+with open(PathCompat.fsPath(REG_TEMPLATE_FILE), "rb") as f:
     REG_TEMPLATE = f.read().decode()
 
 TEMP_TOOLS_ROOT = TEMP_TOOLS_ROOT.replace("\\", "\\\\")
@@ -38,7 +39,7 @@ output = s.substitute(WINRAR_PATH=TEMP_WINRAR_PATH,TOOLS_ROOT=TEMP_TOOLS_ROOT, P
 #Log.out("reg_template : %s" % output)
 
 reg_file = os.path.join(TEMP_TOOLS_ROOT, "ext", "winreg", "out.reg")
-f = open(reg_file, "w")
+f = open(PathCompat.fsPath(reg_file), "w")
 f.write(output)
 f.close()
 Log.out("[Logging...] 脚本执行参数 : [%s]" % reg_file)

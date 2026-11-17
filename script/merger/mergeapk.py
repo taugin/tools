@@ -12,6 +12,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR) 
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Log
 import shutil
 import getopt
@@ -141,9 +142,9 @@ def clean_tmp_folders(masterfolder, slavefolder, file1, file2):
         Utils.deleteFile(file2)
         if (not DEBUG_MODE):
             Log.out("[Logging...] 清除临时文件 : [%s]" % masterfolder)
-            shutil.rmtree(masterfolder, ignore_errors = True)
+            shutil.rmtree(PathCompat.fsPath(masterfolder), ignore_errors = True)
             Log.out("[Logging...] 清除临时文件 : [%s]" % slavefolder)
-            shutil.rmtree(slavefolder, ignore_errors = True)
+            shutil.rmtree(PathCompat.fsPath(slavefolder), ignore_errors = True)
     except:
         pass
     Log.out("[Logging...] 文件清除完成\n")
@@ -198,8 +199,8 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
     result = False
     length = len(functions)
     func_exec_pos = 0
-    if (os.path.exists(TRY_CONFIG)):
-        f = open(TRY_CONFIG, "r");
+    if (os.path.exists(PathCompat.fsPath(TRY_CONFIG))):
+        f = open(PathCompat.fsPath(TRY_CONFIG), "r");
         string = f.read()
         f.close()
         saveflag = eval(string)
@@ -211,7 +212,7 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
         if (filename != None and filename == os.path.abspath(mastermergedapk)):
             pass
         func_exec_pos = saveflag["position"]
-        os.remove(TRY_CONFIG)
+        os.remove(PathCompat.fsPath(TRY_CONFIG))
 
     SAVE_ON_FALSE = False
     for item in range(0, length):
@@ -231,7 +232,7 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
             if (result == False):
                 if (saveonfalse == True):
                     savestr = '{"position":%d,"filename":r"%s"}' % (item, os.path.abspath(mastermergedapk))
-                    fd = open(TRY_CONFIG, "w")
+                    fd = open(PathCompat.fsPath(TRY_CONFIG), "w")
                     fd.write(savestr)
                     fd.close()
                 break
@@ -244,7 +245,7 @@ def mergeapk_batch(masterapk, slaveapk, output, newpkgname, company):
 
 def rename_with_template(masterfinalapk):
     final_name_template =NAME_TEMPLATE
-    if (masterfinalapk == None or not os.path.exists(masterfinalapk)):
+    if (masterfinalapk == None or not os.path.exists(PathCompat.fsPath(masterfinalapk))):
         return
     if (final_name_template == None or len(final_name_template) <= 0):
         final_name_template = "{apklabel}_Release_v{vername}_{vercode}_{datetime}.apk"
@@ -273,9 +274,9 @@ def rename_with_template(masterfinalapk):
     folder = os.path.dirname(masterfinalapk)
     final_apk_path = os.path.normpath(os.path.join(folder, final_apk_name))
     Log.out("[Logging...] 生成最终文件 : [%s]" % final_apk_path)
-    if os.path.exists(final_apk_path):
-        os.remove(final_apk_path)
-    os.rename(masterfinalapk, final_apk_path)
+    if os.path.exists(PathCompat.fsPath(final_apk_path)):
+        os.remove(PathCompat.fsPath(final_apk_path))
+    os.rename(PathCompat.fsPath(masterfinalapk), PathCompat.fsPath(final_apk_path))
 
 def merge_according_cmdline(args):
     if (len(args) < 2):

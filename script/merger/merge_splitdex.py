@@ -9,6 +9,7 @@ DIR = os.path.dirname(sys.argv[0])
 COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
+import PathCompat
 import Log
 import Utils
 import Common
@@ -41,10 +42,10 @@ def parse_method_invoke(line):
 
 def get_smali_method_count(smaliFile, allMethods):
     '''获取smali文件的方法数'''
-    if not os.path.exists(smaliFile):
+    if not os.path.exists(PathCompat.fsPath(smaliFile)):
         return 0
 
-    f = open(smaliFile, 'r', encoding='UTF-8')
+    f = open(PathCompat.fsPath(smaliFile), 'r', encoding='UTF-8')
     lines = f.readlines()
     f.close()
 
@@ -98,7 +99,7 @@ def add_prefix_files_to_front(allFiles, prefix):
     return allFiles
 
 def split_dex_detail(masterfolder, smaliFrom, smaliTo, allFiles):
-    if (not os.path.exists(os.path.join(masterfolder, smaliFrom))):
+    if (not os.path.exists(PathCompat.fsPath(os.path.join(masterfolder, smaliFrom)))):
         return
     maxFuncNum = 65535
     allRefs = []
@@ -123,8 +124,8 @@ def split_dex_detail(masterfolder, smaliFrom, smaliTo, allFiles):
 
         Log.showNoReturn("[Logging...] 累计函数总数 : [%s : %s]" % (smaliFrom, finalFunNum))
         newDexPath = os.path.join(masterfolder, smaliTo)
-        if (not os.path.exists(newDexPath)):
-            os.makedirs(newDexPath)
+        if (not os.path.exists(PathCompat.fsPath(newDexPath))):
+            os.makedirs(PathCompat.fsPath(newDexPath))
         handledFile = f
         fromSmaliPath = os.path.join(masterfolder, smaliFrom)
         toSmaliPath = os.path.join(masterfolder, smaliTo)
@@ -138,15 +139,15 @@ def split_dex_detail(masterfolder, smaliFrom, smaliTo, allFiles):
             handledFile = None
 
 def find_app_name_path(masterfolder):
-    if (os.path.exists(masterfolder) == False):
+    if (os.path.exists(PathCompat.fsPath(masterfolder)) == False):
         Log.out("[Logging...] 无法定位文件夹 %s" % masterfolder, True)
         return None
     manifestfile = "%s/AndroidManifest.xml" % masterfolder;
-    if (os.path.exists(manifestfile) == False):
+    if (os.path.exists(PathCompat.fsPath(manifestfile)) == False):
         Log.out("[Logging...] 无法定位文件夹 %s" % manifestfile, True)
         return None
     ET.register_namespace('android', Common.XML_NAMESPACE)
-    manifesttree = ET.parse(manifestfile)
+    manifesttree = ET.parse(PathCompat.fsPath(manifestfile))
     if (manifesttree == None):
         return None
     manifestroot = manifesttree.getroot()

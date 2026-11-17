@@ -1,5 +1,9 @@
 #!/usr/bin/python
 # coding: UTF-8
+import sys as _pathSys
+from pathlib import Path as _Path
+_pathSys.path.append(str(_Path(__file__).resolve().parents[1] / "common"))
+import PathCompat
 import sys
 import os
 from builtins import float
@@ -117,7 +121,7 @@ def show_cell_type(cell):
 
 def open_excel(excel_file):
     try:
-        return xlrd.open_workbook(excel_file)
+        return xlrd.open_workbook(PathCompat.fsPath(excel_file))
     except:
         pass
     return None
@@ -243,7 +247,7 @@ def read_excel(excel_file):
     adconfig = collections.OrderedDict()
     adplaces = []
     pids_map = collections.OrderedDict()
-    if not os.path.exists(excel_file):
+    if not os.path.exists(PathCompat.fsPath(excel_file)):
         log("[Logging...] 无法定位文件 : [%s]" % excel_file)
         pause()
         sys.exit(0)
@@ -328,7 +332,7 @@ def read_excel(excel_file):
         output = json.dumps(adconfig, sort_keys=False, indent=4)
     except:
         output = str(adstring)
-    f = open(newfile, "w")
+    f = open(PathCompat.fsPath(newfile), "w")
     f.write(output)
     f.close()
     log("[Logging...] 文件转换成功 : [%s]" % newfile)

@@ -8,6 +8,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Common
 import Log
 
@@ -19,7 +20,7 @@ BINARY = False
 
 def encrypt_file(key, input_file, output_file):
     global BINARY
-    if input_file == None or not os.path.exists(input_file):
+    if input_file == None or not os.path.exists(PathCompat.fsPath(input_file)):
         usage()
         return False
     input_file = os.path.abspath(input_file)
@@ -50,7 +51,7 @@ def encrypt_file(key, input_file, output_file):
 
 def decrypt_file(key, input_file, output_file):
     global BINARY
-    if input_file == None or not os.path.exists(input_file):
+    if input_file == None or not os.path.exists(PathCompat.fsPath(input_file)):
         usage()
         sys.exit(-1)
     input_file = os.path.abspath(input_file)

@@ -9,6 +9,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Common
 import Log
 import Utils
@@ -20,13 +21,13 @@ from xml.dom.minidom import Document
 ###########################################################################
 
 def move_files_recursion(fromdir, prefix, dstdir, recursion):
-    if (os.path.exists(fromdir) and os.path.exists(dstdir)):
-            filelist = os.walk(fromdir, True)
+    if (os.path.exists(PathCompat.fsPath(fromdir)) and os.path.exists(PathCompat.fsPath(dstdir))):
+            filelist = PathCompat.walk(fromdir, True)
             for root, filedir, files in filelist:
                 for file in files:
                     fromfile = os.path.join(root, file)
                     tofile = fromfile.replace(fromdir, dstdir)
-                    if (os.path.exists(fromfile) and prefix in fromfile):
+                    if (os.path.exists(PathCompat.fsPath(fromfile)) and prefix in fromfile):
                         if not recursion:
                             dirname = os.path.dirname(fromfile)
                             if not dirname.endswith(prefix):
@@ -44,7 +45,7 @@ def move_special_files(masterfolder, prefix, recursion = True):
 
     for smalidir in smalidirs:
         fromdir = os.path.join(masterfolder, smalidir)
-        if os.path.exists(fromdir):
+        if os.path.exists(PathCompat.fsPath(fromdir)):
             move_files_recursion(fromdir, prefix, dstdir, recursion)
         else:
             break;
@@ -53,7 +54,7 @@ def move_special_files(masterfolder, prefix, recursion = True):
 '''
 def get_application_name(slavefolder):
     manifest = os.path.join(slavefolder, "AndroidManifest.xml")
-    tree = ET.parse(manifest)
+    tree = ET.parse(PathCompat.fsPath(manifest))
     root = tree.getroot()
     package = root.get("package")
     application = root.find("application")
@@ -64,7 +65,7 @@ def get_application_name(slavefolder):
 
 def has_application(masterfolder):
     manifest = os.path.join(masterfolder, "AndroidManifest.xml")
-    tree = ET.parse(manifest)
+    tree = ET.parse(PathCompat.fsPath(manifest))
     root = tree.getroot()
     application = root.find("application")
     app_name = application.get("{%s}name" % Common.XML_NAMESPACE)
@@ -74,12 +75,12 @@ def has_application(masterfolder):
 
 def set_application(masterfolder, app_name):
     manifest = os.path.join(masterfolder, "AndroidManifest.xml")
-    tree = ET.parse(manifest)
+    tree = ET.parse(PathCompat.fsPath(manifest))
     ET.register_namespace('android', Common.XML_NAMESPACE)
     root = tree.getroot()
     application = root.find("application")
     application.set("{%s}name" % Common.XML_NAMESPACE, app_name)
-    tree.write(manifest, encoding='utf-8', xml_declaration=True)
+    tree.write(PathCompat.fsPath(manifest), encoding='utf-8', xml_declaration=True)
 
 def add_application(masterfolder, slavefolder):
     has_app = has_application(masterfolder)
@@ -128,13 +129,13 @@ def modify_entry_activity(package_name, old_entry_activity, activity_with_app_en
             meta_data.set("{%s}value" % Common.XML_NAMESPACE, launcher_full_name)
 
 def modify_activity_entry(masterfolder):
-    if (os.path.exists(masterfolder) == False):
+    if (os.path.exists(PathCompat.fsPath(masterfolder)) == False):
         Log.out("[Logging...] 无法定位文件夹 %s" % masterfolder, True)
         sys.exit(0)
     mastermanifest = "%s/AndroidManifest.xml" % masterfolder;
     ET.register_namespace('android', Common.XML_NAMESPACE)
 
-    mastertree = ET.parse(mastermanifest)
+    mastertree = ET.parse(PathCompat.fsPath(mastermanifest))
     masterroot = mastertree.getroot()
 
     package_name = masterroot.get("package")
@@ -154,7 +155,7 @@ def modify_activity_entry(masterfolder):
 
     modify_entry_activity(package_name, old_entry_activity, activity_with_app_entry)
     Utils.indent(masterroot)
-    mastertree.write(mastermanifest, encoding="utf-8", xml_declaration=True)
+    mastertree.write(PathCompat.fsPath(mastermanifest), encoding="utf-8", xml_declaration=True)
 
 def contain_special_path(spfolder, spfile):
     if (spfolder == None or len(spfolder) <= 0 or spfile == None or len(spfile) <= 0):
@@ -169,25 +170,25 @@ def update_duplicate_files(masterfolder, spfolder):
     Log.out("[Logging...] 更新指定文件 ")
     fromdir = os.path.normpath("%s/smali_classes2" % masterfolder)
     dstdir = os.path.normpath("%s/smali" % masterfolder)
-    if (os.path.exists(fromdir) and os.path.exists(dstdir)):
-        filelist = os.walk(fromdir, True)
+    if (os.path.exists(PathCompat.fsPath(fromdir)) and os.path.exists(PathCompat.fsPath(dstdir))):
+        filelist = PathCompat.walk(fromdir, True)
         for root, filedir, files in filelist:
             for file in files:
                 fromfile = os.path.join(root, file)
                 tofile = fromfile.replace(fromdir, dstdir)
-                if (os.path.exists(fromfile) and os.path.exists(tofile) and contain_special_path(spfolder, fromfile)):
+                if (os.path.exists(PathCompat.fsPath(fromfile)) and os.path.exists(PathCompat.fsPath(tofile)) and contain_special_path(spfolder, fromfile)):
                     Log.out("fromfile : %s" % fromfile)
                     Utils.movefile(fromfile, tofile)
 
     fromdir = os.path.normpath("%s/smali_classes3" % masterfolder)
     dstdir = os.path.normpath("%s/smali" % masterfolder)
-    if (os.path.exists(fromdir) and os.path.exists(dstdir)):
-        filelist = os.walk(fromdir, True)
+    if (os.path.exists(PathCompat.fsPath(fromdir)) and os.path.exists(PathCompat.fsPath(dstdir))):
+        filelist = PathCompat.walk(fromdir, True)
         for root, filedir, files in filelist:
             for file in files:
                 fromfile = os.path.join(root, file)
                 tofile = fromfile.replace(fromdir, dstdir)
-                if (os.path.exists(fromfile) and os.path.exists(tofile) and contain_special_path(spfolder, fromfile)):
+                if (os.path.exists(PathCompat.fsPath(fromfile)) and os.path.exists(PathCompat.fsPath(tofile)) and contain_special_path(spfolder, fromfile)):
                     Log.out("fromfile : %s" % fromfile)
                     Utils.movefile(fromfile, tofile)
 
@@ -195,7 +196,7 @@ def update_duplicate_files(masterfolder, spfolder):
 def move_file_by_appname(masterfolder, slavefolder):
     slavemanifest = "%s/AndroidManifest.xml" % slavefolder;
     ET.register_namespace('android', Common.XML_NAMESPACE)
-    slavetree = ET.parse(slavemanifest)
+    slavetree = ET.parse(PathCompat.fsPath(slavemanifest))
     if slavetree == None:
         return
 

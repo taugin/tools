@@ -8,6 +8,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Common
 import Log
 import Utils
@@ -19,11 +20,11 @@ def copy_smali(masterfolder, slavefolder):
 
     for smalifrom in smalidirs:
         fromdir = os.path.join(slavefolder, smalifrom)
-        if not os.path.exists(fromdir):
+        if not os.path.exists(PathCompat.fsPath(fromdir)):
             break
         for smalidst in smalidirs:
             dstdir = os.path.join(masterfolder, smalidst)
-            if not os.path.exists(dstdir):
+            if not os.path.exists(PathCompat.fsPath(dstdir)):
                 Log.out("[Logging...] 复制汇编文件 : [%s] -> [%s]" % (os.path.basename(fromdir), os.path.basename(dstdir)))
                 Utils.copydir(fromdir, dstdir, False)
                 break;
@@ -34,15 +35,15 @@ def clear_dup_smali(masterfolder):
     smalidirs = ["smali_classes2", "smali_classes3", "smali_classes4", "smali_classes5", "smali_classes6", "smali_classes7", "smali_classes8", "smali_classes9", "smali_classes10"]
     for smalidir in smalidirs:
         smalidst = os.path.join(masterfolder, smalidir)
-        if (not os.path.exists(smalidst)):
+        if (not os.path.exists(PathCompat.fsPath(smalidst))):
             break
-        srclist = os.walk(smali, True)
+        srclist = PathCompat.walk(smali, True)
         for root, filedir, files in srclist:
             for file in files:
                 file = os.path.join(root, file)
                 toDeleteFile = file.replace(smali, smalidst)
-                if os.path.exists(toDeleteFile):
-                    os.remove(toDeleteFile)
+                if os.path.exists(PathCompat.fsPath(toDeleteFile)):
+                    os.remove(PathCompat.fsPath(toDeleteFile))
                     Utils.deleteEmptyDir(toDeleteFile)
     Log.out("[Logging...] 清除文件完成\n ", True)
 
@@ -73,8 +74,8 @@ def baksmali(dexfile, outdir):
     outdir = os.path.normpath(outdir)
     Log.out("[Logging...] 开始转换文件 : [%s] --> [%s]" % (dexfile, outdir))
     tmpdir = os.path.join(os.getcwd(), "tmp%s" % random.randint(0, 1000))
-    if not os.path.exists(tmpdir):
-        os.mkdir(tmpdir)
+    if not os.path.exists(PathCompat.fsPath(tmpdir)):
+        os.mkdir(PathCompat.fsPath(tmpdir))
     cmdlist = [Common.JAVA(), "-jar", Common.BAKSMALI_JAR, "d", "-o", tmpdir, dexfile]
     process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE)
     ret = process.wait()
@@ -92,14 +93,14 @@ def support_multidex(masterfolder):
     smaliPath = os.path.join(masterfolder, "smali/")
     multidexFilePath = os.path.join(smaliPath, "android/support/multidex/MultiDex.smali")
     multidexFilePath = os.path.normpath(multidexFilePath)
-    if not os.path.exists(multidexFilePath):
+    if not os.path.exists(PathCompat.fsPath(multidexFilePath)):
         multiDexJar = os.path.join(Common.LIB_DIR, "android-support-multidex.jar")
-        if not os.path.exists(multiDexJar):
+        if not os.path.exists(PathCompat.fsPath(multiDexJar)):
             Log.out("the method num expired of dex, but no android-support-multidex.jar found")
             return
         multiDexPath = os.path.join(os.getcwd(), "multidex")
-        if not os.path.exists(multiDexPath):
-            os.makedirs(multiDexPath)
+        if not os.path.exists(PathCompat.fsPath(multiDexPath)):
+            os.makedirs(PathCompat.fsPath(multiDexPath))
         multiDexFile = os.path.join(multiDexPath, "classes.dex")
         jar2dex(multiDexJar, multiDexFile)
         smaliPath = os.path.join(masterfolder, "smali/");

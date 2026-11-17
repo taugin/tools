@@ -10,6 +10,7 @@ DIR = os.path.dirname(sys.argv[0])
 COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
+import PathCompat
 import Common
 import Log
 import Utils
@@ -42,7 +43,7 @@ def analyze_ad_platform(manifest_root):
     ad_info_file = os.path.join(script_dir, "ad_info.json")
     Log.out("[Logging...] 配置文件路径 : {}".format(ad_info_file))
     ad_info_json = None
-    with open(ad_info_file, "r", encoding="utf-8") as f:
+    with open(PathCompat.fsPath(ad_info_file), "r", encoding="utf-8") as f:
         ad_info_json = eval(f.read())
     #Log.out("ad_info_json : {}".format(ad_info_json))
 
@@ -211,14 +212,14 @@ def analize_keywords(decompiled_apk_dir):
     search_result_set = set()
     for item in smalidirs:
         smali_dir = os.path.join(decompiled_apk_dir, item)
-        if os.path.exists(smali_dir):
-            mylist = os.walk(smali_dir, True)
+        if os.path.exists(PathCompat.fsPath(smali_dir)):
+            mylist = PathCompat.walk(smali_dir, True)
             for root, filedir, files in mylist:
                 for file in files:
                     relative_file = os.path.join(root, file)
                     abs_file = os.path.abspath(relative_file)
-                    if os.path.exists(abs_file):
-                        with open(abs_file, "r", encoding='UTF-8') as f:
+                    if os.path.exists(PathCompat.fsPath(abs_file)):
+                        with open(PathCompat.fsPath(abs_file), "r", encoding='UTF-8') as f:
                             content = f.read()
                             for word in keywords:
                                 if word in content:
@@ -285,8 +286,8 @@ def compare_manifest(decompiled_dir_old, decompiled_dir_new):
     manifest_old_file = os.path.join(decompiled_dir_old, "AndroidManifest.xml")
     manifest_new_file = os.path.join(decompiled_dir_new, "AndroidManifest.xml")
     #Log.out("[Logging...] 临时中间文件 : [{}, {}]".format(manifest_old_file, manifest_new_file))
-    manifest_old_et = ET.parse(manifest_old_file)
-    manifest_new_et = ET.parse(manifest_new_file)
+    manifest_old_et = ET.parse(PathCompat.fsPath(manifest_old_file))
+    manifest_new_et = ET.parse(PathCompat.fsPath(manifest_new_file))
     old_root = manifest_old_et.getroot()
     new_root = manifest_new_et.getroot()
     compare_manifest_element(old_root, new_root, "uses-permission")
@@ -301,8 +302,8 @@ def compare_string(decompiled_dir_old, decompiled_dir_new):
     '''对比字符串的变化'''
     string_old_file = os.path.join(decompiled_dir_old, "res", "values", "strings.xml")
     string_new_file = os.path.join(decompiled_dir_new, "res", "values", "strings.xml")
-    string_old_et = ET.parse(string_old_file)
-    string_new_et = ET.parse(string_new_file)
+    string_old_et = ET.parse(PathCompat.fsPath(string_old_file))
+    string_new_et = ET.parse(PathCompat.fsPath(string_new_file))
     old_root = string_old_et.getroot()
     new_root = string_new_et.getroot()
     old_apk_set = set()
@@ -336,8 +337,8 @@ def compare_public(decompiled_dir_old, decompiled_dir_new):
     '''对比字符串的变化'''
     string_old_file = os.path.join(decompiled_dir_old, "res", "values", "public.xml")
     string_new_file = os.path.join(decompiled_dir_new, "res", "values", "public.xml")
-    string_old_et = ET.parse(string_old_file)
-    string_new_et = ET.parse(string_new_file)
+    string_old_et = ET.parse(PathCompat.fsPath(string_old_file))
+    string_new_et = ET.parse(PathCompat.fsPath(string_new_file))
     old_root = string_old_et.getroot()
     new_root = string_new_et.getroot()
     old_apk_set = set()
@@ -377,12 +378,12 @@ def decompile_input_apk(apk_old, apk_new):
     if apk_old != None and len(apk_old) > 0:
         apk_old_name, ext = os.path.splitext(os.path.basename(apk_old))
         intermediates_old_dir = os.path.join(intermediates_dir, apk_old_name)
-        if not os.path.exists(intermediates_old_dir):
+        if not os.path.exists(PathCompat.fsPath(intermediates_old_dir)):
             decompiled_apk(apk_old, intermediates_old_dir)
     if apk_new != None and len(apk_new) > 0:
         apk_new_name, ext = os.path.splitext(os.path.basename(apk_new))
         intermediates_new_dir = os.path.join(intermediates_dir, apk_new_name)
-        if not os.path.exists(intermediates_new_dir):
+        if not os.path.exists(PathCompat.fsPath(intermediates_new_dir)):
             decompiled_apk(apk_new, intermediates_new_dir)
     return intermediates_old_dir, intermediates_new_dir
 
@@ -402,18 +403,18 @@ def analyze_apk_manifest(apk_xapk_apks_file):
             manifest_root = ET.fromstring(manifest_content)
     elif apk_xapk_apks_file.endswith(".xapk"):
         apk_file = find_main_apk_from_xapk(apk_xapk_apks_file)
-        if os.path.exists(apk_file):
+        if os.path.exists(PathCompat.fsPath(apk_file)):
             manifest_content = decode_manifest_from_apk(apk_file)
             if manifest_content != None and len(manifest_content) > 0:
                 manifest_root = ET.fromstring(manifest_content)
-            os.remove(apk_file)
+            os.remove(PathCompat.fsPath(apk_file))
     elif apk_xapk_apks_file.endswith(".apks"):
         apk_file = find_main_apk_from_apks(apk_xapk_apks_file)
-        if os.path.exists(apk_file):
+        if os.path.exists(PathCompat.fsPath(apk_file)):
             manifest_content = decode_manifest_from_apk(apk_file)
             if manifest_content != None and len(manifest_content) > 0:
                 manifest_root = ET.fromstring(manifest_content)
-            os.remove(apk_file)
+            os.remove(PathCompat.fsPath(apk_file))
     if manifest_root == None:
         Log.out("[Logging...] {}".format("AXML文件缺失"))
         sys.exit(0)
@@ -430,7 +431,7 @@ def analyze_apk_manifest(apk_xapk_apks_file):
 
 def decode_manifest_from_apk(apk_file):
     manifest_content = None
-    zf = zipfile.ZipFile(os.path.abspath(apk_file), "r")
+    zf = zipfile.ZipFile(PathCompat.fsPath(os.path.abspath(apk_file)), "r")
     manifest = None
     for file in zf.namelist():
         if (file == "AndroidManifest.xml"):
@@ -438,7 +439,7 @@ def decode_manifest_from_apk(apk_file):
             break
     if (manifest != None and manifest != ""):
         tmpfile = os.path.basename(manifest)
-        f = open(tmpfile, "wb")
+        f = open(PathCompat.fsPath(tmpfile), "wb")
         f.write(zf.read(manifest))
         f.close()
         cmd = [Common.JAVA(), "-jar", Common.AXMLPRINTER_JAR, tmpfile]
@@ -451,12 +452,12 @@ def decode_manifest_from_apk(apk_file):
                 content_line.append(line)
             if content_line != None and len(content_line) > 0:
                 manifest_content = "".join(content_line)
-        os.remove(tmpfile)
+        os.remove(PathCompat.fsPath(tmpfile))
     zf.close()
     return manifest_content
 
 def find_main_apk_from_xapk(xapk_file):
-    zf = zipfile.ZipFile(os.path.abspath(xapk_file), "r")
+    zf = zipfile.ZipFile(PathCompat.fsPath(os.path.abspath(xapk_file)), "r")
     apk_file = None
     for file in zf.namelist():
         basefile = os.path.basename(file)
@@ -465,13 +466,13 @@ def find_main_apk_from_xapk(xapk_file):
             break;
     Log.out("[Logging...] {}".format("安卓文件名称 : {}".format(apk_file)))
     tmpfile = os.path.basename(apk_file)
-    f = open(tmpfile, "wb")
+    f = open(PathCompat.fsPath(tmpfile), "wb")
     f.write(zf.read(apk_file))
     f.close()
     return tmpfile
 
 def find_main_apk_from_apks(apks_file):
-    zf = zipfile.ZipFile(os.path.abspath(apks_file), "r")
+    zf = zipfile.ZipFile(PathCompat.fsPath(os.path.abspath(apks_file)), "r")
     apk_file = None
     for file in zf.namelist():
         basefile = os.path.basename(file)
@@ -480,7 +481,7 @@ def find_main_apk_from_apks(apks_file):
             break;
     Log.out("[Logging...] {}".format("安卓文件名称 : {}".format(apk_file)))
     tmpfile = os.path.basename(apk_file)
-    f = open(tmpfile, "wb")
+    f = open(PathCompat.fsPath(tmpfile), "wb")
     f.write(zf.read(apk_file))
     f.close()
     return tmpfile
@@ -512,10 +513,10 @@ if __name__ == "__main__":
     if len(args) >=2 and COMPARE_APK_FILE:
         apk_old = args[0]
         apk_new = args[1]
-        if not os.path.exists(apk_old) or (not apk_old.endswith(".apk") and not apk_old.endswith(".xapk") and not apk_old.endswith(".apks")):
+        if not os.path.exists(PathCompat.fsPath(apk_old)) or (not apk_old.endswith(".apk") and not apk_old.endswith(".xapk") and not apk_old.endswith(".apks")):
             Log.out("[Logging...] apk文件不存在: {}".format(apk_old))
             sys.exit(0)
-        if not os.path.exists(apk_new) or (not apk_old.endswith(".apk") and not apk_old.endswith(".xapk") and not apk_old.endswith(".apks")):
+        if not os.path.exists(PathCompat.fsPath(apk_new)) or (not apk_old.endswith(".apk") and not apk_old.endswith(".xapk") and not apk_old.endswith(".apks")):
             Log.out("[Logging...] apk文件不存在: {}".format(apk_new))
             sys.exit(0)
         intermediates_old_dir, intermediates_new_dir = decompile_input_apk(apk_old, apk_new)
@@ -525,7 +526,7 @@ if __name__ == "__main__":
     else:
         for item in args:
             apk_file = item
-            if os.path.exists(apk_file) or (not apk_file.endswith(".apk") and not apk_file.endswith(".xapk") and not apk_file.endswith(".apks")):
+            if os.path.exists(PathCompat.fsPath(apk_file)) or (not apk_file.endswith(".apk") and not apk_file.endswith(".xapk") and not apk_file.endswith(".apks")):
                 if SEARCH_KEYWORDS_IN_CODE:
                     intermediates_old_dir, intermediates_new_dir = decompile_input_apk(None, apk_file)
                 analyze_apk_manifest(apk_file)

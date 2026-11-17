@@ -11,6 +11,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Common
 import Log
 import Utils
@@ -70,7 +71,7 @@ def getaabpackagename(file):
 
 def readkeystore(src_file):
     filedir = os.path.dirname(src_file)
-    listfile = os.listdir(filedir)
+    listfile = os.listdir(PathCompat.fsPath(filedir))
     storefiles = []
     #Log.out(listfile)
     index = 0
@@ -83,8 +84,8 @@ def readkeystore(src_file):
     # 在工程目录下的keystore文件夹中寻找签名文件
     if (len(storefiles) <= 0):
         keystoredir = os.path.normpath(os.path.join(filedir, "..", "..", "..", "..", "..", "keystore"))
-        if os.path.exists(keystoredir):
-            listfile = os.listdir(keystoredir)
+        if os.path.exists(PathCompat.fsPath(keystoredir)):
+            listfile = os.listdir(PathCompat.fsPath(keystoredir))
             index = 0
             storeindex = 0
             for file in listfile:
@@ -97,9 +98,9 @@ def readkeystore(src_file):
         packagename = getaabpackagename(src_file)
         if (packagename != None and len(packagename) > 0):
             pkg_storefile = os.path.join(Common.KEYSTORES_DIR, "appsignfiles", packagename)
-            if (pkg_storefile != None and os.path.isdir(pkg_storefile)):
+            if (pkg_storefile != None and os.path.isdir(PathCompat.fsPath(pkg_storefile))):
                 Log.out("[Logging...] 文件包名 : [%s]" % packagename)
-                listfile=os.listdir(pkg_storefile)
+                listfile=os.listdir(PathCompat.fsPath(pkg_storefile))
                 #Log.out(listfile)
                 index = 0
                 storeindex = 0
@@ -242,7 +243,7 @@ def aab2apks(aab_file):
     if (LOCAL_TESTING == True):
         cmdlist.append("--local-testing")
 
-    if (DEVICE_SPEC_FILE != None and len(DEVICE_SPEC_FILE) > 0 and os.path.exists(DEVICE_SPEC_FILE)):
+    if (DEVICE_SPEC_FILE != None and len(DEVICE_SPEC_FILE) > 0 and os.path.exists(PathCompat.fsPath(DEVICE_SPEC_FILE))):
         cmdlist.append("--device-spec=%s" % DEVICE_SPEC_FILE)
     
     #Log.out("cmdlist : %s" % cmdlist)
@@ -263,7 +264,7 @@ def aab2apks(aab_file):
         exp_time = end_time - start_time
         Log.out("[Logging...] 转换耗时 : [%.2fs]" % exp_time, True)
         #time.sleep(3)
-        if UNIVERSAL == True and os.path.exists(apks_file):
+        if UNIVERSAL == True and os.path.exists(PathCompat.fsPath(apks_file)):
             extractApksInUniversalMode(apks_file, basename)
         pause()
     else:
@@ -275,17 +276,17 @@ def extractApksInUniversalMode(apks_file, basename):
     final_apk_name = "%s.apk" % basename
     cur_dir = os.path.dirname(apks_file)
     universal_path = os.path.join(cur_dir, "universal.apk")
-    if (os.path.exists(universal_path)):
-        os.remove(universal_path)
-    if (os.path.exists(final_apk_name)):
-        os.remove(final_apk_name)
+    if (os.path.exists(PathCompat.fsPath(universal_path))):
+        os.remove(PathCompat.fsPath(universal_path))
+    if (os.path.exists(PathCompat.fsPath(final_apk_name))):
+        os.remove(PathCompat.fsPath(final_apk_name))
     Log.out("[Logging...] 解压文件 : [%s -> %s]" % (apks_file, final_apk_name), True)
-    apks_zip_file = zipfile.ZipFile(apks_file, "r")
-    apks_zip_file.extract("universal.apk", ".")
+    apks_zip_file = zipfile.ZipFile(PathCompat.fsPath(apks_file), "r")
+    apks_zip_file.extract("universal.apk", PathCompat.fsPath("."))
     apks_zip_file.close()
-    os.rename(universal_path, final_apk_name)
-    if (os.path.exists(apks_file)):
-        os.remove(apks_file)
+    os.rename(PathCompat.fsPath(universal_path), PathCompat.fsPath(final_apk_name))
+    if (os.path.exists(PathCompat.fsPath(apks_file))):
+        os.remove(PathCompat.fsPath(apks_file))
 
 def install_apks(apks_file):
     select_device = get_select_devices(True)

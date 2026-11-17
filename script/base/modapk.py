@@ -15,6 +15,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR) 
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Common
 import Log
 
@@ -126,24 +127,24 @@ def modify_xml():
     Log.out("[Logging...] 正在编辑 AndrodManifest.xml")
     manifest = "%s/AndroidManifest.xml" % TMP_DECOMPILE_FOLDER
     ET.register_namespace('android', XML_NAMESPACE)
-    tree = ET.parse(manifest)
+    tree = ET.parse(PathCompat.fsPath(manifest))
     root = tree.getroot()
     modify_appname_forloader(root)
     # Modify package name for apk
     modify_packagename_ifneed(root)
     modify_applabel_ifneed(root);
-    tree.write(manifest, encoding='utf-8', xml_declaration=True)
+    tree.write(PathCompat.fsPath(manifest), encoding='utf-8', xml_declaration=True)
     return True
 
 #复制一份新的apk，以免损坏了原apk
 def generate_dstapk(dstapk):
     Log.out("[Logging...] 正在生成 %s" % dstapk)
-    shutil.copyfile(srcapkname, dstapk)
+    shutil.copyfile(PathCompat.fsPath(srcapkname), PathCompat.fsPath(dstapk))
 
 #将classes.des压缩为encryptdata.dat
 def generate_encryptdata():
-    basezf = zipfile.ZipFile(srcapkname, "r")
-    zipf = zipfile.ZipFile(DEX_ENCRYPTDATA,"w")
+    basezf = zipfile.ZipFile(PathCompat.fsPath(srcapkname), "r")
+    zipf = zipfile.ZipFile(PathCompat.fsPath(DEX_ENCRYPTDATA),"w")
     zipf.writestr("classes.dex", basezf.read("classes.dex"))
     zipf.close()
     basezf.close()
@@ -156,8 +157,8 @@ def addloader(dstapk):
         subprocess.call([Common.AAPT_BIN, "r", dstapk, "classes.dex"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         subprocess.call([Common.AAPT_BIN, "r", dstapk, "assets/%s" % DEX_ENCRYPTDATA], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    szf = zipfile.ZipFile(TMP_DECOMPILE_APKFILE, "r")
-    zf = zipfile.ZipFile(dstapk, "a")
+    szf = zipfile.ZipFile(PathCompat.fsPath(TMP_DECOMPILE_APKFILE), "r")
+    zf = zipfile.ZipFile(PathCompat.fsPath(dstapk), "a")
 
     ###############################################################################
     #加密Apk时加入壳classes.dex
@@ -165,11 +166,11 @@ def addloader(dstapk):
         #将原classes.dex文件压缩改名后写入assets文件夹
         Log.out("[Logging...] 正在拷贝 assets/%s" % DEX_ENCRYPTDATA)
         encryptdata_file = generate_encryptdata();
-        zf.write(encryptdata_file, "assets/%s" % DEX_ENCRYPTDATA, zipfile.ZIP_DEFLATED)
+        zf.write(PathCompat.fsPath(encryptdata_file), "assets/%s" % DEX_ENCRYPTDATA, zipfile.ZIP_DEFLATED)
 
         #将壳classes.dex文件写入
         Log.out("[Logging...] 正在拷贝 %s" % "classes.dex")
-        zf.write(Common.SHELL_DEX, "classes.dex")
+        zf.write(PathCompat.fsPath(Common.SHELL_DEX), "classes.dex")
     ###############################################################################
     #将修改后的AndroidManifest.xml写入
     Log.out("[Logging...] 正在拷贝 %s" % MANIFEST_FILE)
@@ -182,12 +183,12 @@ def addloader(dstapk):
 #清除临时文件夹
 def clear_tmp_folder():
     Log.out("[Logging...] 清除临时文件")
-    if (os.path.exists(TMP_DECOMPILE_FOLDER)):
-        shutil.rmtree(TMP_DECOMPILE_FOLDER)
-    if (os.path.exists(TMP_DECOMPILE_APKFILE)):
-        os.remove(TMP_DECOMPILE_APKFILE)
-    if (os.path.exists(DEX_ENCRYPTDATA)):
-        os.remove(DEX_ENCRYPTDATA)
+    if (os.path.exists(PathCompat.fsPath(TMP_DECOMPILE_FOLDER))):
+        shutil.rmtree(PathCompat.fsPath(TMP_DECOMPILE_FOLDER))
+    if (os.path.exists(PathCompat.fsPath(TMP_DECOMPILE_APKFILE))):
+        os.remove(PathCompat.fsPath(TMP_DECOMPILE_APKFILE))
+    if (os.path.exists(PathCompat.fsPath(DEX_ENCRYPTDATA))):
+        os.remove(PathCompat.fsPath(DEX_ENCRYPTDATA))
     return True
 
 #为生成的apk签名
@@ -213,15 +214,15 @@ def modifyapk(srcapk, dstapk):
     result = False
     length = len(functions)
     func_exec_pos = 0
-    if (os.path.exists(TRY_CONFIG)):
-        f = open(TRY_CONFIG, "r");
+    if (os.path.exists(PathCompat.fsPath(TRY_CONFIG))):
+        f = open(PathCompat.fsPath(TRY_CONFIG), "r");
         string = f.read()
         f.close()
         saveflag = eval(string)
         filename = saveflag["filename"]
         if (filename != None and filename == os.path.abspath(srcapk)):
             func_exec_pos = saveflag["function_pos"]
-        os.remove(TRY_CONFIG)
+        os.remove(PathCompat.fsPath(TRY_CONFIG))
 
     for item in range(0, length):
         if (item >= func_exec_pos):
@@ -229,7 +230,7 @@ def modifyapk(srcapk, dstapk):
             result = eval(functions[item])
             if (result == False):
                 savestr = '{"function_pos":%d,"filename":r"%s"}' % (item, os.path.abspath(srcapk))
-                fd = open(TRY_CONFIG, "w")
+                fd = open(PathCompat.fsPath(TRY_CONFIG), "w")
                 fd.write(savestr)
                 fd.close()
                 pause()
@@ -237,34 +238,34 @@ def modifyapk(srcapk, dstapk):
 
 #增加调试标记android:debuggable="true"
 def addDebuggable(srcapk, dstapk):
-    szf = zipfile.ZipFile(srcapk, "r")
+    szf = zipfile.ZipFile(PathCompat.fsPath(srcapk), "r")
     srcXml = "src_manifest.xml"
     dstXml = "AndroidManifest.xml"
-    f = open(srcXml, "wb")
+    f = open(PathCompat.fsPath(srcXml), "wb")
     f.write(szf.read("AndroidManifest.xml"));
     szf.close()
     f.close()
     #添加debuggable属性
     cmdlist = [Common.JAVA(), "-jar", Common.AXML_EDITOR, "-attr", "-i", "application", "package", "debuggable", "true", srcXml, dstXml]
     subprocess.call(cmdlist)
-    if (dstXml != None and os.path.exists(dstXml)):
+    if (dstXml != None and os.path.exists(PathCompat.fsPath(dstXml))):
         #生成新的apk
         generate_dstapk(dstapk)
         subprocess.call([Common.AAPT_BIN, "r", dstapk, dstXml], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        zf = zipfile.ZipFile(dstapk, "a")
-        zf.write(dstXml);
+        zf = zipfile.ZipFile(PathCompat.fsPath(dstapk), "a")
+        zf.write(PathCompat.fsPath(dstXml), dstXml);
         zf.close()
         #签名
         signapk_use_testkey(dstapk)
     else:
         Log.out("[Error...] 添加debuggable属性失败")
 
-    if (os.path.exists(srcXml)):
-        os.remove(srcXml)
-    if (os.path.exists(dstXml)):
-        os.remove(dstXml)
-    if (os.path.exists(dstapk)):
-        os.remove(dstapk)
+    if (os.path.exists(PathCompat.fsPath(srcXml))):
+        os.remove(PathCompat.fsPath(srcXml))
+    if (os.path.exists(PathCompat.fsPath(dstXml))):
+        os.remove(PathCompat.fsPath(dstXml))
+    if (os.path.exists(PathCompat.fsPath(dstapk))):
+        os.remove(PathCompat.fsPath(dstapk))
     Common.pause()
 
 def readEncryptArguement():
@@ -328,7 +329,7 @@ def checkArguement():
     if (len(APK_SRCFILE) < 4 or APK_SRCFILE[-4:].lower() != ".apk"):
         Log.out("[Logging...] %s 不是一个apk文件" % APK_SRCFILE)
         sys.exit(0)
-    if (os.path.exists(APK_SRCFILE) == False):
+    if (os.path.exists(PathCompat.fsPath(APK_SRCFILE)) == False):
         Log.out("[Logging...] 无法定位文件 %s" % APK_SRCFILE)
         sys.exit(0)
 

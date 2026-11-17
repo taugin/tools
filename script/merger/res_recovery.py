@@ -9,6 +9,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR) 
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Log
 import subprocess
 import shutil
@@ -23,7 +24,7 @@ STATIC_FIELD_RE = re.compile(".field public static final (.*?):I = (0x\d+)", 0)
 
 def adjust_match_rfile(f):
     static_fields = []
-    file = open(f, "r")
+    file = open(PathCompat.fsPath(f), "r")
     lines = file.readlines()
     if lines == None or len(lines) <= 0:
         return False
@@ -54,7 +55,7 @@ def adjust_match_rfile(f):
 def find_all_rfiles(smali_folder):
     '''查找疑似R文件'''
     rtmp = []
-    file_list = os.walk(smali_folder, True)
+    file_list = PathCompat.walk(smali_folder, True)
     for root, filedir, files in file_list:
         for file in files:
             tmpfile = os.path.join(root, file)
@@ -67,7 +68,7 @@ def update_layout_type(masterfolder, fromname, toname):
     '''还原layout资源'''
     update_layout_file = False
     resdir = os.path.join(masterfolder, "res")
-    alldir = os.listdir(resdir)
+    alldir = os.listdir(PathCompat.fsPath(resdir))
     layoutdir = []
     if (alldir != None and len(alldir) > 0):
         for d in alldir:
@@ -76,7 +77,7 @@ def update_layout_type(masterfolder, fromname, toname):
     for ldir in layoutdir:
         fromfile = os.path.join(masterfolder, "res", ldir, fromname + ".xml")
         tofile = os.path.join(masterfolder, "res", ldir, toname + ".xml")
-        if (os.path.exists(fromfile) and fromfile != tofile):
+        if (os.path.exists(PathCompat.fsPath(fromfile)) and fromfile != tofile):
             Log.out("Update layout res : %s --> %s" % (fromname, toname))
             Utils.movefile(fromfile, tofile)
             update_layout_file = True
@@ -85,12 +86,12 @@ def update_layout_type(masterfolder, fromname, toname):
 def update_attr_type(masterfolder, fromname, toname): 
     update_attr = False
     attr_file = os.path.join(masterfolder, "res", "values", "attrs.xml")
-    tree = ET.parse(attr_file)
+    tree = ET.parse(PathCompat.fsPath(attr_file))
     root = tree.getroot()
     attr_item = root.find("attr/[@name='%s']" % fromname)
     if attr_item != None:
         attr_item.attrib["name"] = toname
-        tree.write(attr_file, encoding='utf-8', xml_declaration=True)
+        tree.write(PathCompat.fsPath(attr_file), encoding='utf-8', xml_declaration=True)
         update_attr = True
         Log.out("Update attr res : %s --> %s" % (fromname, toname))
     return update_attr
@@ -119,9 +120,9 @@ def update_rfiles(masterfolder, rfile, pubroot):
 
 def update_all_rfiles(masterfolder):
     publicxml = os.path.join(masterfolder, "res", "values", "public.xml")
-    if (not os.path.exists(publicxml)):
+    if (not os.path.exists(PathCompat.fsPath(publicxml))):
         return
-    tree = ET.parse(publicxml)
+    tree = ET.parse(PathCompat.fsPath(publicxml))
     pubroot = tree.getroot()
 
     smali_folder = os.path.join(masterfolder, "smali")
@@ -136,7 +137,7 @@ def update_all_rfiles(masterfolder):
         for rfile in all_rfiles:
             update_rfiles(masterfolder, rfile, pubroot)
 
-    tree.write(publicxml, encoding='utf-8', xml_declaration=True)
+    tree.write(PathCompat.fsPath(publicxml), encoding='utf-8', xml_declaration=True)
 #================================================================================
 def find_name_value_pair(field):
     '''查找常量字段名称和值'''
@@ -153,7 +154,7 @@ def find_name_value_pair(field):
 def find_all_static_fields(rfile):
     '''查询R文件的所有常量'''
     all_static_fields = []
-    f = open(rfile, "r")
+    f = open(PathCompat.fsPath(rfile), "r")
     lines = f.readlines()
     f.close()
     for line in lines:
@@ -177,7 +178,7 @@ def find_map_between_public_and_rfile(pubroot, rfile):
 def generate_mapping(masterfolder, all_rfiles):
     '''生成混淆映射表'''
     pubxml = os.path.join(masterfolder, "res", "values", "public.xml")
-    tree = ET.parse(pubxml)
+    tree = ET.parse(PathCompat.fsPath(pubxml))
     root = tree.getroot()
     map_dict = {}
     for rfile in all_rfiles:
@@ -188,7 +189,7 @@ def generate_mapping(masterfolder, all_rfiles):
 def rename_all_files(masterfolder, map_dict = None):
     Log.out("[Logging...] 更新资源文件名称")
     resdir = os.path.join(masterfolder, "res")
-    mylist = os.walk(resdir, True)
+    mylist = PathCompat.walk(resdir, True)
     for root, filedir, files in mylist:
         for file in files:
             dirroot = os.path.basename(root)
@@ -206,16 +207,16 @@ def rename_all_files(masterfolder, map_dict = None):
 def update_public_file(masterfolder, map_dict):
     Log.out("[Logging...] 更新public文件")
     attrs_file = os.path.join(masterfolder, "res", "values", "public.xml")
-    tree = ET.parse(attrs_file)
+    tree = ET.parse(PathCompat.fsPath(attrs_file))
     root = tree.getroot()
-    for child in root.getchildren():
+    for child in list(root):
         obfname = child.attrib["name"]
         restype = child.attrib["type"]
         map_value = map_value = get_map_value(obfname, restype, map_dict)
         if map_value != None and len(map_value) > 0:
             srcname = map_value[0]
             child.attrib["name"] = srcname
-    tree.write(attrs_file, encoding='utf-8', xml_declaration=True)
+    tree.write(PathCompat.fsPath(attrs_file), encoding='utf-8', xml_declaration=True)
 
 def get_map_value(obfname, restype, map_dict):
     map_value = None
@@ -236,20 +237,20 @@ def walk_xml_data(root, map_dict, file):
     attrib = root.attrib
     text = root.text and root.text.strip()
     process_xml(root, tag, attrib, text, map_dict, file)
-    children_nodes = root.getchildren()
+    children_nodes = list(root)
     if children_nodes != None and len(children_nodes) > 0:
         for child in children_nodes:
             walk_xml_data(child, map_dict, file)
 
 def traversal_res(masterfolder, map_dict = None):
     resdir = os.path.join(masterfolder, "res")
-    mylist = os.walk(resdir, True)
+    mylist = PathCompat.walk(resdir, True)
     for root, filedir, files in mylist:
         for file in files:
             if not file.endswith(".xml"):
                 continue
             tmpfile = os.path.join(root, file)
-            tree = ET.parse(tmpfile)
+            tree = ET.parse(PathCompat.fsPath(tmpfile))
             walk_xml_data(tree.getroot(), map_dict, tmpfile)
 
 def res_recovery(masterfolder):

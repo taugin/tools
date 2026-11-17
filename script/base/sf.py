@@ -20,6 +20,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Utils
 import Log
 import Common
@@ -96,7 +97,7 @@ def file_sign_info(keystorefilepath):
 
     global apk_info
     keystorepath = os.path.normpath(os.path.join(filedir, keystorefile))
-    if Common.KEYTOOL == None or len(Common.KEYTOOL) <= 0 or not os.path.exists(Common.KEYTOOL):
+    if Common.KEYTOOL == None or len(Common.KEYTOOL) <= 0 or not os.path.exists(PathCompat.fsPath(Common.KEYTOOL)):
         Log.out("[Logging...] 签名程序路径 : 无法找到签名文件 [keytool]")
     else:
         p = subprocess.Popen([Common.KEYTOOL, "-v", "-list", "-keystore", keystorepath, "-storepass", keystorepass], stdout=subprocess.PIPE)
@@ -117,7 +118,7 @@ def md5_classes(apkFile):
     '''    输出classes.dex的MD5    '''
     global apk_info
     signfile = ""
-    z = zipfile.ZipFile(apkFile, "r")
+    z = zipfile.ZipFile(PathCompat.fsPath(apkFile), "r")
     for f in z.namelist():
         if (f == "classes.dex"):
             signfile = f
@@ -133,10 +134,10 @@ def printsign_md5_with_jarsigner(apkFile):
     keytool = Common.find_keytool_version_180()
     if keytool == None or len(keytool) <= 0:
         keytool = Common.KEYTOOL
-    if keytool == None or len(keytool) <= 0 or not os.path.exists(keytool):
+    if keytool == None or len(keytool) <= 0 or not os.path.exists(PathCompat.fsPath(keytool)):
         Log.out("[Logging...] 签名程序路径 : 无法找到签名文件 [keytool]")
         return
-    if apkFile != None and os.path.exists(apkFile):
+    if apkFile != None and os.path.exists(PathCompat.fsPath(apkFile)):
         cmdlist = [keytool, "-printcert", "-jarfile", apkFile]
         Utils.printExecCmdString(cmdlist)
         process = subprocess.Popen(cmdlist, stdout=subprocess.PIPE, shell=False)
@@ -364,12 +365,12 @@ def printsign_md5_with_meta_inf(apkFile):
                 cert_offset = cert_end
         return None
 
-    if apkFile == None or not os.path.exists(apkFile):
+    if apkFile == None or not os.path.exists(PathCompat.fsPath(apkFile)):
         return
 
     cert_bytes = None
     try:
-        with zipfile.ZipFile(apkFile, "r") as zf:
+        with zipfile.ZipFile(PathCompat.fsPath(apkFile), "r") as zf:
             sign_files = []
             for file_name in zf.namelist():
                 upper_name = file_name.upper()
@@ -691,10 +692,10 @@ def check_ad_network(activities):
         android_dir = os.path.normpath(os.path.join(curdir, "..", "android"))
         ad_info_file = os.path.join(android_dir, "ad_info.json")
 
-        if not os.path.exists(ad_info_file):
+        if not os.path.exists(PathCompat.fsPath(ad_info_file)):
             return []
 
-        with open(ad_info_file, "r", encoding="utf-8") as f:
+        with open(PathCompat.fsPath(ad_info_file), "r", encoding="utf-8") as f:
             ad_info_json = json.load(f)
 
         hit_platforms = set()
@@ -759,8 +760,8 @@ def readapkinfo(apkFile, function):
 
 def processapk(args, function):
     for file in args:
-        if (os.path.isdir(file)):
-            listfiles = os.listdir(file)
+        if (os.path.isdir(PathCompat.fsPath(file))):
+            listfiles = os.listdir(PathCompat.fsPath(file))
             for apkfile in listfiles:
                 apkpath = os.path.join(file, apkfile)
                 apkname, ext = os.path.splitext(apkpath)
@@ -775,18 +776,18 @@ def processapk(args, function):
 def processFileMd5(args):
     global apk_info
     for file in args:
-        if (os.path.isdir(file)):
-            listfiles = os.listdir(file)
+        if (os.path.isdir(PathCompat.fsPath(file))):
+            listfiles = os.listdir(PathCompat.fsPath(file))
             for apkfile in listfiles:
                 apkpath = os.path.join(file, apkfile)
-                if (os.path.isfile(os.path.abspath(apkpath))):
+                if (os.path.isfile(PathCompat.fsPath(os.path.abspath(apkpath)))):
                     apk_info["apk_file"] = os.path.abspath(apkpath)
                     file_md5(os.path.abspath(apkpath))
                     file_sh1(os.path.abspath(apkpath))
                     file_sh256(os.path.abspath(apkpath))
                     file_sign_info(os.path.abspath(apkpath))
         else:
-            if (os.path.isfile(os.path.abspath(file))):
+            if (os.path.isfile(PathCompat.fsPath(os.path.abspath(file)))):
                 apk_info["apk_file"] = os.path.abspath(file)
                 file_md5(os.path.abspath(file))
                 file_sh1(os.path.abspath(file))
@@ -859,7 +860,7 @@ def file_sh256(strFile):
 def file_size(strFile):
     """计算文件大小"""
     try:
-        size = os.path.getsize(strFile)
+        size = os.path.getsize(PathCompat.fsPath(strFile))
         apk_info["apk_size"] = formatSize(size)
     except:
         pass
@@ -877,7 +878,7 @@ def string_md5(srcStr):
 def check_arg(args):
     if (len(args) > 0):
         for arg in args:
-            if (os.path.isfile(arg) == False and os.path.isdir(arg) == False):
+            if (os.path.isfile(PathCompat.fsPath(arg)) == False and os.path.isdir(PathCompat.fsPath(arg)) == False):
                 Log.out("[Logging...] 此文件不存在 : {}".format(os.path.abspath(arg)))
                 args.remove(arg)
     Log.out("")
@@ -1003,14 +1004,14 @@ def install_multiple_apks(xapk, apks):
 def install_xapk(args):
     if (len(args) > 0):
         basefilename, ext = os.path.splitext(os.path.basename(args[0]))
-        if not os.path.exists(basefilename):
-            os.mkdir(basefilename)
-        zf = zipfile.ZipFile(os.path.abspath(args[0]), "r")
+        if not os.path.exists(PathCompat.fsPath(basefilename)):
+            os.mkdir(PathCompat.fsPath(basefilename))
+        zf = zipfile.ZipFile(PathCompat.fsPath(os.path.abspath(args[0])), "r")
         apklist = []
         for file in zf.namelist():
             if (file != None and file.endswith(".apk")):
                 apklist += [os.path.join(os.getcwd(), basefilename, file)]
-                zf.extract(file, basefilename)
+                zf.extract(file, PathCompat.fsPath(basefilename))
         install_multiple_apks(args[0], apklist)
         Log.out("[Logging...] 删除临时文件 : %s" % basefilename)
         Utils.deletedir(basefilename)
@@ -1021,25 +1022,25 @@ def print_xml(args):
     manifest = ""
     if (len(args) > 0):
         if (len(args[0]) >= 4 and args[0][-4:] == ".apk"):
-            zf = zipfile.ZipFile(os.path.abspath(args[0]), "r")
+            zf = zipfile.ZipFile(PathCompat.fsPath(os.path.abspath(args[0])), "r")
             for file in zf.namelist():
                 if (file == "AndroidManifest.xml"):
                     manifest = file
                     break
             if (manifest != ""):
                 tmpfile = os.path.basename(manifest)
-                f = open(tmpfile, "wb")
+                f = open(PathCompat.fsPath(tmpfile), "wb")
                 f.write(zf.read(manifest))
                 f.close()
                 cmd = [Common.JAVA(), "-jar", Common.AXMLPRINTER_JAR, tmpfile]
                 subprocess.call(cmd)
-                os.remove(tmpfile)
+                os.remove(PathCompat.fsPath(tmpfile))
             zf.close()
 
 
 def readpkgnamefromxapk(xapk_path):
     try:
-        zf = zipfile.ZipFile(xapk_path, "r")
+        zf = zipfile.ZipFile(PathCompat.fsPath(xapk_path), "r")
         content = zf.read("manifest.json")
         zf.close()
         import json

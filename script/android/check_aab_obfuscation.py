@@ -5,6 +5,10 @@
 该脚本不依赖 androguard、Android SDK 或 Java，直接读取 AAB 中的 DEX 表。
 结果是基于标识符名称的静态估算值，不等同于 Google Play 内部指标。
 """
+import sys as _pathSys
+from pathlib import Path as _Path
+_pathSys.path.append(str(_Path(__file__).resolve().parents[1] / "common"))
+import PathCompat
 
 import argparse
 import hashlib
@@ -403,7 +407,7 @@ def render_html(report, output_path):
            overall=stats["obfuscation_percentage"], threshold=report["threshold_percentage"],
            source=html.escape(report["source"]), rows="".join(rows),
            comparison_rows="".join(comparison_rows))
-    output_path.write_text(html_text, encoding="utf-8")
+    Path(PathCompat.fsPath(output_path)).write_text(html_text, encoding="utf-8")
 
 
 def main():
@@ -416,7 +420,7 @@ def main():
     if not args.aab.is_file():
         parser.error("AAB 文件不存在：{}".format(args.aab))
     try:
-        with zipfile.ZipFile(args.aab) as bundle:
+        with zipfile.ZipFile(PathCompat.fsPath(args.aab)) as bundle:
             dex_names = sorted(name for name in bundle.namelist()
                                if re.match(r"(?:[^/]+/)*classes(?:\d+)?\.dex$", name))
             if not dex_names:

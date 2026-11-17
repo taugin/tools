@@ -13,6 +13,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR)
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Common
 import Log
 
@@ -39,7 +40,7 @@ def should_copyslaveapkfile(name):
     return True
 
 def get_lib_dirs(mergedapk):
-    mergedzip = zipfile.ZipFile(mergedapk, "r")
+    mergedzip = zipfile.ZipFile(PathCompat.fsPath(mergedapk), "r")
     liblist = []
     for name in mergedzip.namelist():
         if (name.startswith("lib")):
@@ -59,9 +60,9 @@ def should_copyslaveapklibfile(name, liblist):
 #从从源apk中拷贝文件
 def copy_slaveapk(mergedapk, slaveapk):
     Log.out("[Logging...] 拷贝从源文件", True)
-    mergedzip = zipfile.ZipFile(mergedapk, "a")
+    mergedzip = zipfile.ZipFile(PathCompat.fsPath(mergedapk), "a")
     liblist = get_lib_dirs(mergedapk)
-    slavezip = zipfile.ZipFile(slaveapk, "r")
+    slavezip = zipfile.ZipFile(PathCompat.fsPath(slaveapk), "r")
     for name in slavezip.namelist():
         should_copy = should_copyslaveapkfile(name)
         should_copy_lib = should_copyslaveapklibfile(name, liblist)
@@ -98,8 +99,8 @@ def exists_in_masterapk(zip, name):
 #从主源apk中拷贝文件
 def copy_masterapk(mergedapk, masterapk):
     Log.out("[Logging...] 拷贝主源文件", True)
-    mergedzip = zipfile.ZipFile(mergedapk, "a")
-    masterzip = zipfile.ZipFile(masterapk, "r")
+    mergedzip = zipfile.ZipFile(PathCompat.fsPath(mergedapk), "a")
+    masterzip = zipfile.ZipFile(PathCompat.fsPath(masterapk), "r")
     for name in masterzip.namelist():
         shouldcopy = should_copymasterapkfile(name)
         exists_in = exists_in_masterapk(mergedzip, name)
@@ -111,18 +112,18 @@ def copy_masterapk(mergedapk, masterapk):
 #将从源apk中的classes.dex文件，压缩成Common.PAY_STUBDATA，并且放置到合并的apk
 #的assets文件夹内
 def generate_slave(mergedapk, slaveapk):
-    slavezip = zipfile.ZipFile(slaveapk, "r")
+    slavezip = zipfile.ZipFile(PathCompat.fsPath(slaveapk), "r")
     tmpzipfile = "tmp.apk"
-    tmpzip = zipfile.ZipFile(tmpzipfile, "w")
+    tmpzip = zipfile.ZipFile(PathCompat.fsPath(tmpzipfile), "w")
     tmpzip.writestr("classes.dex", slavezip.read("classes.dex"), zipfile.ZIP_DEFLATED)
     slavezip.close()
     tmpzip.close()
 
-    mergedzip = zipfile.ZipFile(mergedapk, "a")
-    mergedzip.write(tmpzipfile, Common.PAY_STUBDATA, zipfile.ZIP_DEFLATED)
+    mergedzip = zipfile.ZipFile(PathCompat.fsPath(mergedapk), "a")
+    mergedzip.write(PathCompat.fsPath(tmpzipfile), Common.PAY_STUBDATA, zipfile.ZIP_DEFLATED)
     mergedzip.close()
-    if (os.path.exists(tmpzipfile)):
-        os.remove(tmpzipfile)
+    if (os.path.exists(PathCompat.fsPath(tmpzipfile))):
+        os.remove(PathCompat.fsPath(tmpzipfile))
 
 ## Get pretty look
 #美化xml文件
@@ -140,13 +141,13 @@ def indent(elem, level=0):
     return elem
 
 def merge_apkfile(mergedapk, masterapk, slaveapk, company_name):
-    if (os.path.exists(mergedapk) == False):
+    if (os.path.exists(PathCompat.fsPath(mergedapk)) == False):
         Log.out("[Logging...] 无法定位文件 %s" % mergedapk, True)
         sys.exit(0)
-    if (os.path.exists(masterapk) == False):
+    if (os.path.exists(PathCompat.fsPath(masterapk)) == False):
         Log.out("[Logging...] 无法定位文件 %s" % masterapk, True)
         sys.exit(0)
-    if (os.path.exists(slaveapk) == False):
+    if (os.path.exists(PathCompat.fsPath(slaveapk)) == False):
         Log.out("[Logging...] 无法定位文件 %s" % slaveapk, True)
         sys.exit(0)
 

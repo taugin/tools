@@ -8,6 +8,7 @@ COM_DIR = os.path.join(DIR, "..", "common")
 COM_DIR = os.path.normpath(COM_DIR) 
 sys.path.append(COM_DIR)
 
+import PathCompat
 import Common
 import Log
 import Utils
@@ -89,7 +90,7 @@ def getpackagename(file):
 
 def deletemetainf(src_apk):
     signfilelist = []
-    z = zipfile.ZipFile(src_apk, "r")
+    z = zipfile.ZipFile(PathCompat.fsPath(src_apk), "r")
     for file in z.namelist():
         if ((file.startswith("META-INF") and (file.endswith(".RSA") or file.endswith(".SF") or file.endswith(".MF")))):
             signfilelist.append(file)
@@ -107,7 +108,7 @@ def deletemetainf(src_apk):
 def signapk_with_jarsigner(src_apk, tmp_apk, aligned_apk, dst_apk, keystoreinfo):
     Log.out("")
     alignapk(src_apk, tmp_apk)
-    if not os.path.exists(tmp_apk):
+    if not os.path.exists(PathCompat.fsPath(tmp_apk)):
         tmp_apk = src_apk
     deletemetainf(tmp_apk)
     Log.out("[Signing...] 执行签名 : %s -> %s" % (os.path.basename(tmp_apk), os.path.basename(dst_apk)), True)
@@ -121,7 +122,7 @@ def signapk_with_jarsigner(src_apk, tmp_apk, aligned_apk, dst_apk, keystoreinfo)
             Log.out("[Signing...] 签名失败", True)
             pause()
     else:
-        if Common.JARSIGNER == None or len(Common.JARSIGNER) < 0 or not os.path.exists(Common.JARSIGNER):
+        if Common.JARSIGNER == None or len(Common.JARSIGNER) < 0 or not os.path.exists(PathCompat.fsPath(Common.JARSIGNER)):
             Log.out("[Signing...] 签名失败 : 无法找到签名文件 [jarsigner]", True)
             return
         Log.out("[Logging...] 签名信息 : [jarsigner] keystore : [%s], storepass : [%s] , keyalias : [%s], keypass : [%s]" % (os.path.basename(keystoreinfo[0]),keystoreinfo[1], keystoreinfo[2], keystoreinfo[3]), True)
@@ -200,7 +201,7 @@ def signapk_with_apksigner(src_apk, tmp_apk, aligned_apk, dst_apk, keystoreinfo)
 def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
     global OUTPUT_SIGNED_APK
     Log.out("[Logging...] APK 文件 : [%s]" % src_apk, True)
-    if not os.path.exists(src_apk):
+    if not os.path.exists(PathCompat.fsPath(src_apk)):
         Log.out("[Logging...] 文件丢失", True)
         return False
     name,ext = os.path.splitext(src_apk)
@@ -244,7 +245,7 @@ def exec_sign_process(src_apk, USE_TESTSIGN_FILE):
         pass
 
 def readkeystore(src_apk, filedir):
-    listfile=os.listdir(filedir)
+    listfile=os.listdir(PathCompat.fsPath(filedir))
     storefiles = []
     #Log.out(listfile)
     index = 0
@@ -259,9 +260,9 @@ def readkeystore(src_apk, filedir):
         packagename = getpackagename(src_apk)
         if (packagename != None and len(packagename) > 0):
             pkg_storefile = os.path.join(Common.KEYSTORES_DIR, "appsignfiles", packagename)
-            if (pkg_storefile != None and os.path.isdir(pkg_storefile)):
+            if (pkg_storefile != None and os.path.isdir(PathCompat.fsPath(pkg_storefile))):
                 Log.out("[Logging...] 文件包名 : [%s]" % packagename)
-                listfile=os.listdir(pkg_storefile)
+                listfile=os.listdir(PathCompat.fsPath(pkg_storefile))
                 #Log.out(listfile)
                 index = 0
                 storeindex = 0
@@ -308,7 +309,7 @@ def readkeystore(src_apk, filedir):
 
     keystorepath = os.path.normpath(os.path.join(filedir, keystorefile))
 
-    if Common.KEYTOOL == None or len(Common.KEYTOOL) <= 0 or not os.path.exists(Common.KEYTOOL):
+    if Common.KEYTOOL == None or len(Common.KEYTOOL) <= 0 or not os.path.exists(PathCompat.fsPath(Common.KEYTOOL)):
         Log.out("[Logging...] 验签失败 : 无法找到签名文件 [keytool]")
     else:
         process = subprocess.Popen([Common.KEYTOOL, "-list", "-keystore", keystorepath, "-storepass", keystorepass], stdout=subprocess.PIPE)
@@ -328,7 +329,7 @@ def exec_align_process(src_apk):
     global OUTPUT_SIGNED_APK
     Log.out("[Logging...] APK 文件 : [%s]" % src_apk, True)
 
-    if not os.path.exists(src_apk):
+    if not os.path.exists(PathCompat.fsPath(src_apk)):
         Log.out("[Logging...] 文件丢失", True)
         return False
 
@@ -379,8 +380,8 @@ if __name__ == "__main__":
             USE_JARSIGNER = True
     if (ALIGN_APK == True):
         for file in args :
-            if (os.path.isdir(file)):
-                listfiles = os.listdir(file)
+            if (os.path.isdir(PathCompat.fsPath(file))):
+                listfiles = os.listdir(PathCompat.fsPath(file))
                 for apkfile in listfiles :
                     apkpath = file + Common.SEPERATER + apkfile
                     if (len(apkpath) >= 4 and apkpath[-4:] == ".apk"):
@@ -390,8 +391,8 @@ if __name__ == "__main__":
                     exec_align_process(os.path.abspath(file))
     else:
         for file in args :
-            if (os.path.isdir(file)):
-                listfiles = os.listdir(file)
+            if (os.path.isdir(PathCompat.fsPath(file))):
+                listfiles = os.listdir(PathCompat.fsPath(file))
                 for apkfile in listfiles :
                     apkpath = file + Common.SEPERATER + apkfile
                     if (len(apkpath) >= 4 and (apkpath[-4:] == ".apk" or apkpath[-4:] == ".aab")):
