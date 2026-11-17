@@ -19,7 +19,7 @@ def out(msg, show=True, end="\n"):
         return
     if (show):
         try:
-            print(msg, end=end)
+            print(msg, end=end, flush=True)
         except:
             pass
 

@@ -4,7 +4,8 @@ import subprocess
 import sys
 import os
 import re
-from time import sleep
+import unicodedata
+from time import sleep, monotonic
 import zipfile
 #引入别的文件夹的模块
 DIR = os.path.dirname(sys.argv[0])
@@ -183,15 +184,29 @@ def modify_axml_file(main_apk_dir):
     Log.out("")
 
 def remove_check_licence(main_apk_dir):
-    # Windows 长路径需要扩展路径前缀，目录遍历和文件读写使用同一路径。
-    if os.name == "nt":
-        main_apk_dir = os.path.abspath(main_apk_dir)
-        if not main_apk_dir.startswith("\\\\?\\"):
-            if main_apk_dir.startswith("\\\\"):
-                main_apk_dir = "\\\\?\\UNC\\" + main_apk_dir[2:]
-            else:
-                main_apk_dir = "\\\\?\\" + main_apk_dir
     Log.out("[Logging...] 注释许可检查")
+    started_at = monotonic()
+    last_progress_at = started_at
+    scanned_count = 0
+    progress_visible = False
+    progress_width = 0
+
+    def update_progress(message):
+        nonlocal progress_visible, progress_width
+        # 覆盖同一行，并清除较长的上一条状态留下的字符。
+        width = sum(2 if unicodedata.east_asian_width(char) in ("W", "F") else 1 for char in message)
+        Log.out("\r" + message + " " * max(0, progress_width - width) + "\r", end="")
+        progress_visible = True
+        progress_width = width
+
+    def finish_progress():
+        nonlocal progress_visible, progress_width
+        # 普通日志另起一行，避免覆盖进度或与进度拼接。
+        if progress_visible:
+            Log.out("")
+            progress_visible = False
+            progress_width = 0
+    target_method = "Lcom/pairip/licensecheck/LicenseClient;->checkLicense(Landroid/content/Context;)V"
     call_pattern = re.compile(
         r"^(\s*)invoke-static(?:/range)?\s+\{[^}]*\},\s*"
         r"Lcom/pairip/licensecheck/LicenseClient;->checkLicense\(Landroid/content/Context;\)V"
@@ -202,15 +217,31 @@ def remove_check_licence(main_apk_dir):
         smali_dir = os.path.join(main_apk_dir, directory)
         if not directory.startswith("smali") or not os.path.isdir(PathCompat.fsPath(smali_dir)):
             continue
-        for root, dirs, files in PathCompat.walk(smali_dir):
+        # 只显示目录名，避免完整路径过长导致终端自动折行。
+        update_progress(f"[Logging...] 开始扫描文件 : [{directory}]")
+        # 遍历失败必须暴露，避免跳过目录后仍显示处理完成。
+        def on_walk_error(error):
+            raise error
+        for root, dirs, files in PathCompat.walk(smali_dir, onerror=on_walk_error):
             for filename in files:
                 if not filename.endswith(".smali"):
                     continue
                 file_path = os.path.join(root, filename)
+                now = monotonic()
+                if now - last_progress_at >= 2:
+                    update_progress(f"[Logging...] 正在扫描文件 : 已扫描 {scanned_count} 个 Smali，已修改 {modified_count} 处，耗时 {now - started_at:.1f}s")
+                    last_progress_at = now
                 with open(PathCompat.fsPath(file_path), "r", encoding="utf-8", newline="") as smali_file:
-                    lines = smali_file.readlines()
+                    content = smali_file.read()
+                scanned_count += 1
+                # 大多数文件无目标调用，先快速筛选，避免逐行创建对象和执行正则。
+                if target_method not in content:
+                    continue
+                lines = content.splitlines(keepends=True)
                 file_count = 0
                 for index, line in enumerate(lines):
+                    if target_method not in line:
+                        continue
                     match = call_pattern.fullmatch(line.rstrip("\r\n"))
                     if match is not None:
                         # 保留缩进、原始指令和换行，已注释的调用不会重复处理。
@@ -221,8 +252,10 @@ def remove_check_licence(main_apk_dir):
                     with open(PathCompat.fsPath(file_path), "w", encoding="utf-8", newline="") as smali_file:
                         smali_file.writelines(lines)
                     modified_count += file_count
+                    finish_progress()
                     Log.out(f"[Logging...] 注释许可调用 : [{file_path}] : {file_count}")
-    Log.out(f"[Logging...] 注释调用次数 : {modified_count}\n")
+    finish_progress()
+    Log.out(f"[Logging...] 注释调用次数 : {modified_count}，已扫描 {scanned_count} 个 Smali，耗时 {monotonic() - started_at:.1f}s\n")
 
 
 def recompile_main_apk(main_apk_dir, final_main_apk):

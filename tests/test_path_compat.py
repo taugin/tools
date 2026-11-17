@@ -135,6 +135,37 @@ class LongPathIoTest(unittest.TestCase):
         merged = ET.parse(PathCompat.fsPath(os.path.join(master, "res", "values", "strings.xml")))
         self.assertEqual({item.attrib["name"] for item in merged.getroot()}, {"first", "second"})
 
+    def test_smali_scan_progress_and_repeat(self):
+        script = Path(__file__).resolve().parents[1] / "script" / "android" / "apks2apk.py"
+        with patch.dict(sys.modules, {"Common": types.ModuleType("Common")}):
+            functions = runpy.run_path(str(script))
+        smali_dir = os.path.join(self.source, "smali_classes2")
+        os.makedirs(PathCompat.fsPath(smali_dir))
+        target = "Lcom/pairip/licensecheck/LicenseClient;->checkLicense(Landroid/content/Context;)V"
+        content = "    invoke-static {v0}, " + target + "\r\n"
+        matching = os.path.join(smali_dir, "Matching.smali")
+        other = os.path.join(smali_dir, "Other.smali")
+        with open(PathCompat.fsPath(matching), "w", encoding="utf-8", newline="") as stream:
+            stream.write(content)
+        with open(PathCompat.fsPath(other), "w", encoding="utf-8", newline="") as stream:
+            stream.write("    return-void\r\n" * 1000)
+        # 使用可控时钟验证长时间扫描也会报告进度。
+        namespace = functions["remove_check_licence"].__globals__
+        ticks = iter(range(0, 100, 3))
+        output = io.StringIO()
+        with patch.dict(namespace, {"monotonic": lambda: next(ticks)}), contextlib.redirect_stdout(output):
+            functions["remove_check_licence"](self.source)
+        self.assertIn("\r[Logging...] 正在扫描文件", output.getvalue())
+        self.assertIn("已扫描 2 个 Smali", output.getvalue())
+        with open(PathCompat.fsPath(matching), "r", encoding="utf-8", newline="") as stream:
+            self.assertEqual(stream.read(), "    # " + content[4:])
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            functions["remove_check_licence"](self.source)
+        self.assertIn("注释调用次数 : 0", output.getvalue())
+        with open(PathCompat.fsPath(other), "r", encoding="utf-8", newline="") as stream:
+            self.assertEqual(stream.read(), "    return-void\r\n" * 1000)
+
 
 if __name__ == "__main__":
     unittest.main()
